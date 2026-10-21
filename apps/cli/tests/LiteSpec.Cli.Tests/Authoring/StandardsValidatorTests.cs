@@ -58,6 +58,25 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/tutorial/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TutorialPage, "## What you built", "## Verification")),
         ["PAGE_MISSING_SECTION", "PAGE_UNKNOWN_SECTION"]);
 
+    [Fact(DisplayName = "analyzer rule page and analyzer procedure pass")]
+    public void AnalyzerPagesPass() => Check(
+        root =>
+        {
+            StandardsFixture.Write(root, "docs/analyzers/rules/sample.md", StandardsFixture.ReferencePage);
+            StandardsFixture.Write(root, "docs/analyzers/sample.md", StandardsFixture.GuidePage);
+        },
+        []);
+
+    [Fact(DisplayName = "analyzer rule page written as a procedure")]
+    public void AnalyzerRuleAsProcedure() => Check(
+        root => StandardsFixture.Write(root, "docs/analyzers/rules/sample.md", StandardsFixture.GuidePage),
+        ["PAGE_MISSING_SECTION"]);
+
+    [Fact(DisplayName = "example page without an Intent")]
+    public void ExamplePageWithoutIntent() => Check(
+        root => StandardsFixture.Write(root, "docs/example/sample.md", "# Sample Example\n\n## The product\n\nA library lends copies.\n"),
+        ["PAGE_MISSING_SECTION"]);
+
     [Fact(DisplayName = "reference page carrying an unknown section")]
     public void ReferenceWithUnknownSection() => Check(
         root => StandardsFixture.Write(root, "docs/reference/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.ReferencePage, "## Notes", "## Procedure")),

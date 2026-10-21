@@ -2,7 +2,7 @@
 
 ## Intent
 
-This page follows one use case from its written record to its code and back, to show how LiteSpec's parts fit together. The example is a small library system, the same one the model builder's own tests use.
+LiteSpec connects what a team writes down about a product with the code that implements it, and checks that the two still agree. This page shows that connection on Expenses, the example product in `examples/expenses/` where employees submit work expenses with receipts, following the Submit expense use case from its written record to the code that implements it and the check that confirms they match.
 
 ## The parts
 
@@ -13,81 +13,80 @@ LiteSpec has four parts. Each one answers a different question.
 | The standard | The pages under `docs/` in the LiteSpec repository, pinned at a release | How do we build? |
 | Records | Short Markdown pages in your project, each with a small JSON header | What do we build, and why? |
 | The model | A file the `litespec model` command computes from your records and code | Does what we built match what we wrote? |
-| The tools | The `litespec` command line | Is everything consistent, and what's missing? |
+| The tools | The `litespec` command line | Is everything consistent, and what is missing? |
 
-Your project pins one LiteSpec release, usually as a Git submodule at `litespec/`. The release never changes under you: when you want a newer one, you move the pin.
+Your project pins one LiteSpec release, usually as a Git submodule at `litespec/`. The pinned release never changes under you. When you want a newer one, you move the pin.
 
 The diagram below shows how the four parts connect in a loop, with the checks sending their findings back to the records.
 
 ![The standard governs the records, the records are implemented by code and tests, the build reads code into the model, and the checks send findings back to the records.](../assets/diagrams/learn-how-it-works.svg)
 
-## A use case, end to end
+## A use case from record to code
 
-Say a library lets readers borrow copies of books. In LiteSpec, that operation is a **use case**, and it has a record.
+Expenses lets employees submit work expenses with receipts. In LiteSpec, that operation is a use case: one command or query with its permissions, results, and cases.
 
-### 1. You write the record
+### 1. The written record
 
-The record lives in your project at `docs/domain/modules/lending/loans/borrow-copy.md`. Its JSON header says what the use case is, who owns it, and how it connects to other records:
+The record lives in the project at `docs/domain/modules/spending/expenses/submit-expense.md`. Its JSON header states what the use case is, who owns it, and how it connects to other records:
 
 ```json
 {
   "type": "use-case",
-  "id": "use-case/lending.borrow-copy",
-  "title": "Borrow copy",
-  "owner": "lending-team",
+  "id": "use-case/spending.submit-expense",
+  "title": "Submit expense",
+  "owner": "expenses-team",
   "status": "approved",
   "operation": "command",
-  "needs": ["permission/borrow-copy"],
-  "reachedThrough": ["entry-point/library-app"],
-  "raises": ["event/loan.loan-borrowed"],
-  "fulfills": ["requirement/borrowing.max-active-loans"],
-  "results": ["result/borrow-copy.borrowed", "result/borrow-copy.copy-unavailable"]
+  "needs": ["permission/submit-expense"],
+  "reachedThrough": ["entry-point/expenses-app"],
+  "raises": ["event/expense.expense-submitted"],
+  "fulfills": ["requirement/approval.receipt-over-threshold"]
 }
 ```
 
-Read it as a set of facts: borrowing a copy is a command; it needs the `borrow-copy` permission; readers reach it through the library app; it raises a `loan-borrowed` event; it exists to satisfy a requirement about how many active loans a reader may have; and it ends in one of two results. The body of the page says the rest in plain words: "A reader borrows an available copy."
+Read it as a set of facts: submitting an expense is a command, a message that changes business state; it needs the `submit-expense` permission, one allowed action from the shared list; employees reach it through the expenses app; it raises an `expense-submitted` event, one statement that the submission completed; and it exists to satisfy a requirement that an expense above the receipt threshold carries a receipt. The body of the page says the rest in plain words: "An employee submits a work expense."
 
-Each result is a record too. The refusal names the HTTP status and the stable failure code the API returns:
+Each result is a record too: one way the use case ends. The refusal names the HTTP status and the stable failure code the API returns:
 
 ```json
 {
   "type": "result",
-  "id": "result/borrow-copy.copy-unavailable",
+  "id": "result/submit-expense.receipt-missing",
   "outcome": "refusal",
-  "code": "failure/lending.copy_not_available",
-  "httpStatus": 409,
-  "meaning": "The copy is unavailable."
+  "code": "failure/spending.receipt_missing",
+  "httpStatus": 422,
+  "meaning": "The expense is above the receipt threshold and carries no receipt."
 }
 ```
 
-The record's `status` is `approved`, so the owner has agreed to it. An agent builds approved records and doesn't invent the parts a draft leaves open.
+The record's `status` is `approved`, so the owner has agreed to it. An agent builds approved records and does not invent the parts a draft leaves open.
 
-The use case page also carries a case, a small example that proves one ending:
+The use case page also carries a case: one worked example that leads from a situation to one named result.
 
 ```json
 {
   "type": "case",
-  "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
-  "situation": "A copy sits available on its shelf.",
-  "action": "The reader borrows the copy.",
-  "result": "result/borrow-copy.borrowed",
-  "expect": "The loan is active."
+  "id": "case/submit-expense.submitting-with-a-receipt-succeeds",
+  "situation": "An employee paid for a train ticket and kept the receipt.",
+  "action": "The employee submits the expense with the receipt.",
+  "result": "result/submit-expense.submitted",
+  "expect": "The expense is submitted."
 }
 ```
 
-Read it as one proven path: when the situation holds and the reader acts, the use case reaches the `borrowed` result, and the loan is active. Each case names exactly one result, so a later acceptance test knows which ending it proves.
+Read it as one proven path: when the situation holds and the employee acts, the use case reaches the `submitted` result, and the expense is submitted. Each case names exactly one result, so a later acceptance test knows which ending it proves.
 
-### 2. You build it to the standard
+### 2. The implementation
 
-The standard says where the code goes and what shape it takes. A use case is implemented by one command handler in the Application project, in a folder that mirrors the record's module and business record:
+The standard states where the code goes and what shape it takes. A use case is implemented by one command handler in the Application project, in a folder that mirrors the record's module and business record:
 
 ```text
-apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs
+apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
 ```
 
-The handler refuses an unavailable copy with the failure code the result record names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
+The handler refuses an expense above the threshold that carries no receipt with the failure code the result record names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
 
-### 3. The model connects the two
+### 3. The computed links
 
 Run the model builder from the project root:
 
@@ -95,16 +94,16 @@ Run the model builder from the project root:
 litespec model build
 ```
 
-It reads every record, the C# code, the frontend routes, and the test results, and writes `.model/model.json`. For the library example it reports:
+It reads every record, the C# code, the frontend routes, and the test results, and writes `.model/model.json`. For the Expenses example it reports:
 
 ```text
-.model/model.json: 76 records, 7 handlers, 1 screens, 9 scenarios.
+.model/model.json: 80 records, 7 handlers, 1 screens, 9 scenarios.
 ```
 
 Then ask about one record:
 
 ```bash
-litespec model query use-case/lending.borrow-copy
+litespec model query use-case/spending.submit-expense
 ```
 
 Alongside the record's own fields, the answer holds what the builder worked out from the code:
@@ -114,13 +113,19 @@ Alongside the record's own fields, the answer holds what the builder worked out 
   "implemented": true,
   "verified": false,
   "implements": [
-    "apps/api/src/Library.Application/Lending/Loans/BorrowCopy/BorrowCopyCommandHandler.cs"
+    "apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs"
   ],
   "calls": [],
   "proves": [
     {
-      "scenario": "Borrowing_an_available_copy_succeeds",
-      "kase": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+      "scenario": "Submitting_with_a_receipt_succeedsAsync",
+      "kase": "case/submit-expense.submitting-with-a-receipt-succeeds",
+      "confirmed": true,
+      "passing": null
+    },
+    {
+      "scenario": "An_expense_is_submitted_through_a_helper_of_the_worldAsync",
+      "kase": "case/submit-expense.submitting-with-a-receipt-succeeds",
       "confirmed": true,
       "passing": null
     }
@@ -128,17 +133,17 @@ Alongside the record's own fields, the answer holds what the builder worked out 
 }
 ```
 
-The use case is implemented: the builder found its handler. One acceptance scenario claims its case, and the claim checks out because the scenario's `when` step belongs to the `BorrowCopySteps` class, so `proves` names `Borrowing_an_available_copy_succeeds` as confirmed. It still isn't verified: no test run exists yet, so `passing` is null. Nobody had to maintain those links by hand, and they can't go stale, because they're computed again on every build.
+The use case is implemented: the builder found its handler. Two scenarios claim its case: the acceptance scenario `Submitting_with_a_receipt_succeedsAsync`, whose `when` step belongs to the `SubmitExpenseSteps` class, and an integration test through a helper. Both claims check out, so each entry reads `confirmed`. The use case is still not verified: no test run exists yet, so `passing` is null. Nobody maintains those links by hand, and they cannot go stale, because the builder computes them again on every build.
 
-### 4. The checks report what's missing
+### 4. The reported gaps
 
-`litespec model check` turns gaps into findings, such as a use case with no handler, a result the code never returns, a link to a record that doesn't exist, or a requirement nothing fulfills. `litespec consumer` checks your project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
+`litespec model check` turns gaps into findings: a use case with no handler, a result the code never returns, a link to a record that does not exist, or a requirement nothing fulfills. `litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
 
-For example, if the borrow-copy page named no success result, `litespec model check` reports `use-case-without-success` against `docs/domain/modules/lending/loans/borrow-copy.md`, and the pull request fails until the record names one.
+For example, if the submit-expense page named no success result, `litespec model check` reports `use-case-without-success` against `docs/domain/modules/spending/expenses/submit-expense.md`, and the pull request fails until the record names one.
 
-## Where the rules come from
+## The provision identifier
 
-Every rule in the standard has an ID made of its page and its heading. For example, the rule that a handler implements exactly one use case is `litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence`, on the [system page](../core/system.md). A review comment, an agent's report, or a project exception can cite that ID, and everyone knows exactly which rule is meant.
+Every rule in the standard is a provision: one identified block with one assertion. Its ID joins its page and its heading. For example, the rule that a handler implements exactly one use case is `litespec/core/system#keep-use-cases-and-handlers-in-one-to-one-correspondence`, on the [system page](../core/system.md). A review comment, an agent's report, or a project exception can cite that ID, and everyone knows exactly which rule is meant.
 
 ## Next
 

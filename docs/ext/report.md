@@ -2,7 +2,7 @@
 
 ## Intent
 
-Reporting separates complex joins, aggregate analysis, and large exports from normal request projections when cost or duration exceeds the baseline read path.
+Reporting and exports answer questions too heavy for a normal request: complex joins, analysis over large data sets, or exports too large to build inside one HTTP call. This page states when a team moves such work off the request path, which protections the heavy query carries, and how Worker-built exports reach their reader safely. A team selects it for each documented query or export whose cost or duration exceeds the normal read path, so one heavy report cannot slow or expose the product's normal reads.
 
 ## Activation
 
@@ -10,13 +10,13 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`.
 
-The consumer enables `report` for a documented query or export with complex relational SQL, large results, long processing, object storage, or exceptional latency budget.
+A use case selects this extension for one documented query or export that the normal request path cannot serve: complex relational SQL, a large result, long processing, output in object storage, or a latency budget beyond a normal request. The use-case page carries the measurements that prove the normal path falls short.
 
 ## Baseline relationship
 
-None. Ordinary queries stay under `litespec/backend/persistence#query-through-the-read-session`; this extension governs reads whose cost or duration exceeds that path.
+This extension replaces no baseline provision. Ordinary queries stay under `litespec/backend/persistence#query-through-the-read-session`; this extension governs only the reads whose cost or duration exceeds that path.
 
-`limit`. Selecting `report` requires Limit records for the request budget and the report bounds.
+Selecting `report` switches on the Limit record type: the request budget and each report bound live in Limit records.
 
 ## Standards
 
@@ -24,79 +24,79 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 **Requirement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
 
-**Rationale:** The record establishes why a normal request projection cannot meet the documented boundary. The use-case page carries the record with its owner and status.
+**Rationale:** Reporting infrastructure costs a Worker, storage, and operating attention, so the team writes down the report, a representative data volume, the plan or limitation, the latency target, the maximum result, and the operating owner before building any of it. The use-case page carries that record with its owner and status, and it shows why a normal request projection cannot meet the boundary.
 
 ### Avoid speculative reporting systems
 
 **Requirement:** A project MUST NOT create reporting infrastructure for possible future analytics.
 
-**Rationale:** Reporting infrastructure needs an accepted query or export with a present cost boundary.
+**Rationale:** A reporting system built for analytics the product may never need charges its full operating cost from day one while serving no accepted query. Each report or export earns its infrastructure with a current cost boundary, not a guess about future analysis.
 
 ### Parameterize report SQL
 
 **Requirement:** A reporting query MUST parameterize every actor, tenant, filter, range, sort, and pagination value.
 
-**Rationale:** Parameters preserve data isolation and protect raw SQL from injection.
+**Rationale:** A report concatenates actor, tenant, filters, ranges, sorting, and pagination into SQL that reads across the database. Binding every one of those values as a parameter keeps tenant and actor isolation intact and closes the injection hole string concatenation opens.
 
 ### Keep raw SQL in Infrastructure
 
 **Requirement:** Infrastructure MUST own raw reporting SQL and connection handling.
 
-**Rationale:** Provider-specific query and connection behavior stays outside Application and Domain.
+**Rationale:** Raw SQL names tables, dialects, and connection handling that belong to one provider. Keeping it in Infrastructure lets Application and Domain state what the report means without depending on how one database phrases it.
 
 ### Review report plans
 
 **Requirement:** A report owner MUST review query plans and indexes with representative data.
 
-**Rationale:** Representative volumes reveal cost that small local datasets can hide.
+**Rationale:** A query that flies over a hundred local rows can scan millions in production. The report owner reviews query plans and indexes against representative data, so the true cost shows before the report ships rather than after it slows the database.
 
 ### Apply item-read authorization
 
 **Requirement:** A report or export MUST enforce actor, role, ownership, tenant, and sensitive-field rules that apply to item reads.
 
-**Rationale:** A bulk interface cannot bypass data access checks applied to individual resources.
+**Rationale:** A report that reads ten thousand rows at once crosses the same actor, role, ownership, tenant, and sensitive-field boundaries as ten thousand single reads. Enforcing the item-read rules on the bulk path stops the report from exposing rows its reader may not open one by one.
 
 ### Run budget-exceeding exports in Worker
 
 **Requirement:** An export exceeding its request budget MUST run through Worker, with the budget a Limit record the export's use case names.
 
-**Rationale:** Worker execution frees the HTTP request from long-running report work.
+**Rationale:** An export that outlasts its request budget holds an HTTP connection open while the reader waits and the server counts threads. Running it in a Worker returns the request immediately, and the budget in its Limit record tells the team exactly when an export outgrows the request path.
 
 ### Protect export output
 
 **Requirement:** An export worker MUST store output in approved object storage with an owner, expiry, and short-lived authorized download.
 
-**Rationale:** Export files can contain sensitive data and need controlled access and retention.
+**Rationale:** An export file concentrates sensitive rows into one downloadable object that outlives the request that built it. Approved object storage with an owner, an expiry, and a short-lived authorized download gives that object controlled access and a defined end instead of a permanent public link.
 
 ### Scope export output to the tenant
 
 **Requirement:** An export MUST store its output under a tenant-scoped object-storage path.
 
-**Rationale:** A shared output path lets one tenant guess another tenant's export address.
+**Rationale:** Export addresses are predictable, and a shared folder lets one tenant guess another tenant's file name. A tenant-scoped storage path puts each tenant's exports under its own prefix, so a guessed address stays inside the guesser's own data.
 
 ### Define report limits
 
 **Requirement:** A report specification MUST state each bound as a Limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
 
-**Rationale:** Explicit limits bound database, Worker, and object-storage cost.
+**Rationale:** Date range, rows, execution time, concurrent jobs, output size, and storage lifetime each cap one dimension of report cost. Limit records hold all six, so a runaway report hits a documented bound instead of an exhausted database, a full disk, or a surprise invoice.
 
 ### Support report cancellation
 
 **Requirement:** A report implementation MUST support cancellation and remove expired outputs.
 
-**Rationale:** Cancellation and expiry prevent abandoned work and files from consuming resources indefinitely.
+**Rationale:** A reader who closes the tab leaves the report running, and an export nobody downloads still occupies storage. Cancellation stops the abandoned work, and expiry removes the abandoned file, so neither consumes resources indefinitely.
 
 ### Escape formula-leading export values
 
 **Requirement:** A CSV or spreadsheet export MUST escape formula-leading values unless a reviewed field intentionally contains a formula.
 
-**Rationale:** Spreadsheet applications can interpret unescaped values as executable formulas.
+**Rationale:** A value starting with `=`, `+`, `-`, or `@` becomes a live formula when the export opens in a spreadsheet, running in the opener's application with the opener's data. Escaping those values keeps data as data, except in a reviewed field the team intentionally fills with a formula.
 
 ### Define export encoding and columns
 
 **Requirement:** An export format MUST use explicit character encoding and a stable column contract.
 
-**Rationale:** Stable output lets consumers parse data without locale or implementation assumptions.
+**Rationale:** An export without a stated encoding arrives garbled on the first machine that guesses differently, and columns that shift per release break every parser built on them. Explicit encoding with a stable column contract lets consumers parse the file without guessing either.
 
 ## Conventions
 
@@ -106,7 +106,7 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Business meaning and authorization belong with the module that owns the report.
+**Rationale:** What a report means and who may run it are business choices. Keeping the definition in Application under its business module puts those choices beside the module's other rules instead of buried in query code.
 
 ### Keep report providers in Infrastructure
 
@@ -114,7 +114,7 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Query and storage implementation details are provider boundaries.
+**Rationale:** SQL text, row mappings, and storage calls change per provider while the report's meaning stays fixed. Keeping them in Infrastructure swaps the provider without touching the report's business rules.
 
 ### Separate Worker orchestration
 
@@ -122,11 +122,11 @@ None. Ordinary queries stay under `litespec/backend/persistence#query-through-th
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Worker scheduling and execution do not define report authorization or meaning.
+**Rationale:** Scheduling, chunking, and progress tracking run the report without defining it. Keeping Worker orchestration apart from the report's business rules lets either change without dragging the other along.
 
 ## Dependencies
 
-The extension selects no report or object-storage package by default. Each provider needs a decision and manifest pin.
+This extension selects no report or object-storage package. Each provider the project uses needs a Decision and a manifest pin.
 
 ## Verification
 

@@ -2,7 +2,7 @@
 
 ## Intent
 
-This stack serves a React frontend beside the product's backend stack. A React frontend takes one of three rendering modes, chosen by who reads it. An authenticated console is a static single-page application. A public surface whose pages are shared as links and read by a search engine renders on the server. A device client that asks one question repeatedly is a static page with no router. The shared stack rules on the [Stacks](../../../core/stacks.md) page apply to every stack.
+A React frontend takes one of 3 rendering modes, chosen by who reads it: a static application for an authenticated console, server rendering for a public surface readers reach by link or search, and one static page with no router for a device client. A team opening a React frontend chooses the mode here before writing routes. The shared stack rules in [Technology Stacks](../../../core/stacks.md) apply to every stack.
 
 ## Standards
 
@@ -10,7 +10,7 @@ This stack serves a React frontend beside the product's backend stack. A React f
 
 **Requirement:** A React frontend MUST render as a static application when it is a console, and on the server when a public page is indexed.
 
-**Rationale:** A console is reached from the application a signed-in user already has open. Its first response has nothing to index. A public page is reached from a message or a search result. Its title and links belong in the first response. A device client asks one question over and over. It takes a static page with no router. A page counts as indexed when its readers reach it from a message or a search result.
+**Rationale:** A console opens inside the application a signed-in user already has, so its first response has nothing to index and ships as static files. A public page arrives by message or search result, so its title and links belong in the first response and it renders on the server. A page counts as indexed when its readers reach it from a message or a search result. A device client asks one question over and over and takes a static page with no router.
 
 **Example:** A back-office console and an internal admin console ship as static files. A public storefront runs as a Node server that hydrates in the browser. A warehouse handheld client ships as one static page.
 
@@ -18,7 +18,7 @@ This stack serves a React frontend beside the product's backend stack. A React f
 
 **Requirement:** A device client MUST ship as one static page with no router.
 
-**Rationale:** A device client asks one question over and over. A router adds downloads without adding destinations.
+**Rationale:** A device client shows one answer on repeat: one question, one screen, no navigation. A router would add downloads for destinations the client never visits. One static page carries exactly what the device needs.
 
 
 ## Conventions

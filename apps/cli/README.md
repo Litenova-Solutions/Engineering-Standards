@@ -13,7 +13,7 @@ The user-facing contract of each command lives in `docs/tools/`. Read those page
 - [Validate Standards](../../docs/tools/validate.md) and [Generate Provisions](../../docs/tools/provisions.md) for the repository commands.
 - [Initialize Consumer](../../docs/tools/init.md), [Validate Consumer](../../docs/tools/consumer.md), [Validate Controlled UI](../../docs/tools/ui.md), [Model Builder](../../docs/tools/model.md), and [Book](../../docs/tools/book.md) for the consumer commands.
 - [Draw Patterns](../../docs/tools/patterns.md) for the wireframe command.
-- [Standards Commands](../../docs/tools/README.md) for how to run the CLI from this repository and from a consumer, and for the `LITESPEC_HOME` and `LITESPEC_TIMING` environment variables.
+- [CLI overview](../../docs/tools/README.md) for how to run the CLI from this repository and from a consumer, and for the `LITESPEC_HOME` and `LITESPEC_TIMING` environment variables.
 
 ## Quick start
 
@@ -153,7 +153,7 @@ To add a fixture repository for a new case, follow the harness the area already 
 
 ## Packing
 
-`LiteSpec.Cli.csproj` sets `PackAsTool` to `true` with `ToolCommandName` `litespec`, so packing produces the `LiteSpec.Cli` tool package described as `The LiteSpec command line: authoring checks, the provision index, consumer and UI validation, the project model, and the project book.` Consumers run the tool from source through the pinned submodule, as the [Standards Commands](../../docs/tools/README.md) page shows, so packing is a release step, not part of daily use. Keep `PackageId`, `ToolCommandName`, and `Description` stable: install scripts and the consumer docs name them.
+`LiteSpec.Cli.csproj` sets `PackAsTool` to `true` with `ToolCommandName` `litespec`, so packing produces the `LiteSpec.Cli` tool package described as `The LiteSpec command line: authoring checks, the provision index, consumer and UI validation, the project model, and the project book.` Consumers run the tool from source through the pinned submodule, as the [CLI overview](../../docs/tools/README.md) shows, so packing is a release step, not part of daily use. Keep `PackageId`, `ToolCommandName`, and `Description` stable: install scripts and the consumer docs name them.
 
 ## Limits
 

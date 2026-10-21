@@ -2,7 +2,7 @@
 
 ## Intent
 
-One agent can hold a whole change in view. A fleet cannot hold it. Delegation needs written boundaries where one agent needs none. This extension states the brief, the containment, and the acceptance check.
+Agent delegation lets one software agent start another on the same working tree by giving it a written brief with its own paths. This page states what the brief carries, how a worker stays inside its paths, and how the delegating agent verifies the result before accepting it. A project selects it when one agent starts another on the same tree, so each worker owns its part instead of rewriting another's.
 
 ## Activation
 
@@ -10,11 +10,11 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer selects `delegation` when one agent starts another on the same tree.
+The consumer selects `delegation` when one agent starts another agent on the same tree.
 
 ## Baseline relationship
 
-This extension replaces no baseline provision. The agent protocol governs one agent. This extension governs the handoff between two.
+This extension replaces no baseline provision. The [agent protocol](../core/agent.md) governs one agent working alone, and this extension governs the handoff between two.
 
 This extension switches on no optional record type.
 
@@ -24,7 +24,7 @@ This extension switches on no optional record type.
 
 **Requirement:** An agent that starts another agent MUST give it a written brief stating goal, context, sources, and output.
 
-**Rationale:** Two agents sharing one tree collide without a written split. The brief states what each one owns. A collision is a defect in the brief rather than in either worker.
+**Rationale:** Two agents sharing one tree collide without a written split of goal, context, sources, and output. The brief states what the worker owns and what it builds on. When workers collide, the defect lies in the brief rather than in either worker.
 
 **Example:** A brief carries four sections, each answering one question for the worker.
 
@@ -39,19 +39,19 @@ Output: the files to change and the report to write.
 
 **Requirement:** A delegated worker MUST stay inside the paths its brief names and commit nothing.
 
-**Rationale:** A worker with the whole tree rewrites what another worker owns.
+**Rationale:** The brief names the paths the worker may change. A worker that stays inside them cannot rewrite what another worker owns. One that roams the whole tree overwrites parallel work and commits what nobody asked for.
 
 ### Ask only unanswered questions
 
 **Requirement:** A delegated worker MUST ask no question its brief answers.
 
-**Rationale:** A question the brief answers is a reading failure, not a gap in the brief.
+**Rationale:** The brief answers the questions the delegating agent already settled. A worker that re-asks them spends a round trip on a reading failure. Questions stay for what the brief leaves genuinely unanswered.
 
 ### Verify before accepting worker output
 
 **Requirement:** A delegating agent MUST re-run the verification its brief names before accepting worker output.
 
-**Rationale:** A done claim without verification is a claim. The delegating agent owns the result. It watches the checks pass rather than reading that they passed.
+**Rationale:** The delegating agent owns the result, so it re-runs the verification the brief named and watches it pass. A done claim without that run is a claim, not evidence. Accepting on trust moves the worker's defect into the delegating agent's change.
 
 ## Conventions
 

@@ -111,18 +111,20 @@ const starterPrompt = [
   "then fetch only the pages each task touches.",
 ].join("\n");
 
-const title = "Use LiteSpec with Your Agent - LiteSpec";
+const title = `Use with Agents - LiteSpec ${version}`;
 const description =
-  "Read how LiteSpec works, give your agent one URL, or answer four questions for a block to commit to your project's AGENTS.md.";
+  "Set up an AI coding agent to follow LiteSpec: read how it works, start a session with one prompt, or answer four questions and commit the block they produce to your project's AGENTS.md file.";
 ---
 
-<Base title={title} description={description} active="agents" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: "Use with agents", path: `/${version}/select/` }])]}>
+<Base title={title} description={description} active="agents" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: "Use with Agents", path: `/${version}/select/` }])]}>
   <div class="select-page">
     <span class="ver">{version}</span>
-    <h1>Use LiteSpec with your agent</h1>
+    <h1>Use with Agents</h1>
     <p class="select-lead">
-      Your agent reads LiteSpec as plain Markdown. This page gives it the address to start from and a short block for
-      your project's <code>AGENTS.md</code>, so every session reads the same rules before it writes code.
+      An AI coding agent follows LiteSpec only when it reads the rules before it writes code. Every LiteSpec page is
+      published as plain Markdown that an agent can fetch. This page sets that up: read how LiteSpec works yourself,
+      start one session with a prompt, or answer four questions about your project and commit the block they produce to
+      its <code>AGENTS.md</code> file, which agents read at the start of every session.
     </p>
     <ol class="steps">
       <li class="step">
@@ -131,8 +133,9 @@ const description =
           <div class="step-head">
             <h2>Read how it works</h2>
             <p>
-              Read these in order before you hand LiteSpec to an agent: you decide what it may do on its own and review
-              what it brings back. About {readingMinutes} minutes in all.
+              The agent applies the rules, but you decide what it may do on its own and you review what it brings back.
+              These {readingOrder.length} pages explain the rules and how LiteSpec's parts fit together, in reading
+              order. They take about {readingMinutes} minutes in all.
             </p>
           </div>
           <ol class="reading">
@@ -152,10 +155,11 @@ const description =
         <span class="step-n" aria-hidden="true">2</span>
         <div class="step-body">
           <div class="step-head">
-            <h2>Quick start: give your agent one prompt</h2>
+            <h2>Start a session with one prompt</h2>
             <p>
-              No choices to make. The agent reads the site index, finds the selection that matches your project, and
-              fetches the rest itself.
+              Paste this prompt into an agent session to try LiteSpec without setting anything up. The agent reads the
+              site index, picks the selection index that matches your project's shape and stacks, and fetches only the
+              pages each task needs. The setup lasts for that session only.
             </p>
           </div>
           <section class="select-output" aria-labelledby="select-prompt-heading">

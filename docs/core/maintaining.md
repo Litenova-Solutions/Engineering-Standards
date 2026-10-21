@@ -2,9 +2,7 @@
 
 ## Intent
 
-This page is the maintainer's manual for the LiteSpec repository itself. It states how a provision moves through its lifecycle. It states how an identifier rename is handled. It states how citations are written. It states how a LiteSpec release is published.
-
-The page exists because `litespec/core/authoring#publish-each-release-as-a-complete-contract` requires each LiteSpec release to state its complete contract. A maintainer who follows those rules needs the procedures this page states.
+LiteSpec publishes each release as one complete contract, so the repository holding the standard needs its own operating rules. This page states them: how a provision, one identified rule on a page, moves from draft to active to retired, how a rename replaces every citation of the old name in one change, and how a maintainer publishes a release from a git tag. The rules keep every provision identifier resolvable and every release reproducible from its tag.
 
 ## Concepts
 
@@ -14,23 +12,23 @@ A provision passes through three states.
 
 | State | Meaning |
 |:---|:---|
-| draft | The provision text is being written. |
-| active | The provision is cited from a validator case or a Verification row. |
-| retired | The provision has been replaced or removed. |
+| draft | The provision text is being written and nothing cites it yet. |
+| active | A Verification row or a validator case cites the provision. |
+| retired | The provision no longer holds and nothing cites it. |
 
-A provision never goes from active back to draft. A retirement is permanent.
+A provision moves from draft to active when its first citation lands, and from active to retired when a richer rule folds its assertion in. It never moves back to draft, and retirement is permanent: a retired identifier stays gone, so a reader who meets one knows it names nothing current.
 
 ### The identifier
 
-Every provision ID is `litespec/<page>#<slug>`, defined by `litespec/core/authoring#use-the-declared-identifier-grammar`. A rename replaces the identifier outright. The repository keeps no alias and no mapping from an old identifier.
+Every provision ID is `litespec/<page>#<slug>`, computed from the page path and the heading, as `litespec/core/authoring#use-the-declared-identifier-grammar` states. A rename replaces the identifier outright: the repository keeps no alias and no map from the old identifier to the new one. That is why a rename replaces every citation in the same change.
 
 ### Citations
 
-A citation from one page to another names the cited provision by its current identifier. A citation on the same page uses the same form.
+A citation names the cited provision by its current identifier, whether the citation sits on the same page or another one. Because no alias exists, a citation that names a retired identifier resolves nowhere, and `litespec validate` reports it.
 
 ### The LiteSpec release
 
-A LiteSpec release is a tagged snapshot of the repository. Between releases, `litespec.manifest.json`, the topmost changelog entry, and the consumer template's `reviewedLiteSpecVersion` name the release being prepared. The new tag carries that version number and makes the release current. Each schema `$id` names that release under `https://litespec.dev/<version>/schemas/`, so a pinned consumer keeps resolving the shapes it reviewed.
+A LiteSpec release is a tagged snapshot of the repository, and the highest git tag names the current release. Between releases, three places name the release being prepared: the version in `litespec.manifest.json`, the topmost `CHANGELOG.md` entry, and the consumer template's `reviewedLiteSpecVersion`. Tagging that version number makes it current. Each schema `$id` carries that release under `https://litespec.dev/<version>/schemas/`, so a consumer that pins the release keeps resolving the shapes it reviewed.
 
 ## Standards
 
@@ -38,7 +36,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Requirement:** A maintainer MUST keep each provision in exactly one of three states: draft, active, or retired.
 
-**Rationale:** The three states tell a maintainer what a provision's identifier means. An active identifier is stable. A retired identifier is gone.
+**Rationale:** The three states tell a maintainer what an identifier promises. An active identifier names a rule that holds and that a Verification row or validator case cites. A retired identifier names nothing, so a citation to it is a defect rather than a reference. Without the lifecycle, a half-written provision and a removed one look identical to a cited one.
 
 **Example:** A provision is added in draft. When cited from a Verification row it becomes active. When its assertion is folded into a richer rule, the provision is retired.
 
@@ -46,7 +44,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Requirement:** A provision rename MUST replace every citation of the old identifier in one change.
 
-**Rationale:** A citation names the provision it resolves to. An old identifier left behind names nothing, and the repository keeps no alias to resolve it. Citations always use current identifiers.
+**Rationale:** A heading rename renames the identifier, and the repository keeps no alias to catch stragglers. Every citation the rename misses names a provision that no longer exists, and readers follow it nowhere. Replacing all of them in one change keeps the repository resolvable at every commit.
 
 **Example:** Renaming a provision changes its heading, its ID, its Verification row, and every citation together.
 
@@ -54,7 +52,7 @@ A LiteSpec release is a tagged snapshot of the repository. Between releases, `li
 
 **Requirement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
 
-**Rationale:** A git tag is the only durable artifact that names a release. The highest tag is the current release. The manifest version, the changelog entry, and the template version name that release.
+**Rationale:** A git tag is the only durable artifact that names a release: branches move and files change, but the tag stays. Reading the current release from the highest tag gives maintainers, consumers, and tools one shared answer. Writing that version into the manifest, the changelog, and the template in the same release keeps the three from disagreeing.
 
 ## Conventions
 
@@ -66,7 +64,7 @@ This informative example demonstrates `litespec/core/maintaining#state-the-provi
 
 ### Step one, adding a provision
 
-A maintainer writes a new provision on a page. The provision is in `draft` until a validator case or a Verification row cites it.
+A maintainer writes a new provision on a page. The provision stays in `draft` until a Verification row or a validator case cites it.
 
 ```text
 ### State the rule
@@ -74,15 +72,15 @@ A maintainer writes a new provision on a page. The provision is in `draft` until
 **Rationale:** The thing matters.
 ```
 
-The validator finds the new provision uncited. The maintainer adds a Verification row that names the rule. The provision moves to `active`.
+The validator reports the new provision as uncited. The maintainer adds the Verification row that names the rule, and the provision becomes `active`.
 
 ### Step two, renaming
 
-A rule changes. The maintainer updates the heading, the identifier, and every citation in one change.
+A rule changes, so the maintainer updates the heading and replaces the identifier and every citation of it in one change. When the change lands, no citation names the old identifier.
 
 ### Step three, releasing
 
-The maintainer runs `git describe --tags --abbrev=0` to find the tag with the highest version number. The tag is the current release. The manifest version names the release being prepared, the changelog entry is added, and the commit is tagged.
+The maintainer runs `git describe --tags --abbrev=0` to find the tag with the highest version number. That tag names the current release. The maintainer sets the manifest version, adds the changelog entry, and tags the commit with the new version number.
 
 ## Verification
 

@@ -2,9 +2,21 @@
 
 ## Intent
 
-Domain holds the business model and protects aggregate invariants. It references no persistence, HTTP, messaging, logging, configuration, injection, serialization, or provider concept. Its names match the Terms that its records use.
+The Domain layer holds a product's business rules in code that depends on nothing but itself, so the rules can be tested on their own. An aggregate is one business record that changes in one step, and this page states how to model aggregates, their lifecycles, closed sets of values, and the repositories that load them. It also states what Domain never references, which stops technical concerns from leaking into business rules.
 
-Every aggregate exposes its lifecycle as state types from its first implementation. A one-state hierarchy gives later states and state-specific facts a defined home. It avoids later replacement of an enumeration, status string, or flag-based lifecycle.
+## Concepts
+
+### Aggregates and the business model
+
+In code, an aggregate is the type that implements a business record. The [aggregate root](../reference/glossary.md) is the single type through which outside code changes the record: it guards every mutation, holds the lifecycle state, and records domain events. Child entities live inside the boundary and expose no mutable state outside the root. One aggregate references another by typed identifier, never by object reference, and one repository per aggregate loads and stages it.
+
+### Lifecycles as state types
+
+Every aggregate exposes its lifecycle as state types from its first implementation: one state property backed by one closed hierarchy with one type per state. A one-state hierarchy gives later states and state-specific facts a defined home, so adding a state extends the hierarchy instead of replacing an enumeration, status string, or flag-based lifecycle. In the Expenses product, an expense is `Submitted`, `Approved`, `Rejected`, or `Reimbursed`, and each state carries its own facts, such as the approver or the reimbursed time.
+
+### Closed sets
+
+A closed set is a fixed menu of values where the compiler knows every case, such as a refund outcome or an expense state. Domain models each one as a type hierarchy with one type per case, so adding a case breaks every switch that must handle it. Each outer layer mirrors the same shape in its own form: a result union in Application, a transport model in WebApi, and a stable string discriminator in storage.
 
 ## Standards
 
@@ -12,43 +24,43 @@ Every aggregate exposes its lifecycle as state types from its first implementati
 
 **Requirement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
 
-**Rationale:** No persistence, web, mediator, logging, configuration, injection, serialization, or provider package enters Domain. Infrastructure registers a persisted discriminator rather than Domain carrying a serialization attribute.
+**Rationale:** Domain that references only the language standard library and its own types compiles and tests with no infrastructure at all. Each banned package would drag one outer concern into the business model: a serialization attribute couples a rule to a store format, a mediator couples it to dispatch. Infrastructure registers a persisted discriminator instead, so Domain carries no serialization metadata.
 
 ### Use one ubiquitous language
 
 **Requirement:** A Domain type, property, method, exception, or event name MUST match a Term record in the project language record.
 
-**Rationale:** A business action named `Publish` in the language record is not `SetStatus` in code. The language record holds each Term meaning, labels per language, rejected words, and broader and narrower links. Records cite the Terms they use, and the glossary is generated from the language record.
+**Rationale:** When code and specification share names, a reader moves between them without translation. A business action named `Publish` in the language record is not `SetStatus` in code, because the second name hides which business action ran. The language record holds each Term meaning, labels per language, rejected words, and broader and narrower links; records cite the Terms they use, and the glossary is generated from the language record.
 
 ### Treat aggregates as consistency boundaries
 
 **Requirement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
-**Rationale:** External code sets no property and calls no child mutation method. A command normally changes one aggregate. The use-case record names any immediate invariant before one command changes several.
+**Rationale:** If outside code could set properties or call child mutations, it could change data without passing the root's checks. The root stands as the only public mutation entry point, so every change passes the invariant the transaction protects. A command normally changes one aggregate, and the use-case record names any immediate invariant before one command changes several.
 
 ### Take identity and events from the project root contract
 
 **Requirement:** An aggregate root MUST take its identity and event mechanics from the project-owned root contract.
 
-**Rationale:** The contract owns typed identity, pending events, recording, and clearing. It owns no timestamp, audit, tenant, lifecycle, or persistence behavior.
+**Rationale:** One root contract gives every aggregate the same identity and event mechanics, so Infrastructure collects events from any aggregate the same way. The contract owns typed identity, pending events, recording, and clearing, and nothing else: no timestamp, audit, tenant, lifecycle, or persistence behavior, because any of those would couple every aggregate to a concern only some need.
 
 ### Model every aggregate lifecycle with state types
 
 **Requirement:** An aggregate MUST expose its lifecycle only through one state property backed by one closed hierarchy of per-state types.
 
-**Rationale:** An enumeration, string discriminator, boolean flag, parallel nullable field, or computed state cannot carry state-specific data or prove exhaustiveness. State types hold that data, and aggregate methods own the transitions.
+**Rationale:** Each lifecycle state can carry different facts: a published post carries its publication time, a draft does not. An enumeration, string discriminator, boolean flag, parallel nullable field, or computed state cannot carry state-specific data, and the compiler cannot prove a switch over them exhaustive. State types hold that data, and aggregate methods own the transitions between them.
 
 **Example:** A post defines one abstract post state with draft and published cases, where the published case carries its publication time. Even an aggregate with one current state defines its hierarchy.
 
-In the library circulation product, `business-record/lending.loan` declares the `Active`, `Overdue`, and `Returned` states. For example, in the .NET stack the loan exposes one abstract loan state with one sealed record per declared state, where the active case carries the due date and the returned case carries the returned time. The diagram shows Borrow from `use-case/lending.borrow-copy` creating Active, Extend from `use-case/lending.extend-loan` keeping Active with a new due date, Return from `use-case/lending.return-copy` moving Active or Overdue to Returned, and the declared Overdue state reached when the due date passes, for which the example names no use case.
+In the Expenses product, `business-record/spending.expense` declares the `Submitted`, `Approved`, `Rejected`, and `Reimbursed` states. For example, in the .NET stack the expense exposes one abstract expense state with one sealed record per declared state, where the approved case carries the approver and the decided time and the reimbursed case carries the reimbursed time. The diagram shows Submit from `use-case/spending.submit-expense` creating Submitted, Approve from `use-case/spending.approve-expense` moving Submitted to Approved, Reject from `use-case/spending.reject-expense` moving Submitted to Rejected, and Reimburse from `use-case/spending.reimburse-expense` moving Approved to Reimbursed.
 
-![Borrow from borrow-copy creates an Active loan carrying the due date, Extend from extend-loan keeps it Active with a new due date, and Return from return-copy moves an Active or Overdue loan to Returned carrying the returned time; Active and Overdue carry the due date. A dashed arrow from Active to Overdue labeled due date passes shows the declared Overdue state, for which the example names no use case.](../assets/diagrams/backend-aggregate-lifecycle.svg)
+![Submit from submit-expense creates a Submitted expense, Approve from approve-expense moves it to Approved carrying the approver and the decided time, Reject from reject-expense moves it to Rejected carrying the reason, and Reimburse from reimburse-expense moves an Approved expense to Reimbursed carrying the reimbursed time.](../assets/diagrams/backend-aggregate-lifecycle.svg)
 
 ### Model every closed set of domain values as a closed type hierarchy
 
 **Requirement:** Domain code MUST model a closed set as one type hierarchy whose cases the type system can enumerate.
 
-**Rationale:** An enumeration carries no case data, admits undefined values, and forces parallel fields when a case gains data. A closed hierarchy lets the type system check exhaustiveness. A boundary converts a label to its case through a named lookup, never through a string conversion. An unrecognized label is a validation failure rather than a default case.
+**Rationale:** A closed set with case data needs a type per case: an enumeration carries no case data, admits undefined values, and forces parallel nullable fields when one case gains data. A closed hierarchy lets the type system check exhaustiveness, so adding a case breaks every switch that must handle it. A boundary converts a label to its case through a named lookup, never through a string conversion, and an unrecognized label is a validation failure rather than a default case.
 
 **Example:** A refund outcome defines pending, succeeded, failed, and reversed cases, where each case carries its own data.
 
@@ -71,7 +83,7 @@ Round-trip tests cover every data-less case, which catches a renamed code and a 
 
 **Requirement:** An aggregate root MUST create instances only through a static factory named for its business action.
 
-**Rationale:** The factory accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
+**Rationale:** A constructor cannot carry a business name and cannot refuse cleanly, so construction through constructors spreads creation rules across call sites. The factory is named for its business action, accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
 
 A root created with its children composes them inside the same factory call. The children are built from typed values the caller supplies. A caller never passes an already constructed child into the factory, because a caller holding that reference can mutate it after the invariant was checked.
 
@@ -96,38 +108,38 @@ public sealed class Order : AggregateRoot<OrderId>
 
 **Requirement:** A public aggregate mutation method MUST check current state and protect its invariants, replacing state and recording its transition event when it moves the lifecycle.
 
-**Rationale:** A handler then calls `post.Publish(utcNow)` without testing the state first. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
+**Rationale:** A business-named method lets the handler call `post.Publish(utcNow)` without testing the state first: the method checks the current state and protects its invariants, then replaces state and records the transition event when it moves the lifecycle. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
 
 Checks run before replacement, and replacement runs before recording. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state.
 
-**Example:** In the library circulation product, `use-case/lending.return-copy` ends with `result/return-copy.returned` when the loan is active, and with `result/return-copy.loan-inactive` when it is not. For example, in the .NET stack the handler calls one business method, and the method checks the state, replaces it, and records `event/loan.loan-returned`:
+**Example:** In the Expenses product, `use-case/spending.reimburse-expense` ends with `result/reimburse-expense.reimbursed` when the expense is approved, and with `result/reimburse-expense.not-approved` when it is not. For example, in the .NET stack the handler calls one business method, and the method checks the state, replaces it, and records `event/expense.expense-reimbursed`:
 
 ```csharp
-public void Return(DateTimeOffset returnedAt)
+public void Reimburse(DateTimeOffset reimbursedAt)
 {
-    if (State is not LoanActiveState)
+    if (State is not ExpenseApprovedState)
     {
-        throw new LoanNotActiveException();
+        throw new ExpenseNotApprovedException();
     }
 
-    State = new LoanReturnedState(returnedAt);
-    RaiseDomainEvent(new LoanReturnedEvent(Id, returnedAt));
+    State = new ExpenseReimbursedState(reimbursedAt);
+    RaiseDomainEvent(new ExpenseReimbursedEvent(Id, reimbursedAt));
 }
 ```
 
-Checks run before replacement, and replacement runs before recording. An inactive loan keeps its state, and the refusal carries the stable code `failure/lending.loan_not_active`.
+Checks run before replacement, and replacement runs before recording. An unapproved expense keeps its state, and the refusal carries the stable code `failure/spending.not_approved`.
 
 ### Keep child entities inside the aggregate boundary
 
 **Requirement:** A child entity MUST expose no mutable state outside its aggregate root, surfacing its collection as a read-only view.
 
-**Rationale:** The root creates, finds, and changes children through business methods. A child with lifecycle states uses the same state types and no enumeration.
+**Rationale:** A child that exposed mutable state would let outside code change aggregate data without passing the root's checks. The root creates, finds, and changes children through business methods, and collections surface as read-only views. A child with lifecycle states uses the same state types and no enumeration.
 
 ### Identify aggregates with strongly typed version 7 values
 
 **Requirement:** An aggregate identity MUST be a dedicated type wrapping one version 7 UUID, with no implicit conversion, primitive alias, or public parameterless creation path.
 
-**Rationale:** It rejects the empty value, and each factory also rejects its default. New values arrive from the caller: a factory takes its identifier as an argument. A method that needs several identifiers takes a generator as an argument. Domain reads no clock and calls no static source of time or randomness.
+**Rationale:** A dedicated identity type stops one aggregate's identifier from passing where another's is expected, and with no implicit conversion, primitive alias, or parameterless creation path, there is no quiet route back to a bare value. The type rejects the empty value, and each factory also rejects its default. New values arrive from the caller: a factory takes its identifier as an argument, and a method that needs several identifiers takes a generator. Domain reads no clock and calls no static source of time or randomness.
 
 Version 7 values come from the caller-supplied generator, so Domain observes no business time and decides nothing about clocks. Persistence rejects a duplicate key and the operation fails, which is the same path as any other write conflict.
 
@@ -137,7 +149,7 @@ Version 7 values come from the caller-supplied generator, so Domain observes no 
 
 **Requirement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
 
-**Rationale:** It exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or a string conversion. Creation through a named static method keeps every construction path under the validation the type declares.
+**Rationale:** Immutability with comparison by complete value lets two instances with the same data stand in for each other. The type exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or a string conversion, and creation through a named static method keeps every construction path under the validation the type declares.
 
 **Example:** In the dotnet stack, the value object reads as follows:
 
@@ -174,7 +186,7 @@ public sealed record PostTitle
 
 **Requirement:** A value object containing a collection MUST implement content equality and a matching hash for its declared ordering rule.
 
-**Rationale:** Default structural equality compares collection references, not contents. Constructors copy incoming mutable collections and members return read-only views. The module terms state whether order is part of the value.
+**Rationale:** Default structural equality compares collection references rather than contents, so two value objects holding equal lists compare as different. Content equality with a matching hash compares what the value means. Constructors copy incoming mutable collections and members return read-only views, so later mutation by the caller cannot change the value. The module terms state whether order is part of the value.
 
 **Example:** In the dotnet stack, the collection value reads as follows:
 
@@ -209,13 +221,13 @@ public sealed record PostTags
 }
 ```
 
-The example treats tag order as meaningful. If order is irrelevant, creation normalizes to the documented comparison order before storing values.
+The example treats tag order as meaningful. If order is not part of the value, creation normalizes to the documented comparison order before storing values.
 
 ### Model money with exact decimal values
 
 **Requirement:** A monetary amount MUST use an exact decimal type inside one shared `Money` value object carrying an ISO 4217 currency code and serializing as `{ "amount": "12.50", "currency": "EUR" }`.
 
-**Rationale:** The owning module record defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic. Infrastructure maps that precision explicitly. A use case fixed to one currency accepts an amount alone and states that currency in its record.
+**Rationale:** Money needs exact arithmetic and an explicit currency on every value, and one shared `Money` object gives both. The owning module record defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly. A use case fixed to one currency accepts an amount alone and states that currency in its record.
 
 **Example:**
 
@@ -229,7 +241,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 **Requirement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
 
-**Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts that a person reads as equal compare as different.
+**Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts a person reads as equal compare as different, and totals drift by fractions of a cent. Exact decimal types keep equality and arithmetic exact.
 
 **Example:** A tax rate multiplied into a `Money` amount uses an exact decimal type. A measured latency in a diagnostic record is not a Domain quantity and is outside this rule.
 
@@ -237,7 +249,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 **Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, logging, clock, authorization, or provider call.
 
-**Rationale:** It exists only when a calculation spans concepts with no natural aggregate owner. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
+**Rationale:** Some calculations span concepts with no natural aggregate owner; forcing them into one aggregate couples it to another's data. A stateless service holds that calculation, accepting and returning Domain values with no persistence, messaging, logging, clock, authorization, or provider call. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
 
 A domain service is stateless and takes no port, so its tests are Domain tests. They sit beside the aggregate tests in the Domain test project, with no harness, no substitute, and no fixture.
 
@@ -263,7 +275,7 @@ Application supplies the lines and passes the returned `Money` to `Order.Confirm
 
 **Requirement:** A repository interface MUST expose only aggregate and Domain types for exactly one aggregate root, without a queryable, a session, or a generic CRUD surface.
 
-**Rationale:** A required load uses a get-by-identity operation and fails with `{Aggregate}NotFound`, so a handler repeats no null check. A nullable find operation is reserved for lookups where absence is normal.
+**Rationale:** One repository per aggregate keeps the write side shaped by the aggregates it loads: a required load uses a get-by-identity operation that fails with `{Aggregate}NotFound`, so a handler repeats no null check, while a nullable find is reserved for lookups where absence is normal. A queryable, session, or generic CRUD surface would expose store mechanics to every handler.
 
 This interface is the write side only. Reading for a query uses a read model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent.
 
@@ -275,13 +287,13 @@ The load returns a post and fails with its not-found error when the identity has
 
 **Requirement:** A domain event MUST be an immutable event named `{Aggregate}{PastFact}Event` and carrying business data only.
 
-**Rationale:** The name states which aggregate raised the fact without opening the file. The event carries no aggregate, session, service, mutable collection, or exception. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process. Business data means typed identifiers and the values its reactions need.
+**Rationale:** A domain event records a completed fact for reactions to consume. The `{Aggregate}{PastFact}Event` name states which aggregate raised the fact without opening the file. The event carries business data only: typed identifiers and the values its reactions need, with no aggregate, session, service, mutable collection, or exception, because any of those would couple reactions to the raising process. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process.
 
 ### Reject business violations with dedicated errors
 
 **Requirement:** A rejected business rule MUST fail with a dedicated error type named `{DomainType}{Reason}` carrying a stable code.
 
-**Rationale:** The name always leads with the aggregate root. Domain raises no standard library, validation, HTTP, or provider error for a business rejection, and carries no transport status. Error names follow `litespec/workspace/naming#name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
+**Rationale:** One error type per rejected rule lets each boundary map failures without parsing messages: the type names the failed rule and the stable code travels to the caller. The name always leads with the aggregate root. Domain raises no standard library, validation, HTTP, or provider error for a business rejection, and carries no transport status. Error names follow `litespec/workspace/naming#name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
 
 **Example:** A refund allocation rule fails with its own error type, rather than one shared error with a code passed at the call site.
 
@@ -293,19 +305,19 @@ Application validators handle malformed caller input through validation errors. 
 
 **Requirement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
-**Rationale:** Application loads each aggregate through its repository when a command coordinates several. The use-case record names any immediate cross-aggregate invariant.
+**Rationale:** An object reference between aggregates loads one aggregate's data through another, which couples their consistency boundaries and their storage. A typed identifier keeps each aggregate loadable on its own: Application loads each aggregate through its repository when a command coordinates several, and the use-case record names any immediate cross-aggregate invariant.
 
 ### Pass nondeterministic values into Domain
 
 **Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them, and read no clock.
 
-**Rationale:** Application obtains each value through an owned port and passes it in, so a Domain test supplies an explicit value and stays deterministic. A method that needs more than one value receives a clock or a generator through its arguments. Version 7 identifiers come from the caller-supplied generator.
+**Rationale:** Domain behavior that read a clock or generated identifiers would return different results for the same call, which makes tests nondeterministic. Receiving time, randomness, and new identifiers as arguments keeps every Domain call a pure function of its inputs: a test supplies explicit values and stays deterministic. Application obtains each value through an owned port and passes it in. A method that needs more than one value receives a clock or a generator through its arguments, and version 7 identifiers come from the caller-supplied generator.
 
 ### Describe every public Domain contract in documentation
 
 **Requirement:** Every public Domain type and member MUST carry documentation stating the business constraint, result, or failure it represents.
 
-**Rationale:** A summary that restates the member name adds nothing. A mutation method names its source states, resulting state, protected invariant, and recorded event.
+**Rationale:** A reader meeting a public Domain member needs to know the business rule behind it, not just its signature. Documentation states the business constraint, result, or failure the member represents: a mutation method names its source states, resulting state, protected invariant, and recorded event. A summary that restates the member name adds nothing.
 
 ## Conventions
 
@@ -317,7 +329,7 @@ Application validators handle malformed caller input through validation errors. 
 
 **Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
-**Rationale:** A single aggregate stays flat only when its plural root name equals the module name. Separate aggregates never share lifecycle, event, or rejection folders.
+**Rationale:** Each aggregate folder holds everything one aggregate owns: its states, events, exceptions, and concepts. A reader finds the full aggregate in one place instead of hunting shared folders. A single aggregate stays flat only when its plural root name equals the module name, and separate aggregates never share lifecycle, event, or rejection folders.
 
 **Example:** In the dotnet stack, the module reads as follows:
 
@@ -393,7 +405,7 @@ Each aggregate-specific repository interface stays with the aggregate it loads. 
 
 **Replacement:** A consumer records a departure as an Exception record naming this provision, with reason and review date.
 
-**Rationale:** Aggregate-owned names follow `litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root`. Architectural suffixes follow `litespec/workspace/naming#use-architectural-suffixes`. Exception names follow `litespec/workspace/naming#name-exceptions-by-failed-rule`. A state case takes the flat or the nested form, and a project keeps the form it picks.
+**Rationale:** Aggregate-prefixed names keep each type readable at its call site without its namespace. Aggregate-owned names follow `litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root`. Architectural suffixes follow `litespec/workspace/naming#use-architectural-suffixes`. Exception names follow `litespec/workspace/naming#name-exceptions-by-failed-rule`. A state case takes the flat or the nested form, and a project keeps the form it picks.
 
 **Example:**
 

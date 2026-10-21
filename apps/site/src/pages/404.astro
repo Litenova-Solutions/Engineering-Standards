@@ -1,7 +1,6 @@
 ---
 // The page Cloudflare serves for any path that matches no file (not_found_handling: 404-page).
 import Base from "../layouts/Base.astro";
-import Icon from "../components/Icon.astro";
 import { version } from "../lib/spec";
 ---
 
@@ -13,7 +12,7 @@ import { version } from "../lib/spec";
       <p>That address is not part of LiteSpec {version}. Search finds a page by its title or by a word in its rules.</p>
       <div class="act">
         <a class="btn" href={`/${version}/learn/`}>Open the docs</a>
-        <a class="btn btn-outline" href={`/${version}/`}><Icon name="book" />All pages</a>
+        <a class="btn btn-outline" href={`/${version}/select/`}>Use with Agents</a>
       </div>
     </div>
   </section>

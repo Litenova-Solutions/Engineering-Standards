@@ -2,7 +2,17 @@
 
 ## Intent
 
-A record detail page shows one business record, such as an order, a customer, or a product. It shows its state, its facts, its history, and the commands a reader may run on it. These patterns answer the recurring questions of that page. Each pattern offers drawn options and names a default.
+One screen shows one business record: its state, facts, history, and the commands a reader may run. This page holds the patterns for that screen: header, tabs, summary, aside, timeline, relations, refusals, change history, notes, attachments, identifiers, phone header, neighbor movement, and the worked order example. A team building a record screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared record shape keeps every record readable in the same order, so support finds the state and the next step without hunting.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about a record screen, such as what the header states. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use order SO-1042 for Maria Garcia: paid, EUR 125.00, part of the Garcia Interiors restock. The header states the order and its state, the sections state the customer, lines, and money, and the aside carries the history. The Standards section states the two rules every option keeps: a record header shows at most one primary action, and a destructive command never takes the primary place or style.
 
 ## Standards
 
@@ -10,13 +20,13 @@ A record detail page shows one business record, such as an order, a customer, or
 
 **Requirement:** A record header MUST show at most one primary action.
 
-**Rationale:** The primary action is the answer to what a reader most often does next with this record. Two primary actions give no answer, and the reader compares labels instead of acting.
+**Rationale:** One primary action names the step readers take most often next on the record, such as Message customer on order SO-1042. Without that single answer, two equal buttons force the reader to compare labels on every visit, and the hurried click lands on the wrong command.
 
 ### Keep destructive commands out of the primary place
 
 **Requirement:** A destructive command MUST NOT take the primary action's place or style in a record header.
 
-**Rationale:** The primary place is where a hurried reader clicks. A destructive command there turns a routine visit into the most expensive mistake on the page.
+**Rationale:** The primary place draws the hurried click, so it holds only the safe next step. A destructive command styled or placed as primary turns a routine visit into a discontinued product or a voided order, with no step between intent and loss.
 
 ## Patterns
 
@@ -245,7 +255,7 @@ page
 
 ### Record tabs
 
-**Question:** A record holds at most three sections, and further facets become tabs. A product record carries four facets. Tab sets stay small, at about six at most, and the active tab stays in the URL.
+**Question:** A record holds at most three sections, and further facets become tabs. A product record carries four facets. Tab sets stay small, at six at most, and the active tab stays in the URL.
 
 **Default:** `four-tabs-with-the-active-one-in-the-url`
 
@@ -1276,7 +1286,7 @@ page
 
 ### Record the reader may not change
 
-**Question:** A refused state exists. A page a role cannot use shows the refusal with the reason and the grant that helps. The question is whether the refusal is a whole page or a part of one.
+**Question:** Some records refuse some roles. A page a role cannot use shows the refusal with the reason and the grant that helps. The question is whether the refusal covers the whole page or a part of one.
 
 **Default:** `the-commands-are-refused-the-record-is-not`
 
@@ -2471,7 +2481,7 @@ page
     fact "Cable tray" "EUR 25.00"
 ```
 
-**Rationale:** Some consoles deliberately offer no neighbor step, because the list is the queue and the record is the work. The reader finishes an order, closes it, and the list shows what is next. Nothing on the record can carry a stale position.
+**Rationale:** Some products deliberately offer no neighbor step, because the list is the queue and the record is the work. The reader finishes an order, closes it, and the list shows what is next. Nothing on the record can carry a stale position.
 
 **Cost:** Every record costs a full round trip through the list, which is slow triage and loses the reader's scroll each time. It is honest but it is the slowest honest option.
 

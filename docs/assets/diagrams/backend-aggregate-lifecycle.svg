@@ -1,21 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="280" viewBox="0 0 720 280" role="img" aria-labelledby="backend-aggregate-lifecycle-title backend-aggregate-lifecycle-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
-  <title id="backend-aggregate-lifecycle-title">The loan aggregate lifecycle from its declared states and use cases</title>
-  <desc id="backend-aggregate-lifecycle-desc">Borrow from borrow-copy creates an Active loan carrying the due date, Extend from extend-loan keeps it Active with a new due date, and Return from return-copy moves an Active or Overdue loan to Returned carrying the returned time; Active and Overdue carry the due date. A dashed arrow from Active to Overdue labeled due date passes shows the declared Overdue state, for which the example names no use case.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="290" viewBox="0 0 720 290" role="img" aria-labelledby="backend-aggregate-lifecycle-title backend-aggregate-lifecycle-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="backend-aggregate-lifecycle-title">The expense aggregate lifecycle from its declared states and use cases</title>
+  <desc id="backend-aggregate-lifecycle-desc">Submit from submit-expense creates a Submitted expense. Approve from approve-expense moves it to Approved, carrying the approver and the decided time. Reject from reject-expense moves it to Rejected, carrying the reason. Reimburse from reimburse-expense moves an Approved expense to Reimbursed, carrying the reimbursed time.</desc>
   <defs>
     <marker id="backend-aggregate-lifecycle-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
     </marker>
   </defs>
 
-  <!-- Solid arrows are use-case moves; the dashed arrow shows the declared Overdue state with no named use case. -->
+  <!-- Every arrow is a use-case move. -->
   <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#backend-aggregate-lifecycle-arrow)">
     <path d="M95 50 V 102" />
-    <path d="M445 136 H 532" />
-    <path d="M95 162 C 95 210, 625 210, 625 170" />
-    <path d="M40 162 C 40 192, 80 192, 80 162" />
-  </g>
-  <g style="stroke: var(--muted-fg, #77706a); fill: none; stroke-dasharray: 6 4" stroke-width="1.25" marker-end="url(#backend-aggregate-lifecycle-arrow)">
     <path d="M180 136 H 267" />
+    <path d="M445 136 H 532" />
+    <path d="M95 162 V 214" />
   </g>
 
   <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
@@ -23,24 +20,24 @@
     <rect x="10" y="110" width="170" height="52" rx="8" />
     <rect x="275" y="110" width="170" height="52" rx="8" />
     <rect x="540" y="110" width="170" height="52" rx="8" />
+    <rect x="10" y="222" width="170" height="52" rx="8" />
   </g>
 
   <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
-    <text x="95" y="38">Borrow</text>
-    <text x="95" y="132">Active</text>
-    <text x="360" y="132">Overdue</text>
-    <text x="625" y="132">Returned</text>
+    <text x="95" y="38">Submit</text>
+    <text x="95" y="132">Submitted</text>
+    <text x="360" y="132">Approved</text>
+    <text x="625" y="132">Reimbursed</text>
+    <text x="95" y="244">Rejected</text>
   </g>
   <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
-    <text x="95" y="148">carries due date</text>
-    <text x="360" y="148">carries due date</text>
-    <text x="625" y="148">carries returned at</text>
-    <text x="223" y="100">due date passes</text>
-    <text x="488" y="128">Return</text>
-    <text x="360" y="216">Return</text>
-    <text x="60" y="206">Extend</text>
-    <text x="60" y="220">new due date</text>
+    <text x="95" y="148">awaits a decision</text>
+    <text x="360" y="148">carries approver, decided at</text>
+    <text x="625" y="148">carries reimbursed at</text>
+    <text x="95" y="260">carries reason, decided at</text>
+    <text x="223" y="128">Approve</text>
+    <text x="488" y="128">Reimburse</text>
   </g>
   <text x="103" y="80" font-size="12" style="fill: var(--muted-fg, #77706a)">creates</text>
-  <text x="360" y="262" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">Solid arrows are use-case moves; the dashed move is one for which the example names no use case.</text>
+  <text x="103" y="192" font-size="12" style="fill: var(--muted-fg, #77706a)">Reject</text>
 </svg>

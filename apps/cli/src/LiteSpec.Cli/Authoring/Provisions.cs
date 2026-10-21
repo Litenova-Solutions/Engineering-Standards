@@ -68,7 +68,7 @@ static class Provisions
     // A provision is a ### heading inside a page's Standards or Conventions section,
     // on any page under docs/ except the lookup areas and the navigation pages, which
     // own no provisions.
-    static readonly string[] ExcludedAreas = ["docs/tools/", "docs/reference/", "docs/tutorial/", "docs/guide/", "docs/learn/"];
+    static readonly string[] ExcludedAreas = ["docs/tools/", "docs/reference/", "docs/tutorial/", "docs/guide/", "docs/learn/", "docs/analyzers/", "docs/example/"];
 
     /// <summary>Whether provisions are collected from this repository-relative path.</summary>
     public static bool IsProvisionPage(string relative) =>

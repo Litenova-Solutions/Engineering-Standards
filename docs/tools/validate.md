@@ -2,7 +2,7 @@
 
 ## Name
 
-`litespec validate` holds the LiteSpec repository to its own authoring contract.
+`litespec validate` checks the LiteSpec repository against its own authoring contract.
 
 ## Synopsis
 
@@ -12,7 +12,7 @@ litespec validate [--root <path>] [--warnings] [--format json] [--help]
 
 ## Description
 
-This command is the repository gate for every page, template, and identifier under `docs/`. It reads page contracts and section order, atomic Standards and Convention blocks, provision identity, pattern pages and their wireframes, verification marks, and ASCII prose. It also reads internal links, manifest paths, extension declarations, and the generated provision index.
+This command is the repository gate for every page, template, and identifier under `docs/`. It checks page contracts and section order, atomic Standards and Convention blocks, provision identity, pattern pages and their wireframes, verification marks, and ASCII prose. It also checks internal links, manifest paths, extension declarations, and the generated provision index.
 
 Run it after changing any page, any template, or any authoring rule.
 
@@ -25,7 +25,7 @@ None. Everything passes through options.
 | Option | Default | Effect |
 |:---|:---|:---|
 | `--root <path>` | the LiteSpec checkout the tool ships in | Selects the LiteSpec repository to read. |
-| `--warnings` | off | Lists every occurrence of a rule the repository is still burning down. |
+| `--warnings` | off | Lists every occurrence of the rules that report warnings. |
 | `--format json` | off | Writes one JSON object on standard output, with the errors and warnings as arrays. |
 | `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 

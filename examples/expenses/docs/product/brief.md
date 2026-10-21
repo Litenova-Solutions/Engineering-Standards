@@ -1,0 +1,25 @@
+---
+{
+  "type": "product",
+  "id": "product/expenses",
+  "title": "Expenses",
+  "owner": "expenses-team",
+  "status": "approved",
+  "boundary": "Expenses submits, approves, and reimburses work expenses with receipts.",
+  "neverDoes": [
+    "The product never pays an expense twice.",
+    "The product never approves without a manager."
+  ],
+  "audience": [
+    "actor/employee",
+    "actor/manager",
+    "actor/finance"
+  ]
+}
+---
+
+# Expenses
+
+The company submits work expenses with receipts.
+
+Employees submit and attach. Managers approve and reject. Finance reimburses.

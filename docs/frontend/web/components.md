@@ -2,27 +2,27 @@
 
 ## Intent
 
-This page states how the TypeScript web stacks realize the frontend component principles ([Frontend components](../components.md)). It states the registry source, the closed element list, and the visual file patterns. It also states the raw HTML sinks and the route suite checks the React and Svelte stacks share.
+Every screen in a TypeScript web frontend draws with composites, shared building blocks for layout and interaction, from one shared UI package, instead of each application drawing its own. This page states how the [React Stack](react/stack.md) and [Svelte Stack](svelte/stack.md) follow the component principles in [Frontend Components](../components.md): the registry source holding the primitives every composite builds on, the closed list of refused raw elements, visual files for drawings no composite makes, the raw HTML sinks untrusted content must never reach, and the route checks both stacks share. A team that applies it while writing pages keeps layout and interaction inside governed composites instead of scattered raw elements.
 
 ## React
 
-The React stack uses these bindings:
+Names and files that differ per stack. The React stack uses these bindings:
 
 - A class or style binding spells `className` or `style`.
-- A visual file ends with `*.visual.tsx`.
-- The raw HTML sink is `dangerouslySetInnerHTML`.
-- The route error surface is the route error component.
-- Component authoring follows `react/components.md`.
+- A file holding a drawing no composite makes ends with `*.visual.tsx`.
+- Raw HTML reaches the page only through `dangerouslySetInnerHTML`.
+- The route error surface is the route error component, which draws the shared problem state.
+- Component authoring follows [React components](react/components.md).
 
 ## Svelte
 
 The Svelte stack uses these bindings:
 
 - A class or style binding spells `class`, `class:`, `style`, or `style:`.
-- A visual file ends with `*.visual.svelte`.
-- The raw HTML sink is `{@html}`.
-- The route error surface is the route error page.
-- Component authoring follows `svelte/components.md`.
+- A file holding a drawing no composite makes ends with `*.visual.svelte`.
+- Raw HTML reaches the page only through `{@html}`.
+- The route error surface is the route error page, which draws the shared problem state.
+- Component authoring follows [Svelte components](svelte/components.md).
 
 ## Standards
 
@@ -30,7 +30,7 @@ The Svelte stack uses these bindings:
 
 **Requirement:** A workspace MUST hold its registry primitives and its composites in one shared UI package, with no copy in an application.
 
-**Rationale:** A primitive copied into two applications diverges on the first upstream update. The divergence is invisible because both copies compile. This realizes litespec/frontend/components#keep-shared-ui-in-one-package.
+**Rationale:** A primitive copied into two applications diverges on the first upstream update, and the divergence is invisible because both copies compile. One shared package holding the registry primitives and the composites keeps every application on the same source: an update lands once and reaches all of them. This realizes litespec/frontend/components#keep-shared-ui-in-one-package.
 
 **Example:** The primitives sit in one folder that the registry CLI writes. No one edits that folder by hand. The composites sit beside them and import them.
 
@@ -38,7 +38,7 @@ The Svelte stack uses these bindings:
 
 **Requirement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
 
-**Rationale:** A raw element carries no focus management, no state, and no accessibility wiring. The reader of the lint message chooses between two answers. The message gives one. This realizes litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
+**Rationale:** A raw layout or interactive element carries no focus management, no state, and no accessibility wiring, so each use rebuilds what a composite already provides. The lint refusal names the composite to use, so the reader gets the answer with the error instead of searching for it. This realizes litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
 
 **Example:** The refused elements and their replacements are one closed list.
 
@@ -52,25 +52,25 @@ The Svelte stack uses these bindings:
 | `table` | `DataTable` |
 | `img` | the shared image component, which `litespec/frontend/components#use-a-composite-for-a-content-image` owns |
 
-Text elements stay available, because a sentence is not a component decision. `p`, `h2`, `h3`, `em`, `strong`, `ul`, `ol`, and `li` carry prose. The floorplan owns the `h1`, so it is not in the list. Any other element follows the same rule: page code declares no other element, and the author adds a composite or a visual file instead.
+Text elements stay available, because a sentence is not a component decision: `p`, `h2`, `h3`, `em`, `strong`, `ul`, `ol`, and `li` carry prose. The [floorplan](../ui.md) owns the `h1`, so it is absent from the list. Any other element follows the same rule: page code declares no other element, and the author adds a composite or a visual file instead.
 
 ### Place a drawing no composite makes in a visual file
 
 **Requirement:** A visual file MAY write class names, and uses semantic theme tokens only.
 
-**Rationale:** A stock-location map, a packing-slip preview, and a public frame have no composite. Refusing them pushes the drawing into an arbitrary value that no token governs. The file name declares this exception. The React and Svelte sections name the file pattern. This realizes litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file.
+**Rationale:** Some drawings have no composite: a stock-location map, a packing-slip preview, a public frame. Refusing them outright would push the drawing into an arbitrary value that no token governs. The visual file name declares the exception visibly, and semantic theme tokens keep even the exception inside the palette. The React and Svelte sections name the file pattern for each stack. This realizes litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file.
 
 ### Meet accessibility requirements
 
 **Requirement:** The route suite MUST check keyboard reach, visible focus, target size, and status announcements on every route.
 
-**Rationale:** The principle's guarantees hold only when every route proves them. This realizes litespec/frontend/components#support-keyboard-focus-labels-and-announcements.
+**Rationale:** Keyboard reach, visible focus, target size, and status announcements hold only when every route proves them. A route the suite skips can ship unreachable controls or silent updates with no error. Checking all four on every route makes the guarantees hold for the whole product, not just the routes somebody specified. This realizes litespec/frontend/components#support-keyboard-focus-labels-and-announcements.
 
 ### Protect rich content boundaries
 
 **Requirement:** A component MUST NOT pass untrusted content to a raw HTML sink.
 
-**Rationale:** The React and Svelte sections name the sink for each stack. Stored rich content requires a decision record naming the sanitizer, the allowed elements and attributes, the link policy, and the test cases. This realizes litespec/frontend/components#sanitize-untrusted-rich-content.
+**Rationale:** A raw HTML sink renders whatever it receives, so untrusted content passed to it runs as page markup. Stored rich content therefore needs a decision record naming the sanitizer, the allowed elements and attributes, the link policy, and the test cases before any component renders it. The React and Svelte sections name the sink for each stack. This realizes litespec/frontend/components#sanitize-untrusted-rich-content.
 
 ## Conventions
 
@@ -80,7 +80,7 @@ Text elements stay available, because a sentence is not a component decision. `p
 
 **Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** Some primitive sources default a title to a non-heading element, which removes it from the outline and the browser test that finds it. The route suite asserts each visible section title resolves as a heading. This realizes litespec/frontend/components#expose-card-and-section-titles-as-headings.
+**Rationale:** A title rendered as a non-heading element vanishes from the document outline and from the browser test that finds it, and some primitive sources default to exactly that. Rendering each visible card, panel, or section title as a heading at its correct level keeps the outline and the test intact. The route suite asserts each visible section title resolves as a heading. This realizes litespec/frontend/components#expose-card-and-section-titles-as-headings.
 
 ### Compose class names in the shared package
 
@@ -88,7 +88,7 @@ Text elements stay available, because a sentence is not a component decision. `p
 
 **Replacement:** A consumer replaces this default by recording an exception with its reason and review date.
 
-**Rationale:** A second merging helper produces a different conflict resolution for the same class pair. Page code has no reason to hold one.
+**Rationale:** Two merging helpers resolve the same class pair differently, so a second helper makes identical markup render differently by location. One merge helper exported by the shared package keeps conflict resolution identical everywhere. Page code holds no merge or variant helper import, because it has no decision to make.
 
 ## Verification
 

@@ -2,16 +2,14 @@
 
 ## Purpose
 
-Run the LiteSpec Roslyn analyzers over your .NET backend so every build reports the findings that break LiteSpec rules, and fix or record each finding.
-
-This guide carries no provision. Each step cites the provisions it satisfies.
+The LiteSpec Roslyn analyzers report breaks in LiteSpec .NET rules as compiler warnings on every build, so a team sees each break in the editor instead of finding it in review. This guide installs the analyzer package once for the 5 backend projects, shows how to read and fix the first warnings, and raises enforced rules to build errors that fail the build. Each step names the standard it satisfies, and the guide adds no rule of its own.
 
 ## Prerequisites
 
 Start with:
 
-- The .NET 9.0.300 SDK, or Visual Studio 17.14 or later. The analyzer package targets the compiler that ships in that SDK.
-- A solution with the five projects from [the .NET architecture page](../backend/dotnet/architecture.md#use-five-application-projects): Domain, Application.Abstractions, Application, Infrastructure, and WebApi.
+- The .NET 9.0.300 SDK, or Visual Studio 17.14 or later, whose compiler the analyzer package targets.
+- A solution with the five application projects that [the .NET architecture page](../backend/dotnet/architecture.md#use-five-application-projects) requires: Domain, Application.Abstractions, Application, Infrastructure, and WebApi.
 - One shared build file that all five projects import, such as `apps/api/Directory.Build.props`, with central package management enabled as [the .NET configuration page](../backend/dotnet/config.md#centralize-nuget-versions) describes.
 
 ## Procedure
@@ -36,7 +34,7 @@ and omit `Version` from the `PackageReference`. Never add a second copy in a pro
 
 ### 2. Confirm each project layer
 
-A rule runs only in the layers its provision covers. The analyzers read the layer from the assembly name suffix: `Shop.Domain` is Domain and `Shop.Application.Abstractions` is Application.Abstractions, and the same suffix rule maps Application, Infrastructure, and WebApi. Any other assembly is not analyzed. The resolver checks the two-part `Application.Abstractions` suffix before `Application`, so `Shop.Application.Abstractions` never resolves as Application.
+Each rule runs only in the layers its provision covers, and the analyzers read the layer from the assembly name suffix. `Shop.Domain` resolves as Domain, `Shop.Application.Abstractions` as Application.Abstractions, and the same suffix rule maps Application, Infrastructure, and WebApi. An assembly whose name carries no layer suffix is not analyzed. The resolver checks the two-part `Application.Abstractions` suffix before `Application`, so `Shop.Application.Abstractions` never resolves as Application.
 
 When a project name does not end in a layer name, set the layer in its project file:
 
@@ -66,7 +64,7 @@ The trailing address is the help link: it opens the provision the rule enforces,
 
 ### 4. Fix a finding
 
-Work through one finding at a time, starting with the Domain layer. The two examples below cover the most common first warnings.
+Work through one finding at a time, starting with the Domain layer. The two examples below cover the most common first warnings. For any other warning, open its rule page from the [Analyzer rules overview](rules/README.md), which states what the rule reports and how to fix the code.
 
 #### Replace an enum with a closed record hierarchy
 
@@ -81,7 +79,7 @@ public enum OrderStatus
 }
 ```
 
-After, following the shape on [the .NET domain page](../backend/dotnet/domain.md#model-every-closed-set-of-domain-values-without-enums):
+After the rewrite, following the shape on [the .NET domain page](../backend/dotnet/domain.md#model-every-closed-set-of-domain-values-without-enums):
 
 ```csharp
 public abstract record OrderStatus
@@ -147,7 +145,7 @@ dotnet_diagnostic.LS1002.severity = error
 dotnet_diagnostic.LS1009.severity = error
 ```
 
-Then fail the build on those warnings. The workspace already treats warnings as errors through `apps/api/Directory.Build.props` under `litespec/backend/dotnet/config#centralize-net-build-settings`. To scope the failure to the analyzers instead, set:
+Then fail the build on those warnings. The workspace already treats warnings as errors through `apps/api/Directory.Build.props` under `litespec/backend/dotnet/config#centralize-net-build-settings`; to fail only on analyzer diagnostics instead, set:
 
 ```xml
 <PropertyGroup>
@@ -159,7 +157,7 @@ Extend the list with each further ID the team enforces. The `build` job compiles
 
 ### 6. Record a deliberate departure
 
-When a finding is wrong for your project, record an Exception record that cites the provision, with its reason and a review date, as [the model page](../core/model.md) describes. The record lives at `docs/exceptions/<name>.md`. Then suppress narrowly, next to the code:
+When a finding is wrong for the project, record an Exception that cites the provision, with its reason and review date, as [the model page](../core/model.md) describes. Keep the record at `docs/exceptions/<name>.md`, then suppress narrowly next to the code:
 
 ```csharp
 #pragma warning disable LS1011 // Exception: docs/exceptions/domain-docs-deferred.md

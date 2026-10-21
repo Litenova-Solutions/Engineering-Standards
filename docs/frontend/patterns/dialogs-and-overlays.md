@@ -2,7 +2,17 @@
 
 ## Intent
 
-An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast, or a bar that stays in view. These patterns answer when each one fits and how it opens, holds focus, and closes. Each pattern shows its options as wireframes and names a default.
+A dialog, drawer, popover, menu, toast, context menu, shortcut overlay, bottom sheet, or persistent bar floats above or beside the page to confirm, edit, preview, or announce without a full navigation. This page shows when each overlay fits and how it opens, holds focus, and closes, as drawn options with a named default to build. The product owner chooses among the options when the team adds a confirmation, a side preview, or any floating layer. Right-sized overlays keep staff oriented: the page stays visible behind short tasks, and irreversible commands get the full attention they need.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about floating layers, such as when a short task belongs in a dialog. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply back office: the spring lighting launch with 1,204 pre-orders, orders such as SO-1042 for Maria Garcia, and the refund and note commands staff run on them. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a confirmation dialog labels its confirm action with the command it runs, and an overlay returns focus to the control that opened it.
 
 ## Standards
 
@@ -10,13 +20,13 @@ An overlay sits above the page: a dialog, a drawer, a popover, a menu, a toast, 
 
 **Requirement:** A confirmation dialog MUST label its confirm action with the command it runs.
 
-**Rationale:** A reader who scans only the buttons still learns what happens. A button labeled `OK` or `Yes` asks the reader to reread the question before acting.
+**Rationale:** Staff often scan only the buttons before clicking, so the button text is the last chance to state what happens. A button labeled `OK` or `Yes` forces the reader to reread the dialog title to know what they confirm, and under time pressure they click without rereading and run the wrong command.
 
 ### Return focus when an overlay closes
 
 **Requirement:** An overlay MUST return focus to the control that opened it when it closes.
 
-**Rationale:** A keyboard reader continues from the place they left. Focus that falls back to the top of the page loses the reader's place in a long list.
+**Rationale:** Keyboard and screen-reader users navigate by focus position, so closing an overlay must put them back where they started. Focus that falls back to the top of the page strands them far from their row in a long list, and they must tab through the whole page to continue.
 
 ## Patterns
 
@@ -168,9 +178,9 @@ page
     action primary "Close the lines first"
 ```
 
-**Rationale:** The command is forbidden by a dependency. The dialog names the dependency and the command that clears it. The commit button is disabled with the reason on it.
+**Rationale:** The command is blocked by a dependency. The dialog names the dependency and the command that clears it, and the commit button stays disabled with the reason beside it.
 
-**Cost:** A dialog that cannot be completed is a dead end. Cloudscape handles this by disabling the commit control, which is honest but leaves the reader needing another surface.
+**Cost:** A dialog that cannot be completed is a dead end. Cloudscape handles this by disabling the commit control, which states the state plainly but leaves the reader needing another surface.
 
 **Reference:** Cloudscape
 
@@ -194,7 +204,7 @@ page
 
 **Rationale:** Safer destructive action. The commit button stays disabled until the reader ticks every consequence line. Unlike typing one name, ticking forces the eye across each line, so the refund route and the record-keeping are each acknowledged.
 
-**Cost:** Three checkboxes for one command is the heaviest confirmation in this set. Past one object per deployment it becomes the reflex click the pattern exists to break.
+**Cost:** Three checkboxes for one command is the heaviest confirmation in this pattern. Past one object per deployment it becomes the reflex click the pattern exists to break.
 
 #### `an-alert-dialog-with-the-safe-action-first`: An alert dialog with the safe action first
 
@@ -222,7 +232,7 @@ page
 
 ### Short task in a dialog
 
-**Question:** When does a short task belong in a dialog. One to four inputs with nothing to consult fits a dialog. More than four inputs, sections, or steps belong on a full page.
+**Question:** A short task with one to four inputs and nothing to consult fits a dialog. More than four inputs, sections, or steps belong on a full page. The decision is which surface each short command takes, and what to do when a dialog would need a second dialog.
 
 **Default:** `two-or-three-inputs-one-dialog`
 
@@ -399,7 +409,7 @@ page
 
 **Rationale:** Five notes cost five dialogs and zero navigation: a checkbox in the dialog keeps it open for repeat entry. It suits warehouse logging, where notes arrive in bursts.
 
-**Cost:** A dialog that stays open hides the list it appends to, so the reader cannot see the note land. Past three repeats in a row, the task on the page is still the honest surface.
+**Cost:** A dialog that stays open hides the list it appends to, so the reader cannot see the note land. Past three repeats in a row, the task belongs on the page instead.
 
 **Reference:** Linear
 
@@ -431,7 +441,7 @@ page
 
 ### Drawer beside the list
 
-**Question:** A list action opens a drawer so a reader can see a record without leaving the list. The drawer holds context that supports the task. Below a narrow width it becomes an overlay.
+**Question:** A list action opens a drawer so a reader can see a record without leaving the list. The drawer holds read-only context that supports the task. Below a narrow width the drawer takes the whole screen with a Back control.
 
 **Default:** `read-only-record-beside-the-list`
 
@@ -466,7 +476,7 @@ page
 
 **Rationale:** The recommended shape. The list is untouched and narrowed, the record holds facts, and the way out is back to the full record. Nothing in the drawer is editable, so it cannot become a task.
 
-**Cost:** A 420-pixel drawer against a 1440 screen leaves the list about 900 wide, which is five columns and not eight. That leaves two nested navigations on one screen.
+**Cost:** A 420-pixel drawer on a 1440 screen leaves the list about 900 wide, which fits five columns and not eight. The screen then holds two navigations, the list and the drawer, side by side.
 
 **Reference:** Atlassian
 
@@ -496,7 +506,7 @@ page
 
 **Rationale:** The drawer slides over the table rather than beside it, so it can be wider and hold more without squeezing the table to five columns.
 
-**Cost:** The row the reader is comparing against is hidden. Atlassian puts the panel beside the main area and only over it at 1024 and below, so this breaks the source rule at 1440.
+**Cost:** The row the reader is comparing against is hidden. Atlassian places the panel beside the main area and only over it at 1024 px and below, so this option breaks that guidance at desktop widths.
 
 **Reference:** Atlassian
 
@@ -604,7 +614,7 @@ page
     action primary "Message the customer"
 ```
 
-**Rationale:** At 390 pixels there is no beside, so the drawer takes the screen and Back returns to the list at the same scroll position. The behavior is honest about having no room.
+**Rationale:** At 390 pixels there is no room for beside, so the drawer takes the screen and Back returns to the list at the same scroll position.
 
 **Cost:** Keeping the list alive behind a full-screen view is a navigation model rather than a layout. It has to hold filters and scroll in memory, or the return is a different list.
 
@@ -853,7 +863,7 @@ page
 
 ### Menu of a row's commands
 
-**Question:** Where do the other commands of a row sit? The first command draws inline and the rest sit behind a menu. A row keeps its other commands in its row menu.
+**Question:** A row with several commands shows the first inline and keeps the rest behind a menu. The decision is how that menu groups its items, explains disabled ones, and handles search and submenus.
 
 **Default:** `a-menu-with-groups-and-a-destructive-item-last`
 
@@ -935,7 +945,7 @@ page
 
 **Rationale:** A destructive item opens its confirmation from inside the menu, so the menu stays and the question appears beside the row it applies to.
 
-**Cost:** That is a dialog opening over a menu, which is a menu opening a dialog. Atlassian forbids a dialog that triggers another dialog. The same reasoning applies to a menu.
+**Cost:** The confirmation opens over the menu, which stacks two floating layers. Atlassian forbids a dialog that triggers another dialog, and the same reasoning refuses a dialog over a menu.
 
 **Reference:** Atlassian
 
@@ -1066,15 +1076,15 @@ page
 
 ### Short panel that opens beside a control
 
-**Question:** What earns a panel anchored to a control? It is not a dialog and not a toast. It closes when the reader looks away, and a reference to another record is chosen from a picker instead.
+**Question:** A popover is a small panel anchored to a control: not a dialog and not a toast. It closes when the reader looks away. The decision is what earns such a panel: term explanations, row previews, pickers, calendars, copy confirmations, hover cards, or coach marks.
 
 **Default:** `a-popover-that-explains-what-a-term-means`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep the popover that explains what a term means. A defined term carries its glossary entry where it is read, and only for terms the application has defined. The runner-up is the row preview popover. It suits dense lists where a hover card saves a navigation, on focus as well as hover.
+**Rationale:** Keep the popover that explains what a term means. A defined term carries its glossary entry where it is read, and only for terms the application has defined. The runner-up is the row preview popover. It suits dense lists where a hover card saves a navigation, and it must open on focus as well as hover.
 
-Never ship a menu and a popover for the same thing. The pair teaches that floating layers stack, which the one-overlay rule refuses.
+Never ship a menu and a popover for the same thing. The pair teaches that floating layers stack, and stacked layers confuse readers about which one to dismiss.
 
 #### `a-row-preview-popover-on-hover-and-focus`: A row preview popover on hover and focus
 
@@ -1097,7 +1107,7 @@ page
 
 **Rationale:** Hovering a parcel code shows the parcel's facts. It gives context without leaving the list and costs one read.
 
-**Cost:** A hover affordance is invisible on touch and undiscoverable at all. It needs focus as well as hover, and then it is two renders of every row.
+**Cost:** A hover affordance is invisible on touch and hard to discover on desktop. It needs focus as well as hover, which means two ways to render every row.
 
 #### `a-popover-that-explains-what-a-term-means`: A popover that explains what a term means
 
@@ -1139,7 +1149,7 @@ page
 
 **Rationale:** The record picker list opens in a popover rather than a dialog, anchored to the field. The rest of the form stays visible behind it.
 
-**Cost:** This is what the picker in the forms category already is. It only works while the list is short enough to sit under the field without leaving the viewport.
+**Cost:** This is the picker the forms page already describes. It only works while the list is short enough to sit under the field without leaving the viewport.
 
 #### `a-popover-for-the-calendar`: A popover for the calendar
 
@@ -1211,7 +1221,7 @@ page
 
 **Rationale:** The row menu holds commands and a popover holds context, side by side. A reviewer can see the two floating shapes next to each other.
 
-**Cost:** A page with both on it has three floating layers counting the dialog, and a reader has to learn which is which. This is the reason the one-overlay rule wants one overlay at a time.
+**Cost:** A page with both holds three floating layers counting the dialog, and a reader must learn which is which. This is why a page should show one overlay at a time.
 
 #### `a-customer-hover-card-with-recent-orders`: A customer hover card with recent orders
 
@@ -1266,15 +1276,15 @@ page
 
 ### Bar that stays while the reader works
 
-**Question:** Not an overlay in the dialog sense: a band the page keeps. It is worded as a fact about the page. A tone may not paint a full-width band on a page about other work.
+**Question:** A persistent bar is a band the page keeps, worded as a fact about the page, the deployment, or the record. A tone may not paint a full-width band on a page about other work. The decision is which facts earn a bar and where each bar sits.
 
 **Default:** `a-neutral-band-for-what-this-page-is`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship A: a neutral band stating a fact about the deployment, the same on every page. E is the runner-up for facts true of one record only, drawn as a notice on that record.
+**Rationale:** Ship the neutral band stating a fact about the deployment, the same on every page. The bar on the record page is the runner-up for facts true of one record only, drawn as a notice on that record.
 
-Never ship C: a full-width caution band paints the whole page. The tone covers work the page is not about.
+Never ship the bar naming a deadline: a full-width caution band paints the whole page, and the tone covers work the page is not about.
 
 #### `a-neutral-band-for-what-this-page-is`: A neutral band for what this page is
 
@@ -1443,11 +1453,11 @@ page
 
 **Default:** `order-actions-in-a-bottom-sheet`
 
-**Compact:** Every option in this item is the phone behavior. A dialog becomes a sheet from the bottom edge with a handle, a title naming the record, and a full-width footer. The compact option is `order-actions-in-a-bottom-sheet`.
+**Compact:** Every option in this pattern is the phone behavior. A dialog becomes a sheet from the bottom edge with a handle, a title naming the record, and a full-width footer. The compact option is `order-actions-in-a-bottom-sheet`.
 
-**Rationale:** Ship A for commands and B for filters: both keep a handle, a title, and a full-width footer above the home indicator. C is the runner-up where the content is genuinely long, because detents let the reader choose half or full.
+**Rationale:** Ship the order-actions sheet for commands and the filters sheet with its sticky apply bar for filters: both keep a handle, a title, and a full-width footer above the home indicator. The half-height sheet is the runner-up where the content is genuinely long, because detents let the reader choose half or full.
 
-Never ship F: a sheet with no dismissal traps the reader on the smallest screen, where every trap costs the most.
+Never ship the sheet with no dismissal: it traps the reader on the smallest screen, where every trap costs the most.
 
 #### `order-actions-in-a-bottom-sheet`: Order actions in a bottom sheet
 
@@ -1616,9 +1626,9 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship A: one scrolling body, one pinned footer, nothing else. D is the runner-up wherever money moves, because the reader sees the totals above the footer before confirming.
+**Rationale:** Ship the scrolling body with a pinned footer: one scrolling body, one pinned footer, nothing else. The summary pinned above the footer is the runner-up wherever money moves, because the reader sees the totals above the footer before confirming.
 
-Never ship F: buttons that scroll away ask the reader to agree first and find how after.
+Never ship the dialog with no pinned footer: buttons that scroll away ask the reader to agree first and find how after.
 
 #### `a-scrolling-body-with-a-pinned-footer`: A scrolling body with a pinned footer
 
@@ -1790,7 +1800,7 @@ page
 
 **Rationale:** Included to refuse it: without a scroll cap the dialog grows past the viewport and the footer sits below the fold. The reader agrees first and finds how after.
 
-**Cost:** On a phone the footer is two screens down, past terms nobody scrolled to. This is the shape every other option in this item exists to replace.
+**Cost:** On a phone the footer is two screens down, past terms nobody scrolled to. This is the shape every other option in this pattern exists to replace.
 
 ### Keyboard shortcut help overlay
 
@@ -1800,9 +1810,9 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Ship A: three groups, one grid, every key the application honors, closed by the same key. D is the runner-up on dense pages, where a `This page` section answers the only keys that work there.
+**Rationale:** Ship the grouped grid of shortcuts: three groups, one grid, every key the application honors, closed by the same key. The this-page-only list is the runner-up on dense pages, where it answers the only keys that work there.
 
-Never ship F: tooltips alone hide the catalog from the reader who would learn it fastest.
+Never ship tooltips alone: they hide the catalog from the reader who would learn it fastest.
 
 #### `a-grouped-grid-of-shortcuts`: A grouped grid of shortcuts
 
@@ -1976,9 +1986,9 @@ page
 
 **Compact:** Touch has no right click: a long press opens the same menu, with the same commands and the same order, positioned above the row. The compact option is `a-long-press-menu-on-touch`.
 
-**Rationale:** Ship A: the row's own commands at the pointer, nothing added, nothing missing, closed by the same click elsewhere. C is the runner-up for bulk work, where the menu rewrites itself for the selection count.
+**Rationale:** Ship the right-click menu on the row: the row's own commands at the pointer, nothing added, nothing missing, closed by clicking elsewhere. The bulk-selection menu is the runner-up for bulk work, where the menu rewrites itself for the selection count.
 
-Never ship F: silence hands the gesture to the browser, whose commands act on the page rather than the record.
+Never ship silence: it hands the gesture to the browser, whose commands act on the page rather than the record.
 
 #### `a-right-click-menu-on-a-row`: A right-click menu on a row
 

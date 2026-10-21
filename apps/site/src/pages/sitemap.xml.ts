@@ -7,7 +7,6 @@ import { absoluteUrl, lastModified } from "../lib/seo";
 export const GET: APIRoute = () => {
   const entries: { path: string; modified?: string }[] = [
     { path: "/", modified: lastModified("apps/site/src/pages/index.astro") },
-    { path: `/${version}/`, modified: lastModified("docs") },
     { path: `/${version}/select/`, modified: lastModified("apps/site/src/components/SelectForm.astro") },
     ...pages
       .filter((page) => htmlPath(page) !== "")

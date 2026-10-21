@@ -2,7 +2,7 @@
 
 ## Intent
 
-Multitenancy makes tenant identity part of authorization, persistence, caches, jobs, exports, diagnostics, and recovery. A tenant ID column alone does not provide isolation.
+Multitenancy lets independent customer organizations share one deployment while each keeps isolated data and policy. This page states how the product resolves tenant identity from trusted context, isolates each tenant's data and policy across authorization, storage, caches, jobs, exports, diagnostics, and recovery, and records the operations that cross tenant lines. A project selects it when separate customers require isolated data or policy in one deployment, because a tenant column without these obligations leaks one customer's data to another.
 
 ## Activation
 
@@ -10,13 +10,13 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer enables `tenancy` only when independent customer organizations share one deployment and require isolated data or policy.
+The project selects `tenancy` only when independent customer organizations share one deployment and need isolated data or policy. One organization with many users does not select it: tenants are separate customers, not separate logins.
 
 ## Baseline relationship
 
-None. This extension adds tenant obligations the baseline does not state.
+This extension replaces no baseline provision. It adds tenant obligations the baseline does not state: identity, isolation, scope, and operations across every boundary a tenant touches.
 
-None. Tenant scope applies to records every project already requires.
+It switches on no record type: tenant scope applies to records every project requires, such as Decisions, audit records, and exports.
 
 ## Standards
 
@@ -24,79 +24,79 @@ None. Tenant scope applies to records every project already requires.
 
 **Requirement:** A consumer selecting `tenancy` MUST record a Decision naming tenant source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound.
 
-**Rationale:** The Decision carries its owner, status, decider, and decide-by date. Approval waits while that Decision is a draft. The enumeration bound caps tenant identifiers in all-tenant records.
+**Rationale:** Tenant source, storage model, isolation guarantee, administrative access, and evolution path interact across every boundary, so one Decision records them together before code assumes any of them. Approval waits while that Decision stays a draft, and the enumeration bound caps how many tenant identifiers an all-tenant record lists.
 
 ### Define tenant isolation
 
 **Requirement:** A multi-tenant decision MUST define shared-table, schema, or database isolation and state its guarantee and operating trade-off.
 
-**Rationale:** The selected storage model determines data isolation, operational complexity, and scaling behavior.
+**Rationale:** Shared tables, separate schemas, and separate databases isolate differently and operate differently: each choice moves work between queries, migrations, backups, and scaling. Naming the model with its guarantee and its operating trade-off tells every later choice which isolation it can rely on.
 
 ### Avoid unplanned isolation models
 
 **Requirement:** A multi-tenant system MUST NOT mix isolation models without a decision and data evolution plan.
 
-**Rationale:** Mixed models create unclear guarantees and operational recovery behavior.
+**Rationale:** One part of the product on shared tables and another on separate databases answers which rows each tenant sees two ways. Each mixed model needs its own decision with a data evolution plan, or backup, restore, and incident response each guess which guarantee covers which data.
 
 ### Resolve tenant identity from trusted context
 
 **Requirement:** A trusted host boundary MUST resolve tenant identity from verified claims, host mapping, or another authenticated source.
 
-**Rationale:** Trusted resolution prevents callers from selecting a tenant outside their authenticated context.
+**Rationale:** The tenant decides which data the request may touch, so only a trusted host boundary resolves it: verified claims, host mapping, or another authenticated source. An identity the caller supplies itself is a choice, not a fact.
 
 ### Reject unrestricted tenant input
 
 **Requirement:** A tenant resolver MUST NOT accept an unrestricted tenant ID from request data.
 
-**Rationale:** Client-controlled identity can select another tenant's data boundary.
+**Rationale:** A tenant ID taken straight from request data lets any caller name any tenant. Rejecting unrestricted input keeps the request from choosing a data boundary outside its authenticated context.
 
 ### Verify actor and target tenancy
 
 **Requirement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
 
-**Rationale:** Both the caller and requested resource need the same authorized tenant scope. The chain runs Actor holds Role at scope, Role allows Permission, and use case needs Permission.
+**Rationale:** Checking the caller alone leaves the target unchecked: an authorized caller can still name a resource from another tenant. The operation confirms both sides through one chain: the actor holds a role at the resolved scope, the role allows the permission, the use case needs that permission, and the target belongs to the same scope.
 
 ### Isolate administrative cross-tenant access
 
 **Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, writing an audit record.
 
-**Rationale:** Exceptional access needs stronger visibility than normal tenant-scoped behavior.
+**Rationale:** Support and operations sometimes reach across tenants, and that exceptional reach needs exceptional control: a permission held through a role at platform scope, with an audit record for every use. Without both, one support login becomes an unscoped key to every customer's data.
 
 ### Use selected tenant storage support
 
 **Requirement:** A multi-tenant persistence implementation MUST resolve its tenant at session creation through the selected provider's own tenancy support.
 
-**Rationale:** Provider-supported tenancy gives queries and storage a consistent isolation mechanism. Session creation is the point that matters. A session opened without a tenant has an unscoped next query. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves it from the registered tenancy at session creation, so no query carries the concern. An Entity Framework Core implementation resolves the tenant when the context is created and applies it through a query filter convention.
+**Rationale:** Session creation is the point that matters: a session opened without a tenant serves an unscoped next query. Resolving the tenant then, through the selected provider's own tenancy support, scopes every query the session runs, so no query carries the concern alone. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves the tenant from the registered tenancy at session creation; an Entity Framework Core implementation resolves it when the context is created and applies it through a query filter convention.
 
 ### Scope tenant-owned records
 
 **Requirement:** Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path MUST include tenant scope.
 
-**Rationale:** Omitting scope from one storage or background boundary can disclose or mix tenant data.
+**Rationale:** Documents, queries, unique constraints, cache keys, outbox records, jobs, exports, and object-storage paths each form a boundary where tenants meet. Leaving tenant scope out of any one of them discloses or mixes customer data through exactly that gap.
 
 ### Apply cross-tenant disclosure policy
 
 **Requirement:** A cross-tenant resource response MUST use the documented not-found or forbidden policy.
 
-**Rationale:** The product chooses one disclosure outcome for unauthorized resource existence.
+**Rationale:** A caller that names another tenant's resource forces an answer: pretend it does not exist, or admit it exists and refuse. The product documents one policy and applies it to every cross-tenant response, so callers cannot probe for resources through inconsistent answers.
 
 ### Protect tenant diagnostics
 
 **Requirement:** Errors, logs, metrics, and traces MUST NOT reveal another tenant's business identifiers or data.
 
-**Rationale:** Diagnostics can bypass an API response's normal resource-disclosure boundary.
+**Rationale:** Errors, logs, metrics, and traces travel to readers the API never authorized: support screens, dashboards, and log stores shared across tenants. Scrubbing other tenants' identifiers and data from diagnostics keeps the disclosure policy whole past the API boundary.
 
 ### Scope tenant operations
 
 **Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
 
-**Rationale:** Operating work can cause a broader data effect than one normal request.
+**Rationale:** Backup, restore, replay, deletion, export, support access, and incident investigation each touch more data than one normal request. Documenting each as one-tenant or all-tenant tells the operator how much data the run touches before it starts.
 
 ### Record an all-tenant operation
 
 **Requirement:** An all-tenant operation MUST record actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound.
 
-**Rationale:** A documented scope states what an operation is allowed to touch. It does not state what one run touched, which is the question a tenant asks after an incident. An all-tenant run is also the one case where no tenant's own audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record. When the audit extension is selected, the record is an audit record; otherwise it stays a standalone record.
+**Rationale:** A documented scope states what an operation may touch, not what one run touched, and the run is what a tenant asks about after an incident. An all-tenant run is also the one case where no single tenant's audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record: actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound. When the audit extension is selected, the record is an audit record; otherwise it stays a standalone record.
 
 **Example:** A support export covering every tenant records the operator, the export, the tenant count, and the incident it was run for.
 
@@ -108,7 +108,7 @@ None. Tenant scope applies to records every project already requires.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** A typed identity prevents accidental confusion with actor, business record, or string identifiers.
+**Rationale:** A bare string tenant ID passes anywhere a string passes: into an actor field, a business record key, or a log line. A strongly typed `TenantId` fails compilation at each of those mistakes instead of failing in production.
 
 ### Use one tenant accessor
 
@@ -116,7 +116,7 @@ None. Tenant scope applies to records every project already requires.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** One accessor centralizes trusted tenant resolution.
+**Rationale:** Every boundary reads the current tenant, and two accessors can disagree about which tenant is current. One accessor at the trusted host boundary gives every reader the same answer from the same trusted source.
 
 ### Pass tenant scope explicitly
 
@@ -124,11 +124,11 @@ None. Tenant scope applies to records every project already requires.
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Explicit scope preserves Domain independence from host request state.
+**Rationale:** Domain logic that reads the tenant from ambient request state depends on the host to run at all, which complicates tests and reuse. Passing the scope through Application messages or trusted ports keeps the tenant visible in the call and the Domain free of host state.
 
 ## Dependencies
 
-Marten tenancy support is part of the baseline persistence package. Another isolation provider needs a decision and manifest pin.
+Tenancy support for Marten ships in the baseline persistence package. A project that isolates tenants with another provider records a Decision and pins that provider in the manifest.
 
 ## Verification
 

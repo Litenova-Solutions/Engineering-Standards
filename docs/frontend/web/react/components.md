@@ -2,7 +2,7 @@
 
 ## Intent
 
-Components in a React frontend are function components with typed boundaries. The shared provisions live on the stack-neutral page ([Frontend components](../../components.md)). This page states what React alone requires.
+A React component is a function using hooks, with props and events typed under strict mode. This page states what React alone adds: function components built on hooks and typed props and events; the shared component principles live in [Frontend Components](../../components.md). A team that applies it while writing components keeps every boundary compile-checked, so a wrong call fails at build time instead of in the browser.
 
 ## Standards
 
@@ -10,7 +10,7 @@ Components in a React frontend are function components with typed boundaries. Th
 
 **Requirement:** A component MUST be a function component using hooks, not a class component.
 
-**Rationale:** Hooks are the reactivity model the renderer understands. Class lifecycle methods fall out of every component. An effect covers what derivation cannot express.
+**Rationale:** Hooks are the reactivity model the renderer understands: state, derivation, and effects all flow through them. Class lifecycle methods split the same logic across mount and update paths that no new code follows. An effect covers what derivation cannot express, so nothing needs a class.
 
 **Example:**
 
@@ -27,7 +27,7 @@ function OrderTotal({ orderId }: { orderId: string }) {
 
 **Requirement:** A component MUST type its props and its events under strict mode.
 
-**Rationale:** An untyped prop fails at the call site the next author writes, which is the most expensive place to learn a shape. Strict mode turns that failure into a build error.
+**Rationale:** An untyped prop fails at the call site the next author writes, which is the most expensive place to learn a shape: after writing the code that uses it. Strict mode turns that failure into a build error at the author's own call. Typed events do the same for what the component reports.
 
 ## Conventions
 

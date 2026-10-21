@@ -2,7 +2,7 @@
 
 ## Name
 
-`litespec ui` holds an opted-in consumer with a controlled web frontend to the UI contract.
+`litespec ui` checks the shared UI package and each controlled web frontend of a consumer against the UI contract.
 
 ## Synopsis
 
@@ -12,13 +12,13 @@ litespec ui [--root <path>] [--format json] [--help]
 
 ## Description
 
-This command reads the shared UI package the consumer declares in `paths.uiPackage`. It checks the registry configuration against the manifest baseline, the source lock and its digests, the design contract, and the token stylesheet. It then checks each controlled frontend: its density profile, its stylesheet entry, the imports its source reaches, and its inline styles.
+This command reads the shared UI package that the consumer declares in `paths.uiPackage`. It checks the registry configuration against the baseline that the manifest pins, the source lock and its digests, the design contract, and the token stylesheet. It then checks each controlled frontend: its density profile, its stylesheet entry, the imports its source reaches, and its inline styles.
 
-A controlled frontend is one declaring `platform: react` or `platform: svelte`. A frontend declaring `platform: blazor` stays outside the UI contract. The package travels with the workspace rather than with an application, so the tool reads one package once no matter how many frontends compose it. The output names a frontend declaring another platform as skipped, so a skipped scope stays visible rather than passing as conformance. The source lock declares which CLI installed the package. A `shadcn-svelte` generator selects the Svelte baseline and `svelte-ui` citations, so a workspace migrates one frontend at a time.
+A controlled frontend is one that declares `platform: react` or `platform: svelte`. A frontend that declares `platform: blazor` stays outside the UI contract. The package travels with the workspace rather than with one application, so the tool reads one package once no matter how many frontends compose it. A frontend that declares another platform is reported as skipped, so a skipped scope stays visible instead of passing as conformance. The source lock records which CLI installed the package. A `shadcn-svelte` generator selects the Svelte baseline and the `svelte-ui` citations, so a workspace migrates one frontend at a time.
 
 The source scan reads the shared package once, then each controlled frontend once. It rejects an arbitrary Tailwind value, a raw palette value, an important modifier, and an inline style. In an application it also rejects a direct primitive library import, an internal package path, and a direct table library import.
 
-The command reads no page file. The route code is the page contract, and the route suite proves each route in a browser.
+This command reads no page file. The route code is the page contract, and the route suite proves each route in a browser.
 
 ## Arguments
 
@@ -50,4 +50,4 @@ litespec ui
 
 ## Underneath
 
-The command reads every record against its schema. Nothing beneath this command is separately runnable.
+The command validates every record it reads against its schema. Nothing beneath this command is separately runnable.

@@ -2,7 +2,17 @@
 
 ## Intent
 
-A page frame is the layout of one kind of page. It covers a home page, a list, a queue, a record, a form, a report, a settings page, or an outcome. These patterns answer how each kind of page is laid out. Each pattern offers drawn options and names a default.
+Every screen in the product is one kind of page, from home and list to form, report, and outcome. This page holds the layout pattern for each kind: home, list, queue, record, form, report, settings, editor, outcome, operations, schedule, setup, error, and drawer. A team building a new screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One layout per kind keeps every screen predictable, so a reader knows where the heading, actions, and content sit before reading.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one layout question, such as how a list page orders its search, filters, table, and paging. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply back office: order SO-1042 for Maria Garcia, the Garcia Interiors restock delivery, and the Amsterdam warehouse. Each kind of page repeats the same frame, so a reader meets one heading and at most one primary action on every screen. The Standards section states the two rules every option keeps: each page shows one top-level heading, and each frame shows at most one primary action outside its rows and overlays.
 
 ## Standards
 
@@ -10,19 +20,19 @@ A page frame is the layout of one kind of page. It covers a home page, a list, a
 
 **Requirement:** Each page MUST show one top-level heading that names the record, list, or task it holds.
 
-**Rationale:** A reader who lands from a link, a notification, or a search learns where they are from one line. Two competing headings make the reader guess which one is the page.
+**Rationale:** One heading names the open record, list, or task, so a reader who arrived from a link or a search knows where they landed. Without it, two headings compete for that job, and the reader guesses which line to trust while assistive tech announces the wrong one.
 
 ### Show one primary action in a page frame
 
 **Requirement:** A page frame MUST show at most one primary action outside its rows and overlays.
 
-**Rationale:** The primary action answers what a reader most often does next on this page. Two primary actions give no answer, so the reader compares labels instead of acting.
+**Rationale:** One primary action names the step readers take most often next on the page, such as New delivery on a deliveries list. Without that single answer, two equal buttons force the reader to compare labels on every visit, and the hurried click lands on the wrong one.
 
 ## Patterns
 
 ### Home page
 
-**Question:** The first page after sign-in tells the reader what needs doing now, in that order, before any figure. A home page typically holds a greeting, stat tiles, a setup section, a needs-attention list, and a coming-up list. The disagreement is how much of that sits above the fold, and whether the tiles lead or the work leads.
+**Question:** The first page after sign-in tells the reader what needs doing now, most urgent first, before any figure. A home page typically holds a greeting, stat tiles, a setup section, a needs-attention list, and a coming-up list. The disagreement is how much of that sits above the fold, and whether the tiles lead or the work leads.
 
 **Default:** `work-first-tiles-second`
 
@@ -212,7 +222,7 @@ page
 
 ### List page
 
-**Question:** Find one record among many. The frame is fixed: header, views, search, filters, one table, pagination. The argument is almost entirely about which controls earn their place, because a search box on its own is not enough across 268 rows.
+**Question:** Find one record among many. The frame is fixed: header, views, search, filters, one table, pagination. The decision is which controls earn their place, because a search box on its own is not enough across 268 rows.
 
 **Default:** `search-and-a-state-filter-only`
 
@@ -577,7 +587,7 @@ page
 
 ### Record page
 
-**Question:** One record, and everything done to it. The frame carries a summary, at most three sections and an aside. The argument is about division: tabs against stacked sections, and what earns the aside.
+**Question:** One record, and everything done to it. The frame carries a summary, at most three sections, and an aside. The decision is how to divide the page: tabs against stacked sections, and what earns the aside.
 
 **Default:** `summary-sections-aside-for-history`
 
@@ -1154,7 +1164,7 @@ page
 
 ### Settings home
 
-**Question:** Find one setting among many areas. A settings home can carry a whole tree: thirty routes under `/settings`, and the home has to carry all of it.
+**Question:** Find one setting among many areas. A settings home can carry a whole tree: thirty routes under `/settings`, and the home page has to hold all of them.
 
 **Default:** `grouped-links-one-line-each`
 
@@ -1533,7 +1543,7 @@ page
 
 ### Outcome page
 
-**Question:** Where a flow ends: an order confirmed, a payment that failed, a link that expired. One state, one statement of what happened, one next step. Flows often end in a toast instead, which is why this frame is worth drawing.
+**Question:** Where a flow ends: an order confirmed, a payment that failed, a link that expired. One state, one statement of what happened, one next step. Flows often end in a toast instead, so this frame states what an ending page holds.
 
 **Default:** `one-statement-one-next-step`
 
@@ -1700,7 +1710,7 @@ page
 
 ### Live operations page
 
-**Question:** Dispatch day is happening: the docks are open, scanners are reading, and the warehouse lead needs the count at a glance. The argument is about what earns the glance: the total, the per-dock split, or only the exceptions.
+**Question:** Dispatch day is happening: the docks are open, scanners are reading, and the warehouse lead needs the count at a glance. The decision is what earns the glance: the total, the per-dock split, or only the exceptions.
 
 **Default:** `the-count-the-docks-the-exceptions`
 
@@ -1850,7 +1860,7 @@ page
 
 ### Calendar or schedule page
 
-**Question:** Ninety-three deliveries ahead need a shape that answers when, not what. The argument is density: a grid that shows the month against a list that shows the next delivery.
+**Question:** Ninety-three deliveries ahead need a shape that answers when, not what. The decision is density: a grid that shows the month against a list that shows the next delivery.
 
 **Default:** `month-grid-with-deliveries-marked`
 
@@ -2005,7 +2015,7 @@ page
 
 ### Onboarding or setup page
 
-**Question:** A new company has an account and nothing else. The argument is how much the page does. A checklist waits, a wizard leads, and a single page states the three steps and gets out of the way.
+**Question:** A new company has an account and nothing else. The decision is how much the page does. A checklist waits, a wizard leads, and a single page states the three steps and gets out of the way.
 
 **Default:** `checklist-with-a-progress-bar`
 
@@ -2160,7 +2170,7 @@ page
 
 ### Error or not-found page
 
-**Question:** Something is missing, broken or refused. The argument is how much the page owns: a dead end with links back, or a working page that names the fix and offers it.
+**Question:** Something is missing, broken or refused. The decision is how much the page owns: a dead end with links back, or a working page that names the fix and offers it.
 
 **Default:** `centered-not-found-with-links-back`
 
@@ -2297,7 +2307,7 @@ page
 
 ### Record drawer
 
-**Question:** Read a record without leaving the list. It exists so a reader can compare a row against what the row actually holds. The catch is width: a 420-pixel drawer inside a 1440 screen holds facts and nothing else.
+**Question:** Read a record without leaving the list. It exists so a reader can compare a row against what the row actually holds. The constraint is width: a 420-pixel drawer inside a 1440 screen holds facts and nothing else.
 
 **Default:** `drawer-beside-the-list-read-only`
 

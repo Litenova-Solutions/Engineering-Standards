@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../schemas/ui-source-lock.schema.json",
+  "schemaVersion": 1,
+  "generator": "shadcn-svelte",
+  "cli": "1.7.0",
+  "preset": {
+    "style": "nova",
+    "base": "bits-ui",
+    "cssVariables": true,
+    "baseColor": "neutral",
+    "theme": "neutral",
+    "chartColor": "neutral",
+    "font": "geist",
+    "fontHeading": "inherit",
+    "icons": "lucide",
+    "radius": "default",
+    "menuAccent": "subtle",
+    "menuColor": "default",
+    "componentsStyle": "base-nova"
+  },
+  "registry": {
+    "name": "shadcn-svelte",
+    "url": "https://shadcn-svelte.com/registry"
+  },
+  "formatter": "default",
+  "components": [
+    {
+      "name": "button",
+      "address": "button",
+      "status": "baseline",
+      "paths": [
+        "src/components/button.svelte"
+      ],
+      "digest": "sha256:619cebd87a292563d5d5712353a7098db70803e158a583875535fd20c6e577c4",
+      "dependencies": [
+        "bits-ui",
+        "class-variance-authority",
+        "cn"
+      ]
+    },
+    {
+      "name": "skeleton",
+      "address": "skeleton",
+      "status": "baseline",
+      "paths": [
+        "src/components/skeleton.svelte"
+      ],
+      "digest": "sha256:8a7c81ee6a2ff42a566569cfd030c32188befb90d625a83fe87eef4e89fe25e4",
+      "dependencies": []
+    }
+  ]
+}

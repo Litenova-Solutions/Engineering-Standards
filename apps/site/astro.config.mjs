@@ -9,11 +9,12 @@ const { version } = JSON.parse(fs.readFileSync(path.join(root, "litespec.manifes
 
 // Cloudflare Pages reads _redirects from the output root. Astro ignores route files
 // that start with an underscore, so the build writes it once the pages exist.
+// A release root has no page of its own: it opens the learn overview.
 const latestRedirects = {
   name: "litespec-latest-redirects",
   hooks: {
     "astro:build:done": ({ dir }) => {
-      fs.writeFileSync(new URL("_redirects", dir), `/latest  /${version}/  302\n/latest/*  /${version}/:splat  302\n`);
+      fs.writeFileSync(new URL("_redirects", dir), `/latest  /${version}/learn/  302\n/latest/*  /${version}/:splat  302\n/${version}/  /${version}/learn/  301\n`);
     },
   },
 };

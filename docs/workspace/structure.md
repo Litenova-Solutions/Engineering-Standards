@@ -2,7 +2,19 @@
 
 ## Intent
 
-One canonical monorepo tree lets agents locate applications, shared packages, documentation, and tests without searching for a project-specific interpretation. The structure supports an API-only application, one frontend, or multiple frontends while retaining one bounded context.
+A LiteSpec consumer, a project built with LiteSpec, keeps one monorepo tree for its applications, shared packages, documentation, tests, and records, the written statements the project builds against. This page states that tree, where each file kind lives inside it, and what `litespec.project.json` declares. It applies to anyone who creates a file, and to agents locating code without asking. One fixed shape works from an API-only product to several frontends while the whole workspace keeps one bounded context, one business language and deployment boundary.
+
+## Concepts
+
+### Applications and packages
+
+`apps/` holds what runs: the API, each frontend, and any deployed host. `packages/` holds what is reused: shared configuration, generated API types, a thin client, and theme tokens. The split keeps deployable code out of libraries and reusable code out of applications.
+
+### Records and their homes
+
+Each record type has one home in the tree: a business record page under its module, requirements on product topic pages, permissions on the permissions page, entry points on the entry-point page, limits on the limits page. Rules, results, cases, and events live on their business record or use case page instead of their own files. Fixed homes let an agent derive the path from the record type without searching.
+
+The model builder writes the generated project model under `.model/` from records, code, routes, tests, and test runs; the folder is rebuilt rather than reviewed.
 
 ## Standards
 
@@ -76,19 +88,19 @@ A record page lives at the home the tree names for its type. An entry lives on i
 
 **Requirement:** `litespec.project.json` MUST declare `size` as `small` or `large` and one stack for the backend and for each frontend.
 
-**Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply.
+**Rationale:** Size decides which record types and test projects apply: small or large selects the project's required-record set. Each stack decides which technology pages and checks apply to its application. Declaring both in `litespec.project.json` lets tools and reviewers read the selection from one file.
 
 ### Keep the generated model out of source control
 
 **Requirement:** The generated `.model/` folder MUST stay out of source control.
 
-**Rationale:** The model builder writes `model.json` there from records, code, routes, tests, and test runs, so the folder is rebuilt rather than reviewed.
+**Rationale:** The model builder writes `model.json` there from records, code, routes, tests, and test runs. Tracking it would commit a derived copy beside its sources, and every commit would carry a stale model until somebody regenerates it. The folder is rebuilt rather than reviewed.
 
 ### Keep production and test code separate
 
 **Requirement:** Production code MUST live under `apps/api/src/` and test code under `apps/api/tests/`.
 
-**Rationale:** The split makes a test dependency reaching production code visible in the path itself.
+**Rationale:** Production code under `apps/api/src/` and test code under `apps/api/tests/` keep the two graphs apart by path. The split makes a test dependency reaching production code visible in the path itself, and keeps test helpers from shipping with the product.
 
 **Example:** The backend tree is:
 
@@ -103,25 +115,25 @@ apps/api/
 
 **Requirement:** An independently runnable frontend, API, or deployed host MUST live under `apps/{name}/`.
 
-**Rationale:** A reusable package under `apps/` or deployable code under `packages/` inverts what each root promises.
+**Rationale:** Each root makes one promise: `apps/` runs, `packages/` is reused. A reusable package under `apps/` or deployable code under `packages/` inverts that promise, so neither location tells the reader what it holds. One home per kind keeps the promise readable.
 
 ### Limit shared TypeScript packages
 
 **Requirement:** A shared TypeScript package MUST have at least two consumers or carry generated output shared by design.
 
-**Rationale:** The baseline permits shared configuration, generated API types, a thin client, and CSS theme tokens.
+**Rationale:** A shared package with one consumer pays versioning, publishing, and cross-package edits for an audience of one. Requiring two consumers or generated output shared by design keeps sharing deliberate. The baseline permits shared configuration, generated API types, a thin client, and CSS theme tokens.
 
 ### Keep consumer documentation at the root
 
 **Requirement:** Project records MUST live under the root `docs/` directory.
 
-**Rationale:** Placing them inside the LiteSpec submodule or the application tree makes them disappear when either is replaced.
+**Rationale:** Project records describe the product, not the standard and not the code. Placing them inside the LiteSpec submodule or the application tree makes them disappear when either is replaced. The root `docs/` directory keeps records where a replaced standard or a rewritten application cannot take them.
 
 ### Keep orientation documents separate from canonical records
 
 **Requirement:** A README under `docs/` MUST link to the approved record rather than restate its content.
 
-**Rationale:** A README that restates a decision becomes a second authored source that drifts from the record it summarizes.
+**Rationale:** A README orients; a record decides. A README that restates a decision becomes a second authored source that drifts from the record it summarizes, until the two disagree and neither is trusted. Linking to the approved record keeps one source with many pointers.
 
 ## Conventions
 
@@ -131,7 +143,7 @@ apps/api/
 
 **Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
-**Rationale:** `frontend`, `client`, or `app` names the technology rather than the audience it serves.
+**Rationale:** `apps/web` tells the reader who it serves; `apps/frontend` tells them only what it is built with. Naming each frontend for its audience keeps the folder meaningful when the technology changes. `frontend`, `client`, or `app` names the technology rather than the audience it serves.
 
 ### Keep scripts at the root
 
@@ -139,7 +151,7 @@ apps/api/
 
 **Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
-**Rationale:** An application-specific script may stay inside its application when no other workspace calls it.
+**Rationale:** Bootstrap, release, and CI helper scripts serve the whole workspace, so the root `scripts/` folder keeps them where every caller looks. An application-specific script may stay inside its application when no other workspace calls it.
 
 ### Keep generated API contracts in packages
 
@@ -147,7 +159,7 @@ apps/api/
 
 **Replacement:** A consumer departs from this default only through an Exception record naming this provision, with a reason and a review date.
 
-**Rationale:** A single frontend may own both locally until a second consumer appears.
+**Rationale:** Generated OpenAPI types and their thin client belong to every frontend that reads the API. With more than one consumer, `packages/api-types/` and `packages/api-client/` keep one copy each. A single frontend may own both locally until a second consumer appears.
 
 ## Reference example
 

@@ -472,12 +472,15 @@ static partial class StandardsValidator
         // data that can never satisfy the authoring contract, and its own test
         // suite checks the tool. The changelog and its archives are release history.
         // The authoring checks read the standards material.
+        // An example under examples/ is a consumer project: the consumer checks own it,
+        // and a test runs them on every example.
         return relative != "CHANGELOG.md"
             && relative != "changelog"
             && !relative.StartsWith("changelog/", StringComparison.Ordinal)
             && relative != "LICENSE.md"
             && !relative.StartsWith("apps/", StringComparison.Ordinal)
-            && !relative.StartsWith("packages/", StringComparison.Ordinal);
+            && !relative.StartsWith("packages/", StringComparison.Ordinal)
+            && !relative.StartsWith("examples/", StringComparison.Ordinal);
     }
 
     static int LineNumber(string text, int offset)

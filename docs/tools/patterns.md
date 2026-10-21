@@ -14,13 +14,13 @@ litespec patterns check [<target>]
 
 ## Description
 
-A pattern page in `docs/frontend/patterns/` offers several options for one recurring interface question, and each option carries its wireframe as text. An agent reads the text. A person chooses from the pictures this command draws.
+A pattern page under `docs/frontend/patterns/` answers one recurring interface question with several options, and each option carries its wireframe as text. An agent reads the text form; a person chooses from the pictures this command draws. [UI patterns](../frontend/patterns.md) defines the wireframe language and the page contract.
 
-`preview` writes one offline HTML page for a group or a single pattern. Every option is drawn at desktop width, 1200 pixels, and at phone width, 390 pixels, beside its rationale and cost. The default option is outlined, and selecting a picture opens it at full size. The page loads nothing from the network.
+`preview` writes one offline HTML page for a group or a single pattern. It draws every option at desktop width (1200 pixels) and at phone width (390 pixels), beside the option's rationale and cost. It outlines the default option, and selecting a picture opens it at full size. The page loads nothing from the network.
 
-`svg` prints one option's sketch on standard output, for a site or a document that embeds it. `--phone` draws the phone width, from the option's own phone block when it has one.
+`svg` prints one option's sketch on standard output, for a site or document that embeds it. With `--phone` it draws the phone width, using the option's own phone block when one exists.
 
-`check` parses every pattern page, or the target's page, and reports each broken wireframe and each gap in the page contract with its page line. `litespec validate` runs the same check.
+`check` parses every pattern page, or the target's page, and reports each broken wireframe and each page-contract gap with its page line. `litespec validate` runs the same check.
 
 ## Arguments
 
@@ -60,6 +60,12 @@ Print the default record header at phone width:
 litespec patterns svg litespec/frontend/patterns/record-detail#record-header title-state-breadcrumb-one-primary-action --phone
 ```
 
+Check one group:
+
+```bash
+litespec patterns check record-detail
+```
+
 ## Underneath
 
-The command parses each fenced `wireframe` block with the language defined in [UI pattern decisions](../frontend/patterns.md) and lays it out with a dependency-free box layout. The command estimates text width from the character count, so the sketch needs no font. Nothing beneath it is separately runnable.
+The command parses each fenced `wireframe` block in the language that [UI patterns](../frontend/patterns.md) defines, and lays it out with a dependency-free box layout. It estimates text width from the character count, so the sketch needs no font. Nothing beneath this command is separately runnable.

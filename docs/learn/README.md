@@ -1,20 +1,20 @@
-# Learn LiteSpec
+# Overview
 
 ## Intent
 
-These pages explain what LiteSpec is, why it exists, and how its parts fit together. Read them in order the first time. They state no rules of their own: the rules are on the standards pages they link to.
+The Learn pages explain LiteSpec, the standard for building one business application from written rules that tools check, to a reader who is new to it: the problem it solves, how its parts fit, how to read the standard, and how a team adopts it. They apply to every project and role, and they state no rules of their own: each rule lives on the standards page they link to. Technical leads and developers read them in order below when they evaluate or adopt LiteSpec, before opening any rules page.
 
 ## Reading order
 
-- [Why LiteSpec exists](why-litespec.md): the problem LiteSpec solves for teams that build with AI agents.
-- [How LiteSpec works](how-litespec-works.md): the standard, the records, the model and the tools, followed through one real use case.
-- [Read the standard](reading-the-standard.md): how pages, stacks, selections, provisions, and extensions fit together, and how to find what applies to you.
-- [Records and the project model](records-and-the-model.md): what a project writes down, and what the model builder works out from the code.
-- [How the tools fit together](the-tooling.md): which tool does what, when each runs, and what it reads and writes.
-- [How LiteSpec compares](how-litespec-compares.md): LiteSpec beside the other approaches to spec-driven development, and when each fits.
-- [Work with agents](working-with-agents.md): how an agent loads LiteSpec, what it may decide, and what it leaves to you.
-- [Adopt LiteSpec](adopting-litespec.md): what changes for a team, in the order a team usually does it.
+- [Why LiteSpec Exists](why-litespec.md): the problem LiteSpec solves, for a team that is deciding whether LiteSpec fits.
+- [How LiteSpec Works](how-litespec-works.md): the standard, the records, the model, and the tools, traced through one Expenses use case.
+- [Read the Standard](reading-the-standard.md): project selections, page arrangement, and provision IDs; how to find the rules that apply to a project.
+- [Records and the Project Model](records-and-the-model.md): what a project writes down, and what the model builder works out from the code.
+- [How the Tools Fit Together](the-tooling.md): the CLI, the analyzers, and the site, in the order one change moves through them.
+- [How LiteSpec Compares](how-litespec-compares.md): LiteSpec beside ten other approaches to spec-driven development, and when each fits.
+- [Work with Agents](working-with-agents.md): how an agent finds the rules, what it decides alone, and what it brings back.
+- [Adopt LiteSpec](adopting-litespec.md): what changes for a team, in the order teams usually do it.
 
 ## Next
 
-When you're ready to build, follow [Get started](../tutorial/getting-started.md).
+When you are ready to build, follow [Start a Consumer Repository](../tutorial/getting-started.md).

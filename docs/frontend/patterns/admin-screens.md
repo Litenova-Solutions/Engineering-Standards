@@ -2,7 +2,17 @@
 
 ## Intent
 
-Admin screens configure the back office itself. They cover the team and its roles, API keys and webhooks, data imports, the payment account, supplier invoices, and discount codes. These patterns answer how each screen is laid out. Each pattern offers drawn options and names a default.
+Settings screens configure the company itself: the team and its roles, API keys and webhooks, spreadsheet imports, the payment account, supplier invoices, and discount codes. This page shows each screen as drawn options with a named default to build. The product owner chooses among the options when the team builds or revises a settings area. Consistent admin layouts keep powerful commands, such as granting access, rotating secrets, and paying invoices, safe to operate.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about a settings screen, such as how the team page shows members and invitations. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply settings: the team with Sam Rivera as Owner, the Counter sync API key, the contacts-2026-01.csv import, the Stripe payment account, supplier invoice INV-2026-09, and discount code DESK10. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a new secret shows in full only once, and an invitation or role change shows what the role allows before it is sent.
 
 ## Standards
 
@@ -10,25 +20,25 @@ Admin screens configure the back office itself. They cover the team and its role
 
 **Requirement:** A screen MUST show a newly created API key or secret in full only once, at creation.
 
-**Rationale:** A secret shown again later is a secret anyone with the screen can copy. Showing it once makes you store it where it belongs.
+**Rationale:** A secret that stays readable on screen can be copied by anyone who later opens the page, including from a shared screen or a screenshot. Showing it once forces the person creating it to store it in a vault or environment file at once, so no later visit can leak it.
 
 ### Show what a role allows before granting it
 
 **Requirement:** An invitation or role change MUST show what the chosen role allows before it is sent.
 
-**Rationale:** A role name alone hides what it grants. You confirm the access, not the label.
+**Rationale:** Role names such as Picker or Manager hide what they grant. A sender who sees only the name can grant access to refunds or data by mistake. Showing the granted capabilities beside the name lets the sender confirm the access itself before the invitation goes out.
 
 ## Patterns
 
 ### Team members and their roles
 
-**Question:** The team is who works for the company. A role states what each person may do. The owner invites people, grants roles, and limits some to one warehouse. The owner also suspends or removes people. Everyone else sees names and roles, and nothing more.
+**Question:** The team is the staff who work for the company, and a role states what each person may do. The staff member holding the Owner role invites people, grants roles, limits some staff to one warehouse, and suspends or removes people. Everyone else sees names and roles, and nothing more.
 
 **Default:** `members-with-the-invitations-below`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The members table with invitations below is the best option. It shows who is in, who is invited, and what each may do. The permission matrix is the runner-up. Prefer it on the role page where capabilities are compared. Never ship the matrix as the team page. The back office manages people, not capabilities.
+**Rationale:** The members table with invitations below is the default because it answers three questions in one scan: who is in, who is invited, and what each may do. The permission matrix is the runner-up; prefer it on the role page, where capabilities are compared across roles. Never ship the matrix as the team page, because the team page manages people, and a capability grid hides who holds what.
 
 #### `members-with-the-invitations-below`: Members with the invitations below
 
@@ -47,7 +57,7 @@ page
       item: text "lina.meyer@example.org" · text muted "Invited as Picker · expires 13 Oct" · status "Sent" info · action "Resend"
 ```
 
-**Rationale:** Linear lists members with their role and state in line and pending invitations below, because joining and belonging are one list with two states. The owner acts on a row without opening it.
+**Rationale:** Linear lists members with role and state in line, and pending invitations below in the same view, because invited and active people are two states of one team list. The owner acts on a row, such as resending or revoking, without opening it.
 
 **Cost:** Row commands for suspend, remove, change role, and limit access cannot all fit, so most move into a menu per row.
 
@@ -68,9 +78,9 @@ page
     message "Warehouse staff dispatch goods and record it. Only Finance refunds." info
 ```
 
-**Rationale:** GitHub compares team roles in a capability matrix, which answers what a role may do without opening each one. The matrix is the honest shape for custom roles.
+**Rationale:** GitHub compares team roles in a capability matrix, which answers what each role may do without opening roles one by one. The matrix fits custom roles because it shows every capability side by side instead of hiding grants inside dialogs.
 
-**Cost:** Capabilities multiply past twenty, so the matrix needs grouping by area and is a reference rather than a page.
+**Cost:** Past about twenty capabilities the matrix needs grouping by area, and it reads as a reference table rather than a working page.
 
 **Reference:** GitHub
 
@@ -143,7 +153,7 @@ page
     action destructive "Suspend member"
 ```
 
-**Rationale:** GitHub suspends with the reason recorded, because a suspension is reviewed later and the reason is the review. The dialog states what the member keeps and what stops.
+**Rationale:** GitHub suspends with the reason recorded, because a suspension is reviewed later and the recorded reason is what the reviewer reads. The dialog states what the member keeps, such as history, and what stops, such as sign-in.
 
 **Cost:** A dialog per member action means suspend, remove, reinstate, and transfer ownership each carry their own copy to maintain.
 
@@ -165,7 +175,7 @@ page
 
 **Rationale:** Linear shows the member list without controls to members who cannot manage, because the names and roles are shared and the commands are not. The page is the same shape with the commands gone.
 
-**Cost:** A read-only page that looks like the managing page invites clicking where nothing happens, so the missing commands need no visible husk.
+**Cost:** A read-only page shaped like the managing page invites clicking where nothing happens, so it must show no disabled buttons or empty menus, only the names and roles.
 
 **Reference:** Linear
 
@@ -177,7 +187,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The keys table with the shown-once dialog is the best option. The list states the grants and the dialog protects the secret. The endpoint with its delivery log is the runner-up. Prefer it on the webhooks tab where deliveries are the work. Never show the secret outside the creation dialog. A secret that can be read again is not a secret.
+**Rationale:** The keys table with the shown-once dialog is the default: the list states each key's grants, and the dialog protects the secret at creation. The endpoint with its delivery log is the runner-up; prefer it on the webhooks tab, where deliveries are the work. Never show the secret outside the creation dialog: a secret that can be read again is not a secret.
 
 #### `keys-table-with-the-grants-in-line`: Keys table with the grants in line
 
@@ -355,7 +365,7 @@ page
       item: text "Row 44 · no address" · text muted "Name present, email address missing." · action "Drop row"
 ```
 
-**Rationale:** Shopify shows an import with its failed rows and the reason per row, because the file is never clean. The back office repairs the rows without touching what already imported.
+**Rationale:** Shopify shows an import with its failed rows and the reason per row, because a spreadsheet is never clean. Staff repair the refused rows without touching the rows that already went in.
 
 **Cost:** Refused rows from several imports pile up, so each import needs its refused rows grouped under it rather than in one list.
 
@@ -425,9 +435,9 @@ page
       item: text "12 rows · address missing" · text muted "Rows 44, 61 and 88." · action "Drop rows"
 ```
 
-**Rationale:** Stripe shows a dry run before a bulk change lands, because the back office should read the damage before it is done. The preview counts accepts, refusals, and updates without writing anything.
+**Rationale:** Stripe shows a dry run before a bulk change lands, because staff should see how many rows will fail before anything is written. The preview counts accepted, refused, and updated rows without writing anything.
 
-**Cost:** A dry run reads a large file twice, so files over 5,000 rows stop before the preview.
+**Cost:** A dry run reads a large file twice, so files over 5,000 rows get no preview.
 
 **Reference:** Stripe
 
@@ -473,7 +483,7 @@ page
     action primary "Import again"
 ```
 
-**Rationale:** Customer.io refuses a consent file without proof, because consent cannot be assumed and the fine lands on the company. The page states the rule and the repair rather than a partial import.
+**Rationale:** Customer.io refuses a consent file without proof, because consent cannot be assumed and the company pays the fine. The page states the rule and the repair instead of importing part of the file.
 
 **Cost:** Refusing the whole file for some bad rows discards the good ones too, so the back office fixes and re-imports rather than continuing.
 
@@ -749,7 +759,7 @@ page
 
 **Rationale:** Chargebee states the failed charge, the reason, and the next retry, because an overdue invoice is a problem with a date. The company fixes the mandate rather than the invoice.
 
-**Cost:** Dunning copy on the invoice page alarms you when you open it to file, not to pay.
+**Cost:** The overdue-payment wording on the invoice page alarms staff who open the invoice to file it, not to pay it.
 
 **Reference:** Chargebee
 
@@ -769,7 +779,7 @@ page
 
 **Rationale:** Resend breaks message cost down by kind, because delivery codes and reminders fail at different rates. The company reads what each kind costs before the invoice arrives.
 
-**Cost:** A cost page per channel multiplies: mail is free and text is metered, and the two need one page or two honest ones.
+**Cost:** Mail is free and text is metered, so one shared cost page mixes two different stories; the channels need either one page with both sections or a page each.
 
 **Reference:** Resend
 
@@ -928,7 +938,7 @@ page
 
 **Rationale:** GitHub retires a leaked secret with the blast radius stated, which is what a leaked code needs. The dialog states the uses, the cost, and what happens to orders already placed.
 
-**Cost:** A confirm dialog for every retirement slows the back office who retires several codes after one leak.
+**Cost:** A confirmation dialog per retirement slows staff who retire several codes after one leak.
 
 **Reference:** GitHub
 

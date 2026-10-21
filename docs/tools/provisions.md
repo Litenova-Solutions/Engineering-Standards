@@ -14,7 +14,7 @@ litespec provisions [--root <path>] [--check] [--help]
 
 This command rebuilds `docs/reference/provisions.md` from the active standards, so a citation reaches its heading in one step. The page carries each provision with its verification mark and its evidence.
 
-Run it after adding, renaming, or removing a provision. The next run overwrites a hand edit.
+Run it after adding, renaming, or removing a provision. The next run overwrites a hand edit, so never edit the page directly.
 
 ## Arguments
 

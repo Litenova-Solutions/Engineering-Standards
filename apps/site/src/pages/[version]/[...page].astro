@@ -1,6 +1,6 @@
 ---
 // One HTML page per spec page: the sidebar tree, the content column with the
-// breadcrumb, title, lead, tool buttons and rendered body, the "On this page"
+// breadcrumb, title, introduction, tool buttons and rendered body, the "On this page"
 // list, and Previous / Next cards. Pattern pages use the full content width
 // with no right column.
 import Base from "../../layouts/Base.astro";
@@ -11,7 +11,7 @@ import PatternViewer from "../../components/PatternViewer.astro";
 import "../../styles/docs.css";
 import "../../styles/prose.css";
 import "../../styles/code.css";
-import { areaOf, sidebarSections } from "../../lib/areas";
+import { folderLabel, folderOverview, foldersOf, pageName, sectionHome, sectionOf, sections } from "../../lib/areas";
 import { breadcrumbs, lastModified, techArticle } from "../../lib/seo";
 import { htmlPath, pageByFile, pages, pageUrl, rawUrl, version, type Page } from "../../lib/spec";
 import { renderPage } from "../../lib/render-markdown";
@@ -29,8 +29,8 @@ const { file } = Astro.props as Props;
 const page = pageByFile(file);
 if (!page) throw new Error(`No page for ${file}`);
 
-const { html, toc } = await renderPage(page);
-const area = areaOf(page.area);
+const { html, intro, toc } = await renderPage(page);
+const section = sectionOf(page.area);
 const isPattern = page.style === "pattern";
 const markdownUrl = rawUrl(page);
 const editUrl = `https://github.com/Litenova-Solutions/LiteSpec/blob/v${version}/${page.file}`;
@@ -46,15 +46,20 @@ const plainLead = page.intent
 const description =
   plainLead.length >= 60
     ? plainLead.slice(0, 300)
-    : `${page.title}: ${plainLead === "" ? "" : `${plainLead} `}Part of LiteSpec ${version}, the specification standard for building business applications with AI agents.`;
-// The lead is the first sentence of the intent only, so it does not repeat the
-// body section that follows. Split at the first ". " followed by an uppercase
-// letter and keep the period.
-const leadMatch = /^(.+?\.)\s+(?=[A-Z])/.exec(plainLead);
-const lead = leadMatch ? leadMatch[1] : plainLead;
+    : `${pageName(page)}: ${plainLead === "" ? "" : `${plainLead} `}Part of LiteSpec ${version}, the specification standard for building business applications with AI agents.`;
+// The breadcrumb: the release, the section, each folder between the section and
+// the page, and the page. Every name is the one the sidebar shows.
+const home = sectionHome(section);
+const crumbs: { name: string; url: string | null }[] = [
+  { name: section.label, url: home && home.file !== page.file ? pageUrl(home) : null },
+  ...foldersOf(page).map((dir) => {
+    const overview = folderOverview(dir);
+    return { name: folderLabel(dir).label, url: overview && overview.file !== page.file ? pageUrl(overview) : null };
+  }),
+];
 // Neighbors in sidebar order: section by section, and inside a folder its overview first,
 // then its pages, then its subfolders. The root index has no page here, so it is never a neighbor.
-const sectionOf = (entry: Page) => sidebarSections.findIndex((section) => section.areas.includes(entry.area));
+const sectionIndex = (entry: Page) => sections.findIndex((entry2) => entry2.areas.includes(entry.area));
 const treeKey = (entry: Page) => {
   const parts = entry.path.split("/");
   const name = parts.pop() ?? "";
@@ -62,8 +67,8 @@ const treeKey = (entry: Page) => {
   return [...parts.map((part) => `1${part}`), `0${overview ? 0 : 1}${String(pages.indexOf(entry)).padStart(4, "0")}`].join("/");
 };
 const ordered = pages
-  .filter((entry) => entry.path !== "README" && sectionOf(entry) >= 0)
-  .sort((a, b) => sectionOf(a) - sectionOf(b) || (treeKey(a) < treeKey(b) ? -1 : treeKey(a) > treeKey(b) ? 1 : 0));
+  .filter((entry) => entry.path !== "README" && sectionIndex(entry) >= 0)
+  .sort((a, b) => sectionIndex(a) - sectionIndex(b) || (treeKey(a) < treeKey(b) ? -1 : treeKey(a) > treeKey(b) ? 1 : 0));
 const at = ordered.findIndex((entry) => entry.file === page.file);
 const prev = at > 0 ? ordered[at - 1] : null;
 const next = at >= 0 && at < ordered.length - 1 ? ordered[at + 1] : null;
@@ -72,18 +77,17 @@ const active: "docs" | "patterns" =
 ---
 
 <Base
-  title={`${page.title} - LiteSpec ${version}`}
+  title={`${pageName(page)} - LiteSpec ${version}`}
   description={description}
   rawUrl={markdownUrl}
   active={active}
   ogType="article"
   jsonLd={[
-    techArticle({ title: page.title, description, path: pageUrl(page), modified: lastModified(page.file), section: area.label }),
+    techArticle({ title: pageName(page), description, path: pageUrl(page), modified: lastModified(page.file), section: section.label }),
     breadcrumbs([
       { name: "LiteSpec", path: "/" },
-      { name: version, path: `/${version}/` },
-      { name: area.label, path: `/${version}/#area-${area.key}` },
-      { name: page.title, path: pageUrl(page) },
+      ...crumbs.filter((crumb) => crumb.url !== null).map((crumb) => ({ name: crumb.name, path: crumb.url! })),
+      { name: pageName(page), path: pageUrl(page) },
     ]),
   ]}
 >
@@ -98,14 +102,22 @@ const active: "docs" | "patterns" =
       </details>
       <div class="docs-body" data-pagefind-body>
         <nav class="crumb" aria-label="Breadcrumb">
-          <a class="ver" href={`/${version}/`}>{version}</a>
-          <span aria-hidden="true">/</span>
-          <a class="crumb-area" href={`/${version}/#area-${page.area}`}><Icon name={area.icon} class="icon-sm" />{area.label}</a>
+          <span class="ver">{version}</span>
+          {crumbs.map((crumb, index) => (
+            <>
+              <span aria-hidden="true">/</span>
+              {crumb.url ? (
+                <a class:list={[{ "crumb-area": index === 0 }]} href={crumb.url}>{index === 0 && <Icon name={section.icon} class="icon-sm" />}{crumb.name}</a>
+              ) : (
+                <span class:list={["crumb-text", { "crumb-area": index === 0 }]}>{index === 0 && <Icon name={section.icon} class="icon-sm" />}{crumb.name}</span>
+              )}
+            </>
+          ))}
           <span aria-hidden="true">/</span>
           <b>{page.title}</b>
         </nav>
-        <h1 data-pagefind-meta="title">{page.title}</h1>
-        {lead !== "" && <p class="lead">{lead}</p>}
+        <h1 data-pagefind-meta={`title:${pageName(page)}`}>{page.title}</h1>
+        {intro !== "" && <div class="page-intro prose" set:html={intro} />}
         <div class="tools" data-pagefind-ignore>
           <button class="btn btn-outline btn-sm" type="button" data-copy-url={markdownUrl}>
             <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy page</span>
@@ -121,13 +133,13 @@ const active: "docs" | "patterns" =
         {prev && (
           <a class="pager-prev" href={pageUrl(prev)}>
             <small><Icon name="arrow-left" class="icon-sm" />Previous</small>
-            <b>{prev.title}</b>
+            <b>{pageName(prev)}</b>
           </a>
         )}
         {next && (
           <a class="pager-next" href={pageUrl(next)}>
             <small>Next<Icon name="arrow" class="icon-sm" /></small>
-            <b>{next.title}</b>
+            <b>{pageName(next)}</b>
           </a>
         )}
       </nav>

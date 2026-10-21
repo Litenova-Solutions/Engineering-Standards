@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="384" viewBox="0 0 720 384" role="img" aria-labelledby="frontend-pattern-flow-title frontend-pattern-flow-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
   <title id="frontend-pattern-flow-title">From a LiteSpec pattern to a catalog entry to the built screen</title>
-  <desc id="frontend-pattern-flow-desc">A LiteSpec pattern with three options and a named default; a catalog entry that cites the pattern by ID and records the chosen option with source owner; and the built loan detail screen. Arrows run from the pattern to the entry to the screen.</desc>
+  <desc id="frontend-pattern-flow-desc">A LiteSpec pattern with three options and a named default; a catalog entry that cites the pattern by ID and records the chosen option with source owner; and the built expense detail screen. Arrows run from the pattern to the entry to the screen.</desc>
   <defs>
     <marker id="frontend-pattern-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
@@ -21,16 +21,16 @@
 
   <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
     <text x="360" y="46">LiteSpec pattern: Record header</text>
-    <text x="360" y="162">Catalog entry: loan-header</text>
+    <text x="360" y="162">Catalog entry: expense-header</text>
     <text x="360" y="294">Built screen</text>
   </g>
   <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
     <text x="360" y="68">3 options; default title-state-breadcrumb-one-primary-action</text>
     <text x="360" y="86">litespec/frontend/patterns/record-detail#record-header</text>
-    <text x="360" y="184">library cites the pattern ID</text>
+    <text x="360" y="184">Expenses cites the pattern ID</text>
     <text x="360" y="202">decision: the default option, source owner</text>
     <text x="360" y="220">compact: the header stacks under the title</text>
-    <text x="360" y="314">loan detail in the catalog app</text>
+    <text x="360" y="314">expense detail in the web app</text>
   </g>
   <text x="360" y="368" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow runs from a decision to what it produces.</text>
 </svg>

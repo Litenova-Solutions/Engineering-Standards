@@ -1,58 +1,42 @@
-# Extensions
+# Overview
 
 ## Intent
 
-Extensions add conditional standards to the baseline stacks. An extension stays inactive until a current requirement meets its activation criteria. The consumer lists its ID in `selectedExtensions` within `litespec.project.json`, with the criterion it met and a review date.
+The extensions pages hold conditional rule bundles a project adds only when a specific need appears, from caching and audit trails to multitenancy and container rollout, so a project carries no rule it does not need. Each bundle stays inactive until a current need meets the criterion its page states, and the project records each choice with its criterion and review date. A team facing a need the default rules do not cover reads the candidate page and selects only the extensions whose criteria hold today.
 
-An extension may add requirements, packages, projects, and verification. It replaces a baseline rule only when its document names that provision ID. The manifest repeats that list where checks read it.
+## How to select an extension
 
-## Selection
+Each extension below states its own activation criterion and whether it applies to the whole project or to named records. A project selects every extension whose criteria hold and no extension whose criteria do not, and lists each selection in `selectedExtensions` in `litespec.project.json` with the criterion it met and a review date. The manifest repeats each scope, replacement list, and switched-on record type where checks read it. Most extensions add rules without replacing any; the audit and outbox pages each name the one baseline provision they replace.
 
-| Extension | Activation scope | Replaces | Switches on | Activate when |
-|:---|:---|:---|:---|:---|
-| [bdd](../backend/dotnet/ext/bdd.md) | `local` | None | `case` | Shared critical examples need executable BDD scenarios. |
-| [compat](compat.md) | `project` | None | None | Public or independently deployed consumers need breaking-change detection and versioning. |
-| [cache](cache.md) | `local` | None | `limit` | Measurements show repeated expensive reads with bounded staleness. |
-| [concurrency](concurrency.md) | `local` | None | `limit` | Conflicting writes or repeated delivery can violate behavior. |
-| [lifecycle](lifecycle.md) | `local` | None | `limit` | Deletion, retention, archival, restore, or legal hold behavior applies. |
-| [containers](containers.md) | `project` | None | `limit`, `runbook` | A hosted environment deploys container images. |
-| [integrations](integrations.md) | `local` | None | None | Behavior calls or receives data from an external system. |
-| [audit](audit.md) | `project` | `litespec/quality/security#record-security-audit-events` | None | A reviewer must establish who acted inside data another party owns. |
-| [locale](locale.md) | `project` | None | None | The product commits to more than one locale. |
-| [mcp](mcp.md) | `project` | None | None | The product ships a Model Context Protocol server an LLM client starts on a user's own machine. |
-| [tenancy](tenancy.md) | `project` | None | None | Independent customer organizations share one deployment. |
-| [outbox](outbox.md) | `local` | `litespec/backend/persistence#collect-events-without-a-public-unit-of-work` | `event`, `limit`, and `runbook` | A committed change requires delivery that cannot be lost. |
-| [efcore](../backend/dotnet/ext/efcore.md) | `local` | The persistence and dependency provisions its Baseline relationship section names | None | Selected aggregates require relational persistence instead of Marten. |
-| [realtime](realtime.md) | `local` | None | `event`, `limit` | Polling cannot meet a measured update-latency requirement. |
-| [report](report.md) | `local` | None | `limit` | Complex reports or large exports exceed normal request reads. |
-| [jobs](jobs.md) | `local` | None | `limit`, `runbook` | Behavior requires recurring, delayed, or calendar-based Worker work. |
-| [site](site.md) | `project` | None | None | The product ships a public static website beside its application. |
-| [stage](stage.md) | `project` | None | None | The first deployment holds no customer data yet, or a past promotion goes on record. |
-| [delegation](delegation.md) | `project` | None | None | One agent starts another agent on the same tree. |
+## Project extensions
 
-The manifest is the machine-readable source for `activationScope`, `replaces`, and `switchesOn`. This table explains the selection decision.
+Selected once for the whole project:
 
-## Switched-on types
+- [Agent Delegation](delegation.md): briefs and containment for one agent starting another on the same tree.
+- [API Compatibility](compat.md): versioning and retirement for APIs with public, partner, mobile, or independently deployed consumers.
+- [Audit Trail](audit.md): tamper-resistant evidence of who attempted what in data another party owns.
+- [Container Deployment](containers.md): images, rollouts, and runtime limits where staging or production ships containers.
+- [Localization](locale.md): locales, catalogs, and formatting for a product that ships in more than one locale.
+- [Model Context Protocol](mcp.md): the server a product ships so an LLM client can call its public API.
+- [Multitenancy](tenancy.md): tenant isolation across authorization, storage, jobs, and recovery for one shared deployment.
+- [Release Stage](stage.md): the pre-customer-data stage, what it defers, and the promotion that ends it.
+- [Static Marketing Site](site.md): the static build for marketing pages, pricing, and help articles beside the application.
 
-`switchesOn` names the record types a selection requires. Selecting the outbox requires Event and Limit records, so a project that selects it writes both. A type the project already requires stays required.
+## Local extensions
 
-## Activation
+Selected per record, for the use cases, journeys, modules, rules, or business records the criterion names:
 
-`litespec/core/scope#select-conditional-extensions-explicitly` states when an extension activates. `litespec/core/scope#record-selected-extensions` states where it is listed. `litespec/core/scope#record-selected-extensions` requires the project record.
+- [Caching](cache.md): staleness contracts and recovery for a repeated expensive read that traces or load tests name.
+- [Concurrency and Idempotency](concurrency.md): versions, client keys, and fingerprints where writes can overlap or retries can duplicate an effect.
+- [Data Lifecycle](lifecycle.md): retention, deletion, archival, and restore behavior for records with a lifetime duty.
+- [External Integrations](integrations.md): provider isolation, failure mapping, and boundary tests for use cases that call outside systems.
+- [Outbox Worker](outbox.md): one-transaction commits with dispatched messages where delivery must survive process failure.
+- [Realtime Updates](realtime.md): live transport where measured polling cannot meet the update target.
+- [Reporting and Exports](report.md): heavy queries and large exports moved off the request path.
+- [Scheduled Jobs](jobs.md): recurring, delayed, and calendar-based work with leases that survive restarts.
 
-The [agent protocol](../core/agent.md) carries the ordered steps an agent follows.
+## Stack extensions
 
-## Example
+Extensions that bind to one stack live beside that stack:
 
-The project selects both `locale` and `outbox`, each with the criterion it met and a review date:
-
-```json
-{
-  "selectedExtensions": [
-    { "id": "locale", "criterion": "The product ships in English and Dutch.", "reviewBy": "2027-03-01" },
-    { "id": "outbox", "criterion": "Shipment dispatch cannot lose a delivery.", "reviewBy": "2027-03-01" }
-  ]
-}
-```
-
-`litespec/core/scope#select-conditional-extensions-explicitly` requires that an extension is selected only when its criteria apply. The object form records which criterion that was. The consumer validator reports a selection whose `reviewBy` has passed. A selection that costs nothing to keep is a selection no one removes.
+- [.NET extensions overview](../backend/dotnet/ext/README.md): the BDD scenarios and EF Core persistence only a .NET backend offers.

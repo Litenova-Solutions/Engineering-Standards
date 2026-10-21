@@ -2,7 +2,7 @@
 
 ## Intent
 
-A consumer passes through two release stages. Before the first deployment holds customer data, several provisions assume a service that does not exist yet. This extension declares the stage, bounds what the early stage defers, and records the promotion that ends it.
+The release stage tells whether any deployment holds customer data yet, because several rules assume a running service that the first builds do not have. This page states how a project declares its stage, which rules the early stage defers and until when, and how a recorded Decision ends the deferral. A project selects it while no deployment holds customer data, or afterwards to record a past move to production, so relaxed early rules expire on a date instead of lingering by accident.
 
 ## Activation
 
@@ -10,13 +10,13 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer selects `stage` before its first deployment holds customer data, or to record a promotion it already passed.
+The project selects `stage` before its first deployment holds customer data, or afterwards to put a past promotion on record. The selection declares the current stage and bounds what the early stage defers.
 
 ## Baseline relationship
 
-None. A `pre-production` consumer defers provisions through this extension; the compat extension still governs versioning once selected.
+This extension replaces no baseline provision. A `pre-production` consumer defers named provisions through this extension, while the compat extension still governs versioning once selected.
 
-None. The promotion Decision is a core record every project requires.
+It switches on no record type: the promotion Decision is a core record every project requires.
 
 ## Standards
 
@@ -24,7 +24,7 @@ None. The promotion Decision is a core record every project requires.
 
 **Requirement:** A consumer MUST declare `pre-production` or `production` as its release stage in `litespec.project.json`.
 
-**Rationale:** A life stage is not a departure from a standard. The `stage` selection in `selectedExtensions` holds `releaseStage` with one of the two values above, along with the deferrals that stage allows.
+**Rationale:** The release stage is a project fact, not a departure from any rule, so it lives as data in the `stage` selection: `releaseStage` holds `pre-production` or `production`, beside the deferrals the early stage allows. Without the declared stage, tools and reviewers cannot tell which provisions the project owes today.
 
 **Example:** A consumer with no customer data in any deployment declares the early stage.
 
@@ -36,7 +36,7 @@ None. The promotion Decision is a core record every project requires.
 
 **Requirement:** A `pre-production` consumer MUST name each deferred provision with its end date in the stage extension selection, with a `production` consumer carrying no deferred provisions.
 
-**Rationale:** A deferral ends at promotion instead of drifting. Each entry names the provision and the date its deferral ends. The promotion Decision names the same provisions.
+**Rationale:** An early-stage deferral without a named end becomes permanent by neglect. Each entry names the deferred provision with the date its deferral ends, and the promotion Decision names the same provisions, so promotion closes every deferral at once.
 
 **Example:** The stage selection carries each deferral with its end.
 
@@ -48,7 +48,7 @@ None. The promotion Decision is a core record every project requires.
 
 **Requirement:** A consumer MUST approve its promotion to `production` as a Decision before its first deployment holds customer data, ending every deferred provision.
 
-**Rationale:** Without a recorded moment, the relaxed rules last until somebody notices they never ended. The Decision carries its owner, status, decider, and decide-by date like any Decision.
+**Rationale:** Promotion is the moment relaxed rules end, and an unrecorded moment never arrives: the relaxed rules last until somebody notices they never ended. The Decision carries its owner, status, decider, and decide-by date like any Decision, and approving it before the first deployment holds customer data keeps the data under full rules from day one.
 
 ## Conventions
 

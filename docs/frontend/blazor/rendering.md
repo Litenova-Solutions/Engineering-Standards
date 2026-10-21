@@ -2,9 +2,13 @@
 
 ## Intent
 
-The client renders entirely in the browser. Routes declare their own templates and states, the acquisition surface stays outside the runtime, and the application keeps working after the network goes away.
+The Blazor client renders entirely in the browser with no server behind it. This page states how it follows the rendering rules in [Frontend Rendering and Routes](../rendering.md): client-only rendering, declared routes with explicit states, landing pages served as static documents outside the application, and offline operation after first load. A team that applies it while writing routes and the cached application shell keeps the product working with a slow connection or none, and keeps first-time visitors from downloading a runtime they do not need yet.
 
-This page states how the Blazor stack follows the frontend rendering rules ([Frontend rendering](../rendering.md)).
+## Concepts
+
+### Routes, the shell, and the acquisition surface
+
+A route is one address in the product, declared on a page with an `@page` template. The application shell is the cached frame and framework payload that start the product without a network. The acquisition surface is the marketing and landing pages a first-time visitor reads before using the product; they ship as static documents so the visitor downloads no runtime.
 
 ## Standards
 
@@ -12,33 +16,33 @@ This page states how the Blazor stack follows the frontend rendering rules ([Fro
 
 **Requirement:** A page MUST render without server-side execution at first paint.
 
-**Rationale:** Interactive server rendering, automatic render mode, and prerendering each require a live server connection, so all three are outside this stack.
+**Rationale:** The stack promises a product with no server of its own. Interactive server rendering, automatic render mode, and prerendering each need a live server connection at first paint, which breaks that promise and removes offline operation. Rendering on the client only keeps the published output static files that any host can serve.
 
 ### Declare routes on pages
 
 **Requirement:** A routable component MUST live under `Pages/`, declare one `@page` template, and type every route parameter.
 
-**Rationale:** Feature components stay unroutable. An unparsable parameter renders the not-found state rather than throwing.
+**Rationale:** One `@page` template on a page under `Pages/` makes each address findable and each route's input typed. Feature components stay unroutable, so no address reaches an interior piece of a page. An unparsable parameter renders the not-found state rather than throwing, so a mistyped link shows a page instead of a crash.
 
 ### Give every route explicit states
 
 **Requirement:** A route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
-**Rationale:** A route reading persisted state renders its loading state until the read completes, so it never shows an unloaded store as ready. All six apply to a client-rendered route: an unparsable parameter renders not-found, and a route the actor is not allowed to read renders forbidden. Each state name is a term in the project's language record. This realizes litespec/frontend/rendering#represent-route-states.
+**Rationale:** A route without declared states shows whatever its components default to while loading, empty, or failing: usually a blank page or a crash. Six named states leave no gap: loading until persisted reads complete, empty, error, forbidden for an address the actor may not read, not-found for an unparsable parameter, and ready. Each state name is a term in the project's language record, so every route describes the same states in the same words. This realizes litespec/frontend/rendering#represent-route-states.
 
 ### Keep the acquisition surface static
 
 **Requirement:** A marketing, search-landing, or informational page MUST be served as a static document outside the WebAssembly application.
 
-**Rationale:** A first-time visitor then downloads no runtime. The application boundary begins where a visitor starts using the product.
+**Rationale:** A first-time visitor reads a landing page, and downloading the WebAssembly runtime first makes that read slow for no reason. Static documents outside the application load immediately. The application boundary begins where a visitor starts using the product, so only users pay the runtime cost.
 
 ### Operate offline after first load
 
 **Requirement:** A client MUST register a service worker that caches the application shell and framework payload.
 
-**Rationale:** The application then starts and navigates with no network. A feature that cannot work offline states that in its use-case specification and degrades to an explicit offline state.
+**Rationale:** The service worker caches the shell and framework payload, so the application starts and navigates with no network. Without it the product is a blank page whenever the connection drops. A feature that cannot work offline states that in its use-case specification and degrades to an explicit offline state.
 
-The rule covers the online case as much as the offline one. A cached shell serves the version it cached, so a visitor who never goes offline still receives yesterday's payload until the worker updates. The worker therefore declares its update strategy and what a visitor sees while a new version installs.
+The worker also shapes the online case. It serves the version it cached, so a visitor who never goes offline still runs yesterday's payload until the worker updates. The worker therefore declares its update strategy and what a visitor sees while a new version installs, so an update never surprises a user mid-task.
 
 ## Conventions
 
@@ -48,7 +52,7 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A route that encodes a storage key, internal identifier, or layer name exposes an implementation choice to the address bar.
+**Rationale:** The address bar shows the route to the reader, so its segments should name the use case or page the reader asked for. A storage key, internal identifier, or layer name in the address exposes an implementation choice and breaks when the implementation changes.
 
 ### Keep navigation state in the URL
 
@@ -56,7 +60,7 @@ The rule covers the online case as much as the offline one. A cached shell serve
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A user expects that state to survive a refresh or a shared link, which component state cannot provide. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
+**Rationale:** Filters, selected tabs, and pagination in the route or query string survive a refresh and travel inside a shared link. The same state in a component vanishes on the first refresh and reaches nobody the reader sends the link to. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
 
 ## Verification
 

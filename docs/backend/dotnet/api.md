@@ -2,7 +2,17 @@
 
 ## Intent
 
-The .NET backend maps each HTTP operation through one endpoint class and generates its OpenAPI contract at build time. The shared provisions live on the stack-neutral page ([HTTP API](../api.md)); this page holds what the dotnet stack alone requires.
+Each HTTP operation in a .NET backend runs through one endpoint class in the WebApi project, and the OpenAPI contract, the machine-readable description of the API, is generated from those classes at build time. This page states the endpoint contract, the metadata each operation declares, and how transport models (the data shapes WebApi defines for the wire) express closed sets of values (fixed menus such as refund outcomes). One class per route keeps every route reviewable in one place, and generated metadata keeps the published contract complete. The shared transport rules live on [HTTP API](../api.md); this page holds only their .NET form.
+
+## Concepts
+
+### Endpoint classes
+
+A WebApi endpoint is a small class that owns one route operation: it converts HTTP input to an Application command or query, sends it through the mediator, and maps the result back to HTTP. Each endpoint implements the project-owned `IEndpoint` contract, so startup code finds every endpoint by scanning the WebApi assembly and maps each one exactly once, in type-name order.
+
+### Operation metadata
+
+The OpenAPI generator builds the published contract from metadata declared on each operation: a stable name, authorization, request and success shapes, failure statuses, and a summary. Comments on route lambdas never reach the contract, so the metadata is declared explicitly with typed results or `Produces` entries.
 
 ## Standards
 
@@ -10,7 +20,7 @@ The .NET backend maps each HTTP operation through one endpoint class and generat
 
 **Requirement:** A WebApi endpoint MUST implement `IEndpoint`, map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
 
-**Rationale:** One class per operation gives each route a single owner and keeps the transport boundary reviewable. This provision realizes litespec/backend/api#map-one-operation-per-endpoint in the dotnet stack.
+**Rationale:** When one class owns one route, a reviewer finds the input mapping, the dispatch, and the result mapping for that route in one place, and no route drifts into a second pattern unnoticed. Without that rule, operations share classes or helpers, and a change to one route silently affects another. This provision states the .NET form of `litespec/backend/api#map-one-operation-per-endpoint`.
 
 **Example:** The WebApi project owns this contract:
 
@@ -21,25 +31,25 @@ internal interface IEndpoint
 }
 ```
 
-At startup, WebApi discovers non-abstract `IEndpoint` implementations in its assembly. It registers each implementation once as an `IEndpoint` singleton. It calls `MapEndpoint` in deterministic type-name order. The discovery code uses framework reflection and dependency injection. It does not require another scanning package.
+At startup, WebApi scans its own assembly for non-abstract `IEndpoint` implementations, registers each one once as a singleton, and calls `MapEndpoint` in type-name order. The scan uses framework reflection and dependency injection, so it needs no extra scanning package.
 
 ### Exclude MVC controllers from the stack
 
 **Requirement:** A WebApi project MUST NOT route requests through MVC controllers or `ControllerBase`.
 
-**Rationale:** A second transport pattern splits routing, filters, and error mapping across two models that behave differently.
+**Rationale:** Controllers and endpoint classes route, filter, and map errors through different models. When both exist, a reviewer checks two mappings for every behavior, and error responses drift apart. One model means one place defines how requests reach handlers and how failures reach clients.
 
 ### Declare operation metadata in the contract
 
 **Requirement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and typed results or `Produces` metadata, and a summary.
 
-**Rationale:** A stable name through `WithName` becomes `operationId`. Authorization metadata cites the enforced policies, and Problem Details metadata covers every documented failure status. Comments on route lambdas are not contract documentation, so operations carry explicit summaries and descriptions. This provision realizes litespec/backend/api#declare-stable-operation-metadata-in-the-contract in the dotnet stack.
+**Rationale:** Generated clients name their calls from `operationId`, so an unnamed or unstable operation breaks every client regeneration. Authorization and Problem Details metadata tell a client which policies apply and which failures to handle; without them the client guesses. Route-lambda comments never reach the contract, so the summary and description are declared explicitly. This provision states the .NET form of `litespec/backend/api#declare-stable-operation-metadata-in-the-contract`.
 
 ### Mark polymorphic transport models with discriminators
 
 **Requirement:** A data-bearing set MUST map to an abstract base record with one sealed record per case, published as `oneOf` with a string discriminator.
 
-**Rationale:** A concrete base cannot mark the discriminator property as required, so the base stays abstract. String discriminators equal the Domain union's stable case codes. Discriminator strings stay stable across identifier renames. This provision realizes litespec/backend/api#mark-polymorphic-models-with-discriminators in the dotnet stack.
+**Rationale:** A concrete base record cannot mark the discriminator as required, so a client could send a payload that names no case. String discriminators carry the Domain union's stable case codes, so the wire value survives renames of code identifiers. Without the discriminator, deserialization picks a case by shape, and two cases with similar fields become ambiguous. This provision states the .NET form of `litespec/backend/api#mark-polymorphic-models-with-discriminators`.
 
 **Example:**
 
@@ -57,7 +67,7 @@ At startup, WebApi discovers non-abstract `IEndpoint` implementations in its ass
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Order-sensitive middleware stays reviewable when one file shows the sequence. Process composition lives in `litespec/backend/architecture#compose-each-process-explicitly`, which this file implements for WebApi.
+**Rationale:** Middleware runs in registration order, so authentication registered after endpoints never runs. When one file shows the whole sequence, a reviewer sees the order at a glance; when registration scatters across files, a misplaced call hides. This file is the WebApi form of `litespec/backend/architecture#compose-each-process-explicitly`.
 
 **Example:** The visible order is trusted forwarded headers, exception handling, transport security, authentication, authorization, endpoints, and then health. Forwarded headers appear only when the deployment boundary requires trusted proxies. OpenAPI and Scalar map only in Development.
 

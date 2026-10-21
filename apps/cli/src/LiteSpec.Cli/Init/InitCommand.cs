@@ -181,6 +181,9 @@ static class InitCommand
 
         // The template names the project as __PROJECT__ in paths and package names; the
         // name fills those, and every other placeholder is left for the owner to fill.
+        // An npm package scope must be lowercase, so a scope takes the name in lowercase
+        // kebab case: Team Expenses becomes @team-expenses/ui.
+        Fill(project, "@__PROJECT__/", $"@{PackageScope(name)}/");
         Fill(project, "__PROJECT__", name);
         var unfilled = Placeholders(project).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
 
@@ -207,6 +210,10 @@ static class InitCommand
     }
 
     /// <summary>Replaces a placeholder inside every string value of the document.</summary>
+    /// <summary>The project name as an npm package scope: lowercase, with runs of other characters as one hyphen.</summary>
+    static string PackageScope(string name) =>
+        System.Text.RegularExpressions.Regex.Replace(name.ToLowerInvariant(), "[^a-z0-9._-]+", "-").Trim('-');
+
     static void Fill(JsonNode? node, string placeholder, string value)
     {
         switch (node)

@@ -2,7 +2,17 @@
 
 ## Intent
 
-A list or a table shows many records of one kind, so a reader can find, compare, and act on them. These patterns answer how columns, sorting, filters, selection, paging, and the states of a table behave. Each pattern offers drawn options and names a default.
+A back-office list shows many records of one kind, such as orders, so a reader can find one record, compare rows, and act on them. This page holds the patterns for those lists: columns, sorting, filters, row density, selection, paging, row actions, table states, status, money, export, search, grouping, expansion, pinning, cards, and phone layout. A team building a list screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared set of answers keeps every list in the product behaving the same way, so a reader who learns one list knows them all.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about lists, such as which columns a table shows. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply orders list: 268 orders across many customers and deliveries, with order 7K4Q2M for Maria Garcia as one row. Filters, sorting, and paging narrow that list, and the money column shows amounts such as EUR 125.00. The Standards section states the two rules every option keeps: the list view lives in the address, and money columns align right with their currency.
 
 ## Standards
 
@@ -10,19 +20,19 @@ A list or a table shows many records of one kind, so a reader can find, compare,
 
 **Requirement:** A list MUST keep its filters, sort order, and page in the URL.
 
-**Rationale:** A reader who opens a record and comes back finds the same view. A colleague who receives the link sees the same rows.
+**Rationale:** A view kept in the address survives the back button, a refresh, and a pasted link, so all three return to the same rows. Without it, opening one record loses the filters the reader set, and a link sent to a colleague opens the unfiltered first page instead of the rows under discussion.
 
 ### Align money to the right with its currency
 
 **Requirement:** A table MUST right-align a money column and show the currency of every amount in it.
 
-**Rationale:** Right-aligned figures line up by place value, so a reader compares amounts down the column. An amount without its currency is a number the reader has to interpret.
+**Rationale:** Right alignment lines up place value down the column, so a reader compares hundreds against thousands without reading each figure digit by digit. A currency on every amount keeps EUR 125.00 distinct from a bare 125.00, so an export or a screenshot never leaves finance guessing which money it shows.
 
 ## Patterns
 
 ### Choosing the columns
 
-**Question:** Which columns does an orders table show. The reader chooses rows by order, customer, date, state, and money. The delivery rides under the order code.
+**Question:** Which columns does the orders table show. The reader picks rows by order, customer, date, state, and money. The delivery name sits under the order code as a second line.
 
 **Default:** `five-columns-nothing-removable`
 
@@ -278,7 +288,7 @@ page
 
 ### Sorting
 
-**Question:** How does a reader reorder an orders table. Newest first is the start. Each sortable header offers its own order, and the sort lives in the URL so a link carries it.
+**Question:** How does a reader reorder the orders table. The table starts newest first. Each sortable header offers its own order, and the sort lives in the URL so a link carries it.
 
 **Default:** `every-sortable-header-carries-an-arrow`
 
@@ -499,7 +509,7 @@ page
 
 ### Filters
 
-**Question:** How does a reader narrow an orders table. Search alone answers one question. Each closed filter shows how many are applied, and several categories never share one dropdown.
+**Question:** How does a reader narrow the orders table. Search alone answers one question. Each closed filter control shows how many values it applies, and several categories never share one dropdown.
 
 **Default:** `one-filter-per-category-visible`
 
@@ -775,7 +785,7 @@ page
 
 ### Row density
 
-**Question:** How tall is a row in an orders table. Carbon defines five heights from 24 to 64 pixels, and the header, toolbar, and pagination match the row size. The default table runs near 47 pixels per row, between `md` and `lg`.
+**Question:** How tall is a row in the orders table. Carbon defines five heights from 24 to 64 pixels, and the header, toolbar, and pagination match the row size. The default table runs near 47 pixels per row, between `md` and `lg`.
 
 **Default:** `40-pixels-the-default`
 
@@ -993,7 +1003,7 @@ page
 
 ### Bulk action bar
 
-**Question:** What appears once order rows are selected. The bar names the count and the money, then offers the commands. A refund on the wrong scope is the expensive mistake this page invites.
+**Question:** What appears once order rows are selected. The bar names the count and the money, then offers the commands. A refund on the wrong scope is the expensive mistake this pattern guards against.
 
 **Default:** `a-bar-above-the-table-naming-the-count`
 
@@ -1446,7 +1456,7 @@ page
 
 ### Row actions
 
-**Question:** An orders table shows rows of orders. Each row may carry its own commands. How many commands sit on the row, and where do the rest live.
+**Question:** The orders table shows rows of orders. Each row may carry its own commands. How many commands sit on the row, and where do the rest live.
 
 **Default:** `one-inline-action-the-rest-in-a-row-menu`
 
@@ -1636,13 +1646,13 @@ page
 
 ### Table's own states
 
-**Question:** An orders table is sometimes empty, still loading, or failed to load. Each case needs its own words and layout. What shows for each state of the table itself.
+**Question:** The orders table is sometimes empty, still loading, or failed to load. Each case needs its own words and layout. What shows for each state of the table itself.
 
 **Default:** `no-data-yet-table-replaced`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keep three sentences for three facts. No data yet, no results, and loading each replace the table they stand for. Prefer the slow-read note that names what is loading on nights when the list takes seconds. Never ship a bare spinner over the table body. Rows that shift when the data lands move the row the reader already chose.
+**Rationale:** Keep three sentences for three facts. No data yet, no results, and loading each replace the table they stand for. Prefer the slow-read note that names what is loading when the list takes seconds. Never ship a bare spinner over the table body. Rows that shift when the data lands move the row the reader already chose.
 
 #### `no-data-yet-table-replaced`: No data yet, table replaced
 
@@ -2511,7 +2521,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The pick is (a), grouped by day with subtotals: it answers what today took without a chart and without leaving the list. The runner-up is (b), grouped by delivery with collapse toggles, once deliveries grow so one day of rows stops fitting. Never ship (f), two group levels: month-then-day nesting turns the list into a tree that paging cannot cross.
+**Rationale:** Keep grouped by day with subtotals. It answers what today took without a chart and without leaving the list. The runner-up is grouped by delivery with collapse toggles. Prefer it once deliveries grow so one day of rows stops fitting. Never ship two group levels: month-then-day nesting turns the list into a tree that paging cannot cross.
 
 #### `grouped-by-day-with-subtotals`: Grouped by day with subtotals
 
@@ -2685,7 +2695,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The pick is (a), expansion to the order lines: it answers what the customer bought, which is the question asked from the list. The runner-up is (c), units with pickup state, on the pickup list where handover is the work. Never ship (e), expand-all: twenty expanded rows is a page nobody can scan, and the control exists to punish curiosity.
+**Rationale:** Keep expansion to the order lines. It answers what the customer bought, which is the question asked from the list. The runner-up is expansion to units with pickup state. Prefer it on the pickup list where handover is the work. Never ship expand-all: twenty expanded rows is a page nobody can scan, and one click fires a read per row.
 
 #### `expand-to-the-order-lines`: Expand to the order lines
 
@@ -2834,7 +2844,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The pick is (a), the order column pinned while the rest scroll: the row stays named at any scroll position, and it costs no control. The runner-up is (b), the actions pinned too, once rows carry inline commands that must stay reachable. Never ship (c), draggable widths, in a first release: per-user widths are stored state that support cannot see and screenshots cannot hold.
+**Rationale:** Keep the order column pinned while the rest scroll. The row stays named at any scroll position, and it costs no control. The runner-up pins the actions too. Prefer it once rows carry inline commands that must stay reachable. Never ship draggable widths in a first release: per-user widths are stored state that support cannot see and screenshots cannot hold.
 
 #### `the-order-column-pinned-while-the-rest-scroll`: The order column pinned while the rest scroll
 
@@ -2969,7 +2979,7 @@ page
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The pick is (a), delivery cards with a load bar. Four deliveries read better as four cards than as four rows. The bar answers the only question the list exists for. The runner-up is (c), a date-led list, once the year holds dozens of runs and cards stop fitting. Never ship (d), the month calendar: it answers when, which the deliveries list is never asked.
+**Rationale:** Keep delivery cards with a load bar. Four deliveries read better as four cards than as four rows. The bar answers the only question the list exists for. The runner-up is a date-led list. Prefer it once the year holds dozens of runs and cards stop fitting. Never ship the month calendar: it answers when, which the deliveries list is never asked.
 
 #### `delivery-cards-with-a-load-bar`: Delivery cards with a load bar
 
@@ -3120,7 +3130,7 @@ page
 
 **Compact:** Below 640 pixels the table becomes two-line rows with the amount right. Sorting moves to a Sort control. The compact option is `two-line-rows-with-money-right`.
 
-**Rationale:** The pick is (a), two-line rows with money right. It reads well at 390 pixels and keeps the order code, the customer, and the amount. It pairs with a Sort control where sorting matters. The runner-up is (c), a scroll container with a sticky first column, for the rare phone task that needs every column. Never ship (f), search hiding the list: a list that starts empty teaches the reader there is nothing to see.
+**Rationale:** Keep two-line rows with money right. The rows read well at 390 pixels and keep the order code, the customer, and the amount. They pair with a Sort control where sorting matters. The runner-up is a scroll container with a sticky first column. Prefer it for the rare phone task that needs every column. Never ship a phone list that hides behind search: a list that starts empty teaches the reader there is nothing to see.
 
 #### `two-line-rows-with-money-right`: Two-line rows with money right
 

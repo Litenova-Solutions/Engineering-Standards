@@ -14,7 +14,7 @@
 
 LiteSpec is a standard for building one bounded-context business application with people and AI agents working from the same written rules and records.
 
-A project names its size (small or large), its shape (server or client-only) and its stacks: `dotnet` for a backend, and `react`, `svelte` or `blazor` for each frontend. New to it? Read [Learn LiteSpec](docs/learn/README.md).
+A project names its size (small or large), its shape (server or client-only) and its stacks: `dotnet` for a backend, and `react`, `svelte` or `blazor` for each frontend. New to it? Read the [Learn overview](docs/learn/README.md).
 
 ## What It Defines
 
@@ -32,13 +32,13 @@ The stacks a consumer selects apply first. An extension or project exception nam
 ## Documentation
 
 - [Hosted documentation](https://litespec.dev)
-- [Learn LiteSpec](docs/learn/README.md)
+- [Learn overview](docs/learn/README.md)
 - [Repository documentation index](docs/README.md)
 - [LiteSpec](docs/core/system.md)
 - [Project model](docs/core/model.md)
 - [Authoring standard](docs/core/authoring.md)
-- [Get started](docs/tutorial/getting-started.md)
-- [Command index](docs/tools/README.md)
+- [Start a consumer repository](docs/tutorial/getting-started.md)
+- [CLI overview](docs/tools/README.md)
 
 ## Use LiteSpec
 
@@ -51,7 +51,7 @@ git -C litespec checkout --detach <approved-tag-or-commit>
 
 Add `litespec.project.json`, a short root `AGENTS.md`, and the project records required by current work.
 
-Follow [Get started](docs/tutorial/getting-started.md) when creating a consumer repository.
+Follow [Start a consumer repository](docs/tutorial/getting-started.md) when creating a consumer repository.
 
 The [template index](templates/consumer/README.md) lists each consumer template and its target path.
 

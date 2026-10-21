@@ -2,7 +2,17 @@
 
 ## Intent
 
-A screen spends part of its life empty, loading, refused, offline, or failed. These patterns answer what shows in each of those states and how a command reports that it worked. Each pattern offers drawn options and names a default.
+Screens spend part of their life empty, loading, forbidden, offline, signed out, conflicted, missing, failed, rate-limited, or under maintenance, and every command the reader runs reports whether it worked. This page states what each state shows and how results read, as drawn options with a named default to build. The product owner chooses among the options when the team builds a list, a form, or any command that can fail. Decided states keep staff informed instead of guessing: each screen says what happened, what it means, and what to do next.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about screen states, such as what a list shows before its first records exist. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply back office: 268 orders including SO-1042 for Maria Garcia, refunds such as the EUR 125.00 on that order, and the delivery, payment, and warehouse facts around them. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a refusal or error message states what failed and the next step, and a failed save keeps the reader's input on screen.
 
 ## Standards
 
@@ -10,13 +20,13 @@ A screen spends part of its life empty, loading, refused, offline, or failed. Th
 
 **Requirement:** A refusal or error message MUST state what failed and the next step the reader can take.
 
-**Rationale:** A message that only says something went wrong leaves the reader to guess. Naming the next step turns a dead end into a task.
+**Rationale:** A message that only says something went wrong leaves the reader guessing whether to retry, fix input, or ask for help, and most readers retry blindly or give up. Naming what failed plus the one next step turns the dead end into a task the reader can complete.
 
 ### Keep the reader's input through a failure
 
 **Requirement:** A failed save MUST keep the reader's unsaved input on the screen.
 
-**Rationale:** The reader retries after the cause is fixed instead of typing the work again. Lost input after a failure is the failure the reader remembers.
+**Rationale:** Retyping a whole form to fix one refused field wastes the reader's time and introduces new typos. Worse, readers who lose work to a failure stop trusting the form and copy long answers elsewhere before saving.
 
 ## Patterns
 
@@ -157,7 +167,7 @@ page
 
 **Rationale:** The list is not empty. It is withheld. Carbon's third empty state is permissions, and this one names the grant rather than saying nothing is there.
 
-**Cost:** It confirms that records exist, which some deployments would rather not do. Naming the grant makes the record count a secret the page reveals.
+**Cost:** It confirms that records exist, which some deployments would rather not do. The header count tells the reader what the body withholds.
 
 **Reference:** Carbon
 
@@ -364,7 +374,7 @@ page
 
 **Rationale:** Where a filter is the only thing between the reader and the records, the empty state names the filter and the number behind it. The reader can go back one step.
 
-**Cost:** The count is a second read, and it is a number on a page that was about to show none. Two numbers where one would do.
+**Cost:** The count needs a second read, and it puts a number on a page that otherwise shows none.
 
 #### `one-line-in-place-of-the-rows-with-one-link-that-clears-ever`: One line in place of the rows, with one link that clears everything
 
@@ -700,7 +710,7 @@ page
     action "See the listing"
 ```
 
-**Rationale:** Not every refusal is a problem. Some commands are refused because nothing needed doing, and saying so is more honest than an error tone.
+**Rationale:** Not every refusal is a problem. Some commands are refused because nothing needed doing, and a neutral tone says so better than an error tone.
 
 **Cost:** The reader cannot tell a no-op from a failure unless the tone differs, and the tone is the only signal. A refusal that was correct should not be red.
 
@@ -982,7 +992,7 @@ page
 
 ### Fact somebody has to read before acting
 
-**Question:** A static notice states a fact about the page. Only a command result is an alert. A tone paints the object in that state, never a full band across other work.
+**Question:** Some pages must state a fact before staff act, such as low stock or a closing window. Only a command result is an alert; a static fact is a notice. A tone paints the object in that state, never a full band across other work.
 
 **Default:** `a-neutral-notice-above-the-page`
 
@@ -1054,7 +1064,7 @@ page
       action primary "Save"
 ```
 
-**Rationale:** The page shows a callout inside the field group, in words, before the command runs. This is the position-neutral form of the same rule and it is the one that keeps a tone off a page.
+**Rationale:** The page shows a callout inside the field group, in words, before the command runs. It states the consequence where the reader decides, without painting the page.
 
 **Cost:** A callout inside a form is a paragraph among fields, and it is the least visible of the alert shapes. It is also the one a reader reads before committing rather than after.
 
@@ -1176,7 +1186,7 @@ page
 
 ### Reader may not do this
 
-**Question:** A page its role cannot use shows it with the reason and the grant that helps. A back office with several roles meets this state on most pages, so it needs one shape.
+**Question:** Staff meet pages their role cannot use, so each such page must show the reason and the grant that would help. A back office with several roles meets this state on most pages, so it needs one shape.
 
 **Default:** `the-commands-are-refused-each-with-its-grant-named`
 
@@ -1359,7 +1369,7 @@ page
 
 ### Connection is gone
 
-**Question:** The warehouse desk needs to work without a connection, which means the back office's counterpart is a stale page. Nothing here shows how fresh its data is, so these options decide what a stale page says.
+**Question:** Staff lose the connection while working, so the page on screen goes stale. The decision is what a stale page says: how fresh its data is, what still works, and when to retry.
 
 **Default:** `a-banner-saying-what-is-stale-and-what-still-works`
 
@@ -1412,7 +1422,7 @@ page
 
 **Rationale:** The page refuses every command with the same reason in words. The message is unambiguous, and a page of refusals that all say the same thing is noisy.
 
-**Cost:** A reader on a train sees a page they cannot use. It is honest and it is still frustrating, and the frustration is not information the page can carry.
+**Cost:** A reader on a train sees a page they cannot use. The refusals are truthful but frustrating, and the page cannot fix the connection.
 
 #### `a-queued-command-so-the-reader-does-not-lose-the-work`: A queued command, so the reader does not lose the work
 
@@ -1850,7 +1860,7 @@ page
 
 ### Work that runs without you
 
-**Question:** An import or a bulk refund runs longer than a page. The reader starts it and does other work. The job must be visible while it runs and answerable when it is done.
+**Question:** An import or a bulk refund runs for minutes, longer than the reader waits on one page. The reader starts it and does other work. The job must stay visible while it runs and report its result when it is done.
 
 **Default:** `an-activity-tray-like-an-upload-panel`
 
@@ -2122,7 +2132,7 @@ page
     action primary "Back to Home"
 ```
 
-**Rationale:** Vercel and Next.js draw a bare `404`. It is honest about the status and silent about everything a reader needs: what is missing, why, and where to go.
+**Rationale:** Vercel and Next.js draw a bare `404`. It states the status and nothing else: not what is missing, why, or where to go.
 
 **Cost:** A code means nothing to a reader. When left bare, it is a dead end with a number on it.
 
@@ -2411,7 +2421,7 @@ page
 
 ### Too many tries
 
-**Question:** The reader hits a limit: too many exports, too many sign-in tries, or too many sends. The API answers `429` with when to try again. The reader needs the wait, not a lecture.
+**Question:** The reader hits a limit: too many exports, too many sign-in tries, or too many sends. The API answers `429` with when to try again. The page must state the wait and the reason, briefly.
 
 **Default:** `the-button-waits-and-says-how-long`
 

@@ -2,7 +2,7 @@
 
 ## Name
 
-`litespec init` starts a consumer repository from a ready-made preset.
+`litespec init` starts a consumer repository from a preset, a ready-made selection of shape, stacks, and frontends.
 
 ## Synopsis
 
@@ -12,11 +12,17 @@ litespec init --preset <name> --size <small|large> [--root <path>] [--name <proj
 
 ## Description
 
-This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the LiteSpec checkout. It overlays the preset's shape, stacks, and frontends, then stamps the project size, name, and reviewed release. It refuses to overwrite an existing project file.
+This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the LiteSpec checkout, overlays the preset's shape, stacks, and frontends, then writes the project size, name, and `reviewedLiteSpecVersion`. It refuses to overwrite an existing project file.
 
-Three presets ship with the release. `dotnet-react` selects shape `server`, stacks `dotnet` and `react`, and one `react` frontend `web` at `apps/web`. `dotnet-svelte` selects the same shape with stacks `dotnet` and `svelte`, and one `svelte` frontend `web` at `apps/web`. `blazor-client` selects shape `client-only`, stack `blazor`, and one `blazor` frontend `app` at `apps/app`.
+Three presets ship with the release:
 
-Run it once in an empty folder, then run `litespec consumer` to validate the new project.
+| Preset | Shape | Stacks | Frontend |
+|:---|:---|:---|:---|
+| `dotnet-react` | `server` | `dotnet`, `react` | `web` at `apps/web` on `react` |
+| `dotnet-svelte` | `server` | `dotnet`, `svelte` | `web` at `apps/web` on `svelte` |
+| `blazor-client` | `client-only` | `blazor` | `app` at `apps/app` on `blazor` |
+
+Run this command once in an empty folder, then run `litespec consumer` to validate the new project.
 
 ## Arguments
 

@@ -37,6 +37,8 @@ export interface TocEntry {
 
 export interface RenderedPage {
   html: string;
+  /** The opening Intent or Purpose section, rendered, or empty. */
+  intro: string;
   toc: TocEntry[];
 }
 
@@ -385,6 +387,27 @@ function wrapProvisions(html: string, page: Page): string {
 
 const headingPattern = /<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/g;
 
+const introMarker = "<!--page-intro-->";
+const introEnd = "<!--/page-intro-->";
+
+// Marks the end of the introduction, at the next H2, so it can be split off
+// once every other transform has run.
+function wrapIntro(html: string): string {
+  const start = html.indexOf(introMarker);
+  if (start < 0) return html;
+  const end = html.indexOf("<h2", start);
+  const stop = end < 0 ? html.length : end;
+  return html.slice(0, stop) + introEnd + html.slice(stop);
+}
+
+// Splits the marked introduction from the body.
+function splitIntro(html: string): { intro: string; body: string } {
+  const start = html.indexOf(introMarker);
+  const end = html.indexOf(introEnd);
+  if (start < 0 || end < start) return { intro: "", body: html };
+  return { intro: html.slice(start + introMarker.length, end).trim(), body: html.slice(0, start) + html.slice(end + introEnd.length) };
+}
+
 export async function renderPage(page: Page): Promise<RenderedPage> {
   const { code } = await (await renderer()).render(page.markdown);
   const provisions = new Map(page.provisions.map((provision) => [provision.slug, provision]));
@@ -398,6 +421,7 @@ export async function renderPage(page: Page): Promise<RenderedPage> {
   };
 
   let firstH1 = true;
+  let firstH2 = true;
   let html = code.replace(headingPattern, (match, depth: string, inner: string) => {
     const text = unescape(stripTags(inner)).replace(/\s+\{#[^}]+\}\s*$/, "").trim();
     const id = unique(slug(text));
@@ -407,12 +431,19 @@ export async function renderPage(page: Page): Promise<RenderedPage> {
       firstH1 = false;
       return "";
     }
+    // The opening Intent or Purpose section is the page's introduction: the
+    // template shows it under the title, without its heading.
+    if (level === 2 && firstH2) {
+      firstH2 = false;
+      if (text === "Intent" || text === "Purpose") return introMarker;
+    }
     const display = text.replace(/`/g, "").replace(/\s+/g, " ");
     if (level === 2) toc.push({ depth: 2, text: display, id });
     if (level === 3 && provisions.has(id)) toc.push({ depth: 3, text: display, id });
     return `<h${level} id="${escape(id)}">${inner}<a class="anchor" href="#${escape(id)}" aria-label="Link to this section" data-pagefind-ignore>#</a></h${level}>`;
   });
 
+  html = wrapIntro(html);
   html = rewriteLinks(html, page);
   html = inlineDiagrams(html, page);
   html = renderWireframes(html, collectWireframes(page.markdown));
@@ -421,7 +452,8 @@ export async function renderPage(page: Page): Promise<RenderedPage> {
   html = styleTables(html);
   html = decorateCodeBlocks(html);
   html = wrapProvisions(html, page);
-  return { html, toc };
+  const { intro, body } = splitIntro(html);
+  return { html: body, intro, toc };
 }
 
 // Renders a short Markdown fragment such as a page intent to inline HTML.

@@ -85,7 +85,8 @@ function styleOf(rel: string): PageStyle {
   if (segments[1] === "reference") return "reference";
   if (segments[1] === "tutorial") return "tutorial";
   if (segments[1] === "guide") return "how-to";
-  if (segments[1] === "learn") return "explanation";
+  if (segments[1] === "analyzers") return segments[2] === "rules" && segments.length > 3 ? "reference" : "how-to";
+  if (segments[1] === "learn" || segments[1] === "example") return "explanation";
   if (segments.at(-1) === "stack.md") return "stack";
   return "topic";
 }
@@ -172,19 +173,24 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The learn/ pages read in the order their index lists them; every other page sorts by path.
+// The learn/ and example/ pages read in the order their index lists them; every
+// other page sorts by path.
 function readingOrder(all: Page[]): Page[] {
-  const index = all.find((page) => page.file === "docs/learn/README.md");
-  if (!index) return all;
-  const listed = [...index.markdown.matchAll(/\]\(([a-z0-9-]+)\.md\)/g)].map((match) => `docs/learn/${match[1]}.md`);
-  const rank = (page: Page) => (page.file === index.file ? -1 : listed.indexOf(page.file) < 0 ? listed.length : listed.indexOf(page.file));
-  const learn = all.filter((page) => page.area === "learn").sort((x, y) => rank(x) - rank(y));
-  const first = all.findIndex((page) => page.area === "learn");
-  const rest = all.filter((page) => page.area !== "learn");
-  return [...rest.slice(0, first), ...learn, ...rest.slice(first)];
+  let out = all;
+  for (const area of ["learn", "example"]) {
+    const index = out.find((page) => page.file === `docs/${area}/README.md`);
+    if (!index) continue;
+    const listed = [...index.markdown.matchAll(/\]\(([a-z0-9-]+)\.md\)/g)].map((match) => `docs/${area}/${match[1]}.md`);
+    const rank = (page: Page) => (page.file === index.file ? -1 : listed.indexOf(page.file) < 0 ? listed.length : listed.indexOf(page.file));
+    const ordered = out.filter((page) => page.area === area).sort((x, y) => rank(x) - rank(y));
+    const first = out.findIndex((page) => page.area === area);
+    const rest = out.filter((page) => page.area !== area);
+    out = [...rest.slice(0, first), ...ordered, ...rest.slice(first)];
+  }
+  return out;
 }
 
-/** Every page under docs/: the learn/ pages in reading order, the rest in ordinal path order. */
+/** Every page under docs/: the learn/ and example/ pages in reading order, the rest in ordinal path order. */
 export const pages: Page[] = readingOrder(walk(path.join(root, "docs")).map(parsePage));
 
 const byFile = new Map(pages.map((page) => [page.file, page]));

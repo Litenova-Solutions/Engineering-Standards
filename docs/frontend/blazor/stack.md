@@ -2,7 +2,7 @@
 
 ## Intent
 
-This stack serves a product that has no server of its own. It combines a .NET client-side domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static output. Such a product declares the `client-only` shape under `litespec/core/scope#declare-a-consumer-that-has-no-backend`, which names the backend pages that still apply. This page adds what Blazor itself requires. Exact framework and package versions live only in `litespec.manifest.json`.
+The Blazor stack is the technology binding for a product that has no server of its own: a .NET domain model, browser-local persistence, and a Blazor WebAssembly application compiled to static files. A team chooses it when the product runs entirely on the user's device, under the `client-only` shape, the deployment boundary with no server, declared in [Supported Scope](../../core/scope.md). This page states what the stack itself requires; exact framework and package versions live only in `litespec.manifest.json`.
 
 ## Standards
 
@@ -10,13 +10,13 @@ This stack serves a product that has no server of its own. It combines a .NET cl
 
 **Requirement:** A consumer selecting this stack MUST NOT apply the controlled UI contract.
 
-**Rationale:** The contract's route checks read TypeScript, so they cannot read a Blazor component. The Blazor pages state the styling, accessibility, and state rules that apply instead.
+**Rationale:** The controlled UI contract's route checks read TypeScript sources, so they cannot read a `.razor` component. Applying them to this stack would fail every check for lack of readable input. The Blazor pages state the styling, accessibility, and state rules that apply instead, so nothing is left ungoverned.
 
 ### Publish static WebAssembly output
 
 **Requirement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
 
-**Rationale:** Blazor Server, interactive server rendering, and prerendering each remove offline operation and reintroduce a server, so all three are outside this stack.
+**Rationale:** Standalone WebAssembly compiles to static files, which is what lets the product run with no server and offline. Blazor Server, interactive server rendering, and prerendering each reintroduce a server dependency, which removes offline operation and contradicts the `client-only` shape.
 
 
 ## Conventions
@@ -27,7 +27,7 @@ This stack serves a product that has no server of its own. It combines a .NET cl
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** The client application has no Node build step. A consumer holding a separate content or asset workspace keeps the manifest-pinned Node and pnpm toolchain for that workspace only.
+**Rationale:** The client has no Node build step, so `dotnet` builds and tests the whole application. A Node toolchain would add downloads and configuration for a step that does not exist. A consumer holding a separate content or asset workspace keeps the manifest-pinned Node and pnpm toolchain for that workspace only.
 
 **Example:**
 
@@ -42,7 +42,7 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A WebAssembly client downloads a runtime before it renders anything. Directory size does not describe what a visitor waits for.
+**Rationale:** A WebAssembly client downloads a runtime before it renders anything, so first load is the slowest moment of the product. A recorded budget on compressed transfer size makes that wait a reviewed number instead of a surprise. Directory size does not describe the wait, because the visitor downloads compressed bytes over the network.
 
 ## Verification
 

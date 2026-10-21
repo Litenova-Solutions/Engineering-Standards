@@ -2,7 +2,7 @@
 
 ## Intent
 
-Realtime transport reduces visible update delay when polling cannot meet an accepted user requirement. Messages remain refresh hints unless a use case defines durable ordered delivery.
+Realtime updates push a change to open screens seconds after it happens, faster than polling (repeat requests) delivers at an acceptable cost. This page states when a team replaces polling with realtime transport, which transport fits which need, and which protections each connection carries: authentication, revalidation, recovery, and resource bounds. A team selects it for each use case (one operation the product offers) or journey (steps toward one goal) after measuring polling against the update target, so the product pays for open connections only where a measured target requires live data.
 
 ## Activation
 
@@ -10,13 +10,13 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `journey`.
 
-The consumer enables `realtime` after measuring polling interval, visible delay, request cost, and required update target. It names acceptable disconnect and missed-message recovery.
+A use case or journey selects this extension after the team measures polling against the update target: the polling interval, the visible delay, the request cost, and the required update speed. The selection also names the accepted cost of disconnects and missed messages: how the client recovers when the connection drops or a notification never arrives.
 
 ## Baseline relationship
 
-This extension replaces no baseline provision. Server-sent events use platform capabilities.
+This extension replaces no baseline provision. One-way notifications travel over server-sent events, which need no added package because the platform ships them.
 
-`event`, `limit`. Selecting `realtime` requires Event records for the notifications it carries and Limit records for the bounds it sets.
+Selecting `realtime` switches on the Event and Limit record types: each notification carries an Event record, and each resource bound lives in a Limit record.
 
 ## Standards
 
@@ -24,67 +24,67 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 **Requirement:** A realtime use case MUST document polling behavior, measured cost, update latency, expected connections, and recovery behavior.
 
-**Rationale:** The record compares realtime cost with an accepted user-visible update target. The use-case page carries the record with its owner and status.
+**Rationale:** Open connections cost memory, CPU, and operating attention on every host, so the team writes down what polling costs, what the update target requires, and how many connections to expect before choosing transport. The use-case page carries that record with its owner and status, so a later reader sees which measurements justified the choice.
 
 ### Reject cosmetic realtime adoption
 
 **Requirement:** A product MUST NOT activate realtime only to make an interface feel immediate.
 
-**Rationale:** Realtime transport needs a measurable update requirement beyond visual preference.
+**Rationale:** Realtime transport that serves only a feeling of immediacy spends connection capacity and operating attention without moving any target. The extension asks for a measured update requirement first, so polling stays where polling suffices.
 
 ### Use server-sent events for notifications
 
 **Requirement:** A one-way server notification use case MUST use server-sent events.
 
-**Rationale:** Server-sent events provide an HTTP-based direction from server to browser.
+**Rationale:** A notification that flows one way, from server to browser, needs no bidirectional channel with groups and fallback. Server-sent events carry it over plain HTTP, which passes through proxies and firewalls without extra negotiation.
 
 ### Use SignalR for interactive messaging
 
 **Requirement:** A use case requiring bidirectional messages, server groups, or transport fallback MUST use SignalR.
 
-**Rationale:** SignalR supplies the interaction and fallback capabilities that one-way events lack.
+**Rationale:** Two-way messages, server-managed groups, and transport fallback need a channel built for interaction, which one-way events cannot provide. SignalR supplies all three, so the use case that needs them takes SignalR instead of stretching events past their shape.
 
 ### Record transport support
 
 **Requirement:** A realtime use case MUST record its transport choice and expected hosted-platform support.
 
-**Rationale:** Hosted-platform connection behavior can constrain the selected transport.
+**Rationale:** Hosted platforms limit connection duration, idle timeouts, and transport upgrades in ways that differ per host. Recording the transport choice with its expected platform support surfaces the mismatch before deployment instead of during the first long-lived connection.
 
 ### Authenticate and authorize subscriptions
 
 **Requirement:** A realtime server MUST authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription.
 
-**Rationale:** A valid connection does not grant access to arbitrary user, tenant, or resource data.
+**Rationale:** Connecting proves who the caller is; it says nothing about which user's, tenant's, or resource's updates the caller may hear. Each user-, tenant-, or resource-scoped subscription checks its own authorization, so one valid connection cannot listen in on another tenant's data.
 
 ### Revalidate long-lived access
 
 **Requirement:** A realtime server MUST revalidate long-lived access according to token and session lifetime.
 
-**Rationale:** Connection authorization can become stale after a token, role, or session change.
+**Rationale:** A connection can outlive the grant that opened it: tokens expire, roles change, sessions end. Revalidating access on token and session lifetime closes the connection whose grant died instead of streaming updates to a caller who no longer qualifies.
 
 ### Reconnect and refresh authoritative state
 
 **Requirement:** A realtime client MUST reconnect with bounded backoff and refresh authoritative state after a connection gap.
 
-**Rationale:** A refresh restores authoritative state after disconnect or missed notifications.
+**Rationale:** Connections drop, and a notification sent during the gap never arrives. Bounded backoff reconnects without hammering the server, and refreshing authoritative state after the gap replaces whatever the missed notifications would have changed.
 
 ### Tolerate notification ordering differences
 
 **Requirement:** A realtime client MUST safely handle duplicate and out-of-order notifications.
 
-**Rationale:** Transport delivery does not guarantee one ordered notification for each observed change.
+**Rationale:** The transport can deliver a notification twice or deliver two of them out of order. A client that applies each notification as an absolute update corrupts its state on the first duplicate; a client built for repeats and reordering converges on the truth either way.
 
 ### Bound realtime resources
 
 **Requirement:** A realtime deployment MUST set four Limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
 
-**Rationale:** Explicit limits protect server memory, CPU, and connection capacity. Each value comes from the deployment's own connection count and message size, with the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
+**Rationale:** Each open connection holds memory, each message costs CPU, and a flood of either starves the host. The deployment sets four bounds as Limit records - concurrent connections per host, receive message size, parallel invocations per connection, and client timeout - with each value drawn from the deployment's own connection count and message size and the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
 
 ### Reject unbounded slow-client buffering
 
 **Requirement:** A realtime server MUST NOT buffer an unbounded stream for a slow client.
 
-**Rationale:** Slow-client buffers can exhaust resources and delay other subscribers.
+**Rationale:** A client that reads slower than the server writes grows its buffer without end, consuming host memory meant for every subscriber. Bounded buffering with backpressure disconnects or slows the laggard instead of letting one slow reader starve the rest.
 
 ## Conventions
 
@@ -94,7 +94,7 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Transport and provider details remain outside business feature ownership.
+**Rationale:** Hubs, endpoints, publication adapters, and browser connections deal in transport and provider detail, not business rules. Keeping them at the outer boundaries leaves business features owning only the narrow functions they call.
 
 ### Subscribe through narrow functions
 
@@ -102,11 +102,11 @@ This extension replaces no baseline provision. Server-sent events use platform c
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Operation-level functions keep subscription inputs and effects visible to the owning feature.
+**Rationale:** A feature that touches the raw connection spreads subscription strings and payload shapes through business code. Narrow operation-specific functions show each subscription's inputs and effects beside the feature that owns them.
 
 ## Dependencies
 
-- Selecting SignalR adds `@microsoft/signalr` through a decision and a manifest pin.
+- Selecting SignalR adds `@microsoft/signalr`. The project records a Decision for the package and pins it in the manifest.
 
 ## Verification
 

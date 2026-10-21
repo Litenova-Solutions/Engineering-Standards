@@ -2,7 +2,13 @@
 
 ## Intent
 
-Names in a .NET backend follow C# file, asynchronous method, and implementation style rules. The shared provisions live on the stack-neutral page ([Naming and code style](../../workspace/naming.md)); this page holds what the .NET stack alone requires.
+C# code in a .NET backend names its files, asynchronous methods, and implementation shapes one way across every project. This page states those .NET rules: one primary type per file, complete async signatures, and a shared implementation style. A complete signature ends in `Async` and takes its cancellation token last, so callers see both asynchrony and cancellation without opening the method. The shared naming rules live on [Naming and Code Style](../../workspace/naming.md); this page holds only their .NET form.
+
+## Concepts
+
+### Files, signatures, and style
+
+A C# file takes its primary type's exact name, so a reader finds any type by its file. An asynchronous method ends in `Async` and takes its cancellation token last, so callers see both asynchrony and cancellation in the signature. File-scoped namespaces, braces on every body, explicit access modifiers, and sealed concrete classes keep diffs readable across every project.
 
 ## Standards
 
@@ -10,19 +16,19 @@ Names in a .NET backend follow C# file, asynchronous method, and implementation 
 
 **Requirement:** A C# file MUST contain one primary top-level type and take that type's exact name.
 
-**Rationale:** Only a small private or file-scoped nested type stays with its owner. Two public or internal top-level types belong in two files.
+**Rationale:** A file named for its type lets a reader and a tool find the type by the path. Two top-level types in one file break that lookup and merge their histories in review. Only a small private or file-scoped nested type stays with its owner.
 
 ### Name asynchronous methods completely
 
 **Requirement:** A method returning `Task` or `ValueTask` MUST end in `Async` and take `CancellationToken cancellationToken` last when cancelable.
 
-**Rationale:** A caller then sees both the asynchrony and the cancellation contract from the signature. A method is cancelable when it performs I/O or awaits. This provision realizes `litespec/workspace/naming#name-asynchronous-operations-completely`.
+**Rationale:** The `Async` suffix tells the caller the method is asynchronous, and the trailing `CancellationToken` tells the caller it can cancel. A cancelable method that hides either invites blocking calls and uncancellable waits. A method is cancelable when it performs I/O or awaits. This provision states the .NET form of `litespec/workspace/naming#name-asynchronous-operations-completely`.
 
 ### Keep implementation style consistent
 
 **Requirement:** Production C# MUST use file-scoped namespaces, braces on every body, explicit access modifiers, and sealed concrete classes.
 
-**Rationale:** These are the style decisions that change diff readability rather than behavior, so one setting removes the debate.
+**Rationale:** File-scoped namespaces, braces on every body, explicit access modifiers, and sealed concrete classes change diff readability rather than behavior. One shared setting removes the debate from every review and keeps generated and hand-written code alike.
 
 ## Conventions
 

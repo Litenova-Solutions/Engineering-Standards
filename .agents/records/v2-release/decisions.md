@@ -50,9 +50,9 @@ Open gaps in the language: a progress part, icons in tab labels, and a status pl
 
 "Profile" is gone except for the UI density profile, a separate concept. The provisions and the finding code that carried it were renamed.
 
-### D12. Prose follows the Google developer documentation style guide
+### D12. LiteSpec keeps only the writing rules its tools check
 
-Chosen by the owner on 2026-10-21. The homemade controlled-prose style, its sentence, list, table-cell and paragraph limits, and its bans on contractions and vague words are gone, with their checks. So are the Agent Summary section on every page and the rule that every paragraph of `AGENTS.md` cites a provision. `docs/core/authoring.md` adds five rules to the guide: ASCII only, one term per concept, capitalized modals only inside a Requirement, Title Case page titles, and nothing about earlier releases. The repository uses US English, and the record field `fulfils` and the requirement kind `behaviour` became `fulfills` and `behavior`.
+Chosen by the owner on 2026-10-21, replacing the earlier choice of the Google style guide. LiteSpec has one maintainer, whose own writing rules (`~/.config/agent-rules/writing/documentation.md`) cover prose. The repository states only what is specific to LiteSpec and checked by its validators: ASCII only, one term per concept from the glossary, capitalized modal words only inside a Requirement, Title Case page titles with sentence-case headings, an `Overview` title on every section index, and nothing about earlier releases. `authoring.md` holds those as provisions; `AGENTS.md` lists them and cites them without restating them. The provision `litespec/core/authoring#follow-the-google-developer-documentation-style-guide` is retired. The repository uses US English, and the record field `fulfils` and the requirement kind `behaviour` became `fulfills` and `behavior`.
 
 ### D13. litespec.dev is a static Astro site in apps/site/
 
@@ -77,6 +77,14 @@ Requested by the owner on 2026-10-21. `apps/analyzers/` builds the `LiteSpec.Ana
 ### D18. litespec.dev runs on Cloudflare Workers and is built for search
 
 Chosen by the owner on 2026-10-21. The site is a static-assets-only Worker on the free plan with the custom domain `litespec.dev`; `www.litespec.dev` redirects through a one-file Worker, and the zone forces HTTPS with Full (strict) SSL and TLS 1.2 or later. The landing page states plainly what LiteSpec is: the specification standard for building business applications with AI agents. Every page carries a canonical URL, a trimmed description, Open Graph and Twitter cards, and a JSON-LD graph; a sitemap lists every HTML page with its git date; raw Markdown and agent index files are `noindex` so search shows the HTML page. Fonts are self-hosted. Diagrams are SVG files in `docs/assets/diagrams/` that the site inlines so they follow the theme, while agents and GitHub see an ordinary image. `docs/learn/how-litespec-compares.md` compares LiteSpec with other spec-driven approaches from their official pages, each source with its read date.
+
+### D19. Every section opens with an Overview page
+
+Chosen by the owner on 2026-10-21. Every docs section and folder has a `README.md` index titled `Overview`, listed first in the sidebar. Where it appears without its section (browser tab, search, Previous and Next) it carries the section name, such as Backend Overview. A page's title is its only name: the sidebar, breadcrumb and link text all use it. Analyzers is its own section beside CLI, with one reference page per rule, and Example is a section that follows one product end to end.
+
+### D20. The worked example is the Expenses product in examples/expenses/
+
+Chosen by the owner on 2026-10-21, replacing the library example: library words (reader, book, record, copy, hold) collide with LiteSpec's own terms. Expenses is a small SaaS product where employees submit expenses with receipts, managers approve them and finance reimburses them. It lives in `examples/expenses/` as a consumer project that `litespec model check` passes, checked by a test, so the Example pages show real output from it. Its code shows the shape the stack pages require and is not a compiled solution.
 
 ## Open items for the owner
 

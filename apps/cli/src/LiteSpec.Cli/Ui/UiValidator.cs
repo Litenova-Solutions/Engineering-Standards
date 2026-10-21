@@ -267,9 +267,15 @@ static partial class UiValidator
             }
 
             var project = ReadJson(projectFile, "litespec.project.json");
-            var manifestFile = File.Exists(Path.Combine(Root, "litespec", "litespec.manifest.json"))
-                ? Path.Combine(Root, "litespec", "litespec.manifest.json")
-                : Path.Combine(Root, "..", "litespec.manifest.json");
+            // The consumer's pinned release first, then a checkout one folder up, then
+            // the checkout this tool runs from, the way every other command finds it.
+            var manifestFile = new[]
+                {
+                    Path.Combine(Root, "litespec", "litespec.manifest.json"),
+                    Path.Combine(Root, "..", "litespec.manifest.json"),
+                }
+                .FirstOrDefault(File.Exists)
+                ?? (LiteSpecHome.Root is { } home ? Path.Combine(home, LiteSpecHome.ManifestFile) : Path.Combine(Root, "..", "litespec.manifest.json"));
             Manifest = File.Exists(manifestFile) ? ReadJson(manifestFile, RelativeToRoot(manifestFile)) : null;
 
             var frontends = Chain(project, "paths", "frontends").Node is JsonArray array

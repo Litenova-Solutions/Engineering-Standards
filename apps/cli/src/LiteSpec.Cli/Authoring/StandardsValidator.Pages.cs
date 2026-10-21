@@ -69,9 +69,17 @@ static partial class StandardsValidator
             return "how-to";
         }
 
+        // The analyzers area mirrors the command area: one reference page per rule
+        // under rules/, and the procedures for using the package beside them.
+        if (segments[0] == "analyzers")
+        {
+            return segments.Length > 2 && segments[1] == "rules" ? "reference" : "how-to";
+        }
+
         // An explanation page builds understanding. Its sections are free, it owns no
-        // provisions, and no selection applies it.
-        if (segments[0] == "learn")
+        // provisions, and no selection applies it. The example area follows one
+        // product through LiteSpec the same way.
+        if (segments[0] == "learn" || segments[0] == "example")
         {
             return "explanation";
         }

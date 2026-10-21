@@ -2,7 +2,7 @@
 
 ## Intent
 
-This extension adds executable scenarios for critical cross-layer examples. A consumer writes them as Reqnroll Gherkin features with C# step definitions or as LightBDD feature classes. The use-case specification remains the authored behavior source.
+This extension adds executable acceptance scenarios for cross-layer examples that need review in business language and execution through a public boundary such as the HTTP API. Scenarios are written as Reqnroll Gherkin features or as LightBDD feature classes: the first are business-readable scenario files, the second C# scenario classes. Test authors use it for the critical examples its rules select, so product, domain, engineering, and testing discussions share one executable example. Scenarios prove examples from the written specification; they never replace it as the behavior source.
 
 ## Activation
 
@@ -10,22 +10,22 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `journey`.
 
-The consumer enables `bdd` when a critical example needs business-language review and execution through a public system boundary. Routine unit behavior does not activate it.
+The consumer enables `bdd` when a critical example needs both business-language review and execution through a public system boundary. Routine unit behavior never activates it.
 
-A consumer selects one runner for the whole suite and follows the provisions below with either runner.
+The consumer selects one runner for the whole suite; every provision below applies to either runner.
 
 | Runner | A scenario is | It proves a Case with | Its business-readable text is |
 |:---|:---|:---|:---|
 | Reqnroll | A Gherkin scenario in a `.feature` file, bound to step definitions | A `proves:` line under the scenario title | The feature file |
 | LightBDD | A C# method on a feature class, whose steps are calls to step methods | A `/// <proves>` tag on the scenario method | The scenario method, the step method names, and the generated report |
 
-LightBDD moves the binding from text matching to the compiler. A step that no longer exists or whose parameters changed fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
+LightBDD binds steps at compile time instead of matching text at run time. A step that no longer exists, or whose parameters changed, fails the build rather than the run. A consumer that generates its API client from the published contract extends the same property to every request a step sends.
 
 ## Baseline relationship
 
-This extension replaces no baseline provision. It adds an acceptance test project and the manifest-pinned packages of one runner.
+This extension replaces no baseline provision: it adds an acceptance test project and the manifest-pinned packages of the selected runner.
 
-This extension switches on `case`. Its scenarios prove Case records.
+It switches on `case`, so its scenarios prove Case records.
 
 ## Standards
 
@@ -33,19 +33,19 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Requirement:** A test author MUST create a BDD scenario only when business-language form improves shared understanding of cross-layer behavior.
 
-**Rationale:** A selected scenario gives product, domain, engineering, and testing discussions one executable example.
+**Rationale:** A scenario costs maintenance on every behavior change, so the suite earns its keep only where business-language form improves shared understanding of cross-layer behavior. Each selected scenario gives product, domain, engineering, and testing discussions one executable example instead of four retellings.
 
 ### Avoid routine scenario duplication
 
 **Requirement:** A test author MUST NOT duplicate every unit or validation case as a scenario.
 
-**Rationale:** Unit and validation tests retain their narrower feedback and failure location.
+**Rationale:** A unit test fails at the exact rule and runs in milliseconds; the same case duplicated as a scenario fails at a public boundary after a full setup. Duplication slows the suite and moves the failure away from its cause, so routine cases stay in their narrower tests.
 
 ### Prove a Case from every scenario
 
 **Requirement:** Every BDD scenario MUST carry one `proves` claim naming its Case, with steps calling the proved use case and asserting its Result.
 
-**Rationale:** A Case pairs one situation with the Result it leads to. The claim, the steps, and the assertion together prove it. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method. A Reqnroll scenario carries it as a `proves:` line under its title.
+**Rationale:** A Case pairs one situation with the Result it leads to, and the proves claim is what ties the scenario to that Case. The claim names it, the steps call the proved use case, and the assertion checks its Result; without the claim, the model builder cannot tell which Case the scenario proves. A LightBDD scenario carries the claim as a `/// <proves>` tag on the scenario method, and a Reqnroll scenario as a `proves:` line under its title.
 
 **Example:** `/// <proves>case/cancel-order.canceling-twice-is-refused</proves>` traces a cancellation scenario to its Case.
 
@@ -53,49 +53,49 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Requirement:** A BDD step MUST call the HTTP API or another declared public system boundary.
 
-**Rationale:** Public execution proves behavior without depending on implementation details.
+**Rationale:** A step that calls the HTTP API or another declared public boundary proves what a caller can observe. A step that reaches past the boundary depends on implementation details, so a refactoring breaks the scenario without breaking the behavior.
 
 ### Assert observable outcomes
 
 **Requirement:** A BDD scenario MUST assert a response, later read, durable event, audit record, or other observable outcome.
 
-**Rationale:** Observable results show whether the public boundary achieved the expected behavior.
+**Rationale:** A scenario that runs requests without asserting proves only that nothing threw. Asserting a response, a later read, a durable event, an audit record, or another observable outcome shows the public boundary achieved the expected behavior.
 
 ### Limit database assertions
 
 **Requirement:** A BDD scenario MUST use direct database assertions only for a documented durable boundary.
 
-**Rationale:** An outbox record is one documented durable boundary with meaningful storage evidence.
+**Rationale:** The database is an implementation detail, so asserting its rows couples the scenario to storage shapes. A direct assertion is allowed only for a documented durable boundary, such as an outbox record, where the stored row is itself the promised evidence.
 
 ### Own scenario data
 
 **Requirement:** Each BDD scenario MUST own its identifiers, actor context, requests, responses, and expected state.
 
-**Rationale:** Local scenario data prevents accidental dependence on data prepared elsewhere.
+**Rationale:** A scenario that borrows identifiers or state prepared elsewhere breaks when that other setup changes. Owning its identifiers, actor context, requests, responses, and expected state keeps each scenario self-contained and runnable alone.
 
 ### Isolate scenario execution
 
 **Requirement:** The acceptance suite MUST reset database state between scenarios and avoid scenario-order dependencies.
 
-**Rationale:** Any scenario can then run alone or in a different order.
+**Rationale:** State left by one scenario becomes a hidden precondition of the next, and the suite passes only in one order. Resetting database state between scenarios removes that coupling, so any scenario runs alone or in any order.
 
 ### Translate business phrases
 
 **Requirement:** A BDD step definition MUST translate a business phrase into a typed test-driver call.
 
-**Rationale:** The scenario stays business-readable while the driver owns boundary mechanics.
+**Rationale:** HTTP calls, JSON shapes, and assertion mechanics in a step definition hide the business phrase the scenario promises. Translating each phrase into a typed test-driver call keeps the scenario readable while the driver owns the boundary mechanics.
 
 ### Exclude production internals
 
 **Requirement:** A BDD step definition MUST NOT resolve repositories, handlers, sessions, or the production service provider.
 
-**Rationale:** Internal resolution bypasses the public behavior that the scenario claims to verify.
+**Rationale:** Resolving a repository, handler, session, or the production service provider runs the behavior without the boundary the scenario claims to verify. The scenario then passes while the public path stays untested, so step definitions resolve none of them.
 
 ### Preserve scenario failures
 
 **Requirement:** A BDD hook MUST await asynchronous setup and cleanup without replacing the original scenario failure.
 
-**Rationale:** Scenario reset and actor setup need complete execution and useful failure evidence.
+**Rationale:** Setup and cleanup are asynchronous, and an unawaited hook leaves the next scenario running against a half-reset database. A hook that throws during cleanup can also replace the scenario's own failure, hiding the real cause. Awaiting both without replacing the original failure keeps the evidence trustworthy.
 
 ## Conventions
 
@@ -105,7 +105,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** Module folders align scenarios with the business vocabulary they exercise.
+**Rationale:** A scenario filed by business module sits beside the vocabulary it exercises, so a reader finds every example of one module in one folder. A flat or technically grouped suite scatters them.
 
 ### Keep steps vocabulary-scoped
 
@@ -113,7 +113,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** Broad generic steps hide business meaning and create unrelated coupling.
+**Rationale:** A step reused across vocabularies, such as a generic success step, means something subtly different in each place and couples unrelated modules to one definition. Steps narrow to one business vocabulary keep their meaning exact.
 
 ### Limit scenario context
 
@@ -121,7 +121,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The context is scenario state rather than a service locator.
+**Rationale:** One context object holding the scenario's own values keeps shared state visible and small. Resolving services from it turns it into a service locator that hides what the scenario depends on.
 
 ### Mark pull-request scenarios
 
@@ -129,7 +129,7 @@ This extension switches on `case`. Its scenarios prove Case records.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The marking selects fast feedback without altering Case proof. `@critical` names the scenarios whose failure stops a release, and the project records which ones those are. A marking that every scenario carries selects nothing, so the subset has a stated size bound and an owner who keeps it there.
+**Rationale:** The `@critical` tag, or the LightBDD critical trait, selects the small subset whose failure stops a release, for fast pull-request feedback. The marking stays separate from the proves claim, which records Case proof rather than release gating. A marking that every scenario carries selects nothing, so the subset keeps a stated size bound and an owner who keeps it there.
 
 ## Dependencies
 

@@ -2,9 +2,7 @@
 
 ## Intent
 
-A static marketing site presents the product to the public as pages that need no server. It serves people, search engines, and language models from one build.
-
-This page states what the build produces, what each page carries, and where shared facts live.
+A static marketing site serves marketing pages, pricing, and help articles as files that need no server at request time. This page states what the static build produces for readers, search engines, and language models, what each page carries, and where the shared facts live so every page agrees. A project selects it when it ships a public static website beside its application, so the site stays fast, findable, and consistent from one build.
 
 ## Activation
 
@@ -12,13 +10,13 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. This extension does not cover a page the application itself serves.
+The project selects `site` when it ships a public static website beside its application, such as marketing pages, pricing, or help articles. It does not cover a page the application itself serves: those pages stay with the frontend and UI pages.
 
 ## Baseline relationship
 
-None. The frontend and UI pages govern application frontends declared in `paths.frontends`. A static site is not an application frontend, and this extension replaces no baseline provision.
+This extension replaces no baseline provision. The frontend and UI pages govern application frontends declared in `paths.frontends`; a static site is not an application frontend, so those pages do not apply to it.
 
-None. Prices and claims read Requirement entries and Terms, which every project requires.
+It switches on no record type: prices and claims read Requirement entries and Terms, which every project records.
 
 ## Standards
 
@@ -26,7 +24,7 @@ None. Prices and claims read Requirement entries and Terms, which every project 
 
 **Requirement:** The site build MUST write every page as a static file that needs no server at request time.
 
-**Rationale:** A file needs no application server, no database, and no per-request rendering. The host serves bytes, so the failure surface is the file set itself.
+**Rationale:** A static file needs no application server, no database, and no per-request rendering: the host serves bytes. The failure surface shrinks to the file set itself, so a traffic spike or a database outage cannot take the marketing pages down with the application.
 
 **Example:**
 
@@ -40,7 +38,7 @@ dist/nl/prijzen/index.html
 
 **Requirement:** A page MUST NOT ship a client script unless the site records the interactive need that script serves.
 
-**Rationale:** A reader reads a marketing page rather than operating it, so each script needs a named reason to exist. The named need lives beside the script, such as a theme switch kept across pages.
+**Rationale:** A reader reads a marketing page rather than operating it, so each script slows the page and widens its failure surface without earning its place by default. Recording the interactive need beside each script, such as a theme switch kept across pages, keeps the script count at what readers actually use.
 
 **Example:** The theme switch is the one script: `/assets/theme.js`, named in the layout as the reader-chosen scheme.
 
@@ -48,13 +46,13 @@ dist/nl/prijzen/index.html
 
 **Requirement:** The site MUST serve every client script from its own origin.
 
-**Rationale:** A script from another origin runs with the authority of the page while living outside the release. Serving each script locally keeps the release self-contained.
+**Rationale:** A script from another origin runs with the page's authority while living outside the release: it can change, fail, or track readers without a site deployment. Serving every script from the site's own origin keeps the release self-contained and reviewable in one place.
 
 ### State allowed sources in a content security policy
 
 **Requirement:** The site MUST publish a content security policy naming every source its pages load.
 
-**Rationale:** The policy is the enforceable form of the loading rules on this page. A source nobody named fails closed in the browser rather than loading on trust.
+**Rationale:** Loading rules in prose rely on every author remembering them; a content security policy enforces them in the browser instead. A source nobody named fails closed rather than loading on trust, so one forgotten reference breaks visibly instead of leaking quietly.
 
 **Example:**
 
@@ -66,13 +64,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** A page MUST NOT load fonts, scripts, styles, images, or analytics from a third-party origin.
 
-**Rationale:** A third-party load trades reader privacy for convenience and fails when that party fails. Fonts, icons, and screenshots ship with the site instead.
+**Rationale:** Fonts, scripts, styles, images, or analytics from another origin send reader visits to that party and fail when that party fails. Shipping all of them with the site keeps reader privacy inside the site's own control and removes the outside dependency.
 
 ### Give every page one main heading and landmark elements
 
 **Requirement:** Every page MUST carry exactly one top-level heading and landmark elements for its regions.
 
-**Rationale:** One top-level heading names the page for a reader and a crawler alike. Landmark elements expose the header, navigation, main content, and footer to assistive tools.
+**Rationale:** One top-level heading tells every reader, and every crawler, what the page is about; two headings or none leave both guessing. Landmark elements expose the header, navigation, main content, and footer to assistive tools, so a reader who navigates by regions reaches each one directly.
 
 **Example:**
 
@@ -87,13 +85,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** Every page MUST state a title element and a description its search result shows.
 
-**Rationale:** The title names the tab and the search result, and the description summarizes the page beneath it. Both come from the page frontmatter, so each page states its own.
+**Rationale:** Search results and browser tabs show the title first and the description beneath it; a page without either appears under a file name with a guessed snippet. Both come from the page frontmatter, so each page states its own instead of inheriting the site's.
 
 ### Point every page at its absolute canonical address
 
 **Requirement:** Every page MUST carry a canonical link with the absolute address of that page.
 
-**Rationale:** One absolute address tells a crawler which address to index when several serve one page. A relative address leaves the host to guesswork.
+**Rationale:** Several addresses can serve one page through trailing slashes, parameters, or mirrors. The canonical link names the one absolute address to index, and the absolute form leaves no host to guesswork.
 
 **Example:**
 
@@ -105,7 +103,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** Every page on a site with more than one language MUST link each language alternate with its language tag and a default fallback.
 
-**Rationale:** The alternates tell a crawler which address serves which language, and the default tells it where to send an unmatched reader. A single-language site carries no alternate links.
+**Rationale:** A crawler that finds one language without links to the others indexes each translation as a separate unrelated page. The alternate links map each language to its address, and the default fallback tells the crawler where to send a reader no language matches. A single-language site carries no alternate links.
 
 **Example:**
 
@@ -119,7 +117,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** The site build MUST generate a sitemap listing every page with the language alternates of that page.
 
-**Rationale:** The build generates the sitemap from the pages that exist, so it cannot drift from them. Each entry carries the alternates, so a crawler finds every language from one file.
+**Rationale:** A hand-written sitemap drifts: pages ship without entries and deleted pages linger as dead links. Generating the sitemap from the pages that exist keeps it exact, and carrying each page's language alternates lets a crawler find every language from one file.
 
 **Example:**
 
@@ -134,7 +132,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 **Requirement:** The site MUST publish crawler rules pointing to the sitemap address.
 
-**Rationale:** Crawlers read `robots.txt` first, so the file points to the sitemap from the site root. Access rules for crawler-only paths live in the same file.
+**Rationale:** Crawlers read `robots.txt` from the site root before anything else. Pointing at the sitemap from that file sends every crawler to the full page list first, and access rules for crawler-only paths live beside the pointer.
 
 **Example:**
 
@@ -148,7 +146,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** The site build MUST generate a page list naming every page with its address and description.
 
-**Rationale:** The `llms.txt` file summarizes the site and groups every page with the address and description a model needs to cite it. The build generates it from the pages, so it lists what exists.
+**Rationale:** A language model that answers from the site needs the page list in one fetchable file instead of a crawl. The `llms.txt` file names every page with the address and description a model needs to cite it, and generating it from the pages keeps the list exact.
 
 **Example:**
 
@@ -162,13 +160,13 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** The site build MUST generate a full-text file with the text of every default-language page.
 
-**Rationale:** The `llms-full.txt` file carries the plain text of the default-language pages for a model that reads the whole site at once. Non-default languages stay out, so the file holds one language.
+**Rationale:** A model that reads the whole site at once needs the text without fetching each page. The `llms-full.txt` file carries the plain text of the default-language pages, and non-default languages stay out so the file holds one language.
 
 ### Publish a Markdown copy beside every page
 
 **Requirement:** Every page MUST link a Markdown copy of its own text served beside that page.
 
-**Rationale:** The Markdown copy gives an agent the page without layout, styles, or scripts. The page head links it, so a reader finds the copy from the page itself.
+**Rationale:** An agent that reads the page wants its text without layout, styles, or scripts. The Markdown copy beside each page carries exactly that, and the link in the page head leads from the page to its copy.
 
 **Example:**
 
@@ -180,7 +178,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** Every page MUST carry JSON-LD structured data for the organization, the site, and the page with breadcrumbs, offers, questions, or article body where each applies.
 
-**Rationale:** One graph per page describes the organization and the site once, then the page with its breadcrumb trail. Price pages add offers, question pages add questions with answers, and articles state their article body.
+**Rationale:** Search engines build rich results from structured data, not from guessed page text. One JSON-LD graph per page describes the organization and the site once, then the page with its breadcrumb trail; price pages add offers, question pages add questions with answers, and articles state their article body. Without the graph, the page still ranks but never earns the rich result.
 
 **Example:**
 
@@ -192,7 +190,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** A repeated fact MUST live in one data source every page reads, as a Term record with labels per language for a product word.
 
-**Rationale:** One source means one edit reaches every page, and two pages cannot disagree. Pages read facts by reference rather than repeating them.
+**Rationale:** A company name or address typed into ten pages disagrees the day one page updates without the other nine. One data source that every page reads turns the change into one edit, and a product word lives there as a Term record with labels per language.
 
 **Example:** The footer and the imprint page both read `company.legalName` from the site data.
 
@@ -200,13 +198,13 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** Each language MUST supply only text into one page structure the site holds once.
 
-**Rationale:** One layout renders every language, so a structural change touches one file. A language adds wording, never markup, so translations cannot fork the page.
+**Rationale:** When each language owns its own markup, one redesign must land in every language separately and one of them lags. One page structure with per-language text keeps structure in one file, so a translation adds wording without ever forking the page.
 
 ### Mark unfinished facts with visible placeholders
 
 **Requirement:** A page whose owner has not supplied a fact MUST carry a visible placeholder naming that fact.
 
-**Rationale:** A visible placeholder tells a reviewer what is missing instead of publishing a guess. The placeholder names the fact, so the owner knows what to supply.
+**Rationale:** An owner who has not supplied a price or a date leaves a gap the page cannot fill honestly. A visible placeholder names the missing fact in place, so reviewers see the gap and the owner knows exactly what to supply, instead of the page publishing a guess.
 
 **Example:** A page awaiting its final price carries `[[FILL: launch price]]` where the price stands.
 
@@ -214,19 +212,19 @@ Sitemap: https://example.test/sitemap.xml
 
 **Requirement:** A release build MUST fail while a visible placeholder remains on any page.
 
-**Rationale:** A published placeholder is a false statement to a reader. The release gate refuses it, while a development build warns and finishes.
+**Rationale:** A placeholder that reaches the public site states a falsehood to every reader. Failing the release build while one remains stops the falsehood at the gate, while a development build only warns so authors keep working.
 
 ### Read site prices and claims from consumer records
 
 **Requirement:** Every price and claim on the site MUST come from the consumer records the site convention names.
 
-**Rationale:** The site repeats commercial facts it does not own, so it reads them where they are owned. A price changed in the record reaches the site on the next build. The named records carry their own owner and status.
+**Rationale:** Prices and claims are commercial facts the site repeats without owning. Reading them from the named consumer records keeps one owner for each fact, so a price changed in the record reaches the site on the next build instead of waiting for someone to remember the site.
 
 ### Declare each static site in the project record
 
 **Requirement:** A consumer selecting this extension MUST declare each static site with its name, path, and generator.
 
-**Rationale:** The `paths.sites` entry tells tools where the site lives and which generator builds it. A site nobody declared is a site no check reads.
+**Rationale:** Tools find the site through the `paths.sites` entry, which names where the site lives and which generator builds it. A site nobody declared is a site no check reads, so its pages drift outside every gate.
 
 **Example:**
 
@@ -242,7 +240,7 @@ Sitemap: https://example.test/sitemap.xml
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Astro renders pages to files at build time and ships no client script unless a component asks for one. That matches the static obligations above without extra machinery.
+**Rationale:** Astro renders pages to files at build time and ships no client script unless a component asks for one. That matches this page's static obligations without extra machinery, so the default build already complies.
 
 **Example:**
 
@@ -256,7 +254,7 @@ export default defineConfig({ output: 'static' });
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Either component form renders to HTML at build time. No component hydrates in the browser, so interactivity stays absent by construction.
+**Rationale:** Astro and Svelte components both render to HTML at build time. Neither hydrates in the browser, so interactivity stays absent by construction rather than by discipline.
 
 ### Use Tailwind for site styles
 
@@ -264,7 +262,7 @@ export default defineConfig({ output: 'static' });
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** One utility stylesheet compiles at build time into the file the pages link. No style comes from another origin.
+**Rationale:** Tailwind compiles its utility classes at build time into the stylesheet the pages link. The whole visual system ships from the site's own origin with no outside style dependency.
 
 ### Default to a light scheme with a reader-chosen dark scheme
 
@@ -272,7 +270,7 @@ export default defineConfig({ output: 'static' });
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Light is the initial scheme, and the reader switches to dark without an account or a stored preference on a server. The choice persists in the browser alone.
+**Rationale:** Light is the initial scheme every reader sees first. The reader switches to dark without an account, and the choice persists in the browser alone with nothing stored on a server.
 
 ### Read prices and claims from product and pricing records
 
@@ -280,7 +278,7 @@ export default defineConfig({ output: 'static' });
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** The names state the records without fixing their paths, because each consumer holds them where its own tree does. A fixed path would bind every consumer to one tree.
+**Rationale:** The product brief and pricing record hold commercial facts in every consumer, but each tree keeps them at its own paths. Naming the records without fixing paths lets every consumer resolve its own, where one fixed path would bind all trees to one layout.
 
 ## Dependencies
 

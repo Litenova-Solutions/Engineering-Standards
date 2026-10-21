@@ -2,7 +2,17 @@
 
 ## Intent
 
-Architecture in a .NET backend is five projects with explicit composition roots. The shared provisions live on the stack-neutral page ([Backend architecture](../architecture.md)); this page holds what dotnet alone requires.
+A .NET backend is 5 projects: Domain, Application.Abstractions, Application, Infrastructure, and WebApi, wired together by host projects that own service registration. This page states the .NET form of that shape: which projects exist, what each may hold, which types stay internal, and where service registration lives. Fixed projects and host-owned wiring keep dependencies pointing inward and give every type one home. The shared architecture rules live on [Backend Architecture](../architecture.md); this page holds only their .NET form.
+
+## Concepts
+
+### The five projects
+
+Each part of the backend is a .NET project with one job. Domain holds the business model. Application.Abstractions holds the contracts that more than one module names. Application holds the messages, handlers, and module-owned ports. Infrastructure holds the technical adapters, and WebApi hosts the HTTP boundary. `AppHost` and `ServiceDefaults` support local hosting and diagnostics; they are hosts, not application layers.
+
+### Visibility and composition
+
+A type is visible only to the projects that need it: implementations stay `internal sealed`, and a message, port, or marker is public only when another project names it. Service registration lives in the hosts, because Domain and Application declare abstractions and a registration call inside either would point the dependency the wrong way.
 
 ## Standards
 
@@ -10,15 +20,13 @@ Architecture in a .NET backend is five projects with explicit composition roots.
 
 **Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
-**Rationale:** `Application.Abstractions` holds the contracts that more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else. No type in it can name a use case, a handler, or a module.
+**Rationale:** `Application.Abstractions` holds the contracts that more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else, so no type in it can name a use case, a handler, or a module.
 
-That refusal is the reason it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
+That refusal is why it is a project rather than a folder. A folder inside Application cannot decline what a developer puts in it, and the folder that tries becomes the place every unplaced type goes.
 
 An implementation never belongs there. The project name states the test, and a type that cannot pass it belongs to a module under `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
 
-`AppHost` and `ServiceDefaults` support local hosting and diagnostics. They are hosts, not application layers.
-
-This realizes litespec/backend/architecture#use-five-application-parts in the dotnet stack.
+This provision states the .NET form of `litespec/backend/architecture#use-five-application-parts`.
 
 **Example:**
 
@@ -34,17 +42,17 @@ apps/api/src/{ProjectName}.WebApi/
 
 **Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Separate Write, Read, Contracts, and event-handler assemblies are outside this stack. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html), which separates the command and query models rather than the assemblies holding them. Splitting assemblies buys a deployment boundary the stack does not use, and costs a project reference that every use case has to cross.
+**Rationale:** Splitting Application into Write, Read, Contracts, and event-handler assemblies would buy a deployment boundary the stack never uses, and every use case would pay for it with a project reference to cross. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): the command and query models differ, while one assembly holds them.
 
-This realizes litespec/backend/architecture#keep-one-application-part in the dotnet stack.
+This provision states the .NET form of `litespec/backend/architecture#keep-one-application-part`.
 
 ### Keep implementation types internal
 
 **Requirement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
 
-**Rationale:** Messages, results, assembly markers, and ports stay public only when another project uses them. Assembly scanning is not a reason to widen visibility.
+**Rationale:** A public type is an offer to every project, so an implementation left public invites callers it was never written for. Messages, results, markers, and ports stay public only when another project uses them; handlers, validators, and implementations stay `internal sealed`. Assembly scanning reads internal types through the one public marker, so it never justifies widening visibility.
 
-This realizes litespec/backend/architecture#keep-implementation-types-hidden in the dotnet stack.
+This provision states the .NET form of `litespec/backend/architecture#keep-implementation-types-hidden`.
 
 ## Conventions
 
@@ -54,9 +62,9 @@ This realizes litespec/backend/architecture#keep-implementation-types-hidden in 
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** Domain and Application declare abstractions, so a registration call inside either inverts the dependency direction.
+**Rationale:** Domain and Application declare abstractions for the hosts to implement. A registration call inside either layer makes the abstraction depend on the thing it abstracts, inverting the dependency direction. Registration in `Program.cs` and host modules keeps that direction intact, and one visible call order shows which layer wires first.
 
-This realizes litespec/backend/architecture#keep-service-registration-in-hosts in the dotnet stack.
+This provision states the .NET form of `litespec/backend/architecture#keep-service-registration-in-hosts`.
 
 **Example:** One registration entry point per outer layer has this shape:
 
@@ -73,7 +81,7 @@ WebApiServiceRegistration.AddWebApi(...)
 
 **Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
 
-**Rationale:** The marker gives the scanner an assembly reference while the scanned handlers stay internal.
+**Rationale:** Scanners need an assembly reference, and without a marker developers make handlers public to supply one. One public static marker per scanned project gives the scanner its reference while every handler stays internal.
 
 ## Verification
 

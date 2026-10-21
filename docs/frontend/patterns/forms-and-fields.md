@@ -2,7 +2,17 @@
 
 ## Intent
 
-A form collects values you enter to create or change a record. These patterns answer how each kind of field takes its value and how a form reports a refused submit or unsaved work. Each pattern offers drawn options and names a default.
+Forms collect typed values to create or change records such as orders, deliveries, and products. This page shows how each field kind takes its value, and how a form reports a refused submit or unsaved work: money, record pickers, dates, text, single choices, switches, uploads, periods, slugs, capacity, colors, repeated groups, tags, addresses, and message templates. Each answer is drawn as options with a named default to build, and the product owner chooses among the options when the team builds or revises a form. One decided shape per field keeps entry fast and errors fixable, so staff type once and repair only what the message names.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about a field kind, such as how a money field names its currency. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply catalog: the Oak desk lamp at EUR 45.00, its Standard, Trade, and Bulk price tiers, the Amsterdam warehouse holding 10,000 units, and deliveries such as Garcia Interiors restock. On this page, `you` means the staff member entering values. The Standards section states the two rules every option keeps: every field carries a visible label naming its value, and a form keeps every entered value when the API refuses a submit.
 
 ## Standards
 
@@ -10,25 +20,25 @@ A form collects values you enter to create or change a record. These patterns an
 
 **Requirement:** Every field MUST carry a visible label that names its value.
 
-**Rationale:** A placeholder disappears as you type, so it cannot carry the name of the value. A screen reader reads the label. You returning to a filled form read it too.
+**Rationale:** A placeholder disappears on the first keystroke, so a filled field with no label no longer says what it holds. Screen readers announce the label, and sighted staff returning to a filled form read it to check each value before saving. Without a visible label, both groups guess what each value means.
 
 ### Keep entered values after a refused submit
 
 **Requirement:** A form MUST keep every entered value when the API refuses a submit.
 
-**Rationale:** A form that clears itself after a refusal makes you type everything again to fix one field. You then repair the field the message names and submit again.
+**Rationale:** Clearing the form after a refusal forces staff to retype every value to fix one field, which wastes time and adds new typos. Keeping all values lets the reader repair only the field the message names and submit again.
 
 ## Patterns
 
 ### Money field
 
-**Question:** The back office holds prices, fees, refunds, and settlement figures. The software chooses none of them. The field is where that rule meets a keyboard. The evidence says text input with an `inputmode`, the currency named in the label, and a symbol prefix that stays hidden from assistive reading.
+**Question:** The back office holds prices, fees, refunds, and settlement figures, and staff type every one of them; the software chooses none. The field is where that rule meets a keyboard. The decision is how a money field takes its value: text input shape, currency naming, symbol prefix, error wording, and totals restated beside it.
 
 **Default:** `text-input-currency-in-the-label-symbol-inside`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The HMRC prefix with the currency in the label stays the pick. It reads in both themes. It names the currency to a screen reader. It refuses nothing you can type.
+**Rationale:** The HMRC prefix with the currency in the label stays the pick. The prefix renders in light and dark themes. It names the currency to a screen reader while hiding the symbol from it. It refuses nothing you can type.
 
 The customer total restatement is the runner-up. It belongs on every price the customer sees. It stops the fee from surprising either side at checkout. Never ship the stepper. You cannot reach a continuous price by stepping.
 
@@ -115,7 +125,7 @@ page
 
 **Rationale:** The same field appears in its refused state. The message follows the GOV.UK template. It reads as a specific instruction rather than a rejection.
 
-**Cost:** You cannot see the three states at once, so the text states which one the mock shows. Each mock here is one state.
+**Cost:** You cannot see the three states at once, so the text states which one the wireframe shows. Each wireframe here is one state.
 
 **Reference:** GOV.UK
 
@@ -176,7 +186,7 @@ page
 
 **Rationale:** The money reads more clearly. You type what the unit costs and read what the customer pays on the same screen before saving. The EUR 50.00 all-in figure stops the fee from surprising either side at checkout.
 
-**Cost:** The restated total must update as you type, which a static mock cannot show. It costs one line under every price field, even where the fee is zero.
+**Cost:** The restated total must update as you type, which a static wireframe cannot show. It costs one line under every price field, even where the fee is zero.
 
 #### `gross-price-with-the-net-and-tax-restated`: Gross price with the net and tax restated
 
@@ -310,7 +320,7 @@ page
 
 **Rationale:** You type part of a name and the list narrows, but you must choose from the list. APG warns that list autocomplete with automatic selection silently adopts the first suggestion, which stores the wrong record.
 
-**Cost:** The field must not commit on blur or on Enter alone, or a mistyped prefix books the wrong warehouse. That is an implementation rule the mock cannot show.
+**Cost:** The field must not commit on blur or on Enter alone, or a mistyped prefix books the wrong warehouse. That is an implementation rule the wireframe cannot show.
 
 **Reference:** APG
 
@@ -404,7 +414,7 @@ page
 
 ### Date and time field
 
-**Question:** A common failure is the native date input of the browser. It draws as `dd/mm/yyyy` with a native picker icon. It is visibly not the application control. GDS rejected that input for browser implementation problems.
+**Question:** Staff enter dates and times for deliveries, shifts, and dispatch plans. The decision is which control takes the value: three text inputs, one field with a calendar, date and time side by side, relative entry, or presets. The native browser date input is refused: it draws the browser chrome instead of the application control, and GDS rejected it for implementation problems across browsers.
 
 **Default:** `one-text-field-with-a-calendar-that-opens-beside-it`
 
@@ -502,7 +512,7 @@ page
 
 **Rationale:** A dispatch plan is written in relative language: "dispatch at 08:00", "loading 4 hours before". One field takes a duration and the page calculates the clock time from the delivery date.
 
-**Cost:** The page derives an absolute time and shows it. You would otherwise hold it in your head. A relative field cannot express dispatch at 08:00 unless the driver is late.
+**Cost:** The page derives an absolute time and shows it, so you never hold it in your head. A relative field cannot express the anchor itself: dispatch at 08:00 must come from the delivery date.
 
 #### `a-duration-field-for-a-length-of-time`: A duration field for a length of time
 
@@ -591,7 +601,7 @@ page
 
 ### Text field and its states
 
-**Question:** Every text field has to draw seven states. GOV.UK is blunt about two of them. The label is always visible and above the input. A placeholder is never the label because it vanishes on the first keystroke.
+**Question:** Every text field draws several states: empty, filled, focused, refused, disabled, and read-only. The label stays visible above the input in all of them. A placeholder is never the label, because it vanishes on the first keystroke.
 
 **Default:** `label-above-help-under-six-states-on-one-page`
 
@@ -678,7 +688,7 @@ page
 
 **Rationale:** Where a field has a hard limit, the remaining count sits under it. GOV.UK says count characters only where its own research shows it helps.
 
-**Cost:** The GOV.UK validation guidance permits live counting only as its own exception. It validates before the field is finished, which is precisely why it needs the exception. On a policy text it is worth it. On a name it is not.
+**Cost:** GOV.UK permits live counting as a narrow exception to its no-live-validation rule, because it judges a field before it is finished. On a policy text the count is worth it. On a name it is not.
 
 **Reference:** GOV.UK
 
@@ -771,7 +781,7 @@ page
 
 ### Choosing one of a few options
 
-**Question:** You choose from a closed set. The GOV.UK rules say a select is a last resort. Radios beat a select. Nothing is pre-selected in a question, though settings allow it. The naming field below is a radio list with three well-worded options.
+**Question:** You choose from a closed set, such as a naming rule or a plan. The GOV.UK rules say a select is a last resort and radios beat a select. Nothing is pre-selected in a question, though settings allow it. The decision is which control carries the choice: radio list, segmented control, cards, select, checkbox list, listbox, or plain buttons.
 
 **Default:** `a-radio-list-with-a-description-per-option`
 
@@ -848,7 +858,7 @@ page
 
 **Rationale:** For a choice between priced options, each card names the option, its price, and its period. The one the company holds says so in words. It does not rely only on a ring.
 
-**Cost:** Cards are boxes, and the layout contract says a Section is the only box and never nests. Three plan cards inside a section break that rule three times.
+**Cost:** Sections are the only boxes and never nest, so three plan cards inside a section break that rule three times.
 
 #### `cards-with-a-radio-inside-each`: Cards with a radio inside each
 
@@ -898,7 +908,7 @@ page
 
 **Rationale:** GOV.UK allows a pre-selection in settings and nowhere else. Where the value has no default and the options are many, a select with a real empty first option is the least-bad shape.
 
-**Cost:** The empty option is a placeholder, and the layout contract says not to show one. A select whose first choice is a blank that must be replaced is two states, not one.
+**Cost:** The empty option is a placeholder, and placeholders stay out of components. A select whose first choice is a blank that must be replaced is two states, not one.
 
 **Reference:** GOV.UK
 
@@ -968,13 +978,13 @@ page
 
 **Rationale:** Typeform asks a yes-or-no question as two large buttons with the consequence under each, because a binary choice deserves no menu and no dropdown. Both answers stay visible with their cost attached.
 
-**Cost:** Two cards for one bit is the heaviest binary control on this page, and it answers only questions with two honest answers. A third option or a conditional follow-up breaks the shape.
+**Cost:** Two cards for one bit is the heaviest binary control on this page, and it answers only questions with two genuine answers. A third option or a conditional follow-up breaks the shape.
 
 **Reference:** Typeform
 
 ### Switch or a checkbox
 
-**Question:** The storefront editor holds a toggle for the platform credit line. A back office holds many settings where a switch fits. This item is about which control the setting deserves. It is also about what the label has to say.
+**Question:** The storefront editor holds a toggle for the platform credit line, and settings pages hold many more switches and checkboxes. This pattern decides which control each setting deserves: switch or checkbox. It also decides what the label must say, since the label carries the difference between the two.
 
 **Default:** `a-switch-with-the-label-and-its-consequence`
 
@@ -1075,7 +1085,7 @@ page
 
 **Rationale:** Settlement frequency is a choice between two money outcomes. It gets radio cards with the amount and the date on each. No switch hides the difference.
 
-**Cost:** Cards for a two-way choice are heavy, and the amounts are derived figures that have to be computed per company to stay honest.
+**Cost:** Cards for a two-way choice are heavy, and the amounts are derived figures that have to be computed per company to stay correct.
 
 #### `a-switch-that-is-refused-with-the-reason`: A switch that is refused, with the reason
 
@@ -1168,7 +1178,7 @@ page
 
 ### Upload field
 
-**Question:** How does an Acme Supply record take a file. A logo needs a stated type and size. A customer import needs stated columns and row-level refusals.
+**Question:** Acme Supply records take files: a logo image or a customer spreadsheet. A logo needs a stated type and size, and a customer import needs stated columns and row-level refusals. The decision is how the upload field states its contract and reports progress and refusals.
 
 **Default:** `a-drop-zone-that-states-what-it-accepts`
 
@@ -1240,7 +1250,7 @@ page
 
 **Rationale:** For an import, the field states what it needs before anything is uploaded: the four column names and a link to a template. The upload cannot be wrong about a format nobody told it.
 
-**Cost:** Stating four columns above the zone is a paragraph of prose, and the layout contract keeps prose out of components. It belongs on the page beside the field, not inside it.
+**Cost:** Stating four columns above the zone is a paragraph of prose, and prose belongs on the page beside the field, not inside a component.
 
 #### `the-upload-refused-naming-the-row-that-failed`: The upload refused, naming the row that failed
 
@@ -1282,7 +1292,7 @@ page
 
 **Rationale:** For a picture that must be a particular shape, the dimensions are part of the requirement, not a nicety. The field says 1600 by 700 pixels reads best and refuses a wrong shape.
 
-**Cost:** The layout contract says the layout decides a stored image box, not the dimensions of the image. A field that demands a ratio re-decides that per field.
+**Cost:** The stored image box follows the page layout, not the dimensions of the image file. A field that demands a ratio re-decides that per field.
 
 #### `an-import-that-reports-what-it-made`: An import that reports what it made
 
@@ -1357,7 +1367,7 @@ page
 
 ### Reporting a refused submit
 
-**Question:** How does a form report a refused submit. GOV.UK asks for a summary with focus and links, plus a message on each field. WCAG 3.3.1 and 3.3.3 sit underneath.
+**Question:** A submit refused by the API must report what is wrong and where. GOV.UK asks for a summary with focus and links, plus a message on each field, meeting WCAG 3.3.1 and 3.3.3. The decision is how the form carries that report.
 
 **Default:** `a-summary-above-the-form-plus-a-message-on-each-field`
 
@@ -1551,13 +1561,13 @@ page
 
 **Rationale:** TurboTax and Typeform ask one question per screen with nowhere else for an error to hide. The refusal sits under the only field on the page. A guided flow cannot submit with a field unseen.
 
-**Cost:** Four screens for four fields is the slowest form in this category, and if you know all four answers you resent the pacing. It fits a first delivery. It does not fit the fortieth.
+**Cost:** Four screens for four fields is the slowest form among these options, and if you know all four answers you resent the pacing. It fits a first delivery. It does not fit the fortieth.
 
 **Reference:** Typeform
 
 ### Work that is not saved
 
-**Question:** How does a form show work that is not saved. Nothing may read as saved before it is. Leaving must not drop typed work without a warning.
+**Question:** A form must show work that is not saved. Nothing may read as saved before it is, and leaving must not drop typed work without a warning. The decision is how the form marks unsaved work and guards the way out.
 
 **Default:** `a-visible-unsaved-marker-beside-the-save`
 
@@ -1738,7 +1748,7 @@ page
     action primary "Save 2 changes"
 ```
 
-**Rationale:** Webflow and Figma mark each changed field with a dot and offer Revert beside it. You keep one change and drop another without retyping. The old value sits under the field as the honest fallback.
+**Rationale:** Webflow and Figma mark each changed field with a dot and offer Revert beside it. You keep one change and drop another without retyping. The old value sits under the field as the value you fall back to.
 
 **Cost:** A dot plus a revert button per field adds two elements on every row of a long form. If you want to keep everything you still need the page-level Save. It pays off only where partial saves are common.
 
@@ -1746,7 +1756,7 @@ page
 
 ### Picking a period
 
-**Question:** How do you pick a period for settlement or reporting. Two typed dates cover every window but ask for both edges. Presets cover the common windows in one tap.
+**Question:** Settlement and reporting run on periods. Two typed dates cover every window but ask for both edges, while presets cover the common windows in one tap. The decision is how the period control combines typing and presets.
 
 **Default:** `two-date-inputs-with-presets`
 
@@ -1918,7 +1928,7 @@ page
 
 **Rationale:** Airbnb and Google Flights paint the chosen range across the calendar, so you see the window instead of reading two dates. The endpoints stay readable as dates under the control.
 
-**Cost:** A painted month shows one month, and the settlement window usually spans two. Two months side by side are the honest control, and they do not fit a phone.
+**Cost:** A painted month shows one month, and the settlement window usually spans two. Two months side by side show the window truthfully, and they do not fit a phone.
 
 **Reference:** Airbnb
 
@@ -1947,7 +1957,7 @@ page
 
 ### Slug or URL field with a preview
 
-**Question:** How does a product take the slug customers read. The slug is the short part typed in. The address is what customers read, link, and print.
+**Question:** A product takes a slug, the short part typed in, and customers read the full address: they link it and print it. The decision is how the field takes the slug and previews the address before saving.
 
 **Default:** `slug-with-the-live-address-under-it`
 
@@ -1976,7 +1986,7 @@ page
 
 **Rationale:** Contentful and Shopify show the full address under the slug field and update it as you type. The short value is never saved unseen. The copy command beside it is how the address leaves the back office.
 
-**Cost:** The address must update as you type, which a static mock cannot show. It also states the host the platform gives, which you cannot change on this screen.
+**Cost:** The address must update as you type, which a static wireframe cannot show. It also states the host the platform gives, which you cannot change on this screen.
 
 **Reference:** Shopify
 
@@ -2102,7 +2112,7 @@ page
 
 ### Capacity field
 
-**Question:** How does a tier take units from one warehouse stock. The Amsterdam warehouse holds 10,000 units. Every tier draws from the same shelves.
+**Question:** A price tier takes units from one warehouse stock: the Amsterdam warehouse holds 10,000 units, and every tier draws from the same shelves. The decision is how the capacity field shows the ceiling, the split, and the refusal past it.
 
 **Default:** `a-number-with-the-warehouse-ceiling-restated`
 
@@ -2342,7 +2352,7 @@ page
 
 **Rationale:** Mailchimp previews a brand color on the button the customer presses, because a ratio is believed once it is seen. You read white on `#1F2937` instead of reading `14.7:1`.
 
-**Cost:** A preview is a second surface to keep honest. It shows the typed value, not the saved one, and updates as you type. A stale preview proves nothing.
+**Cost:** A preview is a second surface that must match the typed value. It shows the typed value, not the saved one, and updates as you type. A stale preview proves nothing.
 
 **Reference:** Mailchimp
 
@@ -2678,7 +2688,7 @@ page
     action primary "Save tags"
 ```
 
-**Rationale:** Stack Overflow and WordPress take tags as one comma-separated line with the parsed chips read back below. Pasting a list from elsewhere works without retyping. The readout is what makes the parsing honest.
+**Rationale:** Stack Overflow and WordPress take tags as one comma-separated line with the parsed chips read back below. Pasting a list from elsewhere works without retyping. The readout shows exactly how the line was split.
 
 **Cost:** No suggestions means no shared spelling: `oak` and `Oak` become two tags and nobody is told. The readout shows the split but cannot judge the words.
 
@@ -2894,7 +2904,7 @@ page
     action primary "Save address"
 ```
 
-**Rationale:** The GOV.UK error template on a postcode states the shape and gives the example. You repair 1011 without opening a second page. The example is the company postcode.
+**Rationale:** The GOV.UK error template on a postcode states the shape and gives an example. You repair 1011 without opening a second page, following the example beside the field.
 
 **Cost:** The shape differs per country, so the message must follow the country field. A Dutch message under a Belgian address refuses a value that was right.
 
@@ -2919,7 +2929,7 @@ page
 
 **Rationale:** Banks and company registers show a verified address as a fact with a change command. Payouts and invoices depend on a verified value. The badge states what the last check found.
 
-**Cost:** Verification is a check against a register the back office does not hold, so the badge can only age. A move the company forgets to report leaves a true badge on a false address.
+**Cost:** Verification is a check against a register the back office does not hold, so the badge only grows older from its check date. A move the company forgets to report leaves a true badge on a false address.
 
 ### Email body editor
 

@@ -2,7 +2,17 @@
 
 ## Intent
 
-A .NET backend realizes the workspace tree with solutions and project files. The shared provisions live on the stack-neutral page ([Workspace structure](../../workspace/structure.md)); this page holds what .NET alone requires.
+A .NET backend lives under `apps/api/`, with production projects under `src/`, test projects under `tests/`, and the solution beside them. This page states that .NET layout: the size (small or large) and stack (technology binding) entries in `litespec.project.json`, the production and test split, the workspace solution, and where the AppHost (the local orchestrator) lives. One fixed address per file lets tools find every project where the layout says it is. The shared workspace rules live on [Workspace Structure](../../workspace/structure.md); this page holds only their .NET form.
+
+## Concepts
+
+### Solutions and project homes
+
+The API solution sits directly under `apps/api/` and remains the solution builds, test runs, and `paths.apiSolution` name. Production projects live under `src/` and test projects under `tests/`, so a test dependency reaching production shows in the path. When the workspace holds a second .NET deployable, a root solution lists both sets for editors that open across them.
+
+### The AppHost exception
+
+An AppHost that runs the API alone stays under `apps/api/src/` with the projects it hosts. An AppHost that also runs frontends orchestrates the workspace rather than the API, so it lives at `apps/apphost/` beside the applications it runs.
 
 ## Standards
 
@@ -10,13 +20,13 @@ A .NET backend realizes the workspace tree with solutions and project files. The
 
 **Requirement:** `litespec.project.json` MUST declare `size` as `small` or `large` and one stack per frontend in `paths.frontends` beside the `dotnet` backend.
 
-**Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply. This provision realizes `litespec/workspace/structure#declare-size-and-application-stacks-in-project-config` for the .NET backend.
+**Rationale:** Size decides which record types and test projects apply, and each stack decides which technology pages and checks apply. An undeclared size or stack leaves tools guessing which rules bind the workspace. This provision states the .NET form of `litespec/workspace/structure#declare-size-and-application-stacks-in-project-config`.
 
 ### Keep .NET production and test projects separate
 
 **Requirement:** Production projects MUST live under `apps/api/src/` and test projects under `apps/api/tests/`, with the solution directly under `apps/api/`.
 
-**Rationale:** The split makes a test dependency reaching a production project visible in the path itself. A workspace AppHost is the one production project outside it, placed by `litespec/backend/dotnet/workspace#place-a-workspace-apphost-beside-the-applications-it-runs`. This provision realizes `litespec/workspace/structure#keep-production-and-test-code-separate` for .NET projects.
+**Rationale:** Production under `apps/api/src/` and tests under `apps/api/tests/` make a test dependency reaching production visible in the path itself. The solution sits directly under `apps/api/`, beside both. A workspace AppHost is the one production project outside `src/`, placed by `litespec/backend/dotnet/workspace#place-a-workspace-apphost-beside-the-applications-it-runs`. This provision states the .NET form of `litespec/workspace/structure#keep-production-and-test-code-separate`.
 
 **Example:** The baseline tree is:
 
@@ -48,7 +58,7 @@ Worker is conditional on the extension that runs background work. Acceptance.Tes
 
 **Requirement:** A root solution MUST list the .NET projects of more than one deployable unit, with builds, test runs, and configuration still naming the API solution.
 
-**Rationale:** The API solution stays at `apps/api/` and remains the one a build, a test run, and `paths.apiSolution` name. A workspace holding a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects are a supported MSBuild arrangement, and the projects themselves stay where `litespec/backend/dotnet/workspace#keep-net-production-and-test-projects-separate` puts them.
+**Rationale:** The API solution stays at `apps/api/` and remains the one builds, test runs, and `paths.apiSolution` name. A workspace with a second .NET deployable, such as a command-line tool, otherwise has no single file an editor can open across both. Two solution files listing overlapping projects are a supported MSBuild arrangement, and the projects stay where `litespec/backend/dotnet/workspace#keep-net-production-and-test-projects-separate` puts them.
 
 **Example:** A workspace with an API and a command-line tool carries `apps/api/{ProjectName}.slnx`, `apps/cli/{ProjectName}.Cli.slnx` where one exists, and a root `{ProjectName}.slnx` listing both sets.
 
@@ -56,7 +66,7 @@ Worker is conditional on the extension that runs background work. Acceptance.Tes
 
 **Requirement:** An AppHost that runs more than one application under `apps/` MUST live at `apps/apphost/{ProjectName}.AppHost/` rather than under `apps/api/src/`.
 
-**Rationale:** An AppHost that runs the API and its dependencies alone stays under `apps/api/src/` with the projects it hosts. An AppHost that also runs the frontends orchestrates the workspace rather than the API. It reads as one of the API's layers under `apps/api/src/`, and it reaches out of that tree for every frontend it starts. Beside the applications it runs, its path says what it serves. `ServiceDefaults` stays under `apps/api/src/`, because the API references it and the AppHost does not.
+**Rationale:** An AppHost that runs the API and its dependencies alone stays under `apps/api/src/` with the projects it hosts. An AppHost that also runs the frontends orchestrates the workspace rather than the API: under `apps/api/src/` it reads as one of the API's layers while reaching out of that tree for every frontend it starts. Beside the applications it runs, its path says what it serves. `ServiceDefaults` stays under `apps/api/src/`, because the API references it and the AppHost does not.
 
 **Example:** A workspace with an API and three frontends carries:
 

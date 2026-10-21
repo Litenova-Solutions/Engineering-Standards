@@ -40,6 +40,19 @@ public sealed class InitCommandTests
         Assert.DoesNotContain("fixture", text, StringComparison.Ordinal);
     }
 
+    [Fact(DisplayName = "init writes a capitalized project name as a lowercase package scope")]
+    public void InitLowercasesThePackageScope()
+    {
+        using var consumer = Cli.Temp("init-scope");
+
+        var result = Cli.Run("init", "--preset", "dotnet-svelte", "--size", "small", "--root", consumer.Path, "--name", "Team Expenses");
+
+        Assert.Equal(0, result.Status);
+        var text = File.ReadAllText(Path.Combine(consumer.Path, "litespec.project.json"));
+        Assert.Contains("\"@team-expenses/ui\"", text, StringComparison.Ordinal);
+        Assert.Contains("\"apps/api/Team Expenses.slnx\"", text, StringComparison.Ordinal);
+    }
+
     [Theory(DisplayName = "init writes a project file from each preset")]
     [InlineData("dotnet-react", "small", "server", "dotnet,react", "web", "apps/web", "react")]
     [InlineData("dotnet-react", "large", "server", "dotnet,react", "web", "apps/web", "react")]

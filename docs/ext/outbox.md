@@ -2,7 +2,7 @@
 
 ## Intent
 
-The outbox makes a business commit and its required outgoing message durable in one database transaction. A Worker dispatches pending records with retry, idempotency, visibility, and safe replay.
+The outbox pattern makes a business change and the message it owes the outside world durable together, so a crash between the two cannot lose the message. This page states how the product stages that message in the same database transaction as the business commit and how a background Worker delivers it later with retry, idempotency, visibility, and safe replay. A team selects it for each use case (one operation the product offers) or journey (steps toward one goal) whose committed change needs delivery that survives process failure, so no accepted change silently drops its consequence.
 
 ## Activation
 
@@ -10,15 +10,13 @@ Activation scope: `local`.
 
 Applicable specification kinds: `use-case`, `journey`.
 
-The consumer enables `outbox` when a committed change requires durable delivery after process failure. Delivery can carry an integration event, a journey-step command, or a provider side effect.
-
-A use case that stages a durable message selects this extension. The extension activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`. The project declares the execution host that runs the dispatcher.
+A use case or journey selects this extension when a committed change needs delivery that survives a process failure. That delivery can carry an integration event to another system, a command that advances a journey step, or a side effect on an outside provider. Selecting it also activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the dispatcher.
 
 ## Baseline relationship
 
 This extension replaces `litespec/backend/persistence#collect-events-without-a-public-unit-of-work`.
 
-This extension switches on the Event, Limit, and Runbook record types.
+Selecting it switches on the Event, Limit, and Runbook record types. The project writes an Event record for each integration event it delivers, Limit records for the delivery bounds, and Runbook records for recovery and rollback.
 
 ## Standards
 
@@ -26,179 +24,177 @@ This extension switches on the Event, Limit, and Runbook record types.
 
 **Requirement:** A durable-delivery specification MUST document delivery guarantee, downstream boundary, duplicate behavior, retry horizon, recovery owner, record owner, and status.
 
-**Rationale:** The specification defines the expected delivery behavior before a message record exists. A draft names its decider and decide-by date.
+**Rationale:** Delivery crosses a system boundary, so the team agrees up front on the guarantee, the boundary, the duplicate behavior, the retry horizon, and who recovers when delivery fails. Without that agreement, the writer assumes once-only delivery while the target assumes retries, and both discover the mismatch in production. A draft names its decider and decide-by date so the agreement lands before the first message does.
 
 ### Exclude manually repeatable reactions
 
 **Requirement:** A project MUST NOT activate outbox for a reaction whose delivery guarantee is best-effort and which operators can repeat manually.
 
-**Rationale:** Outbox storage and dispatcher operation are unnecessary when loss is an accepted recoverable outcome. The delivery guarantee comes from the reaction's own declaration. The module specification records it with the vocabulary its event table already uses.
+**Rationale:** Outbox storage, dispatch, retries, and replay exist to prevent loss; a reaction whose loss the operators accept and can repeat by hand needs none of that machinery. The reaction's own declaration states its best-effort guarantee, and the module specification records it with the vocabulary its event table uses.
 
 ### Publish best-effort reactions after commit
 
 **Requirement:** A reaction the outbox excludes MUST publish after its commit succeeds without staging an outbox record.
 
-**Rationale:** Best-effort delivery has no durable record. The commit success is its only guarantee.
+**Rationale:** Without an outbox record, nothing survives a crash between the commit and the publish, so the reaction publishes immediately after its commit succeeds and accepts the gap. Publishing before the commit risks worse: the reaction fires for a change the database then rolls back.
 
 ### Stage messages with business work
 
 **Requirement:** A command post-handler MUST stage pending durable messages in the same scoped business session as its aggregate changes.
 
-**Rationale:** One session makes the business commit and outgoing message durable together.
+**Rationale:** The business change and its message share one fate: both persist or neither does. Staging the message in the same scoped business session as the aggregate changes puts both under one commit, so a crash can never leave an accepted change without its message or a message without its change.
 
 ### Serialize durable messages
 
 **Requirement:** An outbox writer MUST serialize each pending durable message into an outbox record.
 
-**Rationale:** A durable record holds the dispatch input after the command scope completes.
+**Rationale:** The command scope ends when the request ends, while dispatch happens later in a Worker that never saw the request. Serializing the message into an outbox record gives that Worker everything it needs after the scope is gone.
 
 ### Store required message fields
 
 **Requirement:** An outbox record MUST contain message identity, kind, stable type, schema version, time, payload, tenant, state, attempt, and next-attempt data.
 
-**Rationale:** Dispatch and recovery need one complete durable description of the message.
+**Rationale:** The dispatcher, the retry logic, and the operator each read the record: identity and type route it, the schema version selects its reader, time and tenant scope it, and state, attempt, and next-attempt data drive the retry. A field stored nowhere forces one of those readers to guess.
 
 ### Store failure and completion evidence
 
 **Requirement:** An outbox record MUST retain its last error summary and completion time.
 
-**Rationale:** Operators need failure and completion evidence for backlog review and replay.
+**Rationale:** When delivery stalls, the operator opens the record first: the last error summary says why the previous attempt failed, and the completion time says which records finished. Without that evidence on the record, each investigation starts from scattered logs instead.
 
 ### Classify message kinds
 
 **Requirement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect, with an integration event citing its Event record.
 
-**Rationale:** The kind decides dispatch ownership and transport. The Event record carries the raises and reacts-to links.
+**Rationale:** An integration event, a journey-step command, and a provider side effect dispatch through different owners and transports, so the record names which one it holds. The integration event cites its Event record, which carries the raises and reacts-to links the model uses to trace the flow.
 
 ### Reject independent outbox commits
 
 **Requirement:** An outbox writer MUST NOT use another connection or independent commit for required durable delivery.
 
-**Rationale:** A shared PostgreSQL database does not make separate transactions atomic together.
+**Rationale:** Two commits on two connections can split around a crash: the business change persists while the message rolls back, or the message persists for a change that never happened. Sharing one PostgreSQL database does not make separate transactions atomic, so the message joins the business transaction instead.
 
 ### Dispatch claimed records in Worker
 
 **Requirement:** A Worker MUST claim pending outbox records, dispatch a bounded batch, and record success or retry information.
 
-**Rationale:** Worker ownership separates durable dispatch from the request transaction.
+**Rationale:** Dispatch needs time, retries, and network calls that no request transaction can hold. The Worker claims pending records, dispatches a bounded batch, and records each outcome, so the request commits fast while delivery proceeds on its own schedule.
 
 ### Exclude request-transaction dispatch
 
 **Requirement:** WebApi MUST NOT dispatch a durable message inside the request transaction.
 
-**Rationale:** The request commit only makes the message eligible for later Worker dispatch.
+**Rationale:** A network call inside the request transaction holds database locks while the outside world answers, and a slow target slows every request behind it. The request commits only to make the message eligible; the Worker performs the delivery later.
 
 ### Define claim ownership
 
 **Requirement:** An outbox claim MUST use a short transaction with the lease owner, lease expiry, and fencing value that `litespec/ext/jobs#store-execution-leases` defines.
 
-**Rationale:** Claim fields establish which Worker owns one dispatch attempt.
+**Rationale:** Several Workers poll the same store, so each dispatch attempt needs one owner: the lease owner, the lease expiry, and the fencing value name it. The short transaction takes the claim without holding locks into the delivery itself.
 
 ### Release claim transactions before calls
 
 **Requirement:** A Worker MUST NOT hold an outbox claim transaction open during a network call.
 
-**Rationale:** Network delay does not retain database locks or transaction resources.
+**Rationale:** A network call to a slow target can last seconds or minutes. Holding the claim transaction open across that call pins database locks and connection slots, starving the Workers behind it; releasing the claim first lets the database serve other work while the call runs.
 
 ### Restrict completion to current lease owners
 
 **Requirement:** A Worker MUST update an outbox record only while it owns the matching lease and fencing value.
 
-**Rationale:** A stale Worker does not overwrite a newer owner's dispatch result.
+**Rationale:** A Worker that lost its lease, through a crash, a pause, or an expiry, can wake up after another Worker claimed the same record. Checking the lease and fencing value before each update stops the stale Worker from overwriting the current owner's result.
 
 ### Requeue expired claims
 
 **Requirement:** An outbox store MUST return expired claims to eligible work.
 
-**Rationale:** A crashed Worker cannot permanently strand a pending message.
+**Rationale:** A Worker can die between claiming a record and dispatching it. Returning expired claims to eligible work lets a live Worker pick them up, so one crash delays a message instead of losing it.
 
 ### Accept repeated delivery
 
 **Requirement:** An outbox consumer MUST handle the same message more than once.
 
-**Rationale:** A crash after external acceptance can cause one message to be delivered again.
+**Rationale:** The target can accept a message while the Worker crashes before recording completion, and the requeued claim then dispatches it again. Delivery promises at-least-once, so every consumer handles the same message more than once without corrupting its state.
 
 ### Identify repeated delivery
 
 **Requirement:** An outbox consumer MUST use message ID or a business idempotency key at its Command or side-effect boundary.
 
-**Rationale:** One stable identity lets the target suppress a repeated delivery.
+**Rationale:** Handling a repeat means recognizing it: the message ID or a business idempotency key gives the target a stable identity to check at its command or side-effect boundary. Without that key, the target processes the repeat as new work and charges, notifies, or ships twice.
 
 ### Await target acceptance
 
 **Requirement:** A Worker MUST NOT mark an outbox record complete before the target boundary accepts it.
 
-**Rationale:** Completed state claims delivery that has not yet reached the required target.
+**Rationale:** Marking a record complete before the target accepts it declares a delivery that never happened, and no retry follows because the record looks done. The Worker waits for the target boundary's acceptance before recording completion.
 
 ### Bound delivery retries
 
 **Requirement:** An outbox dispatcher MUST use bounded exponential backoff with jitter.
 
-**Rationale:** Bounded jitter reduces repeated load during a transient target failure.
+**Rationale:** A failing target with ten thousand pending messages meets a retry storm when every message retries at once on a fixed interval. Bounded exponential backoff with jitter spreads the retries over time and caps the total, so the target recovers instead of drowning.
 
 ### Classify permanent delivery failure
 
 **Requirement:** An outbox dispatcher MUST classify permanent failures, stop automatic retry at its configured limit, and retain safe investigation and replay data.
 
-**Rationale:** A dead-letter outcome preserves evidence after automatic recovery is no longer safe.
+**Rationale:** Some failures never clear on retry: a deleted destination, a rejected payload, a revoked credential. Retrying those forever burns resources and buries the real backlog, so the dispatcher classifies them, stops at its configured limit, and keeps the evidence an operator needs to investigate and replay safely.
 
 ### Distinguish dependency outage
 
 **Requirement:** A dispatcher MUST distinguish an unavailable outbox store from a failed claimed message.
 
-**Rationale:** Store availability and a claimed record's target result require different recovery paths.
-
-Each has its own signal. The store's availability is a gauge the readiness endpoint reads. A claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
+**Rationale:** A dead outbox store and a failed delivery ask for different recoveries: the first needs a database restored, the second needs one destination investigated. Each carries its own signal. The store's availability is a gauge the readiness endpoint reads, while a claimed message's outcome is a counter carrying the result, following [the OpenTelemetry metrics specification](https://opentelemetry.io/docs/specs/otel/metrics/). A single error counter cannot tell an operator whether to restore a database or investigate one destination.
 
 ### Back off unavailable-store polling
 
 **Requirement:** A Worker MUST apply bounded backoff and rate-limited logging when its outbox store is unavailable.
 
-**Rationale:** Cold start before schema application and store outage do not justify one exception per loop.
+**Rationale:** A Worker that polls a dead store on a tight loop writes an exception per iteration and fills disks and log quotas before anyone reads the first one. Bounded backoff with rate-limited logging keeps the Worker alive and quiet until the store returns.
 
 ### Restrict message retry to claimed records
 
 **Requirement:** A Worker MUST apply message retry and poison handling only to claimed outbox records.
 
-**Rationale:** An unavailable store has no claimed message eligible for delivery retry.
+**Rationale:** Retry and poison handling act on a claimed message; when the store itself is down, no claim exists and no message waits for delivery. Running retry logic against the outage double-counts attempts and can dead-letter messages whose only fault was an unreachable store.
 
 ### Gate dispatch on readiness
 
 **Requirement:** A Worker host exposing readiness MUST gate dispatch and stop polling stores that cannot serve requests.
 
-**Rationale:** Readiness prevents avoidable work against unavailable storage dependencies.
+**Rationale:** A host that reports unready still serves traffic it cannot finish when its Workers keep polling dead stores. Gating dispatch on readiness stops the polling, so the host fails fast and recovers instead of churning against storage that cannot answer.
 
 ### Version message types
 
 **Requirement:** An outbox message MUST use a stable type name and explicit schema version.
 
-**Rationale:** The pair defines a durable contract for Worker deserialization and dispatch.
+**Rationale:** An outbox record outlives the deployment that wrote it, so the dispatcher meets records written by several versions at once. A stable type name with an explicit schema version tells the dispatcher which reader parses each record; without the pair, one shape change breaks every record written before it.
 
 ### Support coexisting message producers
 
 **Requirement:** A deployed dispatcher MUST process records from every application version that can coexist during rollout or rollback.
 
-**Rationale:** Active deployment versions can place different valid message shapes in one store.
+**Rationale:** During rollout and rollback, several application versions share one store and write different valid shapes into it. The dispatcher reads from every version that can coexist, or the deployment itself causes delivery failures.
 
-A message record therefore carries its own shape version. The dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator needs a new version. The older reader stays until no record carries the older version.
+Each message record therefore carries its own shape version, and the dispatcher selects a reader from that value. Adding an optional member with a defined absent-value behavior needs no new version. Removing a member, renaming one, narrowing a type, or changing a discriminator needs a new version, and the reader for each version stays until no record carries that version.
 
 ### Publish backlog indicators
 
 **Requirement:** An outbox deployment MUST publish pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate.
 
-**Rationale:** These indicators make backlog growth and dispatch quality observable.
+**Rationale:** Pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate together show whether delivery keeps up: growth in the backlog or age reveals a stall, while duration and success rate reveal a struggling target. Without these indicators, the first sign of failure is a customer asking where their message went.
 
 ### Set delivery alerts
 
 **Requirement:** An outbox deployment MUST set alert thresholds as Limit records from its use-case delivery target.
 
-**Rationale:** Alert urgency follows the business consequence of delayed delivery.
+**Rationale:** A shipment notice delayed an hour and a receipt delayed a week carry different business consequences, so each use case sets alert thresholds from its own delivery target. Limit records hold those thresholds, so the alert fires when delay passes what the business accepted.
 
 ### Model outbox lifecycle states
 
 **Requirement:** An outbox record MUST model its lifecycle as an abstract state base with one sealed record for each of pending, processing, dispatched, and dead-letter.
 
-**Rationale:** `pending` becomes `processing`. `processing` becomes `dispatched`, `pending`, or `dead-letter`. Audited replay moves `dead-letter` to `pending`. Three of the four carry data the others do not. `processing` holds a lease expiry. `dispatched` holds a dispatch time. `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that are meaningful in one state each, which is the shape `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes everywhere else.
+**Rationale:** `pending` becomes `processing`, and `processing` becomes `dispatched`, `pending`, or `dead-letter`, while audited replay moves `dead-letter` back to `pending`. Three of the four states carry data the others do not: `processing` holds a lease expiry, `dispatched` holds a dispatch time, and `dead-letter` holds a failure reason and an attempt count. A four-value label forces those onto nullable columns that mean something in one state each, which is the shape `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy` removes everywhere else.
 
 **Example:** `OutboxState.Processing` carries one unexpired lease before a dispatcher records `OutboxState.Dispatched` or a retry state.
 
@@ -206,31 +202,31 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Requirement:** An outbox dispatcher MUST preserve message ID across retry and replay.
 
-**Rationale:** Stable identity lets target idempotency suppress delivery after a crash before dispatch completion.
+**Rationale:** The target suppresses a repeat by recognizing its identity, which works only when every retry and replay carries the same message ID. A dispatcher that mints a new ID per attempt turns each retry into a new message the target processes again.
 
 ### Audit outbox replay
 
 **Requirement:** An outbox replay MUST record actor, reason, time, and failure without editing the payload: an audit record when audit is selected, a standalone record otherwise.
 
-**Rationale:** Replay history preserves message evidence and explains a renewed dispatch attempt.
+**Rationale:** A replay dispatches a message the system already handled or dead-lettered, so the team records who replayed it, why, when, and which failure it answers. Without that record, a duplicate delivery looks like a dispatcher bug instead of an operator's decision, and nobody can reconstruct the choice.
 
 ### Protect active Worker compatibility
 
 **Requirement:** New WebApi code MUST emit a message only after every active Worker can read its type and schema version.
 
-**Rationale:** A writer does not create a message shape that a running dispatcher cannot understand.
+**Rationale:** WebApi writers and Worker dispatchers deploy independently, so a writer can run ahead of the oldest active Worker. When the writer emits a shape that Worker cannot read, those messages dead-letter on arrival through no fault of their own.
 
 ### Deploy readers before writers
 
 **Requirement:** A release MUST deploy compatible readers before writers for additive event versions.
 
-**Rationale:** Reader-first deployment preserves dispatch during a mixed-version rollout.
+**Rationale:** In a mixed-version rollout, old and new records sit in one store. Deploying compatible readers before the writers that emit new shapes keeps every record dispatchable at every step; the reverse order strands new records until the readers catch up.
 
 ### Plan undispatched rollback records
 
 **Requirement:** A rollback Runbook MUST include records created by the new writer but not yet dispatched.
 
-**Rationale:** These records can outlive the deployment that originally wrote them.
+**Rationale:** Rolling back the deployment does not roll back the store: records the new writer staged but nobody dispatched stay behind. The rollback Runbook names how the previous version handles them, or they sit undispatched with no owner and no reader.
 
 ## Conventions
 
@@ -240,7 +236,7 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
-**Rationale:** One Infrastructure location contains the persistent dispatch mechanism.
+**Rationale:** The outbox record, storage, claim, and dispatch code form one mechanism with one owner. Keeping it under `Infrastructure/Messaging/Outbox/` puts every persistent dispatch question in one folder instead of scattered across the project.
 
 ### Isolate the Worker host
 
@@ -248,7 +244,7 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
-**Rationale:** The Worker has independent process lifetime and operating configuration.
+**Rationale:** The Worker runs as its own process with its own lifetime, scaling, and configuration, apart from the request host. Its own project keeps that independence visible and stops request concerns leaking into dispatch configuration.
 
 ### Keep provider mapping with integration
 
@@ -256,7 +252,7 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
-**Rationale:** A provider integration owns its transport mapping and external delivery behavior.
+**Rationale:** Each provider speaks its own transport with its own mapping, retries, and quirks. The integration that owns the side effect owns that mapping, so a provider change touches one integration instead of the shared dispatch path.
 
 ### Dispatch journey-step commands in a new scope
 
@@ -264,7 +260,7 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
-**Rationale:** The command enters its own application pipeline and transaction.
+**Rationale:** A journey-step command is a full command with validation, authorization, and its own transaction, not a subroutine of the dispatcher. Sending it through `ICommandMediator` in a fresh Worker scope runs the whole application pipeline for it.
 
 ### Avoid automatic durable-bus adoption
 
@@ -272,7 +268,7 @@ A message record therefore carries its own shape version. The dispatcher selects
 
 **Replacement:** A consumer records a departure as an Exception record with reason and review date.
 
-**Rationale:** Optional LiteBus durable packages remain unselected until their transaction behavior has evidence.
+**Rationale:** A durable bus package earns its place only when an integration test proves it commits the message in the same transaction as the business work. Until that evidence exists, project-owned Marten records with Worker dispatch carry delivery without depending on behavior nobody verified.
 
 ## Dependencies
 

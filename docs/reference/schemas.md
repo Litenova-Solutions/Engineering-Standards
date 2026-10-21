@@ -2,11 +2,11 @@
 
 ## Intent
 
-A schema states the exact shape of one JSON file a tool reads, so a validator and an editor check the same contract. This page lists every schema the release ships, with the file it validates, the command that checks it, its published URL, its top-level properties, and a real example.
+Every JSON file a LiteSpec tool reads has one schema (a contract stating its exact shape), and the checking command and the editor validate the same contract. This page lists every schema the release ships: the file it validates, the command that checks it, its published URL, its top-level properties, and a real example. An author in a consumer project uses it to wire editor validation and to look up a field, and a tool author uses it to find which command owns which file.
 
 ## Reference
 
-Every schema lives in `schemas/` in the repository root and uses JSON Schema draft 2020-12. Each schema carries an `$id` that equals its published URL, so the copy at `https://litespec.dev/2.0.0/schemas/<file>` and the file in `schemas/` state the same contract. The [validate](../tools/validate.md), [consumer](../tools/consumer.md), and [ui](../tools/ui.md) pages state the commands that check each file.
+Every schema lives in `schemas/` at the repository root and uses JSON Schema draft 2020-12. Each schema carries an `$id` that equals its published URL, so the copy at `https://litespec.dev/2.0.0/schemas/<file>` and the file in `schemas/` state the same contract. The [validate](../tools/validate.md), [consumer](../tools/consumer.md), and [ui](../tools/ui.md) pages state the commands that check each file. The release ships seven schemas, one per section below.
 
 ### Manifest schema
 
@@ -64,7 +64,7 @@ The consumer template opens with these fields:
 | Checked by | `litespec consumer` |
 | Published URL | `https://litespec.dev/2.0.0/schemas/record.schema.json` |
 
-The schema holds no fixed property list. It carries a `oneOf` across 28 page variants, one per record type and page style: `productPage`, `constraintPage`, `researchPage`, `decisionPage`, `problemPage`, `featurePage`, `actorPage`, `rolePage`, `journeyPage`, `modulePage`, `businessRecordPage`, `useCasePage`, `runbookPage`, `exceptionPage`, `knownGapPage`, `productTopicPage`, `permissionListPage`, `entryPointListPage`, `limitSetPage`, `ruleSetPage`, `indexPage`, `tutorialPage`, `howToPage`, `referencePage`, `commandPage`, `configurationPage`, `glossaryPage`, and `scenarioCastPage`. Each variant requires `type` plus its own fields, such as `id`, `title`, `owner`, and `status`. Identifier patterns sit beside them in `$defs`, such as `useCaseId` for `use-case/<module>.<name>`.
+The schema holds no single property list. Instead it carries a `oneOf` across 28 page variants, one per record type and page style, so each opening block matches exactly one variant: `productPage`, `constraintPage`, `researchPage`, `decisionPage`, `problemPage`, `featurePage`, `actorPage`, `rolePage`, `journeyPage`, `modulePage`, `businessRecordPage`, `useCasePage`, `runbookPage`, `exceptionPage`, `knownGapPage`, `productTopicPage`, `permissionListPage`, `entryPointListPage`, `limitSetPage`, `ruleSetPage`, `indexPage`, `tutorialPage`, `howToPage`, `referencePage`, `commandPage`, `configurationPage`, `glossaryPage`, and `scenarioCastPage`. Each variant requires `type` plus its own fields, such as `id`, `title`, `owner`, and `status`. The identifier patterns sit beside the variants in `$defs`, such as `useCaseId` for `use-case/<module>.<name>`.
 
 A use case page in `templates/consumer/use-case.md` opens with this block:
 
@@ -168,4 +168,4 @@ The consumer template lock opens with these fields:
 
 ## Notes
 
-A schema states one exact shape per release, with no compatible range between releases. A consumer adopting a later release absorbs every difference at that moment, under `litespec/core/authoring#publish-each-release-as-a-complete-contract` and `litespec/core/authoring#exclude-cross-release-compatibility-work`. When the published copy and the repository copy disagree, the repository copy wins, because every check reads `schemas/` through the checkout the tool belongs to.
+A schema states one exact shape per release, with no compatible range between releases. A consumer adopting a later release absorbs every difference at that moment, under `litespec/core/authoring#publish-each-release-as-a-complete-contract` and `litespec/core/authoring#exclude-cross-release-compatibility-work`. When the published copy and the repository copy disagree, the repository copy wins, because every check reads `schemas/` from the checkout its tool belongs to.

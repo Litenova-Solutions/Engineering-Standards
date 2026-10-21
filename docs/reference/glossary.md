@@ -2,13 +2,13 @@
 
 ## Actor
 
-One person, company, provider, system, or guest that touches the product.
+One person, company, provider, system, or guest that acts in the product.
 
 Term `term/actor`.
 
 ## Agent
 
-Software that inspects context, reasons about bounded work, changes authorized files, and runs verification.
+Software that reads task context, plans bounded work, changes the files it is allowed to change, and runs verification.
 
 Term `term/agent`.
 
@@ -26,13 +26,13 @@ Term `term/aggregate-root`.
 
 ## Alert inventory
 
-The list of fired alerts and the runbook each one names.
+The list of alerts a product can fire, with the runbook each alert names.
 
 Term `term/alert-inventory`.
 
 ## AppHost
 
-The local orchestrator that starts every application and dependency together.
+The local orchestrator that starts every application and its dependencies together for development.
 
 Term `term/apphost`.
 
@@ -50,7 +50,7 @@ Term `term/audit-record`.
 
 ## Audit trail
 
-The append-only store holding audit records, apart from logs and domain events.
+The append-only store that holds audit records, kept separate from logs and domain events.
 
 Term `term/audit-trail`.
 
@@ -62,7 +62,7 @@ Term `term/authorization-policy`.
 
 ## Business record
 
-One thing kept consistent and changed in one step.
+One unit of business state that stays consistent and changes in one step.
 
 Term `term/business-record`. Rejected: entity.
 
@@ -80,13 +80,13 @@ Term `term/central-package-management`.
 
 ## Command
 
-One message that changes business state through the command pipeline.
+One message that changes business state by running through the command pipeline.
 
 Term `term/command`.
 
 ## Command page
 
-One page documenting a shipped command: arguments, options, exit codes, and underneath.
+One page that documents one shipped command: its arguments, options, exit codes, and what it runs underneath.
 
 Term `term/command-page`.
 
@@ -110,7 +110,7 @@ Term `term/constraint`.
 
 ## Controlled technical prose
 
-The fixed profile for structures, bounded prose, exact terms, and testable provisions.
+The fixed writing profile that sets the allowed structures, prose bounds, exact terms, and testable provisions.
 
 Term `term/controlled-technical-prose`.
 
@@ -122,13 +122,13 @@ Term `term/convention`.
 
 ## CORS
 
-The browser rule deciding which origins may call the API.
+The browser rule that decides which origins can call the API.
 
 Term `term/cors`.
 
 ## Current standards material
 
-The pinned release without transition or history material.
+The pinned release taken on its own, without transition or history material.
 
 Term `term/current-standards-material`.
 
@@ -152,13 +152,13 @@ Term `term/domain`.
 
 ## Domain event
 
-One immutable record describing a completed fact inside the boundary.
+One immutable record that describes a fact completed inside the bounded context.
 
 Term `term/domain-event`.
 
 ## Domain repository
 
-One port that loads and stages complete business records.
+One boundary interface that loads and stages complete business records.
 
 Term `term/domain-repository`. Rejected: repository used alone.
 
@@ -182,7 +182,7 @@ Term `term/event`.
 
 ## Event reaction
 
-Behavior caused by an event, without prescribing its implementation.
+Behavior that an event causes, stated without prescribing how it runs.
 
 Term `term/event-reaction`.
 
@@ -200,25 +200,25 @@ Term `term/extension`.
 
 ## Feature
 
-One offer against a problem: planned, shipped, later, or refused.
+One planned answer to a problem, tracked as planned, shipped, later, or refused.
 
 Term `term/feature`.
 
 ## How-to page
 
-One page solving a stated problem for a reader with a working result.
+One page that solves one stated problem for a reader who already has a working result.
 
 Term `term/how-to-page`.
 
 ## Input validation
 
-Checks on a command or query shape before business behavior runs.
+Checks on the shape of a command or query, run before business behavior runs.
 
 Term `term/input-validation`.
 
 ## Integration event
 
-One versioned message contract delivered outside the boundary.
+One versioned message contract delivered outside the bounded context.
 
 Term `term/integration-event`.
 
@@ -236,7 +236,7 @@ Term `term/known-gap`.
 
 ## Layer
 
-One of the depths a documentation page answers at.
+One depth of documentation, from a first working result down to the mechanism a command runs.
 
 Term `term/layer`.
 
@@ -272,7 +272,7 @@ Term `term/module`.
 
 ## Normative
 
-Required for a conforming consumer through an identified provision.
+Required of a conforming consumer through an identified provision.
 
 Term `term/normative`.
 
@@ -344,13 +344,13 @@ Term `term/provision`.
 
 ## Provision ID
 
-The identifier of one provision, naming kind, page, and heading.
+The identifier of one provision, naming its owning page and heading.
 
 Term `term/provision-id`.
 
 ## Query
 
-One message reading a read model without changing business state.
+One message that reads a read model without changing business state.
 
 Term `term/query`.
 
@@ -362,7 +362,7 @@ Term `term/rate-limit`.
 
 ## Read model
 
-Data shaped for a query, without business record loading.
+Data shaped for a query, served without loading a business record.
 
 Term `term/read-model`.
 
@@ -392,7 +392,7 @@ Term `term/reference-page`.
 
 ## Requirement
 
-One thing the product does or guarantees.
+One behavior the product shows or one guarantee it keeps.
 
 Term `term/requirement`. Rejected: product rule.
 
@@ -440,7 +440,7 @@ Term `term/scenario`.
 
 ## Secret inventory
 
-The list of production secrets with owner, location, and rotation date.
+The list of production secrets, each with its owner, location, and rotation date.
 
 Term `term/secret-inventory`.
 
@@ -452,13 +452,13 @@ Term `term/shape`.
 
 ## Size
 
-One required-record set of a project: small or large.
+One of the required-record sets of a project: small or large.
 
 Term `term/size`.
 
 ## Source material
 
-Research kept outside the documentation, carrying no authority alone.
+Research kept outside the documentation, which carries no authority on its own.
 
 Term `term/source-material`.
 
@@ -494,7 +494,7 @@ Term `term/sub-processor`.
 
 ## Term
 
-One word with a meaning, labels per language, and rejected words.
+One word with one meaning, labels in each language, and rejected synonyms.
 
 Term `term/term`.
 
@@ -506,7 +506,7 @@ Term `term/trace-context`.
 
 ## Tutorial
 
-One page taking a reader to a first working result.
+One page that takes a reader to a first working result.
 
 Term `term/tutorial`.
 
@@ -524,12 +524,12 @@ Term `term/use-case`.
 
 ## Value object
 
-One immutable type defined by its values rather than identity.
+One immutable type defined by its values rather than by identity.
 
 Term `term/value-object`.
 
 ## Workspace
 
-The repository holding a consumer application or the standards.
+The repository that holds a consumer application or the standards.
 
 Term `term/workspace`. Rejected: repo.

@@ -1,0 +1,58 @@
+{
+  "project": {
+    "name": "Expenses"
+  },
+  "size": "large",
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
+  "reviewedLiteSpecVersion": "2.0.0",
+  "optionalTypes": [
+    "constraint",
+    "research",
+    "limit",
+    "runbook"
+  ],
+  "constraints": {
+    "answered": true
+  },
+  "owners": [
+    "expenses-team"
+  ],
+  "paths": {
+    "docs": "docs",
+    "domainDocs": "docs/domain",
+    "uiDocs": "docs/ui",
+    "language": "docs/language.json",
+    "application": "apps/api/src/Expenses.Application",
+    "domain": "apps/api/src/Expenses.Domain",
+    "webapi": "apps/api/src/Expenses.WebApi",
+    "testRoots": [
+      "apps/api/tests"
+    ],
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "svelte",
+        "ui": {
+          "profile": "application-balanced"
+        }
+      }
+    ],
+    "apiClient": "packages/api",
+    "uiPackage": {
+      "name": "@expenses/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": [
+        "@expenses/ui/expenses"
+      ]
+    },
+    "records": {}
+  },
+  "selectedExtensions": []
+}

@@ -2,7 +2,7 @@
 
 ## Intent
 
-OpenAPI freshness proves that committed artifacts match source code. It does not prove that independently deployed consumers can continue using the API.
+API compatibility keeps consumers that release on their own schedule, such as public, partner, and mobile clients, working when the API changes. This page states how a project classifies each contract change, versions breaking ones, keeps supported versions alive, and retires them with notice. A team with such consumers applies it, so its consumers keep working across releases instead of breaking on deploy day.
 
 ## Activation
 
@@ -10,7 +10,7 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer enables `compat` for public APIs, partner clients, mobile clients, or independently deployed consumers. Same-release internal APIs retain `litespec/backend/api#treat-openapi-as-a-generated-contract`. A project in its pre-production stage defers these rules through the stage extension.
+The consumer enables `compat` for public APIs, partner clients, mobile clients, or independently deployed consumers. APIs whose consumers always release together with them stay under `litespec/backend/api#treat-openapi-as-a-generated-contract`. A project whose first deployment holds no customer data yet defers these rules through the stage extension.
 
 ## Baseline relationship
 
@@ -24,61 +24,61 @@ This extension switches on no optional record type.
 
 **Requirement:** An API change reviewer MUST classify each contract change that affects an independently deployed consumer.
 
-**Rationale:** Classification determines whether consumers need a new contract version, review, or no action.
+**Rationale:** Every contract change reaches consumers the project does not deploy. Classifying each one decides whether consumers need a new version, a review, or nothing at all. An unclassified change ships the decision to consumers as a surprise.
 
 ### Classify breaking contract changes
 
 **Requirement:** An API change reviewer MUST classify removal, rename, required input, narrowed value, response, status, or authentication changes as breaking.
 
-**Rationale:** Existing consumers can depend on every removed, renamed, narrowed, or retyped contract element.
+**Rationale:** A consumer can depend on any element of the contract: a field it reads, a status it branches on, an authentication scheme it implements. Removing, renaming, narrowing, or retyping any of them breaks the consumer that depended on it. Calling each such change breaking routes it to versioning instead of silent release.
 
 ### Classify compatible additions
 
 **Requirement:** An API change reviewer MUST classify an optional field, endpoint, or query parameter as compatible when existing clients retain behavior.
 
-**Rationale:** Optional additions do not require existing callers to send or interpret new values.
+**Rationale:** An optional field, endpoint, or query parameter asks nothing of existing callers: they send and interpret the same values as before. Classifying these as compatible keeps routine growth cheap. Treating them as breaking would version the API for changes nobody must adopt.
 
 ### Review exhaustive consumer changes
 
 **Requirement:** An API change reviewer MUST require consumer review for an added enum value or polymorphic subtype.
 
-**Rationale:** Generated exhaustive clients can reject a newly valid enum value or discriminator case.
+**Rationale:** Generated clients often switch exhaustively over enum values and discriminator cases. A new value that the server now sends reaches a client with no branch for it, which rejects a valid response. Consumer review checks that each client handles the new case before it ships.
 
 ### Preserve stable error codes
 
 **Requirement:** An API change reviewer MUST classify removal or reassignment of a stable Problem Details code as breaking.
 
-**Rationale:** A consumer can branch on a stable code even when the HTTP status remains unchanged.
+**Rationale:** Consumers branch on stable Problem Details codes the way they branch on statuses. Removing or reassigning a code breaks that branch while the status stays green. Treating the code as breaking keeps error handling stable across versions.
 
 ### Resolve uncertain classifications safely
 
 **Requirement:** An API change reviewer MUST classify an unclear contract change as breaking and require consumer review.
 
-**Rationale:** A conservative outcome protects consumers when a structural diff cannot prove compatibility.
+**Rationale:** A structural diff cannot prove every change compatible: some changes need a person to judge their effect on consumers. Classifying the unclear ones as breaking routes them to consumer review instead of release. The cost of a needless review is smaller than the cost of a broken consumer.
 
 ### Retain release baselines
 
 **Requirement:** An API owner MUST store each release OpenAPI document as a retained baseline artifact.
 
-**Rationale:** A retained document gives later changes an immutable comparison target.
+**Rationale:** Each release stores its OpenAPI document as an immutable baseline. Later changes diff against it instead of against memory or a mutable file. Without a retained baseline, the project cannot prove what changed between two releases.
 
 ### Diff release contracts
 
 **Requirement:** The project MUST compare the current OpenAPI document with the selected supported baseline, both locally and in continuous integration.
 
-**Rationale:** The same diff detects structural compatibility changes locally and during continuous integration.
+**Rationale:** The diff against the supported baseline runs both locally and in continuous integration. The local run catches a breaking change while it is cheap to rework. The CI run catches it when the local run was skipped.
 
 ### Reject unapproved breaking diffs
 
 **Requirement:** Continuous integration MUST fail a breaking diff unless a new API version or approved consumer decision authorizes it.
 
-**Rationale:** The failure makes a compatibility decision explicit before release.
+**Rationale:** A breaking diff that fails CI stops until a new API version or an approved consumer decision authorizes it. The failure forces the compatibility decision before release, while versioning is still possible. A warning nobody must answer authorizes nothing.
 
 ### Assign operation IDs
 
 **Requirement:** Every operation exposed to an independent consumer MUST have a deliberate `operationId`, except an endpoint whose shape a specification outside the project fixes.
 
-**Rationale:** Generated clients and tools use the identifier as an operation-level contract name.
+**Rationale:** Generated clients turn each `operationId` into a method name, and tools use it to reference the operation. A deliberate identifier keeps those names stable and meaningful. An endpoint whose shape an outside specification fixes is exempt, because the project does not own that contract.
 
 **Example:** An OAuth redirect endpoint, an OIDC discovery document, a provider webhook receiver, and a well-known resource each carry a shape the other party defines.
 
@@ -86,67 +86,67 @@ This extension switches on no optional record type.
 
 **Requirement:** A compatible API change MUST retain the existing `operationId`.
 
-**Rationale:** A changed identifier can break generated client names and operation references.
+**Rationale:** A compatible change promises existing consumers keep working. Renaming the `operationId` breaks that promise for every generated client and every stored operation reference. The identifier stays until a new version takes over.
 
 ### Assign versioned operation IDs
 
 **Requirement:** A new API version MUST assign a new operation ID when its operation contract changes.
 
-**Rationale:** A new version can own a contract name without mutating the retained version.
+**Rationale:** The new version needs its own contract names so the retained version keeps its own. A new `operationId` for each changed operation separates the two. Sharing one identifier across versions would let the new contract rename the old one.
 
 ### Version breaking contracts
 
 **Requirement:** An API owner MUST use a new route or documented media-type version for a breaking contract.
 
-**Rationale:** A version boundary lets existing and changed contracts coexist.
+**Rationale:** Breaking changes need a boundary: a new route or a documented media-type version. Both contracts then serve at once, and each consumer moves on its own schedule. Without the boundary, one contract serves two incompatible expectations.
 
 ### Retain supported versions
 
 **Requirement:** An API owner MUST keep the previous version available for its declared support window.
 
-**Rationale:** Independently deployed consumers need the published support interval to adopt a changed contract.
+**Rationale:** A consumer the project does not deploy moves on its own release cadence. The declared support window states how long the previous version stays available for that move. Removing it early strands consumers that kept to the published plan.
 
 ### Record version retirement
 
 **Requirement:** A versioning decision MUST name the owner of each affected consumer, the deadline, and the removal condition, with the decision approved before any removal.
 
-**Rationale:** Named ownership makes a future removal reviewable rather than implicit.
+**Rationale:** A removal touches consumers the project does not control, so the decision names each affected consumer's owner, the deadline, and the removal condition. Approval happens before any removal, while the plan can still change. An unrecorded retirement removes first and notifies whoever complains.
 
 ### Signal planned public removal
 
 **Requirement:** A public operation scheduled for removal MUST expose a documented deprecation signal.
 
-**Rationale:** `Deprecation` and `Sunset` headers are examples of observable deprecation signals.
+**Rationale:** Consumers discover a planned removal only when the API tells them. A documented deprecation signal, such as `Deprecation` and `Sunset` headers, announces the removal on the operation itself. A removal with no signal arrives as an outage to every consumer that missed the release notes.
 
 ### Publish deprecation context
 
 **Requirement:** A public operation scheduled for removal MUST appear in the consumer `CHANGELOG.md`.
 
-**Rationale:** The `CHANGELOG.md` gives consumers one release-note location for planned removal.
+**Rationale:** Headers announce the removal on the operation, but consumers plan from release notes. The consumer `CHANGELOG.md` names each operation scheduled for removal in the one place consumers already read. A deprecation missing from the changelog reaches only the consumers that inspect headers.
 
 ### Record deprecation conditions
 
 **Requirement:** A deprecation decision MUST record the sunset date and replacement operation, with nothing removed while the decision is draft.
 
-**Rationale:** Consumers need a fixed end date and a named supported alternative.
+**Rationale:** A deprecation decision records the sunset date and the replacement operation, so each consumer knows when to move and where to go. Nothing is removed while the decision is still draft. A removal without a recorded replacement strands the consumer that depended on the old operation.
 
 ### Treat errors as contracts
 
 **Requirement:** An API owner MUST treat Problem Details type, code, field-error codes, and documented statuses as versioned contract elements.
 
-**Rationale:** Consumers can branch on error structures as well as successful response structures.
+**Rationale:** Error handling is consumer code: it branches on Problem Details type, code, field-error codes, and documented statuses. Versioning those elements with the contract keeps error handling working across releases. An error shape that changes outside versioning breaks the consumer's failure path, which is the path least tested.
 
 ### Gate new error outcomes
 
 **Requirement:** An API owner MUST add an error outcome only when existing consumers safely handle an unknown code.
 
-**Rationale:** Safe fallback behavior avoids consumer failure on an unseen outcome.
+**Rationale:** A new error outcome reaches consumers written before it existed. Adding it only when existing consumers handle an unknown code safely keeps old clients working against the new contract. An outcome old clients cannot parse turns their error path into a crash.
 
 ### Exercise generated consumers
 
 **Requirement:** An API owner MUST test each first-party generated client against the changed OpenAPI document, with each client compiling and exercising its changed operations.
 
-**Rationale:** Generated clients expose exhaustive handling and schema differences that a structural diff can miss.
+**Rationale:** A structural diff compares documents; it never compiles a client. Testing each first-party generated client against the changed document compiles it and exercises its changed operations. The client's compiler and its exhaustive switches catch the breaks the diff cannot see.
 
 ## Conventions
 
@@ -156,7 +156,7 @@ This extension switches on no optional record type.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** The path gives source generation and contract review one predictable location.
+**Rationale:** Source generation and contract review both need the current OpenAPI artifact. One predictable path keeps generation, review, and the diff reading the same file. A second copy drifts from the first.
 
 ### Keep baseline references immutable
 
@@ -164,7 +164,7 @@ This extension switches on no optional record type.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** Immutable baseline references prevent a diff from comparing against a mutable artifact.
+**Rationale:** A diff proves nothing when its comparison target can move. Baselines beside their contract owner or under an immutable release reference stay fixed. A mutable baseline lets a breaking change hide by moving the target.
 
 ### Use one diff tool
 
@@ -172,7 +172,7 @@ This extension switches on no optional record type.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** One classifier avoids differences between local and continuous integration outcomes.
+**Rationale:** The local run and CI must agree on what breaking means. One diff tool in both places gives one classification for each change. Two tools disagree on edge cases and teach developers to distrust the check.
 
 ### Keep Problem Details codes stable
 
@@ -180,11 +180,11 @@ This extension switches on no optional record type.
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason and review date.
 
-**Rationale:** A stable code supports consumer error handling over time.
+**Rationale:** Consumer error handling branches on these codes for years. Keeping them stable across compatible versions lets that handling survive routine releases. A renamed code forces every consumer to update its failure path for no behavior gain.
 
 ## Dependencies
 
-The extension adds no required package. An introduced OpenAPI diff tool needs a manifest pin.
+This extension adds no required package. A project that introduces an OpenAPI diff tool pins its version in the manifest.
 
 ## Verification
 

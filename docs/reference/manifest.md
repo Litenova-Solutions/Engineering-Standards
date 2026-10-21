@@ -2,11 +2,11 @@
 
 ## Intent
 
-You read `litespec.manifest.json` when you maintain the LiteSpec release itself: it lists the stacks, shapes, extensions, and version pins the release ships. You never edit it in a consumer project; your consumer pins the whole release and records the version you reviewed in `litespec.project.json`. This page lists every field the manifest holds with the real values of the current release, states what each field drives, and states how you add a stack or an extension.
-
-The file lives at the repository root as `litespec.manifest.json`. Its shape is owned by `schemas/litespec-manifest.schema.json`. The [supported scope](../core/scope.md) page states how a consumer selects from the manifest, and the [stacks](../core/stacks.md) page states what a selection applies. The [project file](project-file.md) page states what your consumer records, the [init](../tools/init.md) page states how a new project starts from a preset, the [consumer](../tools/consumer.md) page states how your selection is validated, and the [validate](../tools/validate.md) page states how the manifest itself is checked.
+`litespec.manifest.json` is the inventory of one LiteSpec release (one published version of the standard): the technology stacks, project shapes, extensions, and pinned versions it ships. A LiteSpec maintainer edits it when the release gains a stack or an extension, while a consumer (an application repository built against one pinned release) never edits it and instead pins the whole release and records the version it reviewed. This page lists every field with the current release's real values, states what each field drives, and shows how to add a stack or an extension.
 
 ## Reference
+
+A consumer selects from this manifest: the [supported scope](../core/scope.md) page states how a selection is made, and the [stacks](../core/stacks.md) page states what a selection applies. The [project file](project-file.md) page states what a consumer records, the [init](../tools/init.md) page states how a new project starts from a preset, the [consumer](../tools/consumer.md) page states how a selection is validated, and the [validate](../tools/validate.md) page states how the manifest itself is checked.
 
 ### File location and schema
 
@@ -38,8 +38,8 @@ The current release is `2.0.0`. Each release is a complete contract that states 
 
 What each field means and what reads it:
 
-- `$schema` holds the editor hint that points at the manifest schema. Only your editor reads it.
-- `schemaVersion` is the constant `5`. It names the exact manifest shape this release uses, because a consumer adopting a later release absorbs every difference at that moment.
+- `$schema` holds the editor hint that points at the manifest schema. Only the editor reads it.
+- `schemaVersion` is the constant `5`. It names the exact manifest shape this release uses, so a consumer adopting a later release absorbs every difference at that moment.
 - `version` is the release version, currently `"2.0.0"`. `litespec init` stamps it into a new `litespec.project.json` as `reviewedLiteSpecVersion`, and `litespec consumer` compares the two and fails the run when they differ.
 - `name` is the distribution name, currently `"litespec"`.
 - `agentsEntry` points at the agent entry page, currently `"AGENTS.md"`. The authoring validator checks that the path exists.
@@ -60,12 +60,12 @@ What each field means and what reads it:
 | `svelte` | `docs/frontend/web/svelte` | none | any backend |
 | `blazor` | `docs/frontend/blazor` | none | any backend |
 
-Each entry holds `folder`, which is required, and the optional `requires` and `pairsWith` lists. The folder is the stack folder under `docs/backend/` or `docs/frontend/` and holds a `stack.md` page: the [.NET stack](../backend/dotnet/stack.md), the [React stack](../frontend/web/react/stack.md), the [Svelte stack](../frontend/web/svelte/stack.md), and the [Blazor stack](../frontend/blazor/stack.md). `requires` names the stacks a project also selects with this one, and `pairsWith` names the only backend stacks a frontend stack works beside. Absent `pairsWith` means any backend. This release ships no `requires` and no `pairsWith` values.
+Each entry holds `folder`, which is required, and the optional `requires` and `pairsWith` lists. The folder is the stack folder under `docs/backend/` or `docs/frontend/`, and it holds a `stack.md` page: the [.NET stack](../backend/dotnet/stack.md), the [React stack](../frontend/web/react/stack.md), the [Svelte stack](../frontend/web/svelte/stack.md), and the [Blazor stack](../frontend/blazor/stack.md). `requires` names the stacks a project also selects with this one, and `pairsWith` names the only backend stacks a frontend stack works beside; absent `pairsWith` means any backend. This release ships no `requires` and no `pairsWith` values.
 
 What the field drives:
 
 - Selection: the folder chain decides which pages apply when a consumer names the stack. A selection applies the stack folder, every folder above it up to its area root, and their subfolders that hold no stack. `litespec/core/stacks#apply-the-complete-stack` requires the whole selection.
-- Validation: `litespec consumer` refuses a stack id the manifest does not ship, and the authoring validator reports a stack folder that sits outside `docs/backend/` or `docs/frontend/`, a folder that does not exist, and a folder that holds no `stack.md`.
+- Validation: `litespec consumer` refuses a stack id the manifest does not ship. The authoring validator reports a stack folder that sits outside `docs/backend/` or `docs/frontend/`, a folder that does not exist, and a folder that holds no `stack.md`.
 
 ### Shapes
 
@@ -78,7 +78,7 @@ Each entry holds `backendStacks`, which is required, and the optional `backendPa
 
 What the field drives:
 
-- Selection: the shape decides how many backend stacks your `stacks` list holds and which backend pages apply without one.
+- Selection: the shape decides how many backend stacks the `stacks` list holds and which backend pages apply without one.
 - Init: each preset selects the shape. `dotnet-react` and `dotnet-svelte` select `server`, and `blazor-client` selects `client-only`.
 - Validation: `litespec consumer` refuses a `client-only` project that names a backend stack and a `server` project whose backend count differs from one.
 
@@ -116,7 +116,7 @@ Three extensions replace baseline provisions, and the manifest repeats the list 
 
 What the field drives:
 
-- Selection: naming an extension id in `selectedExtensions` applies its page. `litespec/core/scope#select-conditional-extensions-explicitly` requires you to select every extension whose criteria apply and none whose do not.
+- Selection: naming an extension id in `selectedExtensions` applies its page. `litespec/core/scope#select-conditional-extensions-explicitly` requires selecting every extension whose criteria apply and none whose do not.
 - Validation: `litespec consumer` refuses an id the manifest does not ship, rejects a selection whose stack does not support the extension, and expires review dates and stage deferrals. The authoring validator checks each path, scope, kind list, and replacement id.
 
 ### Version pins
@@ -134,7 +134,7 @@ The `packages` object pins the package versions in two maps, `nuget` and `npm`. 
 
 What the pins drive:
 
-- Resolution: you resolve every SDK, framework, and package version from the manifest. `litespec/core/stacks#use-manifest-version-pins` requires the pins over prose, examples, and agent memory.
+- Resolution: every SDK, framework, and package version resolves from the manifest. `litespec/core/stacks#use-manifest-version-pins` requires the pins over prose, examples, and agent memory.
 - UI validation: `litespec ui` reads the pinned npm packages and the baselines below when it checks the shared package and the stylesheets.
 
 ### UI baselines
@@ -175,7 +175,7 @@ The `registry` block names the component source:
 
 ### How to add a stack
 
-You add a stack in three steps:
+A stack is added in three steps:
 
 1. Add the stack folder under `docs/backend/` or `docs/frontend/` with a `stack.md` page that states what the stack adds: its rules, its version pins, and its checks.
 2. Add the manifest entry with the stack id and its `folder`, plus `requires` when a project also selects another stack with this one and `pairsWith` when a frontend stack works beside only some backend stacks.
@@ -183,7 +183,7 @@ You add a stack in three steps:
 
 ### How to add an extension
 
-You add an extension in three steps:
+An extension is added in three steps:
 
 1. Write the extension page at `docs/ext/<id>.md`, or at `<stack folder>/ext/<id>.md` when it supports one stack only. The page uses the extension style with `Activation`, `Baseline relationship`, and `Dependencies` sections, and the Activation states the scope and the criterion.
 2. Add the manifest entry with the extension id and its `path`, `activationScope`, `applicableKinds` where the extension applies to specific record kinds, `replaces` where it replaces baseline provisions, and `switchesOn` where selecting it requires record types.

@@ -101,8 +101,9 @@ const defaultPresetName =
     <div class="step-head">
       <h2>Tailor it to your project</h2>
       <p>
-        For a repository you keep. Your answers pick one selection index: an <code>llms.txt</code> that lists only the
-        pages your project applies.
+        For a repository you keep working in. Your answers pick a selection index: a Markdown file,
+        <code>llms.txt</code>, that lists only the LiteSpec pages your project applies, so the agent never loads rules
+        for a stack the project does not use.
       </p>
     </div>
     <form id="select-form" class="select-form">
@@ -198,7 +199,10 @@ const defaultPresetName =
   <div class="step-body">
     <div class="step-head">
       <h2>Copy it into your project</h2>
-      <p>Commit this block to your project's <code>AGENTS.md</code>. Every agent session then reads your selection before a task.</p>
+      <p>
+        Paste this block into the <code>AGENTS.md</code> file at the root of your repository and commit it. An agent
+        that reads <code>AGENTS.md</code> at the start of a session then loads your selection index before each task.
+      </p>
     </div>
     <section class="select-output" aria-live="polite" aria-labelledby="select-agents-heading">
       <div class="select-output-head">

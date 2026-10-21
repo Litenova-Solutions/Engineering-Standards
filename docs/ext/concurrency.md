@@ -2,7 +2,7 @@
 
 ## Intent
 
-Concurrency control protects invariants when accepted writes overlap. Idempotency protects an operation from duplicate execution after a retry or uncertain network response.
+Concurrency and idempotency rules stop overlapping writes from silently overwriting each other and stop a retried request from executing twice. This page states how a project documents conflicting writes, coordinates them with versions, and makes retried operations return one result through client keys and fingerprints. A team applies it when overlap or retry can corrupt behavior, so its callers get one predictable outcome instead of a silent overwrite or a duplicated effect.
 
 ## Activation
 
@@ -10,13 +10,13 @@ Activation scope: `local`.
 
 Applicable specification kinds: `module`, `business-record`, `use-case`.
 
-The consumer enables `concurrency` when accepted writes can conflict or retries can duplicate irreversible or externally visible effects.
+The consumer enables `concurrency` when accepted writes can conflict with each other, or when a retry can duplicate an irreversible or externally visible effect.
 
 ## Baseline relationship
 
-This extension replaces no baseline provision. `litespec/ext/concurrency#return-precondition-outcomes` extends `litespec/backend/api#use-consistent-status-codes` with the 428 row for a missing precondition.
+This extension replaces no baseline provision. `litespec/ext/concurrency#return-precondition-outcomes` adds the 428 outcome for a missing precondition to the outcome table that `litespec/backend/api#use-consistent-status-codes` owns.
 
-This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention` records key retention as a Limit record.
+This extension switches on `limit`: key retention is a Limit record under `litespec/ext/concurrency#set-key-retention`.
 
 ## Standards
 
@@ -24,37 +24,37 @@ This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention`
 
 **Requirement:** A conflicting-write use case MUST document conflicting operations, invalid combined result, expected winner behavior, and user-visible conflict response.
 
-**Rationale:** The specification identifies the invariant that version coordination protects.
+**Rationale:** Version coordination exists to protect one invariant. Naming the conflicting operations, the invalid combined result, the expected winner, and the caller-visible response states which invariant that is. An implementation without that document cannot tell a conflict it must reject from contention it must absorb.
 
 ### Limit version checks
 
 **Requirement:** An implementation MUST NOT add version checks without a documented conflicting-write case.
 
-**Rationale:** Unneeded version checks create rejection behavior without a protected business outcome.
+**Rationale:** Each version check adds a rejection path callers must handle. A check without a documented conflicting-write case rejects callers to protect nothing. The document stays the gate: no case, no check.
 
 ### Compare expected aggregate versions
 
 **Requirement:** A conflicting-write implementation MUST store and compare the aggregate version through its selected persistence model.
 
-**Rationale:** The persistence version detects a competing accepted write against the same aggregate state.
+**Rationale:** The aggregate version stored with the state marks which write the caller saw. Comparing the expected version on write detects a competing accepted write against the same state. Storing and comparing it through the selected persistence model keeps the check inside the same transaction as the change.
 
 ### Map failed expected versions
 
 **Requirement:** An HTTP API MUST map a failed expected version to status 409 Problem Details with a stable code.
 
-**Rationale:** A stable response lets callers distinguish a concurrency conflict from validation or authorization failure.
+**Rationale:** A caller that loses a version race must retry: re-read, re-apply, re-send. Status 409 with a stable Problem Details code names the loss as a conflict, distinct from validation and authorization failures. Without the stable code, the caller guesses which failure it met.
 
 ### Reject silent overwrites
 
 **Requirement:** A conflicting-write implementation MUST NOT silently overwrite a conflicting accepted change.
 
-**Rationale:** Silent replacement can violate the invariant named by the use-case specification.
+**Rationale:** A conflicting write that silently replaces the accepted change destroys work another caller committed. The losing caller never learns its change is gone. Rejecting the conflict instead hands the caller the facts it needs to reconcile.
 
 ### Apply HTTP version preconditions
 
 **Requirement:** An HTTP operation requiring a caller version MUST return a strong persistence-derived `ETag` and require `If-Match` on writes.
 
-**Rationale:** HTTP preconditions let a caller send the version that it read.
+**Rationale:** The caller reads the current state with its strong persistence-derived `ETag` and sends it back in `If-Match` on the write. The server compares what the caller saw with what is stored. The round trip carries the version through HTTP headers instead of a second contract field.
 
 **Example:** A current `ETag` permits the write; a changed entity version rejects it.
 
@@ -62,123 +62,121 @@ This extension switches on `limit`. `litespec/ext/concurrency#set-key-retention`
 
 **Requirement:** An HTTP API MUST return 428 `precondition_required` for missing `If-Match` and 409 `version_conflict` for stale versions.
 
-**Rationale:** Distinct outcomes show whether a caller omitted or supplied an obsolete version. This extends the outcome table of `litespec/backend/api#use-consistent-status-codes`.
+**Rationale:** A missing `If-Match` and a stale version are different caller mistakes with different fixes: send the version, or re-read and retry. Status 428 `precondition_required` names the omission and 409 `version_conflict` names the stale version. One code for both would leave the caller guessing which fix applies.
 
 ### Hide provider version values
 
 **Requirement:** An HTTP API MUST NOT expose a provider-specific version value in another contract field.
 
-**Rationale:** The ETag is the contract boundary for persistence-version coordination.
+**Rationale:** The `ETag` is the one contract field that carries the persistence version. A provider-specific version leaked into another field gives callers a second version to depend on. Hiding it keeps the coordination behind one boundary the project can change.
 
 ### Scope client keys
 
 **Requirement:** An idempotent operation MUST scope its client key to the tenant, authenticated actor, and operation.
 
-**Rationale:** Tenant, actor, and operation scope prevents one caller's key from replaying another operation. A project without the tenancy extension uses one fixed tenant value.
+**Rationale:** A client key alone proves nothing about who sent it: two callers can pick the same key. Scoping the key to tenant, authenticated actor, and operation stops one caller's key from replaying another caller's operation. A project without the tenancy extension uses one fixed tenant value.
 
 ### Store idempotency state atomically
 
 **Requirement:** An idempotent operation MUST store its fingerprint, state, response status, response body, and expiry with its business change in one provider transaction.
 
-**Rationale:** One transaction connects the accepted change to the result that later calls replay. It leaves no completed record without its change and no change without its replay record.
+**Rationale:** The fingerprint, state, response status, response body, and expiry describe the accepted change, so they commit with it in one provider transaction. One transaction leaves neither a completed record without its change nor a change without its replay record. A retry then replays exactly what the first attempt accepted.
 
 ### Reject conflicting key reuse
 
 **Requirement:** An idempotent operation MUST reject reuse of one key with a different request fingerprint.
 
-**Rationale:** One client key can represent only one accepted request intent.
+**Rationale:** A key reused with a different request fingerprint names two different intents under one key. Accepting both would replay the first intent's result for the second intent's request. Rejecting the reuse keeps one key bound to one intent.
 
 ### Enforce key uniqueness
 
 **Requirement:** An idempotency store MUST enforce a unique constraint on tenant, actor, operation, and client key.
 
-**Rationale:** The constraint selects one accepted winner when concurrent requests use the same key. A project without the tenancy extension uses one fixed tenant value.
+**Rationale:** Two concurrent requests can arrive with the same key before either commits. The unique constraint on tenant, actor, operation, and client key admits one winner and rejects the other at the store. Application code alone cannot order two requests that arrive together. A project without the tenancy extension uses one fixed tenant value.
 
 ### Canonicalize request fingerprints
 
 **Requirement:** An idempotency implementation MUST derive its fingerprint from canonical mapped command input, route identity, and the authenticated actor identifier, excluding credentials and the client key.
 
-**Rationale:** Equivalent requests produce one comparison value without embedding authentication material.
-
-The actor identifier is in the fingerprint. The credential that proved it is not in the fingerprint. Two actors can present the same client key. A fingerprint without the actor lets one actor's replay return another actor's stored response. A bearer token, a cookie, and a signature are the credential, and each one changes between two requests the rule has to treat as equal.
+**Rationale:** The fingerprint decides whether two requests under one key carry the same intent. Canonical mapped command input, route identity, and the authenticated actor identifier make equivalent requests produce one value. The actor identifier is in the fingerprint because two actors can present the same client key, and a fingerprint without it would replay one actor's stored response to another. The credential that proved the actor stays out: a cookie and a signature each change between two requests the rule treats as equal.
 
 ### Protect fingerprint source data
 
 **Requirement:** An idempotency implementation MUST store a cryptographic hash when support does not require original sensitive request content.
 
-**Rationale:** A hash preserves comparison behavior while reducing retained sensitive data.
+**Rationale:** The fingerprint needs to compare requests, not to show what they contained. A cryptographic hash preserves the comparison while the original sensitive content stays out of the store. Support keeps original content only where it needs the original to help.
 
 ### Replay completed results
 
 **Requirement:** A completed idempotent retry MUST return the original response status and body.
 
-**Rationale:** A retry receives the accepted result rather than repeating its state change.
+**Rationale:** The first attempt performed the state change, and the retry must not perform it again. Returning the original response status and body gives the retry the accepted result. The caller sees one execution no matter how many times the network retried.
 
 ### Define concurrent retry behavior
 
 **Requirement:** An idempotent use case MUST define whether a concurrent request waits, reports in-progress, or returns a stable conflict.
 
-**Rationale:** Callers need one documented result while an identical request is still active.
+**Rationale:** An identical request can arrive while the first is still running. The use case states whether the concurrent request waits, learns the work is in progress, or receives a stable conflict. Without one documented result, each implementation invents its own and callers handle all of them.
 
 ### Reload concurrent winners
 
 **Requirement:** A losing concurrent idempotency request MUST reload and replay the winning record when its fingerprint matches.
 
-**Rationale:** The unique-key winner provides the accepted result for all matching retries.
+**Rationale:** The unique constraint admits one winner among concurrent same-key requests. A losing request whose fingerprint matches reloads the winning record and replays its result. The loser then returns the accepted outcome instead of an error for work that succeeded.
 
 ### Discard failed replay state
 
 **Requirement:** A failed pre-commit idempotent request MUST leave neither the business change nor a completed replay record.
 
-**Rationale:** A later retry can safely perform the uncommitted operation.
+**Rationale:** A request that fails before commit changed nothing, so it must leave neither the business change nor a completed replay record. A leftover completed record would replay success for work that never happened. Clean state lets a later retry perform the operation for the first time.
 
 ### Delay irreversible provider calls
 
 **Requirement:** An idempotent operation MUST NOT perform an irreversible provider call before its business transaction commits.
 
-**Rationale:** An uncommitted operation cannot safely claim an irreversible external effect.
+**Rationale:** A provider call that cannot be undone must follow the commit, never precede it. A call made before commit fires even when the transaction then rolls back. The business change would vanish while its external effect stands.
 
 ### Route required external effects durably
 
 **Requirement:** An idempotent operation MUST use the outbox extension or a documented provider idempotency contract for required external effects.
 
-**Rationale:** Durable routing or provider replay protection aligns external effects with retries.
+**Rationale:** A required external effect must survive retries without duplicating. The outbox extension delivers it durably after commit, or a documented provider idempotency contract lets the provider absorb the replay. An effect with neither path fires once per retry.
 
 ### Set key retention
 
 **Requirement:** An idempotency owner MUST record key retention as a Limit record set from the caller retry window and business risk.
 
-**Rationale:** Retention lasts through the period in which callers can safely retry.
+**Rationale:** A key that expires too early turns a legitimate retry into duplicate business work. Retention therefore spans the caller retry window plus the business risk of a late duplicate. The Limit record states that span where reviewers and operators read it.
 
 ### Bound expired-record cleanup
 
 **Requirement:** An idempotency owner MUST remove expired records through a bounded maintenance process.
 
-**Rationale:** Bounded maintenance prevents cleanup from overwhelming normal application work.
+**Rationale:** Expired keys accumulate without cleanup, and cleanup without bounds steals capacity from live work. A bounded maintenance process removes expired records within fixed limits on rate and batch. The store stays small without starving the application.
 
 ### Retain safe retry keys
 
 **Requirement:** An idempotency owner MUST NOT expire a key before callers can safely retry.
 
-**Rationale:** Early expiration can turn a retry into duplicate business work.
+**Rationale:** Callers retry inside a documented window after an uncertain response. A key expired inside that window is gone when the retry arrives, so the retry executes as new work. Retention must cover the whole window the project promises.
 
 ### Declare replayed transport outcomes
 
 **Requirement:** An idempotent use case MUST list the statuses and headers stored for replay.
 
-**Rationale:** The list defines the transport result that a completed retry can reproduce.
+**Rationale:** A completed retry reproduces the stored statuses and headers instead of the live ones. The declared list states which statuses and headers the store holds. A reviewer reads the list to learn exactly what a retry can return.
 
 ### Restrict replay data
 
 **Requirement:** An idempotent implementation MUST store only safe response fields required to reproduce an accepted result.
 
-**Rationale:** Replay data needs enough information for callers without retaining unnecessary sensitive content.
+**Rationale:** The store holds what a retry needs to reproduce the accepted result and nothing more. Each extra field widens the sensitive data held under the key's retention. A field that serves no replay need stays out.
 
 ### Exclude unsafe replay outcomes
 
 **Requirement:** An idempotent implementation MUST NOT replay authentication failures, transient server failures, `Set-Cookie`, `Cache-Control`, `Vary`, `Expires`, `Age`, hop-by-hop headers, tokens, or secrets.
 
-**Rationale:** These values are unsafe, transient, or unrelated to the accepted operation result. The caching headers are computed for the response that produced them. Replaying them hands a later caller freshness instructions from an earlier moment. [RFC 9111](https://datatracker.ietf.org/doc/html/rfc9111) makes each one a property of the exchange rather than of the result. The replayed response computes its own.
+**Rationale:** Authentication failures and transient server failures describe one exchange rather than the accepted result, so replaying them answers a new request with an old failure. Tokens, secrets, cookies, and hop-by-hop headers must never cross from one caller's exchange into another's. The caching headers are computed for the response that produced them: replaying them hands a later caller freshness instructions from an earlier moment. [RFC 9111](https://datatracker.ietf.org/doc/html/rfc9111) makes each one a property of the exchange rather than of the result, so the replayed response computes its own.
 
 ## Conventions
 
@@ -188,7 +186,7 @@ The actor identifier is in the fingerprint. The credential that proved it is not
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Rationale:** The standard header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque. A server then stores whatever a client sends as a key. A bound stops an unbounded key from becoming an unbounded store entry. A character set stops a key from carrying a control character into a log line.
+**Rationale:** The `Idempotency-Key` header makes client-key behavior recognizable at the HTTP boundary. [The IETF draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/) leaves the value opaque, so a server stores whatever a client sends. The 255-character visible-ASCII bound stops an unbounded key from becoming an unbounded store entry and keeps control characters out of log lines.
 
 ### Keep idempotency persistence in Infrastructure
 
@@ -196,7 +194,7 @@ The actor identifier is in the fingerprint. The credential that proved it is not
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Rationale:** Provider transactions and constraints belong outside Application and Domain.
+**Rationale:** Idempotency state lives in provider transactions guarded by store constraints. That machinery belongs in Infrastructure, where provider details live. Application and Domain stay free of the store mechanics behind their operations.
 
 ### Map replay responses at the API boundary
 
@@ -204,7 +202,7 @@ The actor identifier is in the fingerprint. The credential that proved it is not
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Rationale:** HTTP statuses and headers are transport concerns.
+**Rationale:** Replaying a stored result means rebuilding its statuses and headers. Those are transport concerns, so the mapping lives at the API boundary. Application code then deals in operation results, never in wire shapes.
 
 ### Declare applicable headers
 
@@ -212,11 +210,11 @@ The actor identifier is in the fingerprint. The credential that proved it is not
 
 **Replacement:** A consumer records a departure from this default as an Exception record with reason, review date, and removal condition.
 
-**Rationale:** Generated API contracts expose the requirement through `litespec/backend/api#publish-precise-complete-schemas`.
+**Rationale:** Each HTTP operation that accepts a client key declares the header as required. Generated API contracts then expose the requirement to every client author under `litespec/backend/api#publish-precise-complete-schemas`. An undeclared header reaches only the callers who read the implementation.
 
 ## Dependencies
 
-The baseline implementation requires no additional package.
+This extension adds no required package.
 
 ## Verification
 

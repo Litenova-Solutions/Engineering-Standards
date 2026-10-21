@@ -202,6 +202,10 @@ details[open] > .sec-h .chev {
   color: var(--rail);
 }
 
+.crumb > span.crumb-text {
+  color: var(--muted-fg);
+}
+
 .crumb .icon {
   color: var(--accent-text);
 }
@@ -229,9 +233,20 @@ details[open] > .sec-h .chev {
   margin: var(--space-3) 0 var(--space-2);
 }
 
-.content .lead {
-  color: var(--muted-fg);
-  font-size: 16px;
+/* The page introduction: the Intent or Purpose section, shown under the title. */
+/* Body size in the secondary text color: the intro gives context, and the title
+   above it carries the weight. */
+.content .page-intro {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-2);
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--fg-2);
+}
+
+.content .page-intro > :last-child {
+  margin-bottom: 0;
 }
 
 .content .tools {

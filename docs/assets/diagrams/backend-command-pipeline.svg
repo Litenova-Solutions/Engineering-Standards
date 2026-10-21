@@ -40,7 +40,7 @@
     <text x="360" y="535">Commit post-handler</text>
   </g>
   <g style="fill: var(--muted-fg, #77706a)" font-size="12">
-    <text x="525" y="45">borrow request</text>
+    <text x="525" y="45">submit request</text>
     <text x="525" y="115">maps to command</text>
     <text x="525" y="185">dispatches message</text>
     <text x="525" y="255">structural checks</text>

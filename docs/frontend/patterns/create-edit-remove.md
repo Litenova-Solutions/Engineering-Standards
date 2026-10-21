@@ -2,7 +2,17 @@
 
 ## Intent
 
-These patterns answer how a reader creates a record, changes one that exists, removes one or several, and changes something that has already happened. Each pattern offers drawn options and names a default.
+Staff create records such as orders, deliveries, and products, change them, and remove one or several, including the special cases: draft-first creation, corrections to the past, duplicates, hand ordering, restoring archived work, invitations, publishing, and scheduled changes. This page shows the layout for each task as drawn options with a named default to build. The product owner chooses among the options when the team builds or revises a working screen. One decided shape per task keeps destructive and far-reaching commands predictable, so staff know what a command will do before they commit.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about working with records, such as how many inputs keep a create in a dialog. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply back office: deliveries such as Garcia Interiors restock, orders such as SO-1042 for Maria Garcia, and products such as the Oak desk lamp at EUR 45.00. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: every removal offers undo or asks for confirmation, and a successful create shows the created record.
 
 ## Standards
 
@@ -10,25 +20,25 @@ These patterns answer how a reader creates a record, changes one that exists, re
 
 **Requirement:** Every removal MUST either offer undo or ask for confirmation before it runs.
 
-**Rationale:** A removal is the command a reader regrets most often. Undo suits a reversible removal, and a confirmation suits one that cannot be taken back.
+**Rationale:** Staff remove the wrong record by misreading a row or misclicking, and without a way back the record is gone. An undo toast restores a reversible removal in one click, while a confirmation dialog makes an irreversible removal a deliberate choice. Either way the reader gets a moment to catch the mistake before it becomes permanent.
 
 ### Show the created record
 
 **Requirement:** A successful create MUST take the reader to the created record or show it in place.
 
-**Rationale:** The reader confirms at once that the record exists with the values they entered. A create that ends on an empty form leaves the reader unsure whether it worked.
+**Rationale:** After creating, the reader needs proof that the record exists with the values entered, and the created record itself is that proof. A create that ends on an empty form or a bare toast leaves the reader unsure whether it worked, so they create it again and produce a duplicate.
 
 ## Patterns
 
 ### Creating one record
 
-**Question:** A create stays a dialog or a page, never a drawer. One to four inputs is a dialog. More than four is a page. The open question is what a create shows before the reader enters anything.
+**Question:** Staff create records such as deliveries, refunds, and products. A create with one to four inputs fits a dialog, and a longer one needs a page; a drawer never holds a create. The decision is which shape each create takes: dialog, page, template, copy, inline row, file import, steps, or a shortcut from elsewhere.
 
 **Default:** `a-dialog-for-two-or-three-inputs`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** The dialog stays the pick for one to four inputs: it keeps the list behind it and commits with one verb. The full page is the runner-up and the right one past four inputs or with sections. The inline table row is the one to refuse, because a form inside a table breaks the layout rules and hides validation. Of the further options, the split button earns its place on the deliveries list, where three starting points already exist.
+**Rationale:** The dialog stays the pick for one to four inputs: it keeps the list behind it and commits with one verb. The full page is the runner-up and the right one past four inputs or with sections. The inline table row is the one to refuse, because a form inside a table breaks the table structure and hides validation. Of the further options, the split button earns its place on the deliveries list, where three starting points already exist.
 
 #### `a-dialog-for-two-or-three-inputs`: A dialog for two or three inputs
 
@@ -97,9 +107,9 @@ page
     action primary "Create delivery"
 ```
 
-**Rationale:** One shape offers 'A blank delivery' or 'A template' at the top of the form. Choosing first means the form below already knows what it is for.
+**Rationale:** One shape offers 'A blank delivery' or 'A template' at the top of the form. Choosing first means the fields below load with the template's customer, warehouse, and plan already filled.
 
-**Cost:** A control inside a form that is not part of the form. Once a template is chosen the toggle is meaningless but stays visible, because nothing knows the create is already under way.
+**Cost:** The starter control sits inside the form but is not part of it. Once a template is chosen the control stays visible with no further use, because the form cannot remove a control mid-create.
 
 #### `create-from-a-copy-of-an-existing-record`: Create from a copy of an existing record
 
@@ -146,7 +156,7 @@ page
 
 **Rationale:** The table grows a form row at the top. Nothing opens, nothing closes, and the reader sees what they are adding in the context of what is already there.
 
-**Cost:** Carbon says a modal is for tasks that are not repeated, and this is the most repeated create in the back office. It also puts a form inside a table, which the layout rules do not cover.
+**Cost:** Carbon says a modal is for tasks that are not repeated, and this is the most repeated create in the back office. It also puts a form inside a table, where tables hold rows and no rule covers embedded forms.
 
 #### `create-many-at-once-from-a-file`: Create many at once from a file
 
@@ -166,7 +176,7 @@ page
     action primary "Check the file"
 ```
 
-**Rationale:** A bulk create: a file, a check of what it made, and a report. This is the shape for a season of products or a list of customers, where one dialog per record would be absurd.
+**Rationale:** A bulk create runs in three steps: the file, a check of what it made, and a report. This is the shape for a season of products or a list of customers, where one dialog per record would take all day.
 
 **Cost:** An import writes across many records at once. A partial failure has to be reportable and undoable while nothing is charged.
 
@@ -246,7 +256,7 @@ page
 
 ### Changing a record that already exists
 
-**Question:** A record page with two sections can carry one Save per section. A reader who edits the first and saves the second believes they saved both.
+**Question:** Staff change records that already exist, from renaming a delivery to raising a stock target. The decision is how the edit commits: one save per page, one per section, inline in the list, in a dialog or side panel, with impact stated first, blocked with a way out, or saved automatically. The hazard to avoid is the reader who edits one section and saves another, believing both are saved.
 
 **Default:** `one-save-per-page`
 
@@ -274,7 +284,7 @@ page
 
 **Rationale:** The whole page is one form and one Save. A reader who has changed three things saves once, and nothing on the page disagrees about what is pending.
 
-**Cost:** A partial failure loses the lot, and a reader who wants to save the name and leave the dates cannot. The page has to say what changed while it is dirty.
+**Cost:** A partial failure loses every change on the page, and a reader who wants to save the name but leave the dates cannot. The page has to list what changed while edits are unsaved.
 
 #### `one-save-per-section-and-each-says-what-it-saves`: One Save per section, and each says what it saves
 
@@ -296,7 +306,7 @@ page
 
 **Rationale:** Each section's button repeats its own verb: Save the name, Save the labeling. Nothing is ambiguous about what each button commits.
 
-**Cost:** It still makes two commits on one screen. It works only because each button names what it commits, which is two things a reader can forget to do.
+**Cost:** It still makes two commits on one screen, so the reader must remember to press both buttons. It works only because each button names what it commits.
 
 #### `editing-in-place-in-the-list-row`: Editing in place in the list row
 
@@ -341,7 +351,7 @@ page
 
 **Rationale:** Where a change breaks something, the page says what before the reader commits: who is affected, what stops working, and what cannot be changed back.
 
-**Cost:** It needs a read that answers the hypothetical, which is not a command and not the record as it stands.
+**Cost:** It needs a read that answers a hypothetical, what would change, which is neither the record as it stands nor a command result.
 
 #### `editing-in-a-dialog-for-two-fields`: Editing in a dialog, for two fields
 
@@ -385,7 +395,7 @@ page
 
 **Rationale:** This is a change that the record's own state forbids. The field is read-only, the reason is stated on the field, and the command that would unblock it is named.
 
-**Cost:** The reader has to leave to unblock and come back, and whatever they typed is only kept if the page holds it. Read-only plus a link is the compromise.
+**Cost:** The reader must leave to unblock and come back, and typed input survives only if the page holds it. Showing the field read-only with a link to the unblocking command is the middle ground.
 
 #### `autosave-with-the-saved-state-always-visible`: Autosave, with the saved state always visible
 
@@ -437,7 +447,7 @@ page
 
 ### Removing something
 
-**Question:** Prefer archive over delete. Shopify treats product deletion as irreversible and suggests archiving instead. Google Drive empties its trash after 30 days. GitHub keeps a deleted repository recoverable for 90 days. No cited system publishes a pattern for removal blocked by dependent records.
+**Question:** Staff remove records that should no longer be active. The decision is which kind of removal each record gets: archive, delete, blocked removal with the blocker named, reversal for money, void for codes, suspend for running services, a thirty-day trash, or an undo toast. Archive is preferred over delete because it is reversible and keeps the audit trail.
 
 **Default:** `archive-with-what-archiving-means`
 
@@ -493,7 +503,7 @@ page
     action destructive "Delete the record"
 ```
 
-**Rationale:** Some records must go rather than be hidden. The dialog says the record is gone for good, and it names what is kept because a record of the decision outlives the record.
+**Rationale:** Some records must go rather than be hidden. The dialog says the record is gone for good, and it names what is kept, because the dispatch log still holds the decision and the time.
 
 **Cost:** Everything the company holds has to stay reconstructable for an audit, which means 'delete' removes the operational record and keeps the evidence. Two different things under one verb.
 
@@ -637,7 +647,7 @@ page
 
 ### Removing several at once
 
-**Question:** A bulk removal turns a confirmation into a safety net. The count itself is the risk. The reader checks how many records and how much money before committing.
+**Question:** Staff remove or refund several records at once. The count itself is the risk, so the reader checks how many records and how much money are involved before committing. The decision is how the confirmation carries that check for small and large selections.
 
 **Default:** `a-dialog-naming-the-count-and-the-money`
 
@@ -667,7 +677,7 @@ page
 
 **Rationale:** A bulk refund confirmation, which lists the records and totals the money before the commit button. The count and the amount are the two things a reader must check.
 
-**Cost:** Twenty-five rows in a dialog is a scroll inside a dialog. Past about five, the total carries the meaning and the list is a detail the reader cannot afford to read.
+**Cost:** Twenty-five rows in a dialog mean scrolling inside a dialog. Past about five rows the total carries the meaning, and few readers check each line.
 
 #### `a-dialog-that-names-the-scope-it-is-about-to-use`: A dialog that names the scope it is about to use
 
@@ -717,7 +727,7 @@ page
       item: text "Okafor Office restock" · text muted "9 Oct 2026, completed" · action "Open"
 ```
 
-**Rationale:** Archive is cheap and reversible, so a bulk archive needs only a count. The dialog appears once per record type rather than once per selection.
+**Rationale:** Archive is cheap and reversible, so a bulk archive needs only a count in the selection bar, not a dialog listing every record.
 
 **Cost:** Archiving 200 deliveries hides 200 deliveries, and the reader has no way back except an Archived view. The safety net is the view, not the dialog.
 
@@ -842,7 +852,7 @@ page
 
 ### Creating a record and then filling it in
 
-**Question:** One answer is a setup section on the home page and a getting-started page. The alternative is to require everything at creation.
+**Question:** A new record such as a delivery needs a name, a date, a warehouse, a priced product, and a channel before it can sell, but staff may not know all five at once. The decision is how much a create requires up front and how the record gets finished: name-only draft, everything required, series defaults, checklist, wizard, nothing until publish, home-page guide, or point-of-use nudges.
 
 **Default:** `create-with-a-name-fill-the-rest-later`
 
@@ -871,7 +881,7 @@ page
 
 **Rationale:** The name is the only required field, and the record exists as a draft. Every later addition is its own audited and reconstructable command.
 
-**Cost:** A draft delivery is nearly useless on its own. If nothing prompts the reader to finish it, it sits unfinished on a list. The setup section is the counterweight.
+**Cost:** A draft delivery is nearly useless on its own. If nothing prompts the reader to finish it, it sits unfinished on a list. The home-page setup guide is what prompts the reader to finish it.
 
 #### `everything-required-before-the-record-exists`: Everything required before the record exists
 
@@ -1046,13 +1056,13 @@ page
 
 ### Changing something that has already happened
 
-**Question:** A record of what is true now cannot always be edited. A charge already priced must stay reconstructable, which makes several edits structurally different rather than merely harder.
+**Question:** A record of what is true now cannot always be edited: a charge already priced must stay reconstructable for invoices and audits. The decision is which shape each after-the-fact change takes: old value kept beside the new, refusal with the newer way named, dated correction, scheduled window, scoped change, reversal, version history, or two-person approval.
 
 **Default:** `the-old-value-stays-on-the-record-beside-the-new`
 
 **Compact:** The recommended option reflows: one column, header actions under the title, and a table scrolls inside its own region.
 
-**Rationale:** Keeping the old value beside the new stays the pick. An order placed last month still resolves to the delivery it was placed for. The dated correction is the runner-up where a fact was entered wrong, and the reversal is the only shape for money. Never ship a silent overwrite of anything priced or shipped. Where no honest edit exists, the refusal with the newer way named is the option. The version history earns its place for names and text, with two-person approval for corrections to money.
+**Rationale:** Keeping the old value beside the new stays the pick. An order placed last month still resolves to the delivery it was placed for. The dated correction is the runner-up where a fact was entered wrong, and the reversal is the only shape for money. Never ship a silent overwrite of anything priced or shipped. Where no safe edit exists, the refusal with the newer way named is the option. The version history earns its place for names and text, with two-person approval for corrections to money.
 
 #### `the-old-value-stays-on-the-record-beside-the-new`: The old value stays on the record beside the new
 
@@ -1093,7 +1103,7 @@ page
 
 **Rationale:** Some edits cannot happen at all after the fact. The command is not disabled silently: it says what cannot change, and names the command that achieves what the reader was trying to do.
 
-**Cost:** A reader who wants a price change on a sold unit is told no and given a different thing. That is the honest answer, but it is also the most likely source of support cases.
+**Cost:** A reader who wants a price change on a sold unit is told no and offered the replacement command instead. That is the correct answer, but refusals still generate support cases.
 
 #### `a-correction-dated-and-attributed`: A correction, dated and attributed
 
@@ -1545,7 +1555,7 @@ page
 
 ### Restoring an archived record
 
-**Question:** Archive is only honest if restore works. A restore returns the record to where it was, with its history, and says so when something changed while it was away.
+**Question:** Archive is only safe if restore works. A restore returns the record to where it was, with its history, and says so when something changed while it was away, such as a name taken since.
 
 **Default:** `restore-from-the-archived-view`
 
@@ -1699,7 +1709,7 @@ page
     action primary "Restore both"
 ```
 
-**Rationale:** The way Google Drive restores a selection: the count is the confirmation, and every record returns to where it was. Archiving a whole season by mistake is fixed in the same gesture it was made with.
+**Rationale:** The way Google Drive restores a selection: the count is the confirmation, and every record returns to where it was. Archiving a whole season by mistake is fixed by selecting the same records and restoring them together.
 
 **Cost:** A bulk restore can return records to states the reader forgot, including one that clashes. The report afterwards must name each record and where it landed.
 
@@ -1904,7 +1914,7 @@ page
 
 **Rationale:** The way Webflow publishes: the dialog lists what is ready and the button commits only when all of it is. Publishing is the one create the reader cannot undo quietly, so the check is the dialog.
 
-**Cost:** A check that reads five systems can disagree with the page behind it by the time the button lands. The publish command must recheck and refuse with the missing piece named.
+**Cost:** A check that reads five systems can disagree with the page behind it by the time the reader presses the button. The publish command must recheck and refuse with the missing piece named.
 
 **Reference:** Webflow
 
@@ -1956,7 +1966,7 @@ page
 
 **Rationale:** The way WordPress schedules a post: the date is set on the draft and the publish happens without anyone present. A sale starting at 10:00 on a Tuesday should not need Sam Rivera at the desk at 10:00.
 
-**Cost:** A scheduled publish can land on a draft that changed since: the price moved, and the stock moved. The scheduler must recheck at the hour and hold the publish with the reason named.
+**Cost:** A scheduled publish can fire after the draft changed: the price moved, or the stock moved. The scheduler must recheck at the hour and hold the publish with the reason named.
 
 **Reference:** WordPress
 
@@ -2029,7 +2039,7 @@ page
 
 ### Scheduling a change for later
 
-**Question:** Prices, fees, and sale windows change on dates, not through selection. A scheduled change names the value, the date, and the way to stop it. The record shows both values until the date arrives.
+**Question:** Prices, fees, and sale windows change on fixed dates. A scheduled change names the value, the date, and the way to stop it, and the record shows both the current and the coming value until the date arrives.
 
 **Default:** `a-change-with-a-date-listed-with-the-record`
 

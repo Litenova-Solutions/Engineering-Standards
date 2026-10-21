@@ -2,15 +2,13 @@
 
 ## Intent
 
-This page states the external obligations that the [audit extension](../ext/audit.md) satisfies. It is informative. The extension page owns every provision.
-
-`litespec/ext/audit#record-the-audit-adoption-decision` requires an adoption decision. `litespec/ext/audit#cover-the-required-audit-categories` requires a stated selection of audited categories. Both ask a project to say why it audits what it audits. This page is the source those answers draw on, so a project records a decision rather than a survey.
+The audit extension is the LiteSpec bundle a project selects to record who attempted what against which target and what it produced; it satisfies obligations from 4 guidance bodies (NIST, ISO, PCI DSS, and OWASP) and from the General Data Protection Regulation (GDPR). This page states those obligations in one place: the frameworks, the GDPR articles, and the map from each obligation to the provision (one identified rule) that satisfies it. A team writing its audit adoption decision (the record of what it audits and why) reads it to state that reasoning without surveying the frameworks from scratch. The [Audit Trail](../ext/audit.md) owns every provision; this page explains and states no rules.
 
 ## Reference
 
 ### The frameworks
 
-Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ. An implementation built to their union satisfies each one without a separate program.
+Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ, so an implementation built to their union satisfies each one without a separate program per framework.
 
 #### NIST SP 800-53, AU family
 
@@ -25,7 +23,7 @@ The AU controls split auditing into six questions. They are the most complete pu
 | AU-11 | Retain records for a defined period. |
 | AU-12 | Generate records across every component in scope. |
 
-AU-3 is the field list that the other frameworks restate. AU-2 is the control most projects skip, because an implicit selection needs no document.
+AU-3 is the field list that the other frameworks restate. AU-2 is the control most projects skip, because a selection nobody writes down produces no document to check.
 
 #### ISO/IEC 27001:2022, Annex A 8.15
 
@@ -33,11 +31,11 @@ Control A.8.15 requires logs of user activities, exceptions, faults, and securit
 
 #### PCI DSS 4.0, Requirement 10
 
-Requirement 10.2.2 names the fields for each event. They are user identification, event type, date and time, success or failure indication, origination, and affected resource identity.
+Requirement 10.2.2 names the fields for each event: user identification, event type, date and time, success or failure indication, origination, and affected resource identity.
 
-Requirement 10.2.1 names the events. It includes individual access to cardholder data, actions by administrative accounts, access to the audit records, invalid logical access attempts, and changes to authentication credentials.
+Requirement 10.2.1 names the events: individual access to cardholder data, actions by administrative accounts, access to the audit records, invalid logical access attempts, and changes to authentication credentials.
 
-The success-or-failure field and the invalid-attempt event are the two obligations that a success-only trail fails.
+A trail that records successes only fails exactly two obligations: the success-or-failure field and the invalid-attempt event.
 
 #### OWASP Logging Cheat Sheet
 
@@ -47,7 +45,7 @@ It also states the exclusions. Never record passwords, session identifiers, acce
 
 ### GDPR
 
-The General Data Protection Regulation pulls in two directions at once. Reading it as only a constraint produces a thin trail. Reading it as only a mandate produces an erasure problem.
+The General Data Protection Regulation both requires the trail and constrains what it holds. Reading it as only a constraint produces a thin trail, and reading it as only a mandate produces an erasure problem.
 
 | Article | Effect on the trail |
 |:---|:---|
@@ -57,15 +55,15 @@ The General Data Protection Regulation pulls in two directions at once. Reading 
 | Article 17 | Erasure applies to the personal data a record holds. |
 | Article 15 | Subject access can reach audit records naming that person. |
 
-The resolution is the record shape. A trail retained on a legal-obligation or legitimate-interest basis stays lawful, and a supervisory authority accepts it. A trail that copies names, addresses, message bodies, or state snapshots into an append-only store conflicts with Article 17. No retention policy resolves that conflict.
+The resolution is the record shape. A trail retained on a legal-obligation or legitimate-interest basis stays lawful, and a supervisory authority accepts it. A trail that copies names, addresses, message bodies, or state snapshots into an append-only store conflicts with Article 17, and no retention policy resolves that conflict.
 
 `litespec/ext/audit#exclude-personal-data-beyond-actor-identity` and `litespec/ext/audit#exclude-state-snapshots` prevent that conflict at design time. `litespec/ext/audit#remove-the-identity-mapping-on-erasure` then satisfies an erasure request by removing the mapping from actor identifier to person. The record keeps its evidential value and the person stops being identifiable from it.
 
-Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because it is itself a processing activity.
+Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because the trail is itself a processing activity.
 
 ### Schema alignment
 
-The record shape follows a model that three sources describe in the same terms. An initiator performs an action on a target and produces an outcome at a time and from a place.
+The record shape follows a model that three sources describe in the same terms: an initiator performs an action on a target and produces an outcome at a time and from a place.
 
 | Source | Contribution |
 |:---|:---|
@@ -73,7 +71,7 @@ The record shape follows a model that three sources describe in the same terms. 
 | NIST AU-3 | The required content of one record. |
 | OCSF | Vendor-neutral schema for shipping records to a security platform. |
 
-Building to that model costs nothing at design time. It lets a project map the trail onto a security platform later without remodeling the store.
+Following that model at design time needs no extra work. It lets a project map the trail onto a security platform later without remodeling the store.
 
 ### Obligation to provision map
 

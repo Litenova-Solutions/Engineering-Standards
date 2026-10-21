@@ -2,19 +2,19 @@
 
 ## Intent
 
-This page states how the TypeScript web stacks realize the frontend rendering rules ([Frontend rendering](../rendering.md)). It states the loaders, queries, router files, and tooling the React and Svelte stacks share. Each realization cites the neutral rule it follows.
+A route in a TypeScript web frontend prefetches its reads in a loader, declares its search parameters in a schema, and reads through the query cache. This page states how the [React Stack](react/stack.md) and [Svelte Stack](svelte/stack.md) follow the rendering rules in [Frontend Rendering and Routes](../rendering.md): loaders, suspense reads, validated search, chunk splitting, intent preloading, metadata, caching, proxies, and the per-request server cache. A team that applies it while writing routes keeps every navigation fast, shareable, and free of stale or cross-actor data.
 
 Rules with no neutral counterpart bind the web stacks alone.
 
 ## React
 
-React routes are files using the router's file convention. Each route declares its search parameters in `validateSearch` and prefetches its reads in its loader. Components read route data with `useSuspenseQuery` over the key the loader filled. A shell is a pathless layout route whose file name starts with an underscore. Server-only code lives in a file whose name and import show the server ownership. The router builds the route tree. Intent preloading fills the query cache.
+React routes are files using the router's file convention, and the router builds the typed route tree from them. Each route declares its search parameters in `validateSearch` and prefetches its reads in its loader. Components read route data with `useSuspenseQuery` over the key the loader filled, and intent preloading fills the query cache before navigation. A shell is a pathless layout route whose file name starts with an underscore. Server-only code lives in a file whose name and import show the server ownership.
 
 ## Svelte
 
-Svelte routes are folders under `src/routes`, each holding a page. Each page declares its parameters in a schema and prefetches its reads in its load. Pages read route data with a query creator over the key the load filled. A shell is a layout file holding the frame every child page shares. Server-only code lives in a server file or under the server library.
+Svelte routes are folders under `src/routes`, each holding a page, and the toolkit generates the route types from them. Each page declares its parameters in a schema and prefetches its reads in its load. Pages read route data with a query creator over the key the load filled, and intent preloading fills the query cache before navigation. A shell is a layout file holding the frame every child page shares. Server-only code lives in a server file or under the server library.
 
-SvelteKit splits each route folder. Intent preloading fills the query cache. A page is a route file, a load is a loader, and a query creator is a suspense query.
+In Svelte terms: a page is a route file, a load is a loader, and a query creator is a suspense query.
 
 ## Standards
 
@@ -22,7 +22,7 @@ SvelteKit splits each route folder. Intent preloading fills the query cache. A p
 
 **Requirement:** A route's loader MUST prefetch each read it needs through the query cache before the component runs.
 
-**Rationale:** The page then renders with its data rather than showing a spinner after it has already appeared. The cache owns freshness. The router never holds a second copy. This realizes litespec/frontend/rendering#load-route-data-before-rendering.
+**Rationale:** A loader that prefetches each read through the query cache lets the page render with its data instead of appearing first and spinning after. The cache owns freshness, so the router holds no second copy that could disagree with it. This realizes litespec/frontend/rendering#load-route-data-before-rendering.
 
 **Example:** An entity route prefetches its record and every read the record's own sections need.
 
@@ -55,7 +55,7 @@ export async function load({ parent, params }) {
 
 **Requirement:** A component MUST read route data with a suspense query over the same cache key its loader filled.
 
-**Rationale:** A read naming another key issues a second request. The two answers can disagree. A failed read reaches the route's error boundary, which draws the shared problem state. This realizes litespec/frontend/rendering#read-route-data-from-the-route-cache.
+**Rationale:** The loader filled one cache key, and the component reads that same key. A read naming another key issues a second request, and the two answers can disagree. A failed read reaches the route's error boundary, which draws the shared problem state instead of a half-rendered page. This realizes litespec/frontend/rendering#read-route-data-from-the-route-cache.
 
 **Example:**
 
@@ -75,7 +75,7 @@ const order = createQuery(() => orderQuery(orderId));
 
 **Requirement:** A route MUST declare its search parameters in a validated schema, including its filters and its page.
 
-**Rationale:** A filtered list is then a link somebody can share, bookmark, and reopen. A filter in component state reaches nobody. It is lost on the first navigation away. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
+**Rationale:** A filter declared in a schema makes the filtered list a link: shareable, bookmarkable, reopenable. The same filter in component state reaches nobody and is lost on the first navigation away. Validation keeps a hand-edited address from reaching the page as values the page cannot interpret. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
 
 **Example:** The list schema declares its own text field and spreads the shared paging fields.
 
@@ -93,7 +93,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** A frontend MUST load each route and each language as its own chunk, with no icon set or language imported whole.
 
-**Rationale:** A signed-in user opens one address and reads one language. A reader in Dutch who never leaves the dashboard should not download English. This realizes litespec/frontend/rendering#load-each-route-and-each-language-separately.
+**Rationale:** A signed-in user opens one address and reads one language, so the download should match: one chunk per route and one per language, with no icon set or language imported whole. Anything more makes a reader wait for code and words they will never see, like a Dutch reader downloading English for a dashboard they never leave. This realizes litespec/frontend/rendering#load-each-route-and-each-language-separately.
 
 **Example:** `loadDictionary` returns a dynamic import of one language. The React router plugin splits each route file, and SvelteKit splits each route folder.
 
@@ -101,13 +101,13 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** A frontend MUST prefetch the route a pointer is over, and never treat that prefetch as a cache beyond the query cache.
 
-**Rationale:** Most navigations then render from the cache the loaders already filled. A router caching a second time serves a stale answer beside a fresh one. This realizes litespec/frontend/rendering#prefetch-a-route-on-intent.
+**Rationale:** Prefetching the route a pointer is over fills the query cache before the click, so most navigations render from data already held. The prefetch must never act as a second cache beyond the query cache: two caches serve a stale answer beside a fresh one with no error anywhere. This realizes litespec/frontend/rendering#prefetch-a-route-on-intent.
 
 ### Define route metadata deliberately
 
 **Requirement:** A public route MUST define its title, its description, its canonical address, and its indexing policy, while a private route refuses indexing.
 
-**Rationale:** The metadata is what a search result and a shared link show. An indexed console exposes an address a signed-in user believes is private.
+**Rationale:** A public route's title, description, canonical address, and indexing policy are what a search result and a shared link show; without them the page arrives as a bare address. A private route refuses indexing, because an indexed console address exposes to search what a signed-in user believes is private.
 
 **Example:** A channel route states `og:*` tags and one alternate per language. A console route ships a `noindex` meta tag in its document.
 
@@ -115,13 +115,13 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
 
-**Rationale:** Shared route or loader behavior otherwise serves one actor's data to another. An uncached read is the safe default. A cache partitioned per request is the safe server shape. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
+**Rationale:** A cache that outlives its actor serves one reader's data to another, so actor-specific data stays uncached until its cache key, partition, invalidation owner, and security review are declared beside the query definition that sets the key. A cache partitioned per request is the safe server shape, and an uncached read is the safe default. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
 
 ### Keep proxy behavior at the edge
 
 **Requirement:** A development or edge proxy rule MUST route only, and never decide who the actor is or what the actor may read.
 
-**Rationale:** The proxy runs before the request reaches the API. It cannot see the resource authorization depends on. Forwarding the API's own paths gives the browser one origin. That makes an HTTP-only session cookie a first-party cookie of the page. This realizes litespec/frontend/rendering#keep-proxy-behavior-at-the-edge.
+**Rationale:** A development or edge proxy runs before the request reaches the API, so it cannot see the resource authorization depends on; any identity or permission decision it made would rest on missing facts. It routes only. Forwarding the API's own paths gives the browser one origin, which makes an HTTP-only session cookie a first-party cookie of the page. This realizes litespec/frontend/rendering#keep-proxy-behavior-at-the-edge.
 
 **Example:** A development proxy forwards `/api` and `/auth` to the API and changes nothing else.
 
@@ -129,7 +129,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Requirement:** A server-rendered frontend MUST construct its query cache inside each request.
 
-**Rationale:** Two readers served at the same time must not read each other's data. A cache outliving one request would serve the next reader the previous reader's answer. This realizes litespec/frontend/rendering#build-the-server-data-cache-per-request.
+**Rationale:** A server renders for many readers at once. A query cache built inside each request dies with its reader, so no reader sees another's data. A cache outliving one request would serve the next reader the previous reader's answer. This realizes litespec/frontend/rendering#build-the-server-data-cache-per-request.
 
 ## Conventions
 
@@ -139,7 +139,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** A layout adds no address segment, so the shell never appears in a link. This realizes litespec/frontend/rendering#use-a-shared-layout-for-a-shell.
+**Rationale:** A shell is the frame every child route shares, and a layout holds it without adding an address segment. The shell then never appears in a link, and every child route inherits the same frame. This realizes litespec/frontend/rendering#use-a-shared-layout-for-a-shell.
 
 ## Reference example
 
@@ -169,7 +169,7 @@ The Svelte page does the same in its load:
 <OrdersPage search={data.search} />
 ```
 
-The route resolves its input and composes the floorplan. The query definition owns the typed call. The table owns the columns. A route links to its use cases through the generated client calls in its code.
+The route resolves its input from the address, prefetches its reads, and composes the floorplan from module components. The query definition owns the typed call and the table owns its columns. The generated client calls in the route code are what link the route to its use cases.
 
 ## Verification
 

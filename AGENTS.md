@@ -59,11 +59,11 @@ Sources: `litespec/core/agent#make-coherent-scoped-changes`, `litespec/core/agen
 
 ## Writing
 
-Write prose the way the [Google developer documentation style guide](https://developers.google.com/style) says, plus the few rules the [authoring standard](docs/core/authoring.md) adds: ASCII only, one term per concept, capitalized modal words only inside a Standard's Requirement, and nothing about earlier releases.
+Write prose by your own documentation guide. LiteSpec adds only what its validators check and what its page contract needs, all stated in the [authoring standard](docs/core/authoring.md): ASCII only, one term per concept from the glossary, capitalized modal words only inside a Standard's Requirement, Title Case page titles with sentence-case headings, an `Overview` title on every section index, and nothing about earlier releases.
 
 Each page uses the sections of its page style. A Standard states one testable obligation. When you rename a provision, replace every citation of the old ID in the same change.
 
-Sources: `litespec/core/authoring#follow-the-google-developer-documentation-style-guide`, `litespec/core/authoring#use-the-declared-page-contract`, `litespec/core/authoring#write-atomic-standards-provisions`, `litespec/core/maintaining#replace-every-citation-on-a-rename`.
+Sources: `litespec/core/authoring#keep-authored-prose-ascii-safe`, `litespec/core/authoring#use-one-term-for-one-concept`, `litespec/core/authoring#use-controlled-capitalization`, `litespec/core/authoring#use-the-declared-page-contract`, `litespec/core/authoring#write-atomic-standards-provisions`, `litespec/core/maintaining#replace-every-citation-on-a-rename`.
 
 ## Releases
 

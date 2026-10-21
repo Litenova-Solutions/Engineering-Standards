@@ -2,7 +2,17 @@
 
 ## Intent
 
-These patterns answer how a back office writes amounts, statements, moments, and periods. They also answer how many rows fit before a page breaks and how figures and charts read. Each pattern offers drawn options and names a default.
+Money, moments in time, and counts are read across tables, statements, charts, and phone screens. This page holds the patterns for writing amounts, statements, moments, periods, counts, charts, payouts, invoices, VAT, and identifiers at every width. A team building a finance or reporting screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared way of writing figures keeps exports, statements, and screens agreeing, so finance can cite a figure without checking where it was read.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about money, time, or density, such as how an amount reads in a table. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply shop: order SO-1042 for Maria Garcia at EUR 125.00, the September 2026 statement, and the autumn lamp range. Amounts use currency codes with two decimals, moments use the Europe/Amsterdam zone, and counts name what they count. The Standards section states the two rules every option keeps: every amount shows its currency, and a moment shared across zones states its zone.
 
 ## Standards
 
@@ -10,19 +20,19 @@ These patterns answer how a back office writes amounts, statements, moments, and
 
 **Requirement:** Every amount MUST show its currency.
 
-**Rationale:** An amount without its currency is ambiguous as soon as a second currency exists. The reader then reads the figure without checking a setting.
+**Rationale:** A currency on every amount keeps EUR 125.00 distinct from GBP 125.00 on every screen and export. Without it, a second currency turns each bare figure into a guess, and a pasted number carries no way to settle the guess.
 
 ### State the time zone of a shared moment
 
 **Requirement:** A moment shown to readers in different time zones MUST state its time zone.
 
-**Rationale:** Readers in two time zones read a delivery window without a zone as two different windows. The zone makes the moment one fact for every reader.
+**Rationale:** A stated zone keeps 09:32 in Amsterdam from reading as 09:32 in London. Without it, two readers plan the same delivery window an hour apart, and the warehouse meets only one of them.
 
 ## Patterns
 
 ### Writing an amount
 
-**Question:** Amounts meet a reader in tables, statements, and exports. One table writes EUR 45.00, and one statement writes the euro sign before 45.00. The question is which form the product keeps. It also asks how a negative reads and which separator the product uses.
+**Question:** A reader meets amounts in tables, statements, and exports. One table writes EUR 45.00, and one statement writes the euro sign before 45.00. The question is which form the product keeps. It also asks how a negative reads and which separator the product uses.
 
 **Default:** `code-and-two-decimals-in-the-reader-s-language-with-a-true-m`
 
@@ -30,7 +40,7 @@ These patterns answer how a back office writes amounts, statements, moments, and
 
 **Rationale:** Ship the code format in the reader's language with a true minus. It keeps one convention and answers negatives and separators. The runner-up is the plain code table. It shows the same choice without refund rows.
 
-Choose the symbol with code in the header only when back office and customer surface show the same form. Never ship the no currency option. It loses the currency in exports. Never ship mixed decimals. It breaks the alignment tables exist for.
+Choose the symbol with code in the header only when the back office and the customer surface show the same form. Never ship the no currency option. It loses the currency in exports. Never ship mixed decimals. It breaks the alignment tables exist for.
 
 #### `currency-code-and-two-decimals-everywhere`: Currency code and two decimals, everywhere
 
@@ -246,7 +256,7 @@ page
 
 ### Statement that adds up
 
-**Question:** A statement has one purpose. Money adds up top to bottom. Each kind forms a group with a subtotal. A grand total closes the foot. A count under each line helps a reader spot a missing line.
+**Question:** A statement has one purpose. Money adds up top to bottom. Each kind forms a group with a subtotal. A grand total closes the statement at the foot. A count under each line helps a reader spot a missing line.
 
 **Default:** `groups-subtotals-and-a-grand-total`
 
@@ -474,7 +484,7 @@ page
 
 ### Writing a moment
 
-**Question:** Every date uses the zone the screen works in. Each table keeps one form. An orders table writes 8 Oct 2026, 09:32. A messages table mixes Sent 6 hours ago with For 2 Jan 2030, 10:00 in one column. That mix breaks the contract.
+**Question:** Every date uses the zone the screen works in. Each table keeps one form. The orders table writes 8 Oct 2026, 09:32. A messages table that mixes Sent 6 hours ago with For 2 Jan 2030, 10:00 in one column breaks that rule.
 
 **Default:** `one-form-per-table-with-the-zone-stated-once`
 
@@ -1037,7 +1047,7 @@ page
 
 ### Counting things
 
-**Question:** One rule governs this whole category: read a number the system can count; never type it. A hand-maintained table will not be updated and a reviewer will trust it anyway.
+**Question:** One rule governs this whole category: read a number the system can count; never type it. A hand-typed figure will not be updated and a reviewer will trust it anyway.
 
 **Default:** `counts-in-the-sidebar-on-the-rows-that-hold-work`
 
@@ -1640,7 +1650,7 @@ page
 
 ### Figure against an earlier period
 
-**Question:** A tile that says EUR 63,350.00 answers how much. Only the tile that adds against EUR 48,340.00 in August answers whether the month was good.
+**Question:** A tile that says EUR 63,350.00 answers how much. Only the tile that adds August EUR 48,340.00 beside it answers whether the month was good.
 
 **Default:** `tiles-with-a-delta-pill-and-the-previous-figure`
 
@@ -2097,7 +2107,7 @@ page
 
 ### Two VAT rates on one page
 
-**Question:** Books carry 9% and a lamp carries 21%. The customer sees one total. The books see two rates on the page the tax return is built from.
+**Question:** Books carry 9% and a lamp carries 21%. The customer sees one total. The accounts show two rates on the page the tax return is built from.
 
 **Default:** `the-vat-split-under-the-order-total`
 
@@ -2406,13 +2416,13 @@ page
 
 **Rationale:** The GitHub mobile web turns wide tables into stacked lists under 640 pixels. The same page serves both widths without a second route. The swap follows the viewport, not the device.
 
-**Cost:** Two markups for one table need to stay in agreement. A screen reader meets the hidden one unless it is properly removed. The list carries every fact the table drops, including the plain ones.
+**Cost:** Two markups for one table need to stay in agreement. A screen reader meets the hidden one unless it is removed from the accessibility tree. The list carries every fact the table drops, including the plain ones.
 
 **Reference:** GitHub
 
 ### Showing an identifier
 
-**Question:** The rule is specific: an identifier shown on screen is labeled and copyable, and a raw code never reaches the screen. A serial page that shows SN-0C893968A2 as plain text, or a messages list showing identifiers where a subject should be, both break it.
+**Question:** One design rule governs identifiers: an identifier shown on screen is labeled and copyable, and a raw code never reaches the screen. A serial page that shows SN-0C893968A2 as plain text breaks it, and so does a messages list showing identifiers where a subject should be.
 
 **Default:** `a-code-monospaced-labeled-and-copyable`
 

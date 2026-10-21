@@ -6,7 +6,7 @@ Use this generated page to resolve a provision ID to its heading, owning page, a
 
 Run `litespec provisions` after any provision change. The repository validator fails when this page and the active standards disagree.
 
-The active release states 1249 provisions across 6 areas.
+The active release states 1248 provisions across 6 areas.
 
 ## backend
 
@@ -223,7 +223,7 @@ The active release states 1249 provisions across 6 areas.
 | litespec/backend/identifiers#keep-business-record-names-unique-across-the-project | [Keep business record names unique across the project](../backend/identifiers.md#keep-business-record-names-unique-across-the-project) | rule | checkable | `litespec model check` reports `business-record-name-clash`. |
 | litespec/backend/identifiers#keep-negation-in-rule-names | [Keep negation in rule names](../backend/identifiers.md#keep-negation-in-rule-names) | rule | checkable | `litespec model check` reports `rule-name-negation`. |
 | litespec/backend/identifiers#keep-use-case-names-unique-across-the-project | [Keep use case names unique across the project](../backend/identifiers.md#keep-use-case-names-unique-across-the-project) | rule | checkable | `litespec model check` reports `use-case-name-clash`. |
-| litespec/backend/identifiers#keep-wire-codes-stable | [Keep wire codes stable](../backend/identifiers.md#keep-wire-codes-stable) | rule | guidance | Do clients read the same code values as before? |
+| litespec/backend/identifiers#keep-wire-codes-stable | [Keep wire codes stable](../backend/identifiers.md#keep-wire-codes-stable) | rule | guidance | Does every wire code that clients read keep the value those clients expect? |
 | litespec/backend/identifiers#name-records-with-one-to-six-words | [Name records with one to six words](../backend/identifiers.md#name-records-with-one-to-six-words) | rule | checkable | `litespec model check` reports `identifier-form`. |
 | litespec/backend/identifiers#resolve-every-identifier-citation | [Resolve every identifier citation](../backend/identifiers.md#resolve-every-identifier-citation) | rule | checkable | `litespec model check` reports `reference-unresolved`. |
 | litespec/backend/persistence#add-read-documents-for-query-shaped-data | [Add read documents for query-shaped data](../backend/persistence.md#add-read-documents-for-query-shaped-data) | convention | guidance | Does each read document record its consistency and rebuild behavior beside its owning use case? |
@@ -255,7 +255,7 @@ The active release states 1249 provisions across 6 areas.
 | litespec/backend/testing#test-domain-in-isolation | [Test Domain in isolation](../backend/testing.md#test-domain-in-isolation) | rule | guidance | Does each Domain test use explicit inputs with no database, host, container, clock, or mock? |
 | litespec/backend/testing#test-http-integration-through-the-real-application-host | [Test HTTP integration through the real application host](../backend/testing.md#test-http-integration-through-the-real-application-host) | rule | guidance | Does each HTTP integration test run through the real host covering Problem Details, authentication, and authorization? |
 | litespec/backend/testing#use-builders-for-valid-defaults | [Use builders for valid defaults](../backend/testing.md#use-builders-for-valid-defaults) | convention | guidance | Does each test data builder produce valid state by default through its Domain factory? |
-| litespec/backend/testing#use-evidence-rather-than-one-coverage-target | [Use evidence rather than one coverage target](../backend/testing.md#use-evidence-rather-than-one-coverage-target) | rule | guidance | Do you collect coverage for review with no percentage treated as sufficient testing? |
+| litespec/backend/testing#use-evidence-rather-than-one-coverage-target | [Use evidence rather than one coverage target](../backend/testing.md#use-evidence-rather-than-one-coverage-target) | rule | guidance | Is coverage collected for review with no percentage treated as sufficient? |
 
 ## core
 
@@ -284,7 +284,6 @@ The active release states 1249 provisions across 6 areas.
 | litespec/core/authoring#exclude-generated-regions-from-prose-checks | [Exclude generated regions from prose checks](../core/authoring.md#exclude-generated-regions-from-prose-checks) | rule | guidance | Does every authoring check skip the text between generated-region fences? |
 | litespec/core/authoring#exclude-historical-transition-material | [Exclude historical transition material](../core/authoring.md#exclude-historical-transition-material) | rule | guidance | Does any active file carry history-specific material between releases? |
 | litespec/core/authoring#exclude-the-compound-that-names-another-concept | [Exclude the compound that names another concept](../core/authoring.md#exclude-the-compound-that-names-another-concept) | rule | checkable | `litespec consumer` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
-| litespec/core/authoring#follow-the-google-developer-documentation-style-guide | [Follow the Google developer documentation style guide](../core/authoring.md#follow-the-google-developer-documentation-style-guide) | rule | guidance | Would a reviewer who knows developers.google.com/style accept the changed prose, apart from the additions this page states? |
 | litespec/core/authoring#identify-actionable-conventions | [Identify actionable conventions](../core/authoring.md#identify-actionable-conventions) | rule | checkable | `litespec validate` emits no `CONVENTION_MISSING_DEFAULT` or `CONVENTION_MISSING_REPLACEMENT` diagnostic. |
 | litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves | [Keep a pinned release for as long as it serves](../core/authoring.md#keep-a-pinned-release-for-as-long-as-it-serves) | rule | guidance | Does any active provision oblige a consumer to adopt a later release? |
 | litespec/core/authoring#keep-authored-prose-ascii-safe | [Keep authored prose ASCII-safe](../core/authoring.md#keep-authored-prose-ascii-safe) | rule | checkable | `litespec validate` emits no `PROSE_NON_ASCII` diagnostic. |

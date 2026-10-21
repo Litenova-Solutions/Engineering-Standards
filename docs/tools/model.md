@@ -7,19 +7,24 @@
 ## Synopsis
 
 ```bash
-litespec model build --root <consumer> [--out <file>]
-litespec model check --root <consumer> [--format json]
-litespec model render --root <consumer>
-litespec model query --root <consumer> <id>
+litespec model build [--root <consumer>] [--out <file>]
+litespec model check [--root <consumer>] [--format json]
+litespec model render [--root <consumer>]
+litespec model query [--root <consumer>] <id>
 ```
 
 ## Description
 
-The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, and the computed `implemented` and `verified` state per use case.
+The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, and the computed `implemented` and `verified` state of each use case.
 
-`build` writes `model.json` under `.model/` in the consumer root unless `--out` names another file. That folder is generated, and the consumer ignores it in Git. `check` builds in memory and reports every finding with its code, message, path, and line. `render` rewrites the fenced generated regions and touches no text outside them. `query` prints one record with its links in both directions, for agents.
+The four subcommands share one reader:
 
-A finding covered by an open known gap is reported as known and exits zero. The gap covers the finding when its `check` equals the finding code and its `subject` lists the `id`. An expired known gap fails.
+- `build` writes `model.json` under `.model/` in the consumer root, unless `--out` names another file. That folder holds generated output, and the consumer ignores it in Git.
+- `check` builds the model in memory and reports every finding with its code, message, path, and line.
+- `render` rewrites the fenced generated regions and touches no text outside them.
+- `query` prints one record with its links in both directions. Agents use it to load a record's context.
+
+A finding that an open known gap covers is reported as known and exits zero. The gap covers the finding when its `check` equals the finding code and its `subject` lists the finding's `id`. An expired known gap fails the check.
 
 The finding codes are:
 
@@ -54,7 +59,7 @@ The finding codes are:
 | `region-unknown` | A generated region names no region the builder renders. |
 | `product-not-singleton` | The project holds no single product record. |
 
-The generated regions `render` writes are `history`, `use-case-coverage`, `sub-processors`, `runbook-index`, `rule-map`, `operations-log`, `open-questions`, `journeys`, `glossary`, `exceptions`, `census`, `business-record-map`, `audit-register`, `alert-inventory`, and `counts`. A region reads `<!-- generated:<name> -->` to `<!-- /generated:<name> -->`.
+The `render` subcommand writes these generated regions, each fenced by `<!-- generated:<name> -->` and `<!-- /generated:<name> -->`: `history`, `use-case-coverage`, `sub-processors`, `runbook-index`, `rule-map`, `operations-log`, `open-questions`, `journeys`, `glossary`, `exceptions`, `census`, `business-record-map`, `audit-register`, `alert-inventory`, and `counts`.
 
 ## Arguments
 
@@ -107,4 +112,4 @@ litespec model query --root ../consumer use-case/orders.cancel-order
 
 ## Underneath
 
-The builder reads `paths`, `shape`, and `stacks` from `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, and the test run from TRX or JUnit XML files under `paths.testResults`. Nothing beneath it is separately runnable.
+The builder reads `paths`, `shape`, and `stacks` from the consumer's `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, and the test run from TRX or JUnit XML files under `paths.testResults`. Nothing beneath it is separately runnable.

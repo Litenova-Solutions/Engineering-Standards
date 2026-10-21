@@ -2,7 +2,17 @@
 
 ## Intent
 
-Navigation is the frame around every page: the sidebar, the header, the breadcrumb, tabs, the command palette, and the account menu. These patterns answer how a reader moves through the back office and knows where they are. Each pattern offers drawn options and names a default.
+The product frame around every screen lets a reader move between areas and know where they are. This page holds the patterns for that frame: sidebar, breadcrumb, header bar, tabs, icons, language and theme, command palette, account menu, notifications, help, workspace switching, and phone navigation. A team building the product frame starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared product frame keeps every page reachable by address and marked in place, so a reader never loses where they are.
+
+## Concepts
+
+### How to read a pattern
+
+Each pattern answers one recurring question about moving through the product, such as how the sidebar shows seven areas. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
+
+### The running example
+
+The drawings on this page use the Acme Supply console: seven areas from Home to Settings, order SO-1042 for Maria Garcia, and the Amsterdam warehouse. The frame marks the current area, and every page carries its own address. The Standards section states the two rules every option keeps: the navigation marks the section holding the current page, and every page opens directly from its own URL.
 
 ## Standards
 
@@ -10,13 +20,13 @@ Navigation is the frame around every page: the sidebar, the header, the breadcru
 
 **Requirement:** The navigation MUST mark the section that holds the current page.
 
-**Rationale:** A reader who arrives from a link sees at once where the page sits. An unmarked frame makes every page look like the start.
+**Rationale:** A marked section tells a reader who arrived from a link, a notification, or a search which area holds the open page. Without it, every page looks like the start, and the reader reopens the sidebar to learn where they already are.
 
 ### Give every page its own address
 
 **Requirement:** Every page MUST have its own URL that opens it directly.
 
-**Rationale:** A reader shares, bookmarks, and reopens a page by its address. A page reachable only by clicking through cannot be linked from a notification or a record.
+**Rationale:** A direct address lets a reader share, bookmark, and reopen a page, and lets a notification or a record link to it. Without it, support cannot send the page under discussion, and a refresh drops the reader back to the start.
 
 ## Patterns
 
@@ -903,7 +913,7 @@ page
 
 ### Icons in the frame
 
-**Question:** Seven area icons, a sidebar toggle, a help mark, and the theme. A page never writes a raw interactive element. Every one of these is a component with a name and an accessible label.
+**Question:** Seven area icons, a sidebar toggle, a help mark, and the theme. Every one of these is a named component with an accessible label, never a raw element.
 
 **Default:** `an-icon-beside-every-label`
 
