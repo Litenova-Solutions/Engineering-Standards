@@ -47,16 +47,16 @@ import Icon from "./Icon.astro";
   .pattern-viewer-top {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
-    padding: 12px 16px;
+    padding: var(--pad-box-y) var(--pad-box-x);
     border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
   .pattern-viewer-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-inline);
     min-width: 0;
     flex: 1 1 auto;
   }
@@ -66,7 +66,7 @@ import Icon from "./Icon.astro";
     background: var(--code-bg);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 1px 5px;
+    padding: 1px var(--space-1);
     white-space: nowrap;
   }
   .pattern-viewer-name {
@@ -87,8 +87,8 @@ import Icon from "./Icon.astro";
   .pattern-viewer-switch {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 2px;
+    gap: var(--space-1);
+    padding: var(--space-1);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--bg);
@@ -96,8 +96,8 @@ import Icon from "./Icon.astro";
   .pattern-viewer-pick {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: var(--gap-inline);
+    padding: var(--space-1) var(--space-2);
     border: 1px solid transparent;
     border-radius: 4px;
     background: transparent;
@@ -118,7 +118,7 @@ import Icon from "./Icon.astro";
   .pattern-viewer-nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-inline);
   }
   .pattern-viewer-body {
     flex: 1;
@@ -130,13 +130,13 @@ import Icon from "./Icon.astro";
     box-sizing: border-box;
     min-height: 100%;
     display: flex;
-    padding: 16px;
+    padding: var(--space-4);
   }
   :global(.pattern-viewer-frame) {
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px;
+    padding: var(--space-4);
     min-width: 0;
   }
   :global(.pattern-viewer-stage-desktop .pattern-viewer-frame) {
@@ -167,14 +167,14 @@ import Icon from "./Icon.astro";
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    margin: 16px;
+    margin: var(--space-4);
     overflow: hidden;
   }
   :global(.pattern-viewer-code-head) {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
+    gap: var(--gap-inline);
+    padding: var(--pad-box-y) var(--pad-box-x);
     border-bottom: 1px solid var(--border);
     background: var(--muted-strong);
     font-size: 13px;
@@ -185,7 +185,7 @@ import Icon from "./Icon.astro";
   }
   :global(.pattern-viewer-code pre) {
     margin: 0;
-    padding: 16px;
+    padding: var(--space-4);
     font-family: var(--mono);
     font-size: 14px;
     line-height: 1.6;
@@ -211,13 +211,13 @@ import Icon from "./Icon.astro";
       flex: 1 1 100%;
     }
     :global(.pattern-viewer-stage) {
-      padding: 12px;
+      padding: var(--space-3);
     }
     :global(.pattern-viewer-frame) {
-      padding: 12px;
+      padding: var(--space-3);
     }
     :global(.pattern-viewer-code) {
-      margin: 12px;
+      margin: var(--space-3);
     }
   }
 </style>

@@ -20,13 +20,13 @@ import { version } from "../lib/spec";
 </Base>
 
 <style>
-  .missing { flex: 1; display: flex; align-items: center; padding: 96px 0; }
-  .missing .wrap { width: 100%; padding: 0 64px; }
-  .missing h1 { font-size: 48px; line-height: 1.05; letter-spacing: -.04em; font-weight: 600; margin: 18px 0 12px; }
+  .missing { flex: 1; display: flex; align-items: center; padding: var(--space-24) 0; }
+  .missing .wrap { width: 100%; padding: 0 var(--space-16); }
+  .missing h1 { font-size: 48px; line-height: 1.05; letter-spacing: -.04em; font-weight: 600; margin: var(--space-5) 0 var(--space-heading); }
   .missing p { color: var(--muted-fg); font-size: 17px; max-width: 56ch; }
-  .missing .act { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .missing .act { display: flex; flex-wrap: wrap; gap: var(--gap-inline); margin-top: var(--space-8); }
   @media (max-width: 760px) {
-    .missing .wrap { padding: 0 16px; }
+    .missing .wrap { padding: 0 var(--space-4); }
     .missing h1 { font-size: 36px; }
   }
 </style>

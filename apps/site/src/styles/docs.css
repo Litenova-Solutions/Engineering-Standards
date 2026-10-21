@@ -22,22 +22,22 @@
   align-self: start;
   max-height: calc(100vh - var(--top));
   overflow-y: auto;
-  padding: 16px 12px 32px;
+  padding: var(--space-4) var(--space-3) var(--space-8);
   font-size: 14px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 
 .sec {
-  margin-bottom: 2px;
+  margin-bottom: var(--space-1);
 }
 
 .sec-h {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap-inline);
   min-height: 32px;
-  padding: 6px 8px;
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
@@ -66,7 +66,7 @@
 
 .sec-h .count {
   margin-left: auto;
-  padding: 0 6px;
+  padding: 0 var(--space-2);
   border-radius: 999px;
   background: var(--muted);
   line-height: 18px;
@@ -81,7 +81,7 @@
   width: 14px;
   height: 14px;
   color: var(--muted-fg);
-  margin-left: 4px;
+  margin-left: var(--space-1);
   transition: transform .15s;
 }
 
@@ -90,8 +90,8 @@ details[open] > .sec-h .chev {
 }
 
 .sec > .tree {
-  margin: 2px 0 8px 15px;
-  padding-left: 8px;
+  margin: var(--space-1) 0 var(--space-2) var(--space-4);
+  padding-left: var(--space-2);
   border-left: 1px solid var(--border);
 }
 
@@ -99,9 +99,9 @@ details[open] > .sec-h .chev {
 .tree summary {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap-inline);
   min-height: 30px;
-  padding: 5px 8px;
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   color: var(--muted-fg);
   cursor: pointer;
@@ -125,9 +125,9 @@ details[open] > .sec-h .chev {
 .tree a.on::before {
   content: "";
   position: absolute;
-  left: -10px;
-  top: 3px;
-  bottom: 3px;
+  left: calc(-1 * var(--space-2) - 2px);
+  top: var(--space-1);
+  bottom: var(--space-1);
   width: 2px;
   border-radius: 1px;
   background: var(--accent);
@@ -141,7 +141,7 @@ details[open] > .sec-h .chev {
   color: var(--muted-fg);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 0 4px;
+  padding: 0 var(--space-1);
   font-variant-numeric: tabular-nums;
 }
 
@@ -166,19 +166,19 @@ details[open] > .sec-h .chev {
 }
 
 .tree summary .tag + .chev {
-  margin-left: 4px;
+  margin-left: var(--space-1);
 }
 
 .tree .kids {
-  margin: 2px 0 4px 15px;
-  padding-left: 8px;
+  margin: var(--space-1) 0 var(--space-1) var(--space-4);
+  padding-left: var(--space-2);
   border-left: 1px solid var(--border);
 }
 
 /* Content column: the mobile browse control, the indexed header and body,
    and the pager pinned to the bottom of the column. */
 .content {
-  padding: 40px 48px;
+  padding: var(--space-10) var(--space-12);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -186,7 +186,7 @@ details[open] > .sec-h .chev {
 
 .docs-body {
   min-width: 0;
-  margin-bottom: 32px;
+  margin-bottom: var(--space-8);
 }
 
 .crumb {
@@ -194,7 +194,7 @@ details[open] > .sec-h .chev {
   color: var(--muted-fg);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap-inline);
   flex-wrap: wrap;
 }
 
@@ -209,7 +209,7 @@ details[open] > .sec-h .chev {
 .crumb-area {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gap-inline);
 }
 
 .crumb a:hover {
@@ -226,7 +226,7 @@ details[open] > .sec-h .chev {
   font-size: 36px;
   letter-spacing: -.03em;
   font-weight: 600;
-  margin: 12px 0 8px;
+  margin: var(--space-3) 0 var(--space-2);
 }
 
 .content .lead {
@@ -237,9 +237,9 @@ details[open] > .sec-h .chev {
 .content .tools {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--gap-inline);
   flex-wrap: wrap;
-  margin: 20px 0 36px;
+  margin: var(--space-5) 0 var(--space-10);
 }
 
 .tools-badge {
@@ -249,16 +249,16 @@ details[open] > .sec-h .chev {
 .pager {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--gap-cards);
   margin-top: auto;
-  padding-top: 32px;
+  padding-top: var(--space-8);
   border-top: 1px solid var(--border);
 }
 
 .pager a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
+  padding: var(--pad-card-y) var(--pad-card-x);
   display: block;
   min-width: 0;
 }
@@ -271,7 +271,7 @@ details[open] > .sec-h .chev {
 .pager small {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gap-inline);
   font-size: 12px;
   color: var(--muted-fg);
 }
@@ -282,7 +282,7 @@ details[open] > .sec-h .chev {
 
 .pager b {
   display: block;
-  margin-top: 2px;
+  margin-top: var(--space-1);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -.01em;
@@ -305,7 +305,7 @@ details[open] > .sec-h .chev {
 /* Right column: the section list with the section in view marked, and the
    page links below it. */
 .toc {
-  padding: 40px 24px;
+  padding: var(--space-10) var(--space-6);
   font-size: 13px;
   position: sticky;
   top: var(--top);
@@ -322,12 +322,12 @@ details[open] > .sec-h .chev {
   text-transform: uppercase;
   color: var(--muted-fg);
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-2);
 }
 
 .toc a {
   display: block;
-  padding: 4px 0 4px 12px;
+  padding: var(--space-1) 0 var(--space-1) var(--space-3);
   color: var(--muted-fg);
   border-left: 1px solid var(--border);
   overflow-wrap: anywhere;
@@ -340,30 +340,30 @@ details[open] > .sec-h .chev {
 .toc a[aria-current="true"] {
   color: var(--fg);
   border-left: 2px solid var(--accent);
-  padding-left: 11px;
+  padding-left: calc(var(--space-3) - 1px);
 }
 
 .toc a.toc-sub {
-  padding-left: 24px;
+  padding-left: var(--space-6);
 }
 
 .toc a.toc-sub[aria-current="true"] {
-  padding-left: 23px;
+  padding-left: calc(var(--space-6) - 1px);
 }
 
 .toc .links {
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
   border-top: 1px solid var(--border);
   display: grid;
-  gap: 8px;
+  gap: var(--gap-stack);
 }
 
 .toc .links a {
   border: 0;
   padding: 0;
   display: flex;
-  gap: 8px;
+  gap: var(--gap-inline);
   align-items: center;
 }
 
@@ -375,7 +375,7 @@ details[open] > .sec-h .chev {
    inline sidebar. It stays hidden on wider screens. */
 .docs-browse {
   display: none;
-  margin: 0 0 20px;
+  margin: 0 0 var(--space-5);
 }
 
 .docs-browse > summary {
@@ -395,7 +395,7 @@ details[open] > .sec-h .chev {
 }
 
 .docs-browse-panel {
-  margin-top: 8px;
+  margin-top: var(--space-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   max-height: 60vh;
@@ -406,7 +406,7 @@ details[open] > .sec-h .chev {
   position: static;
   max-height: none;
   overflow: visible;
-  padding: 12px;
+  padding: var(--space-3);
 }
 
 @media (max-width: 1180px) {
@@ -433,7 +433,7 @@ details[open] > .sec-h .chev {
   }
 
   .content {
-    padding: 28px 16px 48px;
+    padding: var(--space-6) var(--space-4) var(--space-12);
   }
 
   .docs-browse {

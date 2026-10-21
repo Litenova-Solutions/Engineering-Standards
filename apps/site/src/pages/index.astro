@@ -29,7 +29,7 @@ const description =
     align-items: center;
     position: relative;
     isolation: isolate;
-    padding: 120px 0;
+    padding: var(--space-24) 0;
   }
   .hero::before {
     content: "";
@@ -47,7 +47,7 @@ const description =
   }
   .hero-body {
     width: 100%;
-    padding: 0 64px;
+    padding: 0 var(--space-16);
   }
   .hero h1 {
     font-size: 52px;
@@ -55,7 +55,7 @@ const description =
     letter-spacing: -0.04em;
     font-weight: 600;
     max-width: 22ch;
-    margin: 22px 0 18px;
+    margin: var(--space-5) 0 var(--space-heading);
   }
   .tagline {
     font-size: 18px;
@@ -64,8 +64,8 @@ const description =
   }
   .actions {
     display: flex;
-    gap: 10px;
-    margin-top: 32px;
+    gap: var(--gap-inline);
+    margin-top: var(--space-8);
   }
   .hero a.badge:hover {
     border-color: var(--rail);
@@ -73,10 +73,10 @@ const description =
   }
   @media (max-width: 760px) {
     .hero {
-      padding: 72px 0;
+      padding: var(--space-16) 0;
     }
     .hero-body {
-      padding: 0 16px;
+      padding: 0 var(--space-4);
     }
     .hero h1 {
       font-size: 32px;

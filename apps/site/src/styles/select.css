@@ -1,11 +1,12 @@
-/* Styles for the project selection page: the docs-like header block. The form
-   itself carries its styles in SelectForm.astro. */
+/* Styles for the "Use with agents" page: the header block, the numbered steps,
+   the reading list and the copy boxes. The selection questions carry their own
+   styles in SelectForm.astro. */
 
 .select-page {
   width: 100%;
-  max-width: 1040px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 40px 48px;
+  padding: var(--space-10) var(--gutter) var(--space-16);
 }
 
 .select-page h1 {
@@ -13,19 +14,178 @@
   letter-spacing: -0.03em;
   font-weight: 600;
   text-wrap: balance;
-  margin: 12px 0 8px;
+  margin: var(--space-3) 0 var(--space-3);
 }
 
 .select-lead {
   color: var(--muted-fg);
   font-size: 16px;
   text-wrap: pretty;
-  margin: 0 0 28px;
+  margin: 0;
   max-width: 68ch;
+}
+
+.select-page code {
+  font-size: 0.9em;
+}
+
+/* Steps: one rail of numbers; every step's parts start at the same column. */
+.steps {
+  list-style: none;
+  margin: var(--space-10) 0 0;
+  padding: 0;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: var(--space-5);
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border);
+}
+
+.step-n {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--rail);
+  display: grid;
+  place-items: center;
+  font: 600 13px var(--mono);
+  background: var(--bg);
+}
+
+.step-body {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.step-head {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.step-head h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.step-head p {
+  color: var(--muted-fg);
+  font-size: 14px;
+  max-width: 70ch;
+}
+
+/* The reading list: numbered in reading order, with a reading time each. */
+.reading {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: reading;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.reading li {
+  counter-increment: reading;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  column-gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--pad-box-y) var(--pad-box-x);
+}
+
+.reading li + li {
+  border-top: 1px solid var(--border);
+}
+
+.reading li::before {
+  content: counter(reading) ".";
+  font: 500 13px var(--mono);
+  color: var(--muted-fg);
+}
+
+.reading a {
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+
+.reading a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.reading .badge {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.reading p {
+  grid-column: 2 / 4;
+  color: var(--muted-fg);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* A copy box: a labeled header strip and its monospace text. */
+.select-output {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.select-output-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-inline);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--pad-box-x);
+  background: var(--muted-strong);
+  border-bottom: 1px solid var(--border);
+}
+
+.select-output-head h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-fg);
+  min-width: 0;
+}
+
+.select-output-head .btn {
+  margin-left: auto;
+}
+
+.select-output-body {
+  margin: 0;
+  padding: var(--pad-box-y) var(--pad-box-x);
+  background: var(--code-bg);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.select-output-body code {
+  font: inherit;
 }
 
 @media (max-width: 760px) {
   .select-page {
-    padding: 28px 16px;
+    padding: var(--space-8) var(--gutter) var(--space-12);
+  }
+
+  .step {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-3);
   }
 }

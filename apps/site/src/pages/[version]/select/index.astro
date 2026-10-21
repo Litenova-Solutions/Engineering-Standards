@@ -6,6 +6,7 @@ import { breadcrumbs } from "../../../lib/seo";
 import path from "node:path";
 import Base from "../../../layouts/Base.astro";
 import SelectForm from "../../../components/SelectForm.astro";
+import Icon from "../../../components/Icon.astro";
 import "../../../styles/select.css";
 import {
   root,
@@ -19,6 +20,7 @@ import {
   frontendStacks,
   extensionStack,
   pageByFile,
+  pageUrl,
 } from "../../../lib/spec";
 
 export function getStaticPaths() {
@@ -90,46 +92,98 @@ const initialAgents = [
   "UI work: the pattern pages listed in that index.",
 ].join("\n");
 
-const initialProjectJson = JSON.stringify(
-  { size: defaultSize, shape: defaultShape, stacks: defaultStacks, selectedExtensions: [] },
-  null,
-  2
-);
+// The learn pages in the reading order their index states, each with a
+// reading time at 220 words a minute.
+const learnIndex = pageByFile("docs/learn/README.md");
+const readingOrder = [...(learnIndex?.markdown ?? "").matchAll(/^- \[[^\]]+\]\(([a-z0-9-]+)\.md\): (.+)$/gm)]
+  .map((match) => ({ page: pageByFile(`docs/learn/${match[1]}.md`), note: match[2] }))
+  .filter((entry) => entry.page !== undefined)
+  .map((entry) => ({
+    title: entry.page!.title,
+    url: pageUrl(entry.page!),
+    note: entry.note.replace(/^./, (c) => c.toUpperCase()),
+    minutes: Math.max(1, Math.round(entry.page!.markdown.split(/\s+/).length / 220)),
+  }));
+const readingMinutes = readingOrder.reduce((sum, entry) => sum + entry.minutes, 0);
 
-const initialPreset = presets.find(
-  (preset) => preset.shape === defaultShape && sameMembers(preset.stacks, defaultStacks)
-);
-const initialPresetCommand = initialPreset
-  ? `litespec init --preset ${initialPreset.name} --size ${defaultSize}`
-  : "";
+const starterPrompt = [
+  `Read ${siteOrigin}/llms.txt. Pick the selection index that matches this project's shape and stacks,`,
+  "then fetch only the pages each task touches.",
+].join("\n");
 
-const title = "Connect Your Agent - LiteSpec";
+const title = "Use LiteSpec with Your Agent - LiteSpec";
 const description =
-  "Pick the project size, shape, stacks, and extensions, then copy the agent index URL and the AGENTS.md block.";
+  "Read how LiteSpec works, give your agent one URL, or answer four questions for a block to commit to your project's AGENTS.md.";
 ---
 
-<Base title={title} description={description} active="agents" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: "Connect your agent", path: `/${version}/select/` }])]}>
+<Base title={title} description={description} active="agents" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: "Use with agents", path: `/${version}/select/` }])]}>
   <div class="select-page">
     <span class="ver">{version}</span>
-    <h1>Connect your agent</h1>
-    <p class="select-lead">{description}</p>
-    <SelectForm
-    version={version}
-    siteOrigin={siteOrigin}
-    shapes={shapes}
-    backendStacks={backendStacks}
-    frontendStacks={frontendStacks}
-    extensions={extensions}
-    selections={selectionInfos}
-    presets={presets}
-    defaultSize={defaultSize}
-    defaultShape={defaultShape}
-    defaultBackend={defaultBackend}
-    defaultFrontend={defaultFrontend}
-    initialIndexUrl={initialIndexUrl}
-    initialAgents={initialAgents}
-    initialProjectJson={initialProjectJson}
-    initialPresetCommand={initialPresetCommand}
-    />
+    <h1>Use LiteSpec with your agent</h1>
+    <p class="select-lead">
+      Your agent reads LiteSpec as plain Markdown. This page gives it the address to start from and a short block for
+      your project's <code>AGENTS.md</code>, so every session reads the same rules before it writes code.
+    </p>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-n" aria-hidden="true">1</span>
+        <div class="step-body">
+          <div class="step-head">
+            <h2>Read how it works</h2>
+            <p>
+              Read these in order before you hand LiteSpec to an agent: you decide what it may do on its own and review
+              what it brings back. About {readingMinutes} minutes in all.
+            </p>
+          </div>
+          <ol class="reading">
+            {
+              readingOrder.map((entry) => (
+                <li>
+                  <a href={entry.url}>{entry.title}</a>
+                  <span class="badge">{entry.minutes} min</span>
+                  <p>{entry.note}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-n" aria-hidden="true">2</span>
+        <div class="step-body">
+          <div class="step-head">
+            <h2>Quick start: give your agent one prompt</h2>
+            <p>
+              No choices to make. The agent reads the site index, finds the selection that matches your project, and
+              fetches the rest itself.
+            </p>
+          </div>
+          <section class="select-output" aria-labelledby="select-prompt-heading">
+            <div class="select-output-head">
+              <h3 id="select-prompt-heading">Prompt for your agent</h3>
+              <button class="btn btn-outline btn-sm" type="button" data-copy={starterPrompt}>
+                <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+              </button>
+            </div>
+            <pre class="select-output-body"><code>{starterPrompt}</code></pre>
+          </section>
+        </div>
+      </li>
+      <SelectForm
+        version={version}
+        siteOrigin={siteOrigin}
+        shapes={shapes}
+        backendStacks={backendStacks}
+        frontendStacks={frontendStacks}
+        extensions={extensions}
+        selections={selectionInfos}
+        presets={presets}
+        defaultSize={defaultSize}
+        defaultShape={defaultShape}
+        defaultBackend={defaultBackend}
+        defaultFrontend={defaultFrontend}
+        initialAgents={initialAgents}
+      />
+    </ol>
   </div>
 </Base>

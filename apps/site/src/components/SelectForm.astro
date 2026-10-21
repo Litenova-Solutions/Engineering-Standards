@@ -1,6 +1,7 @@
 ---
-/* Project selection form for /[version]/select/. Rendered statically with
-   default values, then updated live by one small inline script. */
+/* Steps 3 and 4 of /[version]/select/: the selection questions, one row each,
+   and the AGENTS.md block they produce. Rendered statically with default
+   values, then updated live by one small inline script. */
 import Icon from "./Icon.astro";
 
 export interface ExtensionInfo {
@@ -37,10 +38,7 @@ interface Props {
   defaultShape: string;
   defaultBackend: string;
   defaultFrontend: string;
-  initialIndexUrl: string;
   initialAgents: string;
-  initialProjectJson: string;
-  initialPresetCommand: string;
 }
 
 const {
@@ -56,10 +54,7 @@ const {
   defaultShape,
   defaultBackend,
   defaultFrontend,
-  initialIndexUrl,
   initialAgents,
-  initialProjectJson,
-  initialPresetCommand,
 } = Astro.props as Props;
 
 const payload = JSON.stringify({
@@ -100,16 +95,23 @@ const defaultPresetName =
   presets.find((preset) => preset.shape === defaultShape && sameMembers(preset.stacks, defaultStackList))?.name ?? "";
 ---
 
-<div>
-  <div class="select-layout">
-    <form id="select-form" class="select-choices">
-      <fieldset class="select-group">
-        <legend>Preset</legend>
-        <p class="select-hint">A preset sets the shape and stacks. Adjust the answers after it.</p>
-        <div class="select-tiles">
+<li class="step">
+  <span class="step-n" aria-hidden="true">3</span>
+  <div class="step-body">
+    <div class="step-head">
+      <h2>Tailor it to your project</h2>
+      <p>
+        For a repository you keep. Your answers pick one selection index: an <code>llms.txt</code> that lists only the
+        pages your project applies.
+      </p>
+    </div>
+    <form id="select-form" class="select-form">
+      <fieldset class="select-row">
+        <legend class="select-label">Preset<span>Fills in the shape and stacks. Change them after.</span></legend>
+        <div class="select-seg">
           {
             presets.map((preset) => (
-              <label class="select-tile">
+              <label title={`${capitalize(preset.shape)}: ${joinList(preset.stacks)}.`}>
                 <input
                   class="visually-hidden"
                   type="radio"
@@ -118,378 +120,234 @@ const defaultPresetName =
                   checked={defaultPresetName === preset.name}
                   data-preset-option={preset.name}
                 />
-                <span class="select-tile-name">{preset.name}</span>
-                <span class="select-tile-note">{capitalize(preset.shape)}: {joinList(preset.stacks)}.</span>
+                <span>{preset.name}</span>
               </label>
             ))
           }
         </div>
       </fieldset>
-      <fieldset class="select-group">
-        <legend>Size</legend>
-        <div class="select-tiles">
-          <label class="select-tile">
-            <input class="visually-hidden" type="radio" name="size" value="small" checked={defaultSize === "small"} />
-            <span class="select-tile-name">Small</span>
-            <span class="select-tile-note">One team, no journeys or cases.</span>
-          </label>
-          <label class="select-tile">
-            <input class="visually-hidden" type="radio" name="size" value="large" checked={defaultSize === "large"} />
-            <span class="select-tile-name">Large</span>
-            <span class="select-tile-note">Journeys, cases, and the Acceptance project.</span>
-          </label>
+      <fieldset class="select-row">
+        <legend class="select-label">Size<span>Small: one team, no journeys or cases. Large adds journeys, cases, and the Acceptance project.</span></legend>
+        <div class="select-seg">
+          <label><input class="visually-hidden" type="radio" name="size" value="small" checked={defaultSize === "small"} /><span>Small</span></label>
+          <label><input class="visually-hidden" type="radio" name="size" value="large" checked={defaultSize === "large"} /><span>Large</span></label>
         </div>
       </fieldset>
-      <fieldset class="select-group">
-        <legend>Shape</legend>
-        <div class="select-tiles">
+      <fieldset class="select-row">
+        <legend class="select-label">Shape<span>Server: one API deployable and one database. Client-only: no server of its own.</span></legend>
+        <div class="select-seg">
           {
             shapes.map((shape) => (
-              <label class="select-tile">
-                <input
-                  class="visually-hidden"
-                  type="radio"
-                  name="shape"
-                  id={`select-shape-${shape}`}
-                  value={shape}
-                  checked={defaultShape === shape}
-                />
-                <span class="select-tile-name">{capitalize(shape)}</span>
-                <span class="select-tile-note">{shape === "server" ? "One API deployable and one database." : "No server of its own."}</span>
+              <label>
+                <input class="visually-hidden" type="radio" name="shape" id={`select-shape-${shape}`} value={shape} checked={defaultShape === shape} />
+                <span>{capitalize(shape)}</span>
               </label>
             ))
           }
         </div>
       </fieldset>
-      <fieldset class="select-group" id="select-backend-group">
-        <legend>Backend stack</legend>
-        <p class="select-hint" id="select-backend-note">
-          A server project selects one backend stack. Client-only projects use no backend stack.
-        </p>
-        <div class="select-tiles">
+      <fieldset class="select-row" id="select-backend-group">
+        <legend class="select-label">Backend stack<span id="select-backend-note">One backend stack for a server project.</span></legend>
+        <div class="select-seg">
           {
             backendStacks.map((id) => (
-              <label class="select-tile">
-                <input
-                  class="visually-hidden"
-                  type="radio"
-                  name="backend"
-                  id={`select-backend-${id}`}
-                  value={id}
-                  checked={defaultBackend === id}
-                  data-backend-option={id}
-                />
-                <span class="select-tile-name">{id}</span>
+              <label>
+                <input class="visually-hidden" type="radio" name="backend" id={`select-backend-${id}`} value={id} checked={defaultBackend === id} data-backend-option={id} />
+                <span>{id}</span>
               </label>
             ))
           }
         </div>
       </fieldset>
-      <fieldset class="select-group">
-        <legend>Frontend stack</legend>
-        <p class="select-hint" id="select-frontend-note">
-          A client-only project selects one frontend stack. A choice is disabled when no published
-          selection combines it with the other answers.
-        </p>
-        <div class="select-tiles">
-          <label class="select-tile">
-            <input
-              class="visually-hidden"
-              type="radio"
-              name="frontend"
-              id="select-frontend-none"
-              value=""
-              checked={defaultFrontend === ""}
-              data-frontend-option="none"
-            />
-            <span class="select-tile-name">None</span>
-            <span class="select-tile-note">Server projects may ship no frontend.</span>
-          </label>
+      <fieldset class="select-row">
+        <legend class="select-label">Frontend stack<span>One stack per frontend, or none. A stack that no published selection pairs with your answers is disabled.</span></legend>
+        <div class="select-seg">
+          <label><input class="visually-hidden" type="radio" name="frontend" id="select-frontend-none" value="" checked={defaultFrontend === ""} data-frontend-option="none" /><span>None</span></label>
           {
             frontendStacks.map((id) => (
-              <label class="select-tile">
-                <input
-                  class="visually-hidden"
-                  type="radio"
-                  name="frontend"
-                  id={`select-frontend-${id}`}
-                  value={id}
-                  checked={defaultFrontend === id}
-                  data-frontend-option={id}
-                />
-                <span class="select-tile-name">{id}</span>
+              <label>
+                <input class="visually-hidden" type="radio" name="frontend" id={`select-frontend-${id}`} value={id} checked={defaultFrontend === id} data-frontend-option={id} />
+                <span>{id}</span>
               </label>
             ))
           }
         </div>
       </fieldset>
-      <fieldset class="select-group">
-        <legend>Extensions</legend>
-        <p class="select-hint">
-          Only extensions that support a selected stack are shown. Each line names the scope from
-          the manifest.
-        </p>
-        <div class="select-tiles">
+      <fieldset class="select-row">
+        <legend class="select-label">Extensions<span>Each applies only when you select it. Only extensions that support your stacks are listed.</span></legend>
+        <ul class="select-exts">
           {
             extensions.map((ext) => (
-              <label class="select-tile" data-extension-row={ext.id}>
-                <input
-                  class="visually-hidden"
-                  type="checkbox"
-                  name="extension"
-                  id={`select-ext-${ext.id}`}
-                  value={ext.id}
-                  data-extension-option={ext.id}
-                  data-extension-stack={ext.stack ?? ""}
-                />
-                <span class="select-tile-name">{ext.id} - {ext.title}</span>
-                <span class="select-tile-note">Scope: {ext.activationScope || "project"}{ext.stack ? ` - needs the ${ext.stack} stack` : " - works with every stack"}.</span>
-              </label>
+              <li data-extension-row={ext.id}>
+                <label>
+                  <input type="checkbox" name="extension" id={`select-ext-${ext.id}`} value={ext.id} data-extension-option={ext.id} data-extension-stack={ext.stack ?? ""} />
+                  <span class="select-ext-title">{ext.title}</span>
+                  <code>{ext.id}</code>
+                  <span class="select-ext-scope">{ext.stack ? `${ext.stack} only` : `${ext.activationScope || "project"} scope`}</span>
+                </label>
+              </li>
             ))
           }
-        </div>
+        </ul>
       </fieldset>
     </form>
-    <div class="select-results">
-      <section class="select-output" aria-live="polite" aria-labelledby="select-index-heading">
-        <div class="select-output-head">
-          <h2 id="select-index-heading">Agent index URL</h2>
-          <span class="select-output-actions">
-            <a class="btn btn-outline btn-sm" id="select-open-index" href={initialIndexUrl}>Open</a>
-            <button class="btn btn-outline btn-sm" type="button" id="select-copy-index" data-copy={initialIndexUrl}>
-              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
-            </button>
-          </span>
-        </div>
-        <pre class="select-output-body"><code id="select-index-link">{initialIndexUrl}</code></pre>
-      </section>
-      <section class="select-output" aria-live="polite" aria-labelledby="select-agents-heading">
-        <div class="select-output-head">
-          <h2 id="select-agents-heading">AGENTS.md block</h2>
-          <span class="select-output-actions">
-            <button class="btn btn-outline btn-sm" type="button" id="select-copy-agents" data-copy={initialAgents}>
-              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
-            </button>
-          </span>
-        </div>
-        <pre class="select-output-body"><code id="select-agents">{initialAgents}</code></pre>
-      </section>
-      <section class="select-output" aria-live="polite" aria-labelledby="select-project-heading">
-        <div class="select-output-head">
-          <h2 id="select-project-heading">litespec.project.json fragment</h2>
-          <span class="select-output-actions">
-            <button class="btn btn-outline btn-sm" type="button" id="select-copy-project" data-copy={initialProjectJson}>
-              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
-            </button>
-          </span>
-        </div>
-        <pre class="select-output-body"><code id="select-project">{initialProjectJson}</code></pre>
-      </section>
-      <section class="select-output" aria-live="polite" aria-labelledby="select-preset-heading">
-        <div class="select-output-head">
-          <h2 id="select-preset-heading">Start command</h2>
-          <span class="select-output-actions">
-            <button class="btn btn-outline btn-sm" type="button" id="select-copy-preset" data-copy={initialPresetCommand}>
-              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
-            </button>
-          </span>
-        </div>
-        <pre class="select-output-body"><code id="select-preset">{initialPresetCommand === "" ? "No preset matches this selection. Use the values above in litespec.project.json." : initialPresetCommand}</code></pre>
-      </section>
-    </div>
   </div>
-  <section class="select-all" aria-labelledby="select-all-heading">
-    <h2 id="select-all-heading">Every selection</h2>
-    <p class="select-hint">Each link opens the published agent index for that selection.</p>
-    <ul>
-      {
-        selections.map((selection) => (
-          <li>
-            <code>{selection.key}</code>{": "}
-            <a href={siteOrigin + selection.indexUrl}>
-              {siteOrigin + selection.indexUrl}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-</div>
+</li>
+<li class="step">
+  <span class="step-n" aria-hidden="true">4</span>
+  <div class="step-body">
+    <div class="step-head">
+      <h2>Copy it into your project</h2>
+      <p>Commit this block to your project's <code>AGENTS.md</code>. Every agent session then reads your selection before a task.</p>
+    </div>
+    <section class="select-output" aria-live="polite" aria-labelledby="select-agents-heading">
+      <div class="select-output-head">
+        <h3 id="select-agents-heading">AGENTS.md block</h3>
+        <button class="btn btn-outline btn-sm" type="button" id="select-copy-agents" data-copy={initialAgents}>
+          <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+        </button>
+      </div>
+      <pre class="select-output-body"><code id="select-agents">{initialAgents}</code></pre>
+    </section>
+  </div>
+</li>
 <style>
-  .select-layout {
-    display: grid;
-    grid-template-columns: 55fr 45fr;
-    gap: 24px;
-    align-items: start;
-  }
-  .select-choices {
-    display: grid;
-    gap: 22px;
-    min-width: 0;
-  }
-  .select-group {
-    border: 0;
-    margin: 0;
-    padding: 0;
-    min-width: 0;
-  }
-  .select-group legend {
-    font-size: 13px;
-    font-weight: 600;
-    padding: 0;
-  }
-  .select-hint {
-    color: var(--muted-fg);
-    font-size: 13px;
-    margin: 4px 0 0;
-  }
-  .select-tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .select-tile {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-    padding: 10px 12px;
+  .select-form {
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background: var(--bg);
-    cursor: pointer;
+    min-width: 0;
   }
-  .select-tile:hover {
-    border-color: var(--rail);
+  .select-row {
+    margin: 0;
+    padding: var(--pad-card-y) var(--pad-card-x);
+    border: 0;
+    border-top: 1px solid var(--border);
+    min-width: 0;
+    display: flow-root;
   }
-  .select-tile:has(input:checked) {
-    border-color: var(--accent);
-    background: var(--accent-subtle);
+  .select-row:first-child {
+    border-top: 0;
   }
-  .select-tile:has(input:checked)::after {
-    content: "";
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-  .select-tile:has(input:focus-visible) {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-  .select-tile:has(input:disabled) {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .select-tile-name {
+  /* A legend cannot be a grid item, so it floats into the label column and the
+     answer takes the rest of the row. */
+  .select-label {
+    float: left;
+    width: 220px;
+    margin-right: var(--space-6);
+    padding: 0;
     font-size: 14px;
-    font-weight: 500;
-    padding-right: 14px;
-    overflow-wrap: anywhere;
+    font-weight: 600;
   }
-  .select-tile-note {
+  .select-label span {
+    display: block;
+    margin-top: 2px;
     color: var(--muted-fg);
     font-size: 13px;
+    font-weight: 400;
     line-height: 1.5;
   }
-  .select-results {
-    display: grid;
-    gap: 12px;
-    min-width: 0;
-    position: sticky;
-    top: calc(var(--top) + 24px);
+  .select-seg,
+  .select-exts {
+    margin-left: calc(220px + var(--space-6));
   }
-  .select-output {
+  .select-seg {
+    display: flex;
+    flex-wrap: wrap;
+    width: max-content;
+    max-width: calc(100% - 220px - var(--space-6));
+    gap: 2px;
+    padding: 2px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background: var(--bg);
-    overflow: hidden;
-    min-width: 0;
+    background: var(--muted);
   }
-  .select-output-head {
+  .select-seg label {
+    display: flex;
+    cursor: pointer;
+  }
+  .select-seg label span {
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--muted-fg);
+  }
+  .select-seg label:hover span {
+    color: var(--fg);
+  }
+  .select-seg input:checked + span {
+    background: var(--bg);
+    color: var(--fg);
+    font-weight: 500;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .select-seg input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  .select-seg input:disabled + span {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .select-exts {
+    list-style: none;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .select-exts li + li {
+    border-top: 1px solid var(--border);
+  }
+  .select-exts label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 8px 8px 12px;
-    background: var(--muted-strong);
-    border-bottom: 1px solid var(--border);
+    gap: var(--gap-inline);
+    padding: var(--space-2) var(--space-3);
+    font-size: 14px;
+    cursor: pointer;
   }
-  .select-output-head h2 {
+  .select-exts label:hover {
+    background: var(--muted);
+  }
+  .select-exts li:has(input:checked) label {
+    background: var(--accent-subtle);
+  }
+  .select-exts input {
+    width: 16px;
+    height: 16px;
     margin: 0;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted-fg);
-    min-width: 0;
-  }
-  .select-output-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
     flex: none;
+    accent-color: var(--primary);
   }
-  .select-output-body {
-    margin: 0;
-    padding: 12px;
-    background: var(--code-bg);
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-  .select-output-body code {
-    font: inherit;
-    overflow-wrap: anywhere;
-  }
-  .select-all {
-    margin-top: 40px;
-  }
-  .select-all h2 {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    margin: 0;
-  }
-  .select-all ul {
-    list-style: none;
-    margin: 12px 0 0;
-    padding: 0;
-    display: grid;
-    gap: 8px;
-  }
-  .select-all li {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-    font-size: 13px;
+  .select-ext-title {
+    font-weight: 500;
     min-width: 0;
   }
-  .select-all li code {
-    font-family: var(--mono);
-    font-size: 13px;
+  .select-exts code {
+    font-size: 12px;
+    color: var(--muted-fg);
   }
-  .select-all li a {
-    overflow-wrap: anywhere;
-    text-decoration: underline;
-    text-decoration-color: var(--border);
-    text-underline-offset: 3px;
+  .select-ext-scope {
+    margin-left: auto;
+    flex: none;
+    font-size: 12px;
+    color: var(--muted-fg);
   }
-  .select-all li a:hover {
-    text-decoration-color: var(--accent);
-  }
-  @media (max-width: 960px) {
-    .select-layout {
-      grid-template-columns: 1fr;
+  @media (max-width: 760px) {
+    .select-label {
+      float: none;
+      width: auto;
+      margin: 0 0 var(--space-3);
     }
-    .select-results {
-      position: static;
+    .select-seg,
+    .select-exts {
+      margin-left: 0;
+    }
+    .select-seg {
+      max-width: 100%;
+    }
+    .select-exts code {
+      display: none;
     }
   }
 </style>
@@ -607,11 +465,13 @@ const defaultPresetName =
     for (var b = 0; b < backendInputs.length; b++) {
       backendInputs[b].disabled = shape !== "server";
     }
+    var backendGroup = document.getElementById("select-backend-group");
+    if (backendGroup) backendGroup.style.display = shape === "server" ? "" : "none";
     var backendNote = document.getElementById("select-backend-note");
     if (backendNote) {
       backendNote.textContent = shape === "server"
-        ? "A server project selects one backend stack. Client-only projects use no backend stack."
-        : "Client-only projects use no backend stack. The backend choice is disabled.";
+        ? "One backend stack for a server project."
+        : "A client-only project has no backend stack.";
     }
 
     var frontendInputs = form.querySelectorAll('input[data-frontend-option]');
@@ -625,7 +485,7 @@ const defaultPresetName =
         valid = option !== "none" && findSelection(shape, candidate) !== null;
       }
       frontendInputs[f].disabled = !valid;
-      var field = frontendInputs[f].closest(".select-tile");
+      var field = frontendInputs[f].closest("label");
       if (field) {
         field.title = valid ? "" : "No published selection combines this stack with the other answers.";
       }
@@ -666,36 +526,12 @@ const defaultPresetName =
       "Selected extensions: " + (chosen.length ? chosen.map(function (id) { return layerById[id]; }).join(", ") : "none"),
       "UI work: the pattern pages listed in that index.",
     ].join("\n");
-    var projectJson = JSON.stringify(
-      { size: size, shape: shape, stacks: stacks, selectedExtensions: chosen },
-      null,
-      2
-    );
-    var preset = presetFor(shape, stacks);
-    var presetText = preset
-      ? "litespec init --preset " + preset.name + " --size " + size
-      : "No preset matches this selection. Use the values above in litespec.project.json.";
-
     syncPreset(shape, stacks);
 
-    var link = document.getElementById("select-index-link");
-    if (link) {
-      if (link instanceof HTMLInputElement) link.value = indexAbsolute;
-      else link.textContent = indexAbsolute;
-    }
-    var open = document.getElementById("select-open-index");
-    if (open) open.setAttribute("href", indexAbsolute);
     var agents = document.getElementById("select-agents");
     if (agents) agents.textContent = agentText;
-    var project = document.getElementById("select-project");
-    if (project) project.textContent = projectJson;
-    var presetEl = document.getElementById("select-preset");
-    if (presetEl) presetEl.textContent = presetText;
 
-    setCopy("select-copy-index", indexAbsolute);
     setCopy("select-copy-agents", agentText);
-    setCopy("select-copy-project", projectJson);
-    setCopy("select-copy-preset", presetText);
   }
 
   form.addEventListener("change", update);

@@ -17,12 +17,12 @@
 .prose h2 {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-4);
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 40px 0 14px;
-  scroll-margin-top: calc(var(--top) + 16px);
+  margin: var(--space-section) 0 var(--space-heading);
+  scroll-margin-top: calc(var(--top) + var(--space-4));
 }
 
 .prose h2::after {
@@ -36,15 +36,15 @@
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 28px 0 10px;
-  scroll-margin-top: calc(var(--top) + 16px);
+  margin: var(--space-8) 0 var(--space-3);
+  scroll-margin-top: calc(var(--top) + var(--space-4));
 }
 
 .prose h4 {
   font-size: 15px;
   font-weight: 600;
-  margin: 24px 0 8px;
-  scroll-margin-top: calc(var(--top) + 16px);
+  margin: var(--space-6) 0 var(--space-2);
+  scroll-margin-top: calc(var(--top) + var(--space-4));
 }
 
 .prose h2 code,
@@ -58,7 +58,7 @@
   color: var(--accent-text);
   text-decoration: none;
   font-weight: 400;
-  margin-left: 8px;
+  margin-left: var(--gap-inline);
 }
 
 .prose h2 .anchor {
@@ -75,7 +75,7 @@
 /* Prose */
 
 .prose p {
-  margin: 0 0 14px;
+  margin: 0 0 var(--space-block);
   max-width: 72ch;
   overflow-wrap: break-word;
 }
@@ -92,25 +92,25 @@
 
 .prose ul,
 .prose ol {
-  margin: 0 0 14px;
-  padding-left: 22px;
+  margin: 0 0 var(--space-block);
+  padding-left: var(--space-6);
   max-width: 72ch;
   overflow-wrap: break-word;
 }
 
 .prose li + li {
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 .prose li > ul,
 .prose li > ol {
-  margin-top: 4px;
+  margin-top: var(--space-1);
   margin-bottom: 0;
 }
 
 .prose blockquote {
-  margin: 0 0 14px;
-  padding: 2px 0 2px 16px;
+  margin: 0 0 var(--space-block);
+  padding: var(--space-1) 0 var(--space-1) var(--space-4);
   border-left: 2px solid var(--accent);
   color: var(--muted-fg);
 }
@@ -122,7 +122,7 @@
 .prose hr {
   border: 0;
   border-top: 1px solid var(--border);
-  margin: 24px 0;
+  margin: var(--space-6) 0;
 }
 
 .prose img {
@@ -138,19 +138,19 @@
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 1px 5px;
+  padding: 1px var(--space-1);
 }
 
 .prose pre {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 14px 16px;
+  padding: var(--pad-box-y) var(--pad-box-x);
   font-family: var(--mono);
   font-size: 13px;
   line-height: 1.6;
   overflow-x: auto;
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-block);
 }
 
 .prose pre code {
@@ -167,7 +167,7 @@
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-block);
 }
 
 .prose table {
@@ -186,12 +186,12 @@
   color: var(--muted-fg);
   text-align: left;
   white-space: nowrap;
-  padding: 10px 14px;
+  padding: var(--pad-box-y) var(--pad-box-x);
   border-bottom: 1px solid var(--border);
 }
 
 .prose tbody td {
-  padding: 10px 14px;
+  padding: var(--pad-box-y) var(--pad-box-x);
   vertical-align: top;
 }
 
@@ -211,7 +211,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
-  margin: 0 0 12px;
+  margin: 0 0 var(--gap-cards);
   overflow: hidden;
 }
 
@@ -222,8 +222,8 @@
 .prose .provision-head {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 16px 20px 0;
+  gap: var(--gap-inline);
+  padding: var(--pad-card-y) var(--pad-card-x) 0;
 }
 
 .prose .provision-head h3 {
@@ -235,13 +235,13 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gap-inline);
   flex-wrap: wrap;
   flex: none;
 }
 
 .prose .provision-body {
-  padding: 6px 20px 16px;
+  padding: var(--space-1) var(--pad-card-x) var(--pad-card-y);
 }
 
 .prose .provision-body p,
@@ -257,8 +257,8 @@
 .prose .provision-id {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 4px 20px 14px;
+  gap: var(--gap-inline);
+  margin: var(--space-1) var(--pad-card-x) var(--space-block);
   color: var(--muted-fg);
 }
 
@@ -297,8 +297,8 @@
 /* A rule or convention card leads with its statement behind the kind's bar;
    Why, Example and Check fold beneath it. */
 .prose .provision-statement {
-  margin: 0 20px 16px;
-  padding: 2px 0 2px 16px;
+  margin: 0 var(--pad-card-x) var(--pad-card-y);
+  padding: var(--space-1) 0 var(--space-1) var(--space-4);
   border-left: 3px solid var(--accent);
 }
 
@@ -312,7 +312,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent-text);
-  margin-bottom: 2px;
+  margin-bottom: var(--space-1);
 }
 
 .prose .provision-convention .provision-eyebrow {
@@ -328,7 +328,7 @@
 }
 
 .prose .provision-statement .provision-sub {
-  margin-top: 8px;
+  margin-top: var(--space-2);
   font-size: 14.5px;
   font-weight: 400;
   color: var(--muted-fg);
@@ -343,8 +343,8 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 20px;
+  gap: var(--gap-inline);
+  padding: var(--space-2) var(--pad-card-x);
   font-size: 13px;
   font-weight: 500;
   color: var(--muted-fg);
@@ -358,7 +358,7 @@
   content: "";
   width: 6px;
   height: 6px;
-  margin-right: 4px;
+  margin-right: var(--space-1);
   border-right: 1.5px solid currentColor;
   border-bottom: 1.5px solid currentColor;
   transform: rotate(-45deg);
@@ -386,8 +386,8 @@
 
 .prose .provision-more {
   display: grid;
-  gap: 10px;
-  padding: 0 20px 14px 38px;
+  gap: var(--gap-stack);
+  padding: 0 var(--pad-card-x) var(--pad-card-y) var(--space-10);
   color: var(--muted-fg);
 }
 
@@ -406,7 +406,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted-fg);
-  margin-right: 6px;
+  margin-right: var(--gap-inline);
 }
 
 .prose .note-muted {
@@ -419,9 +419,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
-  margin: 0 0 12px;
+  margin: 0 0 var(--gap-cards);
   overflow: hidden;
-  scroll-margin-top: calc(var(--top) + 16px);
+  scroll-margin-top: calc(var(--top) + var(--space-4));
 }
 
 .prose .option:hover {
@@ -431,9 +431,9 @@
 .prose .option-head {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--gap-inline);
   flex-wrap: wrap;
-  padding: 12px 16px;
+  padding: var(--pad-box-y) var(--pad-card-x);
   background: var(--muted-strong);
   border-bottom: 1px solid var(--border);
 }
@@ -454,9 +454,9 @@
 .prose .option-tabs {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-1);
   margin-left: auto;
-  padding: 2px;
+  padding: var(--space-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
@@ -470,8 +470,8 @@
 .prose .option-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: var(--gap-inline);
+  padding: var(--space-1) var(--space-2);
   border: 1px solid transparent;
   border-radius: 4px;
   background: transparent;
@@ -499,8 +499,8 @@
 .prose .option-drawings {
   display: grid;
   grid-template-columns: 3fr 1fr;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--gap-cards);
+  padding: var(--pad-card-y) var(--pad-card-x);
 }
 
 .prose .option-frame {
@@ -509,7 +509,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
-  padding: 12px;
+  padding: var(--space-3);
   min-width: 0;
 }
 
@@ -524,9 +524,9 @@
 .prose .option-enlarge {
   display: none;
   position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 4px;
+  top: var(--space-2);
+  right: var(--space-2);
+  padding: var(--space-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
@@ -560,8 +560,8 @@
 .prose .option-code-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
+  gap: var(--gap-inline);
+  padding: var(--space-2) var(--pad-card-x);
   font-size: 13px;
   color: var(--muted-fg);
 }
@@ -582,8 +582,8 @@
 }
 
 .prose .option > p {
-  padding-left: 16px;
-  padding-right: 16px;
+  padding-left: var(--pad-card-x);
+  padding-right: var(--pad-card-x);
   max-width: none;
 }
 
@@ -601,7 +601,7 @@
   }
 
   .prose .provision-more {
-    padding-left: 20px;
+    padding-left: var(--pad-card-x);
   }
 
   .prose .option-drawings {
@@ -612,8 +612,8 @@
 /* Diagrams: an inlined SVG from docs/assets/diagrams/, in a bordered frame, with its
    description as the caption. Its colors are the site's tokens, so it follows the theme. */
 .prose .diagram {
-  margin: 20px 0;
-  padding: 20px 16px 12px;
+  margin: var(--space-block) 0;
+  padding: var(--space-5) var(--space-4) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
@@ -627,8 +627,8 @@
   margin: 0 auto;
 }
 .prose .diagram figcaption {
-  margin-top: 12px;
-  padding-top: 10px;
+  margin-top: var(--gap-stack);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--border);
   font-size: 13px;
   line-height: 1.5;
