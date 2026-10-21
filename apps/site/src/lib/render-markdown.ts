@@ -243,16 +243,83 @@ function rewriteLinks(html: string, page: Page): string {
   });
 }
 
-// The labels a provision paragraph can open with. Requirement, Default,
-// Question and Compact keep full text color; the rest read as secondary notes.
+// The labels a provision paragraph can open with. A rule or convention card
+// sorts them into its parts: the statement, Why, Example and Check.
+const labelSplit =
+  /(?=<p><strong>(?:Requirement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>)/;
+const labelLead = /^<p><strong>([A-Z][a-z]+):<\/strong>\s*/;
+
+// Pattern cards keep their body in order, with each label as a small tag.
 const labelPattern =
-  /<p><strong>(Requirement|Default|Replacement|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>/g;
+  /<p><strong>(Requirement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>/g;
 
 function styleLabels(body: string): string {
   return body.replace(labelPattern, (_match, label: string) =>
     label === "Requirement" || label === "Default" || label === "Question" || label === "Compact"
       ? `<p class="note"><span class="lbl" data-pagefind-ignore>${label}</span>`
       : `<p class="note note-muted"><span class="lbl" data-pagefind-ignore>${label}</span>`);
+}
+
+// Splits a rule or convention body by its labels. Content before the first
+// label, which a page should not have, joins the Why section.
+function splitLabels(body: string): Map<string, string[]> {
+  const parts = new Map<string, string[]>();
+  for (const segment of body.split(labelSplit)) {
+    if (segment.trim() === "") continue;
+    const lead = labelLead.exec(segment);
+    const label = lead ? lead[1] : "Rationale";
+    const html = lead ? "<p>" + segment.slice(lead[0].length) : segment;
+    parts.set(label, [...(parts.get(label) ?? []), html]);
+  }
+  return parts;
+}
+
+// Renders the inline code spans of a Verification table cell.
+function inlineCode(text: string): string {
+  return escape(text).replace(/`([^`]+)`/g, "<code>$1</code>");
+}
+
+function section(name: string, body: string, open: boolean, aside = ""): string {
+  return (
+    `<details class="provision-part"${open ? " open" : ""}>` +
+    `<summary data-pagefind-ignore>${name}${aside ? `<span class="provision-aside">${aside}</span>` : ""}</summary>` +
+    `<div class="provision-more">${body}</div></details>`
+  );
+}
+
+// A rule or convention card: the statement leads, behind its kind's bar, and
+// Why, Example and Check fold beneath it. An example with code starts open.
+function provisionParts(body: string, provision: Page["provisions"][number]): string {
+  const parts = splitLabels(body);
+  const take = (...labels: string[]) => labels.flatMap((label) => parts.get(label) ?? []);
+  const tagged = (label: string) =>
+    (parts.get(label) ?? []).map((html) => html.replace(/^<p>/, `<p><span class="lbl" data-pagefind-ignore>${label}</span>`));
+  const lead = provision.kind === "convention" ? "Default" : "Requirement";
+  const statement = take("Requirement", "Default").join("");
+  const subs = [...tagged("Replacement"), ...tagged("Deviation")].map((html) => html.replace(/^<p>/, `<p class="provision-sub">`));
+  let out =
+    `<div class="provision-statement"><span class="provision-eyebrow" data-pagefind-ignore>${lead}</span>` +
+    `${highlightMust(statement)}${highlightMust(subs.join(""))}</div>`;
+  const why = [...take("Rationale"), ...tagged("Cost"), ...tagged("Reference")].join("");
+  if (why) out += section("Why", highlightMust(why), false);
+  const example = take("Example").join("");
+  if (example) out += section("Example", example, /<pre\b/.test(example));
+  const evidence = [...take("Evidence")];
+  if (provision.evidence) evidence.unshift(`<p class="provision-evidence">${inlineCode(provision.evidence)}</p>`);
+  if (evidence.length > 0) {
+    const how =
+      provision.mark === "checkable"
+        ? "Marked <strong>checkable</strong>: the tool named here checks it."
+        : provision.mark === "guidance"
+          ? "Marked <strong>guidance</strong>: a reviewer answers this question."
+          : "";
+    out += section(
+      "Check",
+      evidence.join("") + (how ? `<p>${how}</p>` : ""),
+      false,
+      provision.mark === "checkable" ? "checked by a tool" : provision.mark === "guidance" ? "a reviewer answers" : "");
+  }
+  return out;
 }
 
 const mustPattern = /\b(MUST\s+NOT|SHOULD\s+NOT|SHALL\s+NOT|MUST|SHOULD|MAY|REQUIRED|SHALL)\b/g;
@@ -271,8 +338,9 @@ function highlightMust(body: string): string {
 }
 
 // Wraps each provision H3 with the elements it owns, up to the next H2 or H3,
-// in its card: the heading with kind and verification badges, the body with
-// labels and modal words styled, and the ID footer with its copy button.
+// in its card: the heading with kind and verification badges, the ID line with
+// its copy button, then the body. A rule or convention body becomes its
+// statement and folding parts; a pattern body keeps its order.
 function wrapProvisions(html: string, page: Page): string {
   const provisions = new Map(page.provisions.map((provision) => [provision.slug, provision]));
   const pattern = /<h([23]) id="([^"]+)">[\s\S]*?<\/h\1>/g;
@@ -305,9 +373,11 @@ function wrapProvisions(html: string, page: Page): string {
     out +=
       `<section class="provision ${kindModifier}">` +
       `<header class="provision-head">${head.html}<span class="provision-badges" data-pagefind-ignore><span class="badge ${badgeModifier}">${provision.kind}</span>${markBadge}</span></header>` +
-      `<div class="provision-body">${highlightMust(styleLabels(body))}</div>` +
-      `<footer class="provision-id" data-pagefind-ignore><code>${escape(provision.id)}</code>` +
-      `<button type="button" class="btn btn-ghost btn-icon btn-copy" data-copy="${escape(provision.id)}" aria-label="Copy provision ID">${iconSvg(paths.copy)}</button></footer>` +
+      `<div class="provision-id" data-pagefind-ignore><span class="provision-hash" aria-hidden="true">#</span><code>${escape(provision.id)}</code>` +
+      `<button type="button" class="btn btn-ghost btn-icon btn-copy" data-copy="${escape(provision.id)}" aria-label="Copy provision ID">${iconSvg(paths.copy)}</button></div>` +
+      (provision.kind === "pattern"
+        ? `<div class="provision-body">${highlightMust(styleLabels(body))}</div>`
+        : provisionParts(body, provision)) +
       `</section>`;
   }
   return out;

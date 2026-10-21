@@ -221,7 +221,7 @@
 
 .prose .provision-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 16px 20px 0;
 }
@@ -257,10 +257,14 @@
 .prose .provision-id {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px 8px 20px;
-  border-top: 1px solid var(--border);
-  background: var(--muted-strong);
+  gap: 6px;
+  margin: 4px 20px 14px;
+  color: var(--muted-fg);
+}
+
+.prose .provision-hash {
+  font: 600 12px var(--mono);
+  color: var(--accent-text);
 }
 
 .prose .provision-id code {
@@ -269,19 +273,131 @@
   border-radius: 0;
   padding: 0;
   font-size: 12px;
+  color: var(--muted-fg);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .prose .provision-id .btn-copy {
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   flex: none;
+  color: var(--muted-fg);
+}
+
+.prose .provision-id .btn-copy svg {
+  width: 14px;
+  height: 14px;
 }
 
 .prose .provision-id .btn-copy[data-copied] {
   color: var(--accent-text);
+}
+
+/* A rule or convention card leads with its statement behind the kind's bar;
+   Why, Example and Check fold beneath it. */
+.prose .provision-statement {
+  margin: 0 20px 16px;
+  padding: 2px 0 2px 16px;
+  border-left: 3px solid var(--accent);
+}
+
+.prose .provision-convention .provision-statement {
+  border-left-color: var(--conv-bd);
+}
+
+.prose .provision-eyebrow {
+  display: block;
+  font: 600 11px var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-text);
+  margin-bottom: 2px;
+}
+
+.prose .provision-convention .provision-eyebrow {
+  color: var(--conv-fg);
+}
+
+.prose .provision-statement p {
+  max-width: none;
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.prose .provision-statement .provision-sub {
+  margin-top: 8px;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: var(--muted-fg);
+}
+
+.prose .provision-part {
+  border-top: 1px solid var(--border);
+}
+
+.prose .provision-part > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted-fg);
+}
+
+.prose .provision-part > summary::-webkit-details-marker {
+  display: none;
+}
+
+.prose .provision-part > summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.12s;
+}
+
+.prose .provision-part[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.prose .provision-part > summary:hover {
+  background: var(--muted);
+  color: var(--fg);
+}
+
+.prose .provision-part > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.prose .provision-aside {
+  margin-left: auto;
+  font-weight: 400;
+}
+
+.prose .provision-more {
+  display: grid;
+  gap: 10px;
+  padding: 0 20px 14px 38px;
+  color: var(--muted-fg);
+}
+
+.prose .provision-more > * {
+  margin: 0;
+  max-width: none;
+}
+
+.prose .provision-more .provision-evidence {
+  color: var(--fg);
 }
 
 .prose .lbl {
@@ -482,6 +598,10 @@
 
   .prose .provision-badges {
     margin-left: 0;
+  }
+
+  .prose .provision-more {
+    padding-left: 20px;
   }
 
   .prose .option-drawings {

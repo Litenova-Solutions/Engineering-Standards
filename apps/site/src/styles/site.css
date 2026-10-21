@@ -174,7 +174,7 @@ a, button, summary, .btn { transition: color .12s, background-color .12s, border
 }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--accent-ink); }
 .kbd { font: 500 11px var(--mono); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; color: var(--muted-fg); background: var(--muted); }
-.must { background: var(--accent-soft); color: var(--rule-fg); border-radius: 3px; padding: 0 3px; font-weight: 600; font-size: .94em; letter-spacing: .02em; }
+.must { color: var(--accent-text); font-weight: 700; letter-spacing: .02em; }
 .muted { color: var(--muted-fg); }
 
 @media (max-width: 760px) {

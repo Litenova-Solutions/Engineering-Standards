@@ -15,6 +15,7 @@
 
 /* A block inside a provision card or a table keeps the same look. */
 .prose .provision-body .code-block,
+.prose .provision-more .code-block,
 .prose .table-wrap .code-block {
   margin: 16px 0;
 }
