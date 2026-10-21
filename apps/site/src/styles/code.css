@@ -1,0 +1,131 @@
+/* Highlighted code blocks: a bordered figure with a header strip showing the
+   language name and a copy button, and the Shiki-highlighted listing below.
+   Shiki emits its themes as custom properties only, so this file picks the
+   active scheme. Every color is a token from site.css. */
+
+.prose .code-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  margin: 16px 0;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* A block inside a provision card or a table keeps the same look. */
+.prose .provision-body .code-block,
+.prose .table-wrap .code-block {
+  margin: 16px 0;
+}
+
+.prose .code-block .code-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 6px 0 14px;
+  background: var(--muted-strong);
+  border-bottom: 1px solid var(--border);
+}
+
+.prose .code-block .code-lang {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-fg);
+  white-space: nowrap;
+}
+
+.prose .code-block .code-copy {
+  margin-left: auto;
+  flex: none;
+  color: var(--muted-fg);
+}
+
+.prose .code-block .code-copy:hover {
+  color: var(--fg);
+}
+
+.prose .code-block .code-copy[data-copied],
+.prose .code-block .code-copy[data-copied] .copy-label {
+  color: var(--accent-text);
+}
+
+/* Token colors: Shiki writes both themes as custom properties on each
+   element, and this file selects the one for the active color scheme. */
+.prose .code-block .astro-code,
+.prose .code-block .astro-code span {
+  color: var(--shiki-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .prose .code-block .astro-code,
+  :root:not([data-theme="light"]) .prose .code-block .astro-code span {
+    color: var(--shiki-dark);
+  }
+}
+
+:root[data-theme="dark"] .prose .code-block .astro-code,
+:root[data-theme="dark"] .prose .code-block .astro-code span {
+  color: var(--shiki-dark);
+}
+
+.prose .code-block pre.astro-code {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--code-bg);
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-width: 100%;
+  tab-size: 4;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.prose .code-block pre.astro-code::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose .code-block pre.astro-code::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose .code-block pre.astro-code::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.prose .code-block pre.astro-code code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Shell listings read as commands: every non-empty line except a comment shows a prompt that
+   cannot be selected, so copying still yields the plain command text. */
+.prose .code-block[data-language="bash"] .line:not(:empty):not(:has(> span:first-child[style*="--shiki-light:#6A737D"]))::before,
+.prose .code-block[data-language="sh"] .line:not(:empty):not(:has(> span:first-child[style*="--shiki-light:#6A737D"]))::before,
+.prose .code-block[data-language="shell"] .line:not(:empty):not(:has(> span:first-child[style*="--shiki-light:#6A737D"]))::before,
+.prose .code-block[data-language="powershell"] .line:not(:empty):not(:has(> span:first-child[style*="--shiki-light:#6A737D"]))::before {
+  content: "$ ";
+  color: var(--muted-fg);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media (max-width: 760px) {
+  .prose .code-block {
+    max-width: 100%;
+  }
+
+  .prose .code-block pre.astro-code {
+    overflow-x: auto;
+  }
+}

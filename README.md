@@ -12,9 +12,9 @@
 
 ## Intent
 
-LiteSpec is the standards contract Litenova Solutions uses for software work by humans and AI agents.
+LiteSpec is a standard for building one bounded-context business application with people and AI agents working from the same written rules and records.
 
-LiteSpec v2.0.0 covers one bounded-context business application. A consumer selects one size, small or large, the `dotnet` stack for its backend, and one stack per frontend: `react`, `svelte`, or `blazor`.
+A project names its size (small or large), its shape (server or client-only) and its stacks: `dotnet` for a backend, and `react`, `svelte` or `blazor` for each frontend. New to it? Read [Learn LiteSpec](docs/learn/README.md).
 
 ## What It Defines
 
@@ -24,13 +24,15 @@ LiteSpec v2.0.0 covers one bounded-context business application. A consumer sele
 - Implementation conventions for backend and frontend work.
 - Verification, security, operations, and release evidence.
 - Conditional extensions for capabilities outside the baseline.
-- Controlled technical prose for standards and agent instructions.
+- UI patterns with drawn options for recurring interface questions.
+- Pages for agents: `llms.txt` indexes and raw Markdown on [litespec.dev](https://litespec.dev).
 
 The stacks a consumer selects apply first. An extension or project exception names each Standard that it replaces.
 
 ## Documentation
 
 - [Hosted documentation](https://litespec.dev)
+- [Learn LiteSpec](docs/learn/README.md)
 - [Repository documentation index](docs/README.md)
 - [LiteSpec](docs/core/system.md)
 - [Project model](docs/core/model.md)

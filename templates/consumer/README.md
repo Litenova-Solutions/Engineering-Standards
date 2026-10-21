@@ -2,7 +2,7 @@
 
 ## Intent
 
-These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` before committing, and remove any optional line left unused. The JSON templates carry working example values; adjust them to the project.
+These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` and every `__NAME__` placeholder before committing, and remove any optional line left unused. `litespec init` fills `__PROJECT__` in `litespec.project.json` and lists the placeholders it leaves, and `litespec consumer` refuses a project file that still holds one. The other JSON templates carry working example values; adjust them to the project.
 
 A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a product topic page. Rules and events sit on a business record page, and results and cases on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the language record instead of on a page.
 

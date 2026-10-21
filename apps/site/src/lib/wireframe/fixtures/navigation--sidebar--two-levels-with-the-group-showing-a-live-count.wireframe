@@ -1,0 +1,23 @@
+page
+  breadcrumb "Home" "Orders" "Refunds"
+  header
+    heading "Refunds"
+    text "10 open. The oldest waited 214 days."
+    action "Export"
+  split 1:4
+    nav side
+      link "Home"
+      link "Orders"
+      link "Awaiting payment 31"
+      link current "Refunds 10"
+      link "Exceptions 2"
+      link "Customers"
+      link "Products"
+      link "Invoices"
+      link "Reports"
+      link "Settings"
+    region "Refunds"
+      toolbar
+        field "Search refunds" search
+      table 4 "Order" "Customer" "Asked" "State" "Amount"
+        item: text "SO-1042" · text "Maria Garcia" · text muted "Asked 6 days ago" · status "Open" neutral · text "EUR 125.00"

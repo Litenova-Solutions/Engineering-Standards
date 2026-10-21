@@ -1,0 +1,19 @@
+page
+  header
+    heading "Good afternoon, Alex"
+    text "What is waiting for you, and the coming deliveries."
+    action primary "New delivery"
+  row
+    figure "Ordered" "9,412"
+    figure "Coming up" "2"
+    figure "Dispatching now" "0"
+  region "Finish your setup"
+    list 1
+      item: text "Connect a payment account" · text muted "Money cannot be taken until the provider is connected." · action "Connect"
+  region "Needs attention"
+    status "1 thing to do" caution
+    list 1
+      item: text "Close out the Becker restock" · text muted "Nothing left to settle." · action "Close out"
+  region "Coming up"
+    list 2
+      item: text "Garcia Interiors restock" · text muted "Sat 14 Mar 2026, 08:00 to 12:00" · status "Active" positive · action "Open delivery"

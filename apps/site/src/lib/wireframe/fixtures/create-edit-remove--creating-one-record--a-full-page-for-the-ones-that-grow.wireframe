@@ -1,0 +1,15 @@
+page
+  breadcrumb "Home" "Orders" "New delivery"
+  header
+    heading "New delivery"
+    text "Start with a name. Everything else can wait."
+  region "The delivery"
+    field "Name" text
+    field "Description" textarea
+  region "When"
+    field "Loading starts" text
+    field "Departs" text
+  region "Where"
+    field "Warehouse" select = "Amsterdam warehouse"
+    action "Cancel"
+    action primary "Create delivery"

@@ -1,0 +1,11 @@
+page
+  breadcrumb "Home" "Orders" "SO-1042"
+  header
+    heading "SO-1042"
+    status "Paid" positive
+    action "Resend the confirmation"
+    action primary "Refund"
+  region "The order"
+    fact "Delivery" "Garcia Interiors restock"
+    fact "Placed" "8 Oct 2026, 09:32"
+    fact "Paid" "EUR 125.00"

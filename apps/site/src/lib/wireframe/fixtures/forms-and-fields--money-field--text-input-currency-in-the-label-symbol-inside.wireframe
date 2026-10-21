@@ -1,0 +1,10 @@
+page
+  breadcrumb "Home" "Products" "Oak desk lamp"
+  header
+    heading "Pricing"
+    text "What each unit costs, and what the customer pays on top."
+  region "Standard tier"
+    field "Standard unit price, in euros" number = "45.00"
+    text muted "45,00 or 45.00. Up to two decimal places."
+    field "Delivery fee customers pay, in euros" number = "5.00"
+    text muted "Added at checkout. The company keeps this one."

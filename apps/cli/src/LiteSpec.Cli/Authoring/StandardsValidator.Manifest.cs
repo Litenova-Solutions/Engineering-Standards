@@ -353,7 +353,7 @@ static partial class StandardsValidator
     static readonly string[] KnownAreas =
     [
         "docs/core/", "docs/workspace/", "docs/quality/", "docs/ext/", "docs/backend/",
-        "docs/frontend/", "docs/guide/", "docs/reference/", "docs/tools/", "docs/tutorial/",
+        "docs/frontend/", "docs/guide/", "docs/learn/", "docs/reference/", "docs/tools/", "docs/tutorial/",
     ];
 
     static void CheckStrayPages(string root, Action<string, int, string, string> add)

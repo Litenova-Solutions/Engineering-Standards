@@ -1,0 +1,14 @@
+page
+  breadcrumb "Home" "Orders"
+  header
+    heading "Orders"
+    text "Every paid order across every delivery, newest first."
+  toolbar
+    field "Search orders" search
+  region "Orders"
+    table 5 "Order" "Customer" "Placed" "State" "Paid"
+      item: field "Select 7K4Q2M" checkbox · text "7K4Q2M" · text muted "Garcia Interiors restock" · text "Maria Garcia" · text "8 Oct 09:32" · status "Paid" positive · text "EUR 125.00"
+  footer
+    text "1 – 25 of 268"
+    action quiet "‹ Previous"
+    action quiet "Next ›"

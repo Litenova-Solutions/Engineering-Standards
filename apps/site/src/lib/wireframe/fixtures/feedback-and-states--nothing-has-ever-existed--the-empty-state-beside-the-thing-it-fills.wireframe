@@ -1,0 +1,13 @@
+page
+  breadcrumb "Home" "Products"
+  header
+    heading "Products"
+    text "Nothing here yet."
+    action primary "New product"
+  split 2:1
+    region "Products"
+      message "No products yet. A product holds a name, a SKU, a price and stock." neutral
+      action primary "New product"
+    aside "What a first product needs"
+      list 4
+        item: text "A name" · text muted "Customers see it in the store"

@@ -1,0 +1,490 @@
+/* Styles for the rendered page body: every element render-markdown.ts can emit
+   inside .prose, from section headings and provision cards down to links, lists,
+   tables, code and wireframe option cards. */
+
+.prose {
+  font-size: 15px;
+  line-height: 1.65;
+  min-width: 0;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+/* Headings */
+
+.prose h2 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 40px 0 14px;
+  scroll-margin-top: calc(var(--top) + 16px);
+}
+
+.prose h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.prose h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 28px 0 10px;
+  scroll-margin-top: calc(var(--top) + 16px);
+}
+
+.prose h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 24px 0 8px;
+  scroll-margin-top: calc(var(--top) + 16px);
+}
+
+.prose h2 code,
+.prose h3 code,
+.prose h4 code {
+  font-size: 0.85em;
+}
+
+.prose .anchor {
+  opacity: 0;
+  color: var(--accent-text);
+  text-decoration: none;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.prose h2 .anchor {
+  margin-left: 0;
+}
+
+.prose h2:hover .anchor,
+.prose h3:hover .anchor,
+.prose h4:hover .anchor,
+.prose .anchor:focus-visible {
+  opacity: 1;
+}
+
+/* Prose */
+
+.prose p {
+  margin: 0 0 14px;
+  max-width: 72ch;
+  overflow-wrap: break-word;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+  max-width: 72ch;
+  overflow-wrap: break-word;
+}
+
+.prose li + li {
+  margin-top: 4px;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.prose blockquote {
+  margin: 0 0 14px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--accent);
+  color: var(--muted-fg);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Code */
+
+.prose code {
+  font-family: var(--mono);
+  font-size: 13px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.prose pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0 0 16px;
+}
+
+.prose pre code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Tables */
+
+.prose .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0 0 16px;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 0;
+}
+
+.prose thead th {
+  background: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-fg);
+  text-align: left;
+  white-space: nowrap;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose tbody td {
+  padding: 10px 14px;
+  vertical-align: top;
+}
+
+.prose tbody tr + tr td {
+  border-top: 1px solid var(--border);
+}
+
+.prose .table-provisions tbody td:first-child {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+/* Provision cards */
+
+.prose .provision {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  margin: 0 0 12px;
+  overflow: hidden;
+}
+
+.prose .provision:hover {
+  border-color: var(--rail);
+}
+
+.prose .provision-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px 0;
+}
+
+.prose .provision-head h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.prose .provision-badges {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: none;
+}
+
+.prose .provision-body {
+  padding: 6px 20px 16px;
+}
+
+.prose .provision-body p,
+.prose .provision-body ul,
+.prose .provision-body ol {
+  max-width: none;
+}
+
+.prose .provision-body > :last-child {
+  margin-bottom: 0;
+}
+
+.prose .provision-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--muted-strong);
+}
+
+.prose .provision-id code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 12px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.prose .provision-id .btn-copy {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.prose .provision-id .btn-copy[data-copied] {
+  color: var(--accent-text);
+}
+
+.prose .lbl {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-fg);
+  margin-right: 6px;
+}
+
+.prose .note-muted {
+  color: var(--muted-fg);
+}
+
+/* Wireframe option cards */
+
+.prose .option {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  margin: 0 0 12px;
+  overflow: hidden;
+  scroll-margin-top: calc(var(--top) + 16px);
+}
+
+.prose .option:hover {
+  border-color: var(--rail);
+}
+
+.prose .option-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--muted-strong);
+  border-bottom: 1px solid var(--border);
+}
+
+.prose .option-head code {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 13px;
+}
+
+.prose .option-name {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.prose .option-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.prose .option-tabs[hidden],
+.prose .option-expand[hidden] {
+  display: none;
+}
+
+.prose .option-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-fg);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.prose .option-tab:hover {
+  color: var(--fg);
+}
+
+.prose .option-tab[aria-selected="true"] {
+  background: var(--muted);
+  border-color: var(--border);
+  color: var(--fg);
+}
+
+.prose .option-expand {
+  flex: none;
+}
+
+.prose .option-drawings {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+.prose .option-frame {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  padding: 12px;
+  min-width: 0;
+}
+
+.pattern-js .prose .option-frame {
+  cursor: zoom-in;
+}
+
+.pattern-js .prose .option-frame:hover {
+  border-color: var(--rail);
+}
+
+.prose .option-enlarge {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--muted-fg);
+  opacity: 0;
+}
+
+.pattern-js .prose .option-enlarge {
+  display: inline-flex;
+}
+
+.pattern-js .prose .option-frame:hover .option-enlarge,
+.pattern-js .prose .option-frame:focus-visible .option-enlarge {
+  opacity: 0.9;
+}
+
+.prose .option-drawing svg {
+  width: 100%;
+  height: auto;
+}
+
+.prose .option-frame-phone .option-drawing svg {
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.prose .option-code {
+  border-top: 1px solid var(--border);
+}
+
+.prose .option-code-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+
+.prose .option-code-head .btn {
+  margin-left: auto;
+}
+
+.prose .option-code-head .btn[data-copied] {
+  color: var(--accent-text);
+}
+
+.prose .option-code pre {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.prose .option > p {
+  padding-left: 16px;
+  padding-right: 16px;
+  max-width: none;
+}
+
+@media (max-width: 760px) {
+  .prose .provision-head {
+    flex-wrap: wrap;
+  }
+
+  .prose .provision-head h3 {
+    width: 100%;
+  }
+
+  .prose .provision-badges {
+    margin-left: 0;
+  }
+
+  .prose .option-drawings {
+    grid-template-columns: 1fr;
+  }
+}

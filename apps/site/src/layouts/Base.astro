@@ -1,0 +1,131 @@
+---
+// The shared layout: head, the theme set before first paint, the framed column
+// with the header and footer, and the copy-button behavior. Every page is static
+// and complete without JavaScript; scripts only add the theme, copying, search
+// and the "On this page" tracking.
+import "../styles/site.css";
+import Icon from "../components/Icon.astro";
+import Mark from "../components/Mark.astro";
+import Search from "../components/Search.astro";
+import ThemeSwitcher from "../components/ThemeSwitcher.astro";
+import { version } from "../lib/spec";
+
+interface Props {
+  title: string;
+  description: string;
+  /** The raw Markdown URL of the page, when the page has one. */
+  rawUrl?: string;
+  /** The header section this page belongs to. */
+  active?: "docs" | "patterns" | "agents";
+}
+
+const { title, description, rawUrl, active } = Astro.props;
+const github = "https://github.com/Litenova-Solutions/LiteSpec";
+const links = [
+  { href: `/${version}/learn/`, label: "Docs", key: "docs" },
+  { href: `/${version}/frontend/patterns/`, label: "Patterns", key: "patterns" },
+  { href: `/${version}/select/`, label: "Use with agents", key: "agents" },
+] as const;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {rawUrl && <link rel="alternate" type="text/markdown" href={rawUrl} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script is:inline>
+      try {
+        var theme = window.localStorage.getItem("litespec-theme");
+        if (theme === "light" || theme === "dark") document.documentElement.setAttribute("data-theme", theme);
+      } catch (err) { /* a blocked store keeps the system theme */ }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to main content</a>
+    <div class="frame">
+      <header class="site-top">
+        <div class="wrap">
+          <a class="logo" href="/" aria-label="LiteSpec home">
+            <Mark />LiteSpec
+          </a>
+          <nav class="site-nav" aria-label="Site">
+            {links.map((link) => (
+              <a href={link.href} aria-current={active === link.key ? "page" : undefined}>{link.label}</a>
+            ))}
+          </nav>
+          <div class="site-end">
+            <Search />
+            <a class="btn btn-ghost btn-icon" href={github} aria-label="LiteSpec on GitHub"><Icon name="github" /></a>
+            <ThemeSwitcher />
+            <details class="site-menu">
+              <summary class="btn btn-ghost btn-icon" aria-label="Menu"><Icon name="menu" /></summary>
+              <nav class="site-menu-panel" aria-label="Site">
+                {links.map((link) => (
+                  <a href={link.href} aria-current={active === link.key ? "page" : undefined}>{link.label}</a>
+                ))}
+              </nav>
+            </details>
+          </div>
+        </div>
+      </header>
+      <main id="content" class="frame-main">
+        <slot />
+      </main>
+      <footer class="site-foot">
+        <div class="wrap">
+          <span class="brand"><Mark size={16} />LiteSpec {version}</span>
+          <span>MIT license</span>
+          <span>By <a href="https://litenova.solutions">Litenova Solutions</a></span>
+          <span class="spacer"></span>
+          <a href="/llms.txt">llms.txt</a>
+          <a href={github}>GitHub</a>
+          <a href={`${github}/blob/main/CHANGELOG.md`}>Changelog</a>
+        </div>
+      </footer>
+    </div>
+    <script is:inline>
+      (function () {
+        // Any element with data-copy copies that text. Its first .copy-label child,
+        // or the element itself when it has none, shows "Copied" for a moment.
+        function flash(button) {
+          var label = button.querySelector(".copy-label") || (button.children.length === 0 ? button : null);
+          button.setAttribute("data-copied", "");
+          if (label) {
+            var text = label.textContent;
+            label.textContent = "Copied";
+            window.setTimeout(function () { label.textContent = text; button.removeAttribute("data-copied"); }, 1500);
+          } else {
+            window.setTimeout(function () { button.removeAttribute("data-copied"); }, 1500);
+          }
+        }
+        document.addEventListener("click", function (event) {
+          var target = event.target;
+          if (!(target instanceof Element)) return;
+          var button = target.closest("[data-copy]");
+          if (!button) return;
+          var text = button.getAttribute("data-copy") || "";
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () { flash(button); }, function () { /* the text stays visible */ });
+            return;
+          }
+          try {
+            var area = document.createElement("textarea");
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            document.body.removeChild(area);
+            flash(button);
+          } catch (err) { /* the text stays visible */ }
+        });
+      })();
+    </script>
+  </body>
+</html>

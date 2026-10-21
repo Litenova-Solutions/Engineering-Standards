@@ -444,11 +444,9 @@ sealed class UiFixture : IDisposable
             foreach (var key in jsonObject.Select(entry => entry.Key).ToList())
             {
                 var child = jsonObject[key];
-                if (child is JsonValue value && value.TryGetValue<string>(out var text)
-                    && text.StartsWith("__", StringComparison.Ordinal))
+                if (child is JsonValue value && value.TryGetValue<string>(out var text) && text.Contains("__", StringComparison.Ordinal))
                 {
-                    var lowered = text.Substring(2).ToLowerInvariant();
-                    jsonObject[key] = lowered.Length == 0 ? "fixture" : lowered;
+                    jsonObject[key] = System.Text.RegularExpressions.Regex.Replace(text, "__[A-Z][A-Z0-9_]*?__", "fixture");
                 }
                 else
                 {
@@ -461,11 +459,9 @@ sealed class UiFixture : IDisposable
             for (var index = 0; index < jsonArray.Count; index++)
             {
                 var child = jsonArray[index];
-                if (child is JsonValue value && value.TryGetValue<string>(out var text)
-                    && text.StartsWith("__", StringComparison.Ordinal))
+                if (child is JsonValue value && value.TryGetValue<string>(out var text) && text.Contains("__", StringComparison.Ordinal))
                 {
-                    var lowered = text.Substring(2).ToLowerInvariant();
-                    jsonArray[index] = lowered.Length == 0 ? "fixture" : lowered;
+                    jsonArray[index] = System.Text.RegularExpressions.Regex.Replace(text, "__[A-Z][A-Z0-9_]*?__", "fixture");
                 }
                 else
                 {

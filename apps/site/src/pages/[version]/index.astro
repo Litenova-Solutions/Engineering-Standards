@@ -1,0 +1,235 @@
+---
+import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
+import { areas, areaOf, type Area } from "../../lib/areas";
+import { manifest, pages, pageUrl, provisions, version, type Page } from "../../lib/spec";
+import { renderFragment } from "../../lib/render-markdown";
+
+export async function getStaticPaths() {
+  return [{ params: { version } }];
+}
+
+interface AreaGroup {
+  area: Area;
+  entries: { page: Page; intent: string }[];
+}
+
+const groups: AreaGroup[] = [];
+for (const area of areas) {
+  const areaPages = pages.filter((page) => page.area === area.key);
+  if (areaPages.length === 0) continue;
+  const entries = [];
+  for (const page of areaPages) {
+    entries.push({ page, intent: await renderFragment(page, page.intent) });
+  }
+  groups.push({ area, entries });
+}
+const known = new Set(areas.map((area) => area.key));
+for (const key of pages.filter((page) => page.path !== "README").map((page) => page.area).filter((key) => !known.has(key))) {
+  if (groups.some((group) => group.area.key === key)) continue;
+  const areaPages = pages.filter((page) => page.area === key);
+  const entries = [];
+  for (const page of areaPages) {
+    entries.push({ page, intent: await renderFragment(page, page.intent) });
+  }
+  groups.push({ area: areaOf(key), entries });
+}
+
+const styleLabel: Record<Page["style"], string> = {
+  topic: "Standards",
+  stack: "Stack",
+  extension: "Extension",
+  pattern: "Pattern",
+  reference: "Reference",
+  command: "Command",
+  "how-to": "How-to",
+  tutorial: "Tutorial",
+  explanation: "Explanation",
+  index: "Index",
+  glossary: "Glossary",
+};
+
+function provisionText(count: number): string {
+  return count === 0 ? "No provisions" : count === 1 ? "1 provision" : `${count} provisions`;
+}
+
+function pageCountText(count: number): string {
+  return count === 1 ? "1 page" : `${count} pages`;
+}
+
+const stackCount = Object.keys(manifest.stacks).length;
+const extensionCount = Object.keys(manifest.extensions).length;
+
+const description =
+  `LiteSpec ${version}: ${pages.length} pages and ${provisions.size} provisions. ` +
+  "Every page by area, with its intent and provision count.";
+---
+
+<Base title={`LiteSpec ${version} - The standard by area`} description={description} active="docs">
+  <div class="page wrap">
+    <div class="inner">
+      <header class="page-head">
+        <span class="ver">{version}</span>
+        <h1>The standard</h1>
+        <p class="intro">
+          Every page of release {version} by area, with its intent and the provisions you can cite.{" "}
+          {stackCount} stacks and {extensionCount} extensions ship with this release.
+        </p>
+        <div class="cta">
+          <a class="btn" href={`/${version}/select/`}>Pages for my selection</a>
+          <a class="btn btn-outline" href="/llms.txt">llms.txt</a>
+        </div>
+      </header>
+      <nav class="jump" aria-label="Areas">
+        {groups.map((group) => (
+          <a class="btn btn-outline btn-sm" href={`#area-${group.area.key}`}>
+            <Icon name={group.area.icon} class="icon-sm" />{group.area.label}
+          </a>
+        ))}
+      </nav>
+      {groups.map((group) => (
+        <section id={`area-${group.area.key}`} class="area">
+          <div class="area-head">
+            <Icon name={group.area.icon} />
+            <h2>{group.area.label}</h2>
+            <span class="badge">{pageCountText(group.entries.length)}</span>
+          </div>
+          {group.area.note !== "" && <p class="area-note">{group.area.note}</p>}
+          <div class="listing">
+            {group.entries.map(({ page, intent }) => (
+              <div class="entry">
+                <div class="entry-main">
+                  <h3><a href={pageUrl(page)}>{page.title}</a></h3>
+                  {intent !== "" && <p class="entry-intent" set:html={intent} />}
+                </div>
+                <div class="entry-meta">
+                  <span class="badge">{styleLabel[page.style]}</span>
+                  <span class="prov-count">{provisionText(page.provisions.length)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page {
+    padding-top: 48px;
+    padding-bottom: 64px;
+  }
+  .inner {
+    max-width: 960px;
+  }
+  .page-head h1 {
+    font-size: 36px;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    margin: 12px 0 8px;
+  }
+  .intro {
+    color: var(--muted-fg);
+    max-width: 68ch;
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 32px 0 8px;
+  }
+  .area {
+    margin-top: 40px;
+    scroll-margin-top: 72px;
+  }
+  .area-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .area-head h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .area-head .icon {
+    color: var(--accent-text);
+  }
+  .area-note {
+    color: var(--muted-fg);
+    margin: 8px 0 16px;
+  }
+  .listing {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .entry {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+  }
+  .entry + .entry {
+    border-top: 1px solid var(--border);
+  }
+  .entry:hover {
+    background: var(--muted);
+  }
+  .entry-main {
+    min-width: 0;
+  }
+  .entry-main h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .entry-main h3 a:hover {
+    color: var(--accent-text);
+  }
+  .entry-intent {
+    color: var(--muted-fg);
+    font-size: 14px;
+    margin: 4px 0 0;
+  }
+  .entry-intent :global(a) {
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 3px;
+  }
+  .entry-intent :global(a):hover {
+    text-decoration-color: var(--accent);
+  }
+  .entry-intent :global(code) {
+    font-family: var(--mono);
+    font-size: 0.92em;
+  }
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: 8px;
+  }
+  .prov-count {
+    color: var(--muted-fg);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .entry {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+  }
+</style>

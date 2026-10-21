@@ -58,6 +58,14 @@ public sealed partial class ConsumerValidatorTests
         AssertClean(RunConsumer(folder.Path));
     }
 
+    [Fact(DisplayName = "a template placeholder left in the project file")]
+    public void TemplatePlaceholderLeftInTheProjectFile()
+    {
+        using var folder = ConsumerFixture.Create();
+        ConsumerFixture.MutateProject(folder.Path, project => project["owners"] = new JsonArray("__OWNER__"));
+        AssertProblem(RunConsumer(folder.Path), "template placeholder '__OWNER__' is not filled");
+    }
+
     [Fact(DisplayName = "size outside the allowed sizes")]
     public void SizeOutsideTheAllowedSizes()
     {

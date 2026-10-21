@@ -1,0 +1,15 @@
+page
+  breadcrumb "Home" "Orders" "SO-1042" "Delivery" "Plan"
+  header
+    heading "Garcia Interiors restock"
+    text "Delivery plan, 6 entries."
+    action "Add to the plan"
+  region "Delivery plan"
+    list 3
+      item: text "Loading bay booked" · text muted "08:00" · text muted "Chris Novak"
+  dialog "Add to the delivery plan"
+    field "What" text
+    field "When" text = "06:30"
+    field "Who" text
+    action "Cancel"
+    action primary "Add it"

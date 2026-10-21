@@ -1,0 +1,449 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<dialog class="pattern-viewer" data-pattern-viewer aria-label="Option viewer">
+  <div class="pattern-viewer-top">
+    <div class="pattern-viewer-title">
+      <code data-pattern-id></code>
+      <span class="pattern-viewer-name" data-pattern-name></span>
+      <span class="badge badge-rule" data-pattern-default hidden>Default</span>
+      <span class="pattern-viewer-pos muted" data-pattern-pos></span>
+    </div>
+    <div class="pattern-viewer-switch" role="group" aria-label="View">
+      <button type="button" class="pattern-viewer-pick" data-pattern-pick="desktop" aria-pressed="true"><Icon name="monitor" class="icon-sm" />Desktop</button>
+      <button type="button" class="pattern-viewer-pick" data-pattern-pick="phone" aria-pressed="false"><Icon name="phone" class="icon-sm" />Phone</button>
+      <button type="button" class="pattern-viewer-pick" data-pattern-pick="wireframe" aria-pressed="false"><Icon name="code" class="icon-sm" />Wireframe</button>
+    </div>
+    <div class="pattern-viewer-nav">
+      <button type="button" class="btn btn-outline btn-icon" data-pattern-prev aria-label="Previous option"><Icon name="arrow-left" class="icon-sm" /></button>
+      <button type="button" class="btn btn-outline btn-icon" data-pattern-next aria-label="Next option"><Icon name="arrow" class="icon-sm" /></button>
+      <button type="button" class="btn btn-outline btn-sm" data-pattern-close><Icon name="close" class="icon-sm" />Close</button>
+    </div>
+  </div>
+  <div class="pattern-viewer-body" data-pattern-body></div>
+</dialog>
+<style>
+  .pattern-viewer {
+    width: calc(100vw - 32px);
+    height: calc(100dvh - 32px);
+    max-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    overflow: hidden;
+  }
+  .pattern-viewer::backdrop {
+    background: color-mix(in srgb, var(--outside) 80%, transparent);
+  }
+  .pattern-viewer[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  .pattern-viewer-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .pattern-viewer-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .pattern-viewer-title code {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    white-space: nowrap;
+  }
+  .pattern-viewer-name {
+    font-weight: 500;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .pattern-viewer-title .badge[hidden] {
+    display: none;
+  }
+  .pattern-viewer-pos {
+    font-size: 13px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .pattern-viewer-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+  }
+  .pattern-viewer-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted-fg);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .pattern-viewer-pick:hover {
+    color: var(--fg);
+  }
+  .pattern-viewer-pick[aria-pressed="true"] {
+    background: var(--muted);
+    border-color: var(--border);
+    color: var(--fg);
+  }
+  .pattern-viewer-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pattern-viewer-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: var(--muted);
+  }
+  :global(.pattern-viewer-stage) {
+    box-sizing: border-box;
+    min-height: 100%;
+    display: flex;
+    padding: 16px;
+  }
+  :global(.pattern-viewer-frame) {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    min-width: 0;
+  }
+  :global(.pattern-viewer-stage-desktop .pattern-viewer-frame) {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
+  :global(.pattern-viewer-stage-desktop .pattern-viewer-frame svg) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  :global(.pattern-viewer-stage-phone) {
+    justify-content: center;
+    align-items: center;
+  }
+  :global(.pattern-viewer-stage-phone .pattern-viewer-frame) {
+    flex: none;
+    width: min(440px, 100%);
+  }
+  :global(.pattern-viewer-stage-phone .pattern-viewer-frame svg) {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    display: block;
+  }
+  :global(.pattern-viewer-code) {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin: 16px;
+    overflow: hidden;
+  }
+  :global(.pattern-viewer-code-head) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--muted-strong);
+    font-size: 13px;
+    color: var(--muted-fg);
+  }
+  :global(.pattern-viewer-code-head .btn) {
+    margin-left: auto;
+  }
+  :global(.pattern-viewer-code pre) {
+    margin: 0;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: auto;
+    background: var(--bg);
+  }
+  :global(.pattern-viewer-code code) {
+    font-family: inherit;
+    font-size: inherit;
+  }
+  @media (max-width: 760px) {
+    .pattern-viewer {
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      max-width: 100vw;
+      max-height: 100dvh;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+    }
+    .pattern-viewer-title {
+      flex: 1 1 100%;
+    }
+    :global(.pattern-viewer-stage) {
+      padding: 12px;
+    }
+    :global(.pattern-viewer-frame) {
+      padding: 12px;
+    }
+    :global(.pattern-viewer-code) {
+      margin: 12px;
+    }
+  }
+</style>
+<script>
+  (function () {
+    var dialog = document.querySelector("[data-pattern-viewer]");
+    if (!(dialog instanceof HTMLDialogElement)) return;
+    var cards = Array.prototype.slice.call(document.querySelectorAll("section.option"));
+    var body = dialog.querySelector("[data-pattern-body]");
+    var idEl = dialog.querySelector("[data-pattern-id]");
+    var nameEl = dialog.querySelector("[data-pattern-name]");
+    var defaultEl = dialog.querySelector("[data-pattern-default]");
+    var posEl = dialog.querySelector("[data-pattern-pos]");
+    var picks = Array.prototype.slice.call(dialog.querySelectorAll("[data-pattern-pick]"));
+    var prevBtn = dialog.querySelector("[data-pattern-prev]");
+    var nextBtn = dialog.querySelector("[data-pattern-next]");
+    var closeBtn = dialog.querySelector("[data-pattern-close]");
+    if (
+      !(body instanceof HTMLElement) ||
+      !(idEl instanceof HTMLElement) ||
+      !(nameEl instanceof HTMLElement) ||
+      !(defaultEl instanceof HTMLElement) ||
+      !(posEl instanceof HTMLElement) ||
+      !(prevBtn instanceof HTMLButtonElement) ||
+      !(nextBtn instanceof HTMLButtonElement) ||
+      !(closeBtn instanceof HTMLButtonElement)
+    ) {
+      return;
+    }
+    document.documentElement.classList.add("pattern-js");
+
+    var current = 0;
+    var view = "desktop";
+    var opener = null;
+
+    function cardLabel(card) {
+      return card.getAttribute("data-option-id") || "option";
+    }
+
+    function render() {
+      var card = cards[current];
+      var id = cardLabel(card);
+      var name = card.getAttribute("data-option-name") || "";
+      idEl.textContent = id;
+      nameEl.textContent = name;
+      if (card.querySelector(".option-head .badge")) defaultEl.removeAttribute("hidden");
+      else defaultEl.setAttribute("hidden", "");
+      posEl.textContent = current + 1 + " of " + cards.length;
+      dialog.setAttribute("aria-label", "Option " + id + " viewer");
+      picks.forEach(function (pick) {
+        var active = pick.getAttribute("data-pattern-pick") === view;
+        pick.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      body.innerHTML = "";
+      if (view === "desktop" || view === "phone") {
+        var source = card.querySelector('[data-view="' + view + '"] .option-drawing');
+        var stage = document.createElement("div");
+        stage.className = "pattern-viewer-stage pattern-viewer-stage-" + view;
+        var frame = document.createElement("div");
+        frame.className = "pattern-viewer-frame";
+        frame.setAttribute("role", "img");
+        frame.setAttribute(
+          "aria-label",
+          (view === "desktop" ? "Wireframe drawing of " : "Phone wireframe drawing of ") + id
+        );
+        if (source) frame.innerHTML = source.innerHTML;
+        stage.appendChild(frame);
+        body.appendChild(stage);
+      } else {
+        var copyBtn = card.querySelector('[data-panel="wireframe"] [data-copy]');
+        var text = copyBtn ? copyBtn.getAttribute("data-copy") || "" : "";
+        var wrap = document.createElement("div");
+        wrap.className = "pattern-viewer-code";
+        var head = document.createElement("div");
+        head.className = "pattern-viewer-code-head";
+        var caption = document.createElement("span");
+        caption.textContent = "Wireframe text";
+        head.appendChild(caption);
+        if (copyBtn) head.appendChild(copyBtn.cloneNode(true));
+        wrap.appendChild(head);
+        var pre = document.createElement("pre");
+        var code = document.createElement("code");
+        code.textContent = text + "\n";
+        pre.appendChild(code);
+        wrap.appendChild(pre);
+        body.appendChild(wrap);
+      }
+    }
+
+    function setView(next) {
+      view = next;
+      render();
+    }
+
+    function step(delta) {
+      current = (current + delta + cards.length) % cards.length;
+      render();
+    }
+
+    function openViewer(index, nextView, from) {
+      if (cards.length === 0) return;
+      current = index;
+      view = nextView === "phone" || nextView === "wireframe" ? nextView : "desktop";
+      opener = from instanceof HTMLElement ? from : null;
+      render();
+      if (!dialog.open) dialog.showModal();
+      closeBtn.focus();
+    }
+
+    function selectTab(card, name) {
+      var tabs = Array.prototype.slice.call(card.querySelectorAll('[role="tab"]'));
+      tabs.forEach(function (tab) {
+        var active = tab.getAttribute("data-tab") === name;
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+        var panel = card.querySelector('[data-panel="' + tab.getAttribute("data-tab") + '"]');
+        if (panel instanceof HTMLElement && active) panel.removeAttribute("hidden");
+        else if (panel instanceof HTMLElement) panel.setAttribute("hidden", "");
+      });
+    }
+
+    cards.forEach(function (card, index) {
+      var tabs = card.querySelector(".option-tabs");
+      var expand = card.querySelector("[data-expand]");
+      var wire = card.querySelector('[data-panel="wireframe"]');
+      if (tabs instanceof HTMLElement) tabs.removeAttribute("hidden");
+      if (expand instanceof HTMLButtonElement) expand.removeAttribute("hidden");
+      if (wire instanceof HTMLElement) wire.setAttribute("hidden", "");
+
+      var buttons = Array.prototype.slice.call(card.querySelectorAll('[role="tab"]'));
+      buttons.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          var name = tab.getAttribute("data-tab") || "preview";
+          selectTab(card, name);
+        });
+      });
+      if (tabs instanceof HTMLElement) {
+        tabs.addEventListener("keydown", function (event) {
+          var names = buttons.map(function (tab) {
+            return tab.getAttribute("data-tab") || "preview";
+          });
+          var at = buttons.indexOf(document.activeElement);
+          var go = -1;
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            var delta = event.key === "ArrowLeft" ? -1 : 1;
+            go = (at + delta + buttons.length) % buttons.length;
+          } else if (event.key === "Home") {
+            event.preventDefault();
+            go = 0;
+          } else if (event.key === "End") {
+            event.preventDefault();
+            go = buttons.length - 1;
+          }
+          if (go !== -1 && buttons[go] instanceof HTMLButtonElement) {
+            selectTab(card, names[go]);
+            buttons[go].focus();
+          }
+        });
+      }
+
+      var frames = Array.prototype.slice.call(card.querySelectorAll("[data-view]"));
+      frames.forEach(function (frame) {
+        if (!(frame instanceof HTMLElement)) return;
+        var kind = frame.getAttribute("data-view") === "phone" ? "phone" : "desktop";
+        frame.setAttribute("tabindex", "0");
+        frame.setAttribute("role", "button");
+        frame.setAttribute("aria-label", "Open " + cardLabel(card) + " " + kind + " view full screen");
+        frame.addEventListener("click", function () {
+          openViewer(index, kind, frame);
+        });
+        frame.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openViewer(index, kind, frame);
+          }
+        });
+      });
+
+      if (expand instanceof HTMLButtonElement) {
+        expand.addEventListener("click", function () {
+          openViewer(index, "desktop", expand);
+        });
+      }
+    });
+
+    picks.forEach(function (pick) {
+      pick.addEventListener("click", function () {
+        setView(pick.getAttribute("data-pattern-pick") || "desktop");
+      });
+    });
+
+    prevBtn.addEventListener("click", function () {
+      step(-1);
+    });
+
+    nextBtn.addEventListener("click", function () {
+      step(1);
+    });
+
+    closeBtn.addEventListener("click", function () {
+      dialog.close();
+    });
+
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener("close", function () {
+      if (opener && document.contains(opener)) opener.focus();
+      opener = null;
+    });
+
+    dialog.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        step(-1);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        step(1);
+      } else if (event.key === "1") {
+        setView("desktop");
+      } else if (event.key === "2") {
+        setView("phone");
+      } else if (event.key === "3") {
+        setView("wireframe");
+      }
+    });
+  })();
+</script>

@@ -1,0 +1,13 @@
+page
+  breadcrumb "Home" "Orders" "SO-1042"
+  header
+    heading "SO-1042"
+    status "Paid" positive
+    text "Placed 8 Oct 2026, 09:32 by Maria Garcia of Garcia Interiors."
+    action "Resend the confirmation"
+    action "Refund"
+    action primary "Message customer"
+  region "The customer"
+    fact "Name" "Maria Garcia"
+    fact "Email" "maria@garcia-interiors.example"
+    fact "Country" "Netherlands"

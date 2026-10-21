@@ -1,0 +1,12 @@
+page
+  breadcrumb "Settings" "Team"
+  header
+    heading "Team"
+    text "Acme Supply · 5 members · 2 invitations outstanding."
+    action primary "Invite member"
+  region "Members"
+    table 5 "Member" "Role" "Access" "State"
+      item: avatar "SR" · text "Sam Rivera" · text "Owner" · text "Everything" · status "Active" positive · action "Manage"
+  region "Invitations · 2"
+    list 2
+      item: text "lina.meyer@example.org" · text muted "Invited as Picker · expires 13 Oct" · status "Sent" info · action "Resend"

@@ -1,0 +1,87 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { version } from "../lib/spec";
+
+const description =
+  "LiteSpec is the standards contract for one bounded-context business application, written for software work by people and AI agents.";
+---
+
+<Base title="LiteSpec - The spec your agents build from" description={description}>
+  <section class="hero">
+    <div class="hero-body">
+      <a class="badge" href="https://github.com/Litenova-Solutions/LiteSpec/blob/main/CHANGELOG.md"><span class="dot"></span>v{version} <Icon name="arrow" class="icon-sm" /></a>
+      <h1>The spec your agents build from.</h1>
+      <p class="tagline">Rules with IDs. Records your agents read. One URL to start.</p>
+      <div class="actions">
+        <a class="btn" href={`/${version}/select/`}>Start with your agent</a>
+        <a class="btn btn-outline" href={`/${version}/learn/`}>Learn how it works</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    isolation: isolate;
+    padding: 120px 0;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: 63px 63px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 70% 50%, black 0%, transparent 75%);
+    mask-image: radial-gradient(ellipse 70% 70% at 70% 50%, black 0%, transparent 75%);
+    opacity: 0.7;
+  }
+  .hero-body {
+    width: 100%;
+    padding: 0 64px;
+  }
+  .hero h1 {
+    font-size: 64px;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+    font-weight: 600;
+    max-width: 12ch;
+    margin: 22px 0 18px;
+  }
+  .tagline {
+    font-size: 18px;
+    color: var(--muted-fg);
+    max-width: 52ch;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 32px;
+  }
+  .hero a.badge:hover {
+    border-color: var(--rail);
+    color: var(--fg);
+  }
+  @media (max-width: 760px) {
+    .hero {
+      padding: 72px 0;
+    }
+    .hero-body {
+      padding: 0 16px;
+    }
+    .hero h1 {
+      font-size: 40px;
+    }
+    .actions {
+      flex-wrap: wrap;
+    }
+  }
+</style>

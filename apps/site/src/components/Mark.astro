@@ -1,0 +1,15 @@
+---
+// The LiteSpec mark drawn inline, so its charcoal lines follow the theme's
+// stroke color while the amber path stays the brand amber.
+interface Props {
+  size?: number;
+}
+
+const { size = 22 } = Astro.props;
+---
+
+<svg width={size} height={size} viewBox="0 0 128 128" aria-hidden="true">
+  <g fill="none" stroke="var(--stroke)" stroke-linecap="round" stroke-width="9"><path d="M18 28h92" /><path d="M18 64h92" /><path d="M18 100h92" /></g>
+  <path d="M36 28 78 64 52 100" fill="none" stroke="#f8c258" stroke-linecap="round" stroke-linejoin="round" stroke-width="11" />
+  <g fill="#f8c258" stroke="var(--stroke)" stroke-width="5"><circle cx="36" cy="28" r="8" /><circle cx="78" cy="64" r="8" /><circle cx="52" cy="100" r="8" /></g>
+</svg>

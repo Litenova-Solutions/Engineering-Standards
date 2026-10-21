@@ -1,0 +1,10 @@
+page
+  breadcrumb "Home" "Orders"
+  header
+    heading "Orders"
+    text "268 orders from 96 customers."
+    action "Download"
+  field "Order number, name or email" search
+  region "Orders"
+    table 4 "Order" "Customer" "Placed" "State" "Paid (EUR)"
+      item: text "SO-1042" · text "Maria Garcia" · text "8 Oct 2026, 09:32" · status "Paid" positive · text "€125.00"

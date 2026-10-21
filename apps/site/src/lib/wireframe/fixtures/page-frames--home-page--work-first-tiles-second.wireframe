@@ -1,0 +1,16 @@
+page
+  header
+    heading "Good afternoon, Alex"
+    text "Two things need you today. Dispatch for the Garcia restock starts Saturday."
+    action primary "New delivery"
+  region "Needs attention"
+    status "2 to do" caution
+    list 2
+      item: text "Close out the Becker restock" · text muted "The delivery is complete. Nothing left to settle." · action "Close out"
+  region "Coming up"
+    list 2
+      item: text "Garcia Interiors restock" · text muted "Sat 14 Mar 2026, 08:00 to 12:00" · status "Active" positive · action "Open delivery"
+  row
+    figure "Ordered this month" "9,412"
+    figure "Paid out by the provider" "EUR 57,506"
+    figure "Active now" "2"

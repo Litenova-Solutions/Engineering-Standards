@@ -1,0 +1,13 @@
+page
+  breadcrumb "Home" "Products" "Oak desk lamp"
+  header
+    heading "Pricing"
+    text "What each unit costs."
+  region "Standard tier"
+    row
+      field "Standard unit price" number = "45.00"
+      field "Currency" select = "EUR"
+    text muted "45,00 or 45.00. Up to two decimal places."
+    row
+      field "Delivery fee customers pay" number = "5.00"
+      field "Currency" select = "EUR"

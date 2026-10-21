@@ -69,6 +69,13 @@ static partial class StandardsValidator
             return "how-to";
         }
 
+        // An explanation page builds understanding. Its sections are free, it owns no
+        // provisions, and no selection applies it.
+        if (segments[0] == "learn")
+        {
+            return "explanation";
+        }
+
         if (Patterns.PatternPage.IsPatternPage(relative))
         {
             return "pattern";
@@ -261,6 +268,11 @@ static partial class StandardsValidator
         if (kind == "index" && (sections.Count == 0 || sections[0].Name != "Intent"))
         {
             add(relative, sections.Count > 0 ? sections[0].Line : 1, "INDEX_INTENT", "an index must start with an Intent H2");
+        }
+
+        if (kind == "explanation" && (sections.Count == 0 || sections[0].Name != "Intent"))
+        {
+            add(relative, sections.Count > 0 ? sections[0].Line : 1, "PAGE_MISSING_SECTION", "an explanation page starts with an Intent H2");
         }
 
         if (kind != "glossary")

@@ -1,0 +1,11 @@
+page
+  breadcrumb "Home" "Products" "Spring lighting launch"
+  header
+    heading "Spring lighting launch"
+    text "Sat 14 Mar 2026 at the Amsterdam warehouse. 1,204 pre-orders."
+  dialog "Cancel this launch for good?"
+    text "1,204 customers will be refunded EUR 54,180.00 and told the launch is off."
+    message "This cannot be undone." critical
+    field "Type the launch name to confirm" text = "Spring lighting launch"
+    action "Keep the launch"
+    action disabled "Cancel the launch"

@@ -1,0 +1,705 @@
+---
+/* Project selection form for /[version]/select/. Rendered statically with
+   default values, then updated live by one small inline script. */
+import Icon from "./Icon.astro";
+
+export interface ExtensionInfo {
+  id: string;
+  title: string;
+  activationScope: string;
+  stack: string | null;
+  layerUrl: string;
+}
+
+export interface SelectionInfo {
+  shape: string;
+  stacks: string[];
+  key: string;
+  indexUrl: string;
+}
+
+export interface PresetInfo {
+  name: string;
+  shape: string;
+  stacks: string[];
+}
+
+interface Props {
+  version: string;
+  siteOrigin: string;
+  shapes: string[];
+  backendStacks: string[];
+  frontendStacks: string[];
+  extensions: ExtensionInfo[];
+  selections: SelectionInfo[];
+  presets: PresetInfo[];
+  defaultSize: string;
+  defaultShape: string;
+  defaultBackend: string;
+  defaultFrontend: string;
+  initialIndexUrl: string;
+  initialAgents: string;
+  initialProjectJson: string;
+  initialPresetCommand: string;
+}
+
+const {
+  version,
+  siteOrigin,
+  shapes,
+  backendStacks,
+  frontendStacks,
+  extensions,
+  selections,
+  presets,
+  defaultSize,
+  defaultShape,
+  defaultBackend,
+  defaultFrontend,
+  initialIndexUrl,
+  initialAgents,
+  initialProjectJson,
+  initialPresetCommand,
+} = Astro.props as Props;
+
+const payload = JSON.stringify({
+  version,
+  siteOrigin,
+  shapes,
+  backendStacks,
+  frontendStacks,
+  extensions,
+  selections,
+  presets,
+  defaultSize,
+  defaultShape,
+  defaultBackend,
+  defaultFrontend,
+});
+
+function capitalize(value: string): string {
+  return value.length === 0 ? value : value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function joinList(items: string[]): string {
+  if (items.length === 0) return "none";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function sameMembers(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((item) => b.includes(item));
+}
+
+const defaultStackList =
+  defaultShape === "server"
+    ? defaultFrontend ? [defaultBackend, defaultFrontend] : [defaultBackend]
+    : defaultFrontend ? [defaultFrontend] : [];
+const defaultPresetName =
+  presets.find((preset) => preset.shape === defaultShape && sameMembers(preset.stacks, defaultStackList))?.name ?? "";
+---
+
+<div>
+  <div class="select-layout">
+    <form id="select-form" class="select-choices">
+      <fieldset class="select-group">
+        <legend>Preset</legend>
+        <p class="select-hint">A preset sets the shape and stacks. Adjust the answers after it.</p>
+        <div class="select-tiles">
+          {
+            presets.map((preset) => (
+              <label class="select-tile">
+                <input
+                  class="visually-hidden"
+                  type="radio"
+                  name="preset"
+                  value={preset.name}
+                  checked={defaultPresetName === preset.name}
+                  data-preset-option={preset.name}
+                />
+                <span class="select-tile-name">{preset.name}</span>
+                <span class="select-tile-note">{capitalize(preset.shape)}: {joinList(preset.stacks)}.</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <fieldset class="select-group">
+        <legend>Size</legend>
+        <div class="select-tiles">
+          <label class="select-tile">
+            <input class="visually-hidden" type="radio" name="size" value="small" checked={defaultSize === "small"} />
+            <span class="select-tile-name">Small</span>
+            <span class="select-tile-note">One team, no journeys or cases.</span>
+          </label>
+          <label class="select-tile">
+            <input class="visually-hidden" type="radio" name="size" value="large" checked={defaultSize === "large"} />
+            <span class="select-tile-name">Large</span>
+            <span class="select-tile-note">Journeys, cases, and the Acceptance project.</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset class="select-group">
+        <legend>Shape</legend>
+        <div class="select-tiles">
+          {
+            shapes.map((shape) => (
+              <label class="select-tile">
+                <input
+                  class="visually-hidden"
+                  type="radio"
+                  name="shape"
+                  id={`select-shape-${shape}`}
+                  value={shape}
+                  checked={defaultShape === shape}
+                />
+                <span class="select-tile-name">{capitalize(shape)}</span>
+                <span class="select-tile-note">{shape === "server" ? "One API deployable and one database." : "No server of its own."}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <fieldset class="select-group" id="select-backend-group">
+        <legend>Backend stack</legend>
+        <p class="select-hint" id="select-backend-note">
+          A server project selects one backend stack. Client-only projects use no backend stack.
+        </p>
+        <div class="select-tiles">
+          {
+            backendStacks.map((id) => (
+              <label class="select-tile">
+                <input
+                  class="visually-hidden"
+                  type="radio"
+                  name="backend"
+                  id={`select-backend-${id}`}
+                  value={id}
+                  checked={defaultBackend === id}
+                  data-backend-option={id}
+                />
+                <span class="select-tile-name">{id}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <fieldset class="select-group">
+        <legend>Frontend stack</legend>
+        <p class="select-hint" id="select-frontend-note">
+          A client-only project selects one frontend stack. A choice is disabled when no published
+          selection combines it with the other answers.
+        </p>
+        <div class="select-tiles">
+          <label class="select-tile">
+            <input
+              class="visually-hidden"
+              type="radio"
+              name="frontend"
+              id="select-frontend-none"
+              value=""
+              checked={defaultFrontend === ""}
+              data-frontend-option="none"
+            />
+            <span class="select-tile-name">None</span>
+            <span class="select-tile-note">Server projects may ship no frontend.</span>
+          </label>
+          {
+            frontendStacks.map((id) => (
+              <label class="select-tile">
+                <input
+                  class="visually-hidden"
+                  type="radio"
+                  name="frontend"
+                  id={`select-frontend-${id}`}
+                  value={id}
+                  checked={defaultFrontend === id}
+                  data-frontend-option={id}
+                />
+                <span class="select-tile-name">{id}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <fieldset class="select-group">
+        <legend>Extensions</legend>
+        <p class="select-hint">
+          Only extensions that support a selected stack are shown. Each line names the scope from
+          the manifest.
+        </p>
+        <div class="select-tiles">
+          {
+            extensions.map((ext) => (
+              <label class="select-tile" data-extension-row={ext.id}>
+                <input
+                  class="visually-hidden"
+                  type="checkbox"
+                  name="extension"
+                  id={`select-ext-${ext.id}`}
+                  value={ext.id}
+                  data-extension-option={ext.id}
+                  data-extension-stack={ext.stack ?? ""}
+                />
+                <span class="select-tile-name">{ext.id} - {ext.title}</span>
+                <span class="select-tile-note">Scope: {ext.activationScope || "project"}{ext.stack ? ` - needs the ${ext.stack} stack` : " - works with every stack"}.</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+    </form>
+    <div class="select-results">
+      <section class="select-output" aria-live="polite" aria-labelledby="select-index-heading">
+        <div class="select-output-head">
+          <h2 id="select-index-heading">Agent index URL</h2>
+          <span class="select-output-actions">
+            <a class="btn btn-outline btn-sm" id="select-open-index" href={initialIndexUrl}>Open</a>
+            <button class="btn btn-outline btn-sm" type="button" id="select-copy-index" data-copy={initialIndexUrl}>
+              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+            </button>
+          </span>
+        </div>
+        <pre class="select-output-body"><code id="select-index-link">{initialIndexUrl}</code></pre>
+      </section>
+      <section class="select-output" aria-live="polite" aria-labelledby="select-agents-heading">
+        <div class="select-output-head">
+          <h2 id="select-agents-heading">AGENTS.md block</h2>
+          <span class="select-output-actions">
+            <button class="btn btn-outline btn-sm" type="button" id="select-copy-agents" data-copy={initialAgents}>
+              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+            </button>
+          </span>
+        </div>
+        <pre class="select-output-body"><code id="select-agents">{initialAgents}</code></pre>
+      </section>
+      <section class="select-output" aria-live="polite" aria-labelledby="select-project-heading">
+        <div class="select-output-head">
+          <h2 id="select-project-heading">litespec.project.json fragment</h2>
+          <span class="select-output-actions">
+            <button class="btn btn-outline btn-sm" type="button" id="select-copy-project" data-copy={initialProjectJson}>
+              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+            </button>
+          </span>
+        </div>
+        <pre class="select-output-body"><code id="select-project">{initialProjectJson}</code></pre>
+      </section>
+      <section class="select-output" aria-live="polite" aria-labelledby="select-preset-heading">
+        <div class="select-output-head">
+          <h2 id="select-preset-heading">Start command</h2>
+          <span class="select-output-actions">
+            <button class="btn btn-outline btn-sm" type="button" id="select-copy-preset" data-copy={initialPresetCommand}>
+              <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy</span>
+            </button>
+          </span>
+        </div>
+        <pre class="select-output-body"><code id="select-preset">{initialPresetCommand === "" ? "No preset matches this selection. Use the values above in litespec.project.json." : initialPresetCommand}</code></pre>
+      </section>
+    </div>
+  </div>
+  <section class="select-all" aria-labelledby="select-all-heading">
+    <h2 id="select-all-heading">Every selection</h2>
+    <p class="select-hint">Each link opens the published agent index for that selection.</p>
+    <ul>
+      {
+        selections.map((selection) => (
+          <li>
+            <code>{selection.key}</code>{": "}
+            <a href={siteOrigin + selection.indexUrl}>
+              {siteOrigin + selection.indexUrl}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</div>
+<style>
+  .select-layout {
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .select-choices {
+    display: grid;
+    gap: 22px;
+    min-width: 0;
+  }
+  .select-group {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .select-group legend {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0;
+  }
+  .select-hint {
+    color: var(--muted-fg);
+    font-size: 13px;
+    margin: 4px 0 0;
+  }
+  .select-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .select-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    cursor: pointer;
+  }
+  .select-tile:hover {
+    border-color: var(--rail);
+  }
+  .select-tile:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+  }
+  .select-tile:has(input:checked)::after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .select-tile:has(input:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .select-tile:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .select-tile-name {
+    font-size: 14px;
+    font-weight: 500;
+    padding-right: 14px;
+    overflow-wrap: anywhere;
+  }
+  .select-tile-note {
+    color: var(--muted-fg);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .select-results {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+    position: sticky;
+    top: calc(var(--top) + 24px);
+  }
+  .select-output {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    overflow: hidden;
+    min-width: 0;
+  }
+  .select-output-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 12px;
+    background: var(--muted-strong);
+    border-bottom: 1px solid var(--border);
+  }
+  .select-output-head h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-fg);
+    min-width: 0;
+  }
+  .select-output-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    flex: none;
+  }
+  .select-output-body {
+    margin: 0;
+    padding: 12px;
+    background: var(--code-bg);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .select-output-body code {
+    font: inherit;
+    overflow-wrap: anywhere;
+  }
+  .select-all {
+    margin-top: 40px;
+  }
+  .select-all h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .select-all ul {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .select-all li {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 0;
+  }
+  .select-all li code {
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .select-all li a {
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 3px;
+  }
+  .select-all li a:hover {
+    text-decoration-color: var(--accent);
+  }
+  @media (max-width: 960px) {
+    .select-layout {
+      grid-template-columns: 1fr;
+    }
+    .select-results {
+      position: static;
+    }
+  }
+</style>
+<script type="application/json" id="select-data" set:html={payload}></script>
+<script is:inline>
+(function () {
+  var dataEl = document.getElementById("select-data");
+  var form = document.getElementById("select-form");
+  if (!dataEl || !form) return;
+  var data = JSON.parse(dataEl.textContent || "{}");
+  var origin = data.siteOrigin || "https://litespec.dev";
+
+  function sameMembers(a, b) {
+    if (a.length !== b.length) return false;
+    return a.every(function (item) { return b.indexOf(item) !== -1; });
+  }
+
+  function joinList(items) {
+    if (items.length === 0) return "none";
+    if (items.length === 1) return items[0];
+    if (items.length === 2) return items[0] + " and " + items[1];
+    return items.slice(0, -1).join(", ") + " and " + items[items.length - 1];
+  }
+
+  function checkedValue(name) {
+    var input = form.querySelector('input[name="' + name + '"]:checked');
+    return input ? input.value : "";
+  }
+
+  function checkedExtensions() {
+    var out = [];
+    var boxes = form.querySelectorAll('input[data-extension-option]:checked');
+    for (var i = 0; i < boxes.length; i++) out.push(boxes[i].value);
+    return out;
+  }
+
+  function findSelection(shape, stacks) {
+    for (var i = 0; i < data.selections.length; i++) {
+      var entry = data.selections[i];
+      if (entry.shape === shape && sameMembers(entry.stacks, stacks)) return entry;
+    }
+    return null;
+  }
+
+  function stacksFor(shape, backend, frontend) {
+    if (shape === "server") {
+      return frontend ? [backend, frontend] : [backend];
+    }
+    return frontend ? [frontend] : [];
+  }
+
+  function presetByName(name) {
+    for (var i = 0; i < data.presets.length; i++) {
+      if (data.presets[i].name === name) return data.presets[i];
+    }
+    return null;
+  }
+
+  function presetFor(shape, stacks) {
+    for (var i = 0; i < data.presets.length; i++) {
+      if (data.presets[i].shape === shape && sameMembers(data.presets[i].stacks, stacks)) {
+        return data.presets[i];
+      }
+    }
+    return null;
+  }
+
+  function applyPreset(name) {
+    var preset = presetByName(name);
+    if (!preset) return;
+    var shapeInput = form.querySelector('input[name="shape"][value="' + preset.shape + '"]');
+    if (shapeInput) shapeInput.checked = true;
+    if (preset.shape === "server") {
+      var backend = form.querySelector('input[name="backend"][value="' + (preset.stacks[0] || "") + '"]');
+      if (backend) backend.checked = true;
+      var frontend = preset.stacks[1]
+        ? form.querySelector('input[name="frontend"][value="' + preset.stacks[1] + '"]')
+        : form.querySelector('input[data-frontend-option="none"]');
+      if (frontend) frontend.checked = true;
+    } else {
+      var only = form.querySelector('input[name="frontend"][value="' + (preset.stacks[0] || "") + '"]');
+      if (only) only.checked = true;
+    }
+  }
+
+  function syncPreset(shape, stacks) {
+    var match = presetFor(shape, stacks);
+    var inputs = form.querySelectorAll('input[data-preset-option]');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].checked = !!match && inputs[i].value === match.name;
+    }
+  }
+
+  function setCopy(id, text) {
+    var button = document.getElementById(id);
+    if (button) button.setAttribute("data-copy", text);
+  }
+
+  function update(event) {
+    if (
+      event && event.target instanceof HTMLInputElement &&
+      event.target.name === "preset" && event.target.checked
+    ) {
+      applyPreset(event.target.value);
+    }
+
+    var size = checkedValue("size") || data.defaultSize;
+    var shape = checkedValue("shape") || data.defaultShape;
+    var backend = checkedValue("backend") || data.defaultBackend;
+    var frontend = checkedValue("frontend");
+    if (shape !== "server") frontend = frontend || data.frontendStacks[0] || "";
+    var stacks = stacksFor(shape, backend, frontend);
+
+    var backendInputs = form.querySelectorAll('input[name="backend"]');
+    for (var b = 0; b < backendInputs.length; b++) {
+      backendInputs[b].disabled = shape !== "server";
+    }
+    var backendNote = document.getElementById("select-backend-note");
+    if (backendNote) {
+      backendNote.textContent = shape === "server"
+        ? "A server project selects one backend stack. Client-only projects use no backend stack."
+        : "Client-only projects use no backend stack. The backend choice is disabled.";
+    }
+
+    var frontendInputs = form.querySelectorAll('input[data-frontend-option]');
+    for (var f = 0; f < frontendInputs.length; f++) {
+      var option = frontendInputs[f].getAttribute("data-frontend-option");
+      var candidate = option === "none" ? [] : [option];
+      var valid;
+      if (shape === "server") {
+        valid = option === "none" || findSelection(shape, [backend, option]) !== null;
+      } else {
+        valid = option !== "none" && findSelection(shape, candidate) !== null;
+      }
+      frontendInputs[f].disabled = !valid;
+      var field = frontendInputs[f].closest(".select-tile");
+      if (field) {
+        field.title = valid ? "" : "No published selection combines this stack with the other answers.";
+      }
+    }
+    var checkedFrontend = form.querySelector('input[name="frontend"]:checked');
+    if (checkedFrontend && checkedFrontend.disabled) {
+      var firstValid = form.querySelector('input[data-frontend-option]:not(:disabled)');
+      if (firstValid) {
+        firstValid.checked = true;
+        frontend = firstValid.value;
+        stacks = stacksFor(shape, backend, frontend);
+      }
+    }
+
+    var rows = form.querySelectorAll("[data-extension-row]");
+    for (var r = 0; r < rows.length; r++) {
+      var box = rows[r].querySelector('input[data-extension-option]');
+      if (!box) continue;
+      var need = box.getAttribute("data-extension-stack") || "";
+      var applies = need === "" || stacks.indexOf(need) !== -1;
+      rows[r].style.display = applies ? "" : "none";
+      box.disabled = !applies;
+      if (!applies) box.checked = false;
+    }
+
+    var selection = findSelection(shape, stacks);
+    var indexAbsolute = selection ? origin + selection.indexUrl : origin + "/select/";
+    var chosen = checkedExtensions();
+    var layerById = {};
+    for (var e = 0; e < data.extensions.length; e++) {
+      layerById[data.extensions[e].id] = origin + data.extensions[e].layerUrl;
+    }
+    var agentText = [
+      "## LiteSpec",
+      "This project follows LiteSpec " + data.version + ": size " + size + ", shape " + shape +
+        ", stacks " + joinList(stacks) + ", extensions " + (chosen.length ? chosen.join(", ") : "none") + ".",
+      "Before a task, read " + indexAbsolute + " and fetch only the pages the task touches.",
+      "Selected extensions: " + (chosen.length ? chosen.map(function (id) { return layerById[id]; }).join(", ") : "none"),
+      "UI work: the pattern pages listed in that index.",
+    ].join("\n");
+    var projectJson = JSON.stringify(
+      { size: size, shape: shape, stacks: stacks, selectedExtensions: chosen },
+      null,
+      2
+    );
+    var preset = presetFor(shape, stacks);
+    var presetText = preset
+      ? "litespec init --preset " + preset.name + " --size " + size
+      : "No preset matches this selection. Use the values above in litespec.project.json.";
+
+    syncPreset(shape, stacks);
+
+    var link = document.getElementById("select-index-link");
+    if (link) {
+      if (link instanceof HTMLInputElement) link.value = indexAbsolute;
+      else link.textContent = indexAbsolute;
+    }
+    var open = document.getElementById("select-open-index");
+    if (open) open.setAttribute("href", indexAbsolute);
+    var agents = document.getElementById("select-agents");
+    if (agents) agents.textContent = agentText;
+    var project = document.getElementById("select-project");
+    if (project) project.textContent = projectJson;
+    var presetEl = document.getElementById("select-preset");
+    if (presetEl) presetEl.textContent = presetText;
+
+    setCopy("select-copy-index", indexAbsolute);
+    setCopy("select-copy-agents", agentText);
+    setCopy("select-copy-project", projectJson);
+    setCopy("select-copy-preset", presetText);
+  }
+
+  form.addEventListener("change", update);
+
+  update(null);
+})();
+</script>

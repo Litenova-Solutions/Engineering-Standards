@@ -25,7 +25,8 @@ LiteSpec/
 │                            The validator parses each one as a virtual page, so a seed always passes.
 ├─ litespec.manifest.json    The release: version, stacks, shapes, extensions, toolchain and package pins, UI baselines
 ├─ apps/
-│  └─ cli/                   The `litespec` command line (section 5)
+│  ├─ cli/                   The `litespec` command line (section 5)
+│  └─ site/                  litespec.dev: a static Astro site built from the standard (section 8)
 ├─ assets/litespec-icon.svg  The product mark
 ├─ .github/                  CI workflow, pull request template, issue forms, Copilot adapter
 ├─ .agents/records/          Release working records for the owner's review (this page and decisions.md).
@@ -50,6 +51,7 @@ A consumer pins the repository root as a submodule at `litespec/`, so every path
 ```text
 docs/
 ├─ README.md                 The human index: one line per page, by area
+├─ learn/                    Explanation pages for people new to LiteSpec; no selection applies them
 ├─ core/                     Applies to every project
 │  ├─ system.md              What LiteSpec is, the record catalogue, the consumer documentation layout
 │  ├─ model.md               Record types, their homes, fields, links and the checks the model builder runs
@@ -146,3 +148,25 @@ apps/cli/
 ## 7. The project file
 
 A consumer's `litespec.project.json` names its `size`, `shape`, `stacks`, `paths` (record roots, code roots, frontends, UI files) and `selectedExtensions`, and records `reviewedLiteSpecVersion`. `litespec init --preset <name> --size <small|large>` writes a first one. `litespec consumer` refuses a stack the release does not ship, a `server` project without exactly one backend stack, a `client-only` project naming one, a frontend platform the project does not name, an unmet `requires` or `pairsWith`, and an extension whose stack is not selected.
+
+## 8. The site: apps/site/
+
+```text
+apps/site/
+├─ astro.config.mjs          Static output; writes Cloudflare's _redirects (/latest -> the release) after the build
+├─ package.json              Astro 7, @astrojs/markdown-remark, Pagefind
+├─ pnpm-workspace.yaml       Allows esbuild's install script, which Astro's bundler needs
+└─ src/
+   ├─ lib/spec.ts            The one loader: manifest, pages, provisions, selections, layers and every URL
+   ├─ lib/agent-text.ts      Text builders for llms.txt, indexes and bundles
+   ├─ lib/render-markdown.ts Markdown to HTML with LiteSpec's heading slugs, provision cards and wireframe options
+   ├─ lib/wireframe/         The TypeScript wireframe parser and renderer, tested against golden SVGs from the CLI
+   ├─ lib/areas.ts, icons.ts Area order, labels and icons; the line icon set
+   ├─ styles/                site.css (palette, tokens, frame, shared parts), docs.css, prose.css, select.css
+   ├─ layouts/Base.astro     The framed column, header, footer and copy buttons
+   ├─ components/            Icon, Mark, Search, ThemeSwitcher, the docs sidebar tree, the page contents list, the selection form
+   └─ pages/                 The landing page, the release home, one page per spec page, the selection page,
+                             and the agent endpoints: llms.txt, raw .md, selection indexes, layer bundles, schemas
+```
+
+`pnpm exec astro build` in `apps/site/` writes `dist/`. The CI job `site` runs the wireframe tests and the build.

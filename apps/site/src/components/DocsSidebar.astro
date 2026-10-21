@@ -1,0 +1,99 @@
+---
+// Left navigation of the docs pages: the full documentation tree grouped by
+// sidebar section, with collapsible folders. A README or stack page is its
+// folder's Overview. The tree is built as a string because Astro components
+// cannot recurse; icons come from the shared icon paths.
+import { areaOf, sidebarSections } from "../lib/areas";
+import { paths } from "../lib/icons";
+import { pages, pageUrl, type Page } from "../lib/spec";
+
+interface Props {
+  /** Repository-relative file of the current page, such as docs/core/scope.md. */
+  current: string;
+}
+
+const { current } = Astro.props;
+
+const escapeHtml = (value: string): string =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const iconSvg = (name: string, cls: string): string =>
+  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(paths as Record<string, string>)[name] ?? ""}</svg>`;
+
+const byFile = new Map(pages.map((page) => [page.file, page]));
+
+/** Pages directly in a folder, in reading order. */
+const inDir = (dir: string): Page[] =>
+  pages.filter((page) => page.file.startsWith(`${dir}/`) && !page.file.slice(dir.length + 1).includes("/"));
+
+/** Immediate subfolders of a folder that hold pages, in ordinal order. */
+const childDirs = (dir: string): string[] => {
+  const out = new Set<string>();
+  for (const page of pages) {
+    if (!page.file.startsWith(`${dir}/`)) continue;
+    const rest = page.file.slice(dir.length + 1);
+    const slash = rest.indexOf("/");
+    if (slash >= 0) out.add(`${dir}/${rest.slice(0, slash)}`);
+  }
+  return [...out].sort();
+};
+
+const folderLabel = (dir: string): { label: string; stack: boolean } => {
+  const stack = byFile.get(`${dir}/stack.md`);
+  if (stack) return { label: stack.title.replace(/ Stack$/, ""), stack: true };
+  const name = dir.slice(dir.lastIndexOf("/") + 1);
+  if (name === "ext") return { label: "Extensions", stack: false };
+  return { label: name.charAt(0).toUpperCase() + name.slice(1), stack: false };
+};
+
+/** The title with a leading or trailing repeat of its folder label removed. */
+const shortLabel = (page: Page, folder: string): string => {
+  let label = page.title;
+  const prefix = `${folder} `;
+  if (label.startsWith(prefix) && label.length > prefix.length) label = label.slice(prefix.length);
+  const suffix = ` ${folder}`;
+  if (label.endsWith(suffix) && label.length > suffix.length) label = label.slice(0, -suffix.length);
+  return label;
+};
+
+const link = (page: Page, label: string): string =>
+  page.file === current
+    ? `<a class="on" href="${escapeHtml(pageUrl(page))}" aria-current="page">${escapeHtml(label)}</a>`
+    : `<a href="${escapeHtml(pageUrl(page))}">${escapeHtml(label)}</a>`;
+
+const folderTree = (dir: string): string => {
+  const { label, stack } = folderLabel(dir);
+  const overviewFile = stack ? `${dir}/stack.md` : `${dir}/README.md`;
+  const overview = byFile.get(overviewFile);
+  let inner = overview ? link(overview, "Overview") : "";
+  for (const page of inDir(dir).filter((page) => page.file !== overviewFile)) inner += link(page, shortLabel(page, label));
+  for (const sub of childDirs(dir)) inner += folderTree(sub);
+  const tag = stack ? `<span class="tag">stack</span>` : "";
+  const open = current.startsWith(`${dir}/`) ? " open" : "";
+  return `<details${open}><summary>${escapeHtml(label)}${tag}${iconSvg("chevron", "icon chev")}</summary><div class="kids">${inner}</div></details>`;
+};
+
+const sections = sidebarSections
+  .map((section) => {
+    const count = pages.filter((page) => section.areas.includes(page.area)).length;
+    const holds = section.areas.some((area) => current === `docs/${area}/README.md` || current.startsWith(`docs/${area}/`));
+    const open = section.key === "start" || holds;
+    let inner = "";
+    for (const area of section.areas) {
+      const dir = `docs/${area}`;
+      const label = areaOf(area).label;
+      const overview = byFile.get(`${dir}/README.md`);
+      if (overview) inner += link(overview, "Overview");
+      for (const page of inDir(dir).filter((page) => page.file !== `${dir}/README.md`)) inner += link(page, shortLabel(page, label));
+      for (const sub of childDirs(dir)) inner += folderTree(sub);
+    }
+    return (
+      `<details class="sec"${open ? " open" : ""}>` +
+      `<summary class="sec-h collapse${holds ? " open-here" : ""}">${iconSvg(section.icon, "icon")}${escapeHtml(section.label)}<span class="count">${count}</span>${iconSvg("chevron", "icon chev")}</summary>` +
+      `<div class="tree">${inner}</div></details>`
+    );
+  })
+  .join("");
+---
+
+<nav class="side" aria-label="Documentation" set:html={sections}></nav>

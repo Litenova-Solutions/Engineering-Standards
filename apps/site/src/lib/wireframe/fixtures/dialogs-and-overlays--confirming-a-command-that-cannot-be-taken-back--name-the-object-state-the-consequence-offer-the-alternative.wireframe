@@ -1,0 +1,14 @@
+page
+  breadcrumb "Home" "Products" "Spring lighting launch"
+  header
+    heading "Spring lighting launch"
+    text "Sat 14 Mar 2026 at the Amsterdam warehouse. 1,204 pre-orders."
+    action "Move the launch"
+  dialog "Cancel the spring lighting launch?"
+    text "1,204 customers pre-ordered and will be told the launch is off."
+    fact "Refunds" "EUR 54,180.00 on the payment each customer used"
+    text "Two people on the warehouse plan will be told to stand down."
+    message "This cannot be undone. A canceled launch cannot be scheduled again." critical
+    link "Move the launch instead of canceling it"
+    action "Keep the launch"
+    action destructive "Cancel the launch"

@@ -1,0 +1,23 @@
+page
+  breadcrumb "Home" "Products"
+  header
+    heading "Products"
+    text "93 in the catalog."
+    action primary "New product"
+  split 1:4
+    nav side
+      link "Home"
+      link "Orders"
+      link "Customers"
+      link current "Products"
+      link "Variants"
+      link "Invoices"
+      link "Reports"
+      link "Settings"
+    region "Products"
+      toolbar
+        field "Search products" search
+        action "Active 81"
+        action "Draft 9"
+      table 4 "Product" "Stock" "State" "Price"
+        item: text "Oak desk lamp" · text "412 in stock" · status "Active" positive · text "EUR 45.00"

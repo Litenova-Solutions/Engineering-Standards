@@ -1,0 +1,10 @@
+page
+  breadcrumb "Settings" "Team" "Roles"
+  header
+    heading "Roles"
+    text "Acme Supply · 4 roles beside the owner."
+    action primary "New role"
+  region "What each role may do"
+    table 6 "Capability" "Manager" "Finance" "Warehouse lead" "Support"
+      item: text "Refund an order" · text "No" · text "Yes" · text "No" · text "No"
+    message "Warehouse staff dispatch goods and record it. Only Finance refunds." info

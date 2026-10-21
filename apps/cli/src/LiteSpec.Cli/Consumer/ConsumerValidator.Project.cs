@@ -33,6 +33,13 @@ static partial class ConsumerValidator
             run.Err(problem);
         }
 
+        // A placeholder left from the template, such as __OWNER__, reads as a real value to
+        // every later check, so the run names each one instead of passing over it.
+        foreach (var placeholder in Init.InitCommand.Placeholders(run.Project).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
+        {
+            run.Err($"litespec.project.json: template placeholder '{placeholder}' is not filled [litespec/core/scope#select-a-size-a-shape-and-stacks]");
+        }
+
         var paths = (run.Project as JsonObject)?["paths"] as JsonObject;
 
         // The documentation root is configuration, not a constant. A hard-coded docs/

@@ -1,0 +1,9 @@
+page
+  breadcrumb "Home" "Products"
+  header
+    heading "Products"
+    text "Six kinds of stock, from a 12-unit gift box to the Oak desk lamp."
+    action primary "New product"
+  region "Products"
+    message "No products yet. A product holds a name, a SKU, a price and what is in stock." neutral
+    action primary "New product"

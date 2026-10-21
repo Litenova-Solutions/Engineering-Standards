@@ -24,6 +24,22 @@ public sealed class InitCommandTests
         Assert.Equal(expected, paths.ContainsKey("uiPatterns"));
     }
 
+    [Fact(DisplayName = "init fills the project name and lists the placeholders left to fill")]
+    public void InitFillsTheProjectNameAndListsPlaceholders()
+    {
+        using var consumer = Cli.Temp("init-placeholders");
+
+        var result = Cli.Run("init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path, "--name", "shop");
+
+        Assert.Equal(0, result.Status);
+        Assert.Contains("Fill these placeholders before validating: __OWNER__.", result.Stdout, StringComparison.Ordinal);
+        var text = File.ReadAllText(Path.Combine(consumer.Path, "litespec.project.json"));
+        Assert.Contains("\"apps/api/shop.slnx\"", text, StringComparison.Ordinal);
+        Assert.Contains("\"@shop/ui\"", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("__PROJECT__", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("fixture", text, StringComparison.Ordinal);
+    }
+
     [Theory(DisplayName = "init writes a project file from each preset")]
     [InlineData("dotnet-react", "small", "server", "dotnet,react", "web", "apps/web", "react")]
     [InlineData("dotnet-react", "large", "server", "dotnet,react", "web", "apps/web", "react")]

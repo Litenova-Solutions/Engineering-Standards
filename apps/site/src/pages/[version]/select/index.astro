@@ -1,0 +1,134 @@
+---
+/* The project selection page: /[version]/select/. Static HTML with defaults,
+   plus the SelectForm island for live updates. */
+import fs from "node:fs";
+import path from "node:path";
+import Base from "../../../layouts/Base.astro";
+import SelectForm from "../../../components/SelectForm.astro";
+import "../../../styles/select.css";
+import {
+  root,
+  version,
+  manifest,
+  selections,
+  selectionKey,
+  selectionIndexUrl,
+  layerUrl,
+  backendStacks,
+  frontendStacks,
+  extensionStack,
+  pageByFile,
+} from "../../../lib/spec";
+
+export function getStaticPaths() {
+  return [{ params: { version } }];
+}
+
+export const prerender = true;
+
+const siteOrigin = "https://litespec.dev";
+const shapes = Object.keys(manifest.shapes);
+
+interface PresetFile {
+  shape: string;
+  stacks: string[];
+}
+
+const presets = fs
+  .readdirSync(path.join(root, "templates/presets"))
+  .filter((file) => file.endsWith(".json"))
+  .map((file) => {
+    const parsed = JSON.parse(fs.readFileSync(path.join(root, "templates/presets", file), "utf8")) as PresetFile;
+    return { name: file.slice(0, -".json".length), shape: parsed.shape, stacks: parsed.stacks };
+  })
+  .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+
+const extensions = Object.entries(manifest.extensions)
+  .map(([id, ext]) => ({
+    id,
+    title: pageByFile(ext.path)?.title ?? id,
+    activationScope: ext.activationScope ?? "project",
+    stack: extensionStack(id),
+    layerUrl: layerUrl(`ext/${id}`),
+  }))
+  .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+const selectionInfos = selections().map((selection) => ({
+  shape: selection.shape,
+  stacks: selection.stacks,
+  key: selectionKey(selection),
+  indexUrl: selectionIndexUrl(selection),
+}));
+
+function joinList(items: string[]): string {
+  if (items.length === 0) return "none";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function sameMembers(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((item) => b.includes(item));
+}
+
+const defaultSize = "small";
+const defaultShape = "server";
+const defaultBackend = backendStacks[0] ?? "";
+const defaultFrontend = frontendStacks.includes("react") ? "react" : (frontendStacks[0] ?? "");
+const defaultStacks = defaultFrontend ? [defaultBackend, defaultFrontend] : [defaultBackend];
+const defaultSelection = selectionInfos.find(
+  (entry) => entry.shape === defaultShape && sameMembers(entry.stacks, defaultStacks)
+);
+const initialIndexUrl = siteOrigin + (defaultSelection?.indexUrl ?? selectionIndexUrl({ shape: defaultShape, stacks: defaultStacks, extensions: [] }));
+
+const initialAgents = [
+  "## LiteSpec",
+  `This project follows LiteSpec ${version}: size ${defaultSize}, shape ${defaultShape}, stacks ${joinList(defaultStacks)}, extensions none.`,
+  `Before a task, read ${initialIndexUrl} and fetch only the pages the task touches.`,
+  "Selected extensions: none",
+  "UI work: the pattern pages listed in that index.",
+].join("\n");
+
+const initialProjectJson = JSON.stringify(
+  { size: defaultSize, shape: defaultShape, stacks: defaultStacks, selectedExtensions: [] },
+  null,
+  2
+);
+
+const initialPreset = presets.find(
+  (preset) => preset.shape === defaultShape && sameMembers(preset.stacks, defaultStacks)
+);
+const initialPresetCommand = initialPreset
+  ? `litespec init --preset ${initialPreset.name} --size ${defaultSize}`
+  : "";
+
+const title = "Select a LiteSpec Project";
+const description =
+  "Pick the project size, shape, stacks, and extensions, then copy the agent index URL and the AGENTS.md block.";
+---
+
+<Base title={title} description={description} active="agents">
+  <div class="select-page">
+    <span class="ver">{version}</span>
+    <h1>Use LiteSpec with your agents</h1>
+    <p class="select-lead">{description}</p>
+    <SelectForm
+    version={version}
+    siteOrigin={siteOrigin}
+    shapes={shapes}
+    backendStacks={backendStacks}
+    frontendStacks={frontendStacks}
+    extensions={extensions}
+    selections={selectionInfos}
+    presets={presets}
+    defaultSize={defaultSize}
+    defaultShape={defaultShape}
+    defaultBackend={defaultBackend}
+    defaultFrontend={defaultFrontend}
+    initialIndexUrl={initialIndexUrl}
+    initialAgents={initialAgents}
+    initialProjectJson={initialProjectJson}
+    initialPresetCommand={initialPresetCommand}
+    />
+  </div>
+</Base>

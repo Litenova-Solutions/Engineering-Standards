@@ -1,0 +1,8 @@
+{
+  "unknown-part": "page\n  button \"Save\"",
+  "odd-indent": "page\n   heading \"Odd\"",
+  "split-children": "page\n  split 2:1\n    text \"Only one\"",
+  "two-primaries": "page\n  header\n    action primary \"A\"\n    action primary \"B\"",
+  "no-count": "page\n  list\n    item: text \"A\"",
+  "overlay-nested": "page\n  region\n    dialog \"Nested\""
+}

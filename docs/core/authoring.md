@@ -37,7 +37,7 @@ A reader arrives with one of four questions, and each page answers one of them.
 | 3 | Topic, stack, extension, pattern, reference, command, configuration | What exactly applies, with which values and defaults? |
 | 4 | The `Underneath` section of a command page | What does the command run, and how do I run it myself? |
 
-An index routes a reader to pages, and the glossary resolves one term, so neither sits in a layer. A page links down a layer and never up. Any page may link to the glossary.
+An explanation page builds understanding: what LiteSpec is, why it works the way it does, and how its parts fit. It sits beside the layers rather than in one, because a reader takes it before or between tasks, not during one. An index routes a reader to pages, and the glossary resolves one term, so neither sits in a layer. A page links down a layer and never up. Any page may link to the glossary.
 
 ### Page styles
 
@@ -53,6 +53,7 @@ Every LiteSpec page uses one of these styles. Its location decides its style.
 | Command | `docs/tools/` | `templates/standard/command.md` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
 | How-to | `docs/guide/` | `templates/standard/how-to.md` | Purpose, optional Prerequisites, Procedure, Verification |
 | Tutorial | `docs/tutorial/` | `templates/standard/tutorial.md` | Purpose, Prerequisites, Lesson, What you built |
+| Explanation | `docs/learn/` | None | Intent, then sections of its own |
 | Index | A `README.md` | None | Intent, then navigation groups |
 | Glossary | `docs/reference/glossary.md` | None | One heading per term, in alphabetical order |
 
@@ -80,7 +81,7 @@ These rules apply to every page style:
 - A page has one H1.
 - A required section with nothing to say contains only `None.`
 - An example sits inside the provision it illustrates, or in a Reference example that names every provision it demonstrates.
-- A tutorial, how-to, reference, command or index page owns no provisions.
+- A tutorial, how-to, explanation, reference, command or index page owns no provisions.
 - A tutorial follows one path. An option or an alternative belongs on a how-to page.
 
 ### Provisions

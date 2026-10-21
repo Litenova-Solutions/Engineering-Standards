@@ -1,7 +1,7 @@
 {
   "$schema": "./litespec/schemas/litespec-project.schema.json",
   "project": {
-    "name": "fixture-shop"
+    "name": "__PROJECT__"
   },
   "size": "small",
   "shape": "server",
@@ -15,10 +15,10 @@
     "answered": true
   },
   "owners": [
-    "fixture-owner"
+    "__OWNER__"
   ],
   "paths": {
-    "apiSolution": "apps/api/Fixture.slnx",
+    "apiSolution": "apps/api/__PROJECT__.slnx",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
@@ -28,7 +28,7 @@
     ],
     "languageScan": [],
     "uiPackage": {
-      "name": "@fixture/ui",
+      "name": "@__PROJECT__/ui",
       "path": "packages/ui",
       "componentsJson": "packages/ui/components.json",
       "primitives": "packages/ui/src/components",
@@ -36,7 +36,7 @@
       "sourceLock": "packages/ui/ui-source-lock.json",
       "designContract": "packages/ui/DESIGN.md",
       "publicExports": [
-        "@fixture/ui/floorplans"
+        "@__PROJECT__/ui/floorplans"
       ]
     },
     "uiPatterns": "docs/ui/pattern-catalog.json",

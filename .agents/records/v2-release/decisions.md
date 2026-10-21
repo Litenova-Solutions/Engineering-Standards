@@ -54,11 +54,26 @@ Open gaps in the language: a progress part, icons in tab labels, and a status pl
 
 Chosen by the owner on 2026-10-21. The homemade controlled-prose style, its sentence, list, table-cell and paragraph limits, and its bans on contractions and vague words are gone, with their checks. So are the Agent Summary section on every page and the rule that every paragraph of `AGENTS.md` cites a provision. `docs/core/authoring.md` adds five rules to the guide: ASCII only, one term per concept, capitalized modals only inside a Requirement, Title Case page titles, and nothing about earlier releases. The repository uses US English, and the record field `fulfils` and the requirement kind `behaviour` became `fulfills` and `behavior`.
 
+### D13. litespec.dev is a static Astro site in apps/site/
+
+Chosen by the owner on 2026-10-21. The site is maintainer tooling, built in CI and never shipped to consumers, so it lives in `apps/site/` rather than in the CLI. It is static Astro 7 output for Cloudflare Pages, built from the standard at the repository root through one loader (`apps/site/src/lib/spec.ts`). People read HTML pages. Agents read `/llms.txt`, a raw `.md` copy of every page, one index per selection (shape and stacks) and one bundle per layer. The UI is hand-written CSS (D16). Wireframes are drawn by a TypeScript port of the C# renderer, proved byte-identical by golden SVGs from `litespec patterns svg`.
+
+### D14. Learning pages are explanation pages in docs/learn/
+
+Chosen by the owner on 2026-10-21. The pages that teach a person what LiteSpec is and why it exists belong to the versioned standard, so they live in `docs/learn/` with a new explanation page style: an Intent, free sections, no provisions, and no selection applies them. The site renders them, agents get them as raw Markdown, and `litespec validate` checks them. Only the landing page is site-only; its two calls to action lead to the selection page and to the learning pages.
+
+### D15. Templates carry placeholders, not fixture values
+
+`templates/consumer/litespec.project.json` named a fixture owner and solution, which `litespec init` copied into every new project. It now carries `__PROJECT__` and `__OWNER__`. `litespec init` fills `__PROJECT__` from the project name and lists what is left, and `litespec consumer` refuses a project file that still holds a placeholder.
+
+### D16. The site has its own flat, bordered design
+
+Chosen by the owner on 2026-10-21 from a series of mockups, replacing Bootstrap. The content sits in a centered 1280px column with visible side rails on a tinted page, and the footer stays at the bottom of a short page. Borders replace shadows. Colors come from one palette built on the logo's charcoal and amber: warm neutrals, an amber ramp, and three muted support hues (sage, slate, clay). Amber marks only the current item, important text and focus; rules, conventions and patterns get amber, sage and slate labels. Every component uses semantic tokens from `apps/site/src/styles/site.css`, never a raw color. Type is Geist and Geist Mono from Google Fonts. Search uses Pagefind's JavaScript API with no extra package. The header's Docs link opens the overview of the learn pages, and the docs sidebar starts with them as Start; tutorials and how-to guides follow the standard as Guides. Code blocks are highlighted by Shiki (GitHub light and dark themes), and pattern options have Preview and Wireframe tabs and a full-screen viewer.
+
 ## Open items for the owner
 
 1. Buy `litespec.dev` and point it at Cloudflare.
 2. Approve the `v2.0.0` tag.
 3. Decide whether to delete the `v1.14.0` to `v1.18.0` tags on GitHub.
-4. Your untracked `PROPOSAL-CONSUMER-SPECIFICATIONS.md` predates 2.0.0. It makes `litespec validate` report broken links while it sits in the working tree. Delete it or move it out.
-5. An unreadable TRX file is skipped without a finding, so verified counts can shrink silently. A fix adds a finding code.
-6. When the LiteSpec docs are not beside a consumer, any `litespec/...` citation resolves. This leniency is undocumented.
+4. An unreadable TRX file is skipped without a finding, so verified counts can shrink silently. A fix adds a finding code.
+5. When the LiteSpec docs are not beside a consumer, any `litespec/...` citation resolves. This leniency is undocumented.

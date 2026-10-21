@@ -175,8 +175,14 @@ static class InitCommand
             project["project"] = record;
         }
 
-        record["name"] = parsed.Value("--name") ?? new DirectoryInfo(root).Name;
+        var name = parsed.Value("--name") ?? new DirectoryInfo(root).Name;
+        record["name"] = name;
         project["reviewedLiteSpecVersion"] = version;
+
+        // The template names the project as __PROJECT__ in paths and package names; the
+        // name fills those, and every other placeholder is left for the owner to fill.
+        Fill(project, "__PROJECT__", name);
+        var unfilled = Placeholders(project).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
 
         try
         {
@@ -190,7 +196,60 @@ static class InitCommand
         }
 
         Console.WriteLine($"Wrote {target}.");
+
+        if (unfilled.Count > 0)
+        {
+            Console.WriteLine($"Fill these placeholders before validating: {string.Join(", ", unfilled)}.");
+        }
+
         Console.WriteLine("Next step: litespec consumer");
         return 0;
     }
+
+    /// <summary>Replaces a placeholder inside every string value of the document.</summary>
+    static void Fill(JsonNode? node, string placeholder, string value)
+    {
+        switch (node)
+        {
+            case JsonObject jsonObject:
+                foreach (var key in jsonObject.Select(entry => entry.Key).ToList())
+                {
+                    if (jsonObject[key] is JsonValue text && text.TryGetValue<string>(out var current))
+                    {
+                        jsonObject[key] = current.Replace(placeholder, value, StringComparison.Ordinal);
+                    }
+                    else
+                    {
+                        Fill(jsonObject[key], placeholder, value);
+                    }
+                }
+
+                break;
+            case JsonArray array:
+                for (var index = 0; index < array.Count; index++)
+                {
+                    if (array[index] is JsonValue text && text.TryGetValue<string>(out var current))
+                    {
+                        array[index] = current.Replace(placeholder, value, StringComparison.Ordinal);
+                    }
+                    else
+                    {
+                        Fill(array[index], placeholder, value);
+                    }
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>Every template placeholder, such as <c>__OWNER__</c>, still in the document.</summary>
+    public static IEnumerable<string> Placeholders(JsonNode? node) => node switch
+    {
+        JsonObject jsonObject => jsonObject.SelectMany(entry => Placeholders(entry.Value)),
+        JsonArray array => array.SelectMany(Placeholders),
+        JsonValue value when value.TryGetValue<string>(out var text) => PlaceholderPattern.Matches(text).Select(match => match.Value),
+        _ => [],
+    };
+
+    static readonly System.Text.RegularExpressions.Regex PlaceholderPattern = new(@"__[A-Z][A-Z0-9_]*?__");
 }

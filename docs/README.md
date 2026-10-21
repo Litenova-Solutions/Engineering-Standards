@@ -6,15 +6,26 @@ Use this index to load the canonical page for current work.
 
 The folder a page sits in decides who applies it. Pages in `core/`, `workspace/` and `quality/` apply to every project. Pages directly in `backend/` and `frontend/` are principles for every backend and every frontend. A stack folder such as `backend/dotnet/` holds how one stack realizes them, and a project applies its stack's folder and every folder above it.
 
-A provision ID is its page and heading, so `litespec/frontend/components#compose-composites-in-page-code` is a heading in `frontend/components.md`. The [provision index](reference/provisions.md) lists them all. The `tools/`, `guide/`, `tutorial/` and `reference/` folders carry no provisions.
+A provision ID is its page and heading, so `litespec/frontend/components#compose-composites-in-page-code` is a heading in `frontend/components.md`. The [provision index](reference/provisions.md) lists them all. The `learn/`, `tools/`, `guide/`, `tutorial/` and `reference/` folders carry no provisions.
 
 ## Which page do you want
 
+An **explanation** says what LiteSpec is, why it works the way it does, and how its parts fit. Start with [Learn LiteSpec](learn/README.md) if you're new.
 A **tutorial** takes you through a first working result, one step at a time.
 A **how-to** solves one stated problem for a reader who already has it running.
 A **reference** states exact values, options, and defaults, and is read by looking up.
 A **command** page documents one command: its options, its exit codes, and what it runs underneath.
 A standards page owns the provisions a reader cites for one concern.
+
+## Learn
+
+- [Learn LiteSpec](learn/README.md)
+- [Why LiteSpec exists](learn/why-litespec.md)
+- [How LiteSpec works](learn/how-litespec-works.md)
+- [Read the standard](learn/reading-the-standard.md)
+- [Records and the project model](learn/records-and-the-model.md)
+- [Work with agents](learn/working-with-agents.md)
+- [Adopt LiteSpec](learn/adopting-litespec.md)
 
 ## Core
 
