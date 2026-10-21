@@ -12,6 +12,7 @@ import { pageByFile, pageUrl, slug, type Page } from "./spec";
 import { paths } from "./icons";
 import { parseWireframe, renderWireframe } from "./wireframe/index.js";
 import { decorateCodeBlocks } from "./code-blocks";
+import { inlineDiagrams } from "./diagrams";
 
 let processor: MarkdownRenderer | null = null;
 
@@ -343,6 +344,7 @@ export async function renderPage(page: Page): Promise<RenderedPage> {
   });
 
   html = rewriteLinks(html, page);
+  html = inlineDiagrams(html, page);
   html = renderWireframes(html, collectWireframes(page.markdown));
   html = mergeOptionAnnotations(html);
   html = hoistOptionIds(html);

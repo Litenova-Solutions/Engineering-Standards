@@ -1,0 +1,39 @@
+# Response headers for litespec.dev (Cloudflare Workers static assets).
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Fingerprinted build output and fonts never change under the same name.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+/pagefind/*
+  Cache-Control: public, max-age=3600
+
+# Agent text: raw Markdown pages, selection indexes and layer bundles are read by agents
+# and stay out of search results, where the HTML page is the one to show.
+/2.0.0/:a.md
+  X-Robots-Tag: noindex
+/2.0.0/:a/:b.md
+  X-Robots-Tag: noindex
+/2.0.0/:a/:b/:c.md
+  X-Robots-Tag: noindex
+/2.0.0/:a/:b/:c/:d.md
+  X-Robots-Tag: noindex
+/2.0.0/:a/:b/:c/:d/:e.md
+  X-Robots-Tag: noindex
+/2.0.0/select/:key/llms.txt
+  X-Robots-Tag: noindex
+/2.0.0/layers/*
+  X-Robots-Tag: noindex
+/2.0.0/llms.txt
+  X-Robots-Tag: noindex
+/2.0.0/llms-full.txt
+  X-Robots-Tag: noindex
+/llms.txt
+  X-Robots-Tag: noindex

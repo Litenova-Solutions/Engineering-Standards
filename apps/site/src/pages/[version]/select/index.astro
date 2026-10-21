@@ -2,6 +2,7 @@
 /* The project selection page: /[version]/select/. Static HTML with defaults,
    plus the SelectForm island for live updates. */
 import fs from "node:fs";
+import { breadcrumbs } from "../../../lib/seo";
 import path from "node:path";
 import Base from "../../../layouts/Base.astro";
 import SelectForm from "../../../components/SelectForm.astro";
@@ -102,15 +103,15 @@ const initialPresetCommand = initialPreset
   ? `litespec init --preset ${initialPreset.name} --size ${defaultSize}`
   : "";
 
-const title = "Select a LiteSpec Project";
+const title = "Connect Your Agent - LiteSpec";
 const description =
   "Pick the project size, shape, stacks, and extensions, then copy the agent index URL and the AGENTS.md block.";
 ---
 
-<Base title={title} description={description} active="agents">
+<Base title={title} description={description} active="agents" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: "Connect your agent", path: `/${version}/select/` }])]}>
   <div class="select-page">
     <span class="ver">{version}</span>
-    <h1>Use LiteSpec with your agents</h1>
+    <h1>Connect your agent</h1>
     <p class="select-lead">{description}</p>
     <SelectForm
     version={version}

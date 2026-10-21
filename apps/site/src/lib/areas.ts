@@ -11,7 +11,7 @@ export interface Area {
 }
 
 export const areas: Area[] = [
-  { key: "learn", label: "Start", icon: "start", note: "What LiteSpec is, why it exists, and how its parts fit. Start here if you are new." },
+  { key: "learn", label: "Introduction", icon: "start", note: "What LiteSpec is, why it exists, and how its parts fit. Start here if you are new." },
   { key: "core", label: "Core", icon: "core", note: "Every project applies these: the system, scope, stacks, the project model, and agent and authoring rules." },
   { key: "workspace", label: "Workspace", icon: "folder", note: "Every project applies these: structure, naming, dependencies, and configuration." },
   { key: "backend", label: "Backend", icon: "server", note: "Backend principles for every backend, and the stacks that realize them." },

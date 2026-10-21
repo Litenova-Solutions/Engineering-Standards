@@ -488,3 +488,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Diagrams: an inlined SVG from docs/assets/diagrams/, in a bordered frame, with its
+   description as the caption. Its colors are the site's tokens, so it follows the theme. */
+.prose .diagram {
+  margin: 20px 0;
+  padding: 20px 16px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow-x: auto;
+}
+.prose .diagram-art {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  height: auto;
+  margin: 0 auto;
+}
+.prose .diagram figcaption {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted-fg);
+}
+@media (max-width: 760px) {
+  .prose .diagram-art { min-width: 560px; }
+}

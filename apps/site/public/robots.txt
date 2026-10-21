@@ -1,0 +1,5 @@
+# litespec.dev: every page is public. Agents read /llms.txt for the agent indexes.
+User-agent: *
+Allow: /
+
+Sitemap: https://litespec.dev/sitemap.xml

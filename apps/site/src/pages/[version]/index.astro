@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { breadcrumbs } from "../../lib/seo";
 import Icon from "../../components/Icon.astro";
 import { areas, areaOf, type Area } from "../../lib/areas";
 import { manifest, pages, pageUrl, provisions, version, type Page } from "../../lib/spec";
@@ -65,12 +66,12 @@ const description =
   "Every page by area, with its intent and provision count.";
 ---
 
-<Base title={`LiteSpec ${version} - The standard by area`} description={description} active="docs">
+<Base title={`All Pages in LiteSpec ${version} - LiteSpec`} description={description} active="docs" jsonLd={[breadcrumbs([{ name: "LiteSpec", path: "/" }, { name: version, path: `/${version}/` }])]}>
   <div class="page wrap">
     <div class="inner">
       <header class="page-head">
         <span class="ver">{version}</span>
-        <h1>The standard</h1>
+        <h1>All pages in {version}</h1>
         <p class="intro">
           Every page of release {version} by area, with its intent and the provisions you can cite.{" "}
           {stackCount} stacks and {extensionCount} extensions ship with this release.

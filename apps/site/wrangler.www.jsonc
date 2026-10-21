@@ -1,0 +1,14 @@
+// www.litespec.dev: a one-file Worker that redirects to litespec.dev.
+// Deploy with: wrangler deploy --config wrangler.www.jsonc
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "litespec-www",
+  "account_id": "864f2fee2367d77cf443122378ca1366",
+  "main": "./workers/www-redirect.js",
+  "compatibility_date": "2026-10-01",
+  "routes": [
+    { "pattern": "www.litespec.dev", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}

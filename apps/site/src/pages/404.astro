@@ -1,0 +1,32 @@
+---
+// The page Cloudflare serves for any path that matches no file (not_found_handling: 404-page).
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { version } from "../lib/spec";
+---
+
+<Base title="Page not found - LiteSpec" description="The page you asked for is not part of this LiteSpec release." noindex>
+  <section class="missing">
+    <div class="wrap">
+      <span class="ver">404</span>
+      <h1>Page not found</h1>
+      <p>That address is not part of LiteSpec {version}. Search finds a page by its title or by a word in its rules.</p>
+      <div class="act">
+        <a class="btn" href={`/${version}/learn/`}>Open the docs</a>
+        <a class="btn btn-outline" href={`/${version}/`}><Icon name="book" />All pages</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .missing { flex: 1; display: flex; align-items: center; padding: 96px 0; }
+  .missing .wrap { width: 100%; padding: 0 64px; }
+  .missing h1 { font-size: 48px; line-height: 1.05; letter-spacing: -.04em; font-weight: 600; margin: 18px 0 12px; }
+  .missing p { color: var(--muted-fg); font-size: 17px; max-width: 56ch; }
+  .missing .act { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  @media (max-width: 760px) {
+    .missing .wrap { padding: 0 16px; }
+    .missing h1 { font-size: 36px; }
+  }
+</style>

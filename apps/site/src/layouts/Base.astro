@@ -9,6 +9,7 @@ import Mark from "../components/Mark.astro";
 import Search from "../components/Search.astro";
 import ThemeSwitcher from "../components/ThemeSwitcher.astro";
 import { version } from "../lib/spec";
+import { absoluteUrl, metaDescription, organization, socialImage } from "../lib/seo";
 
 interface Props {
   title: string;
@@ -17,9 +18,18 @@ interface Props {
   rawUrl?: string;
   /** The header section this page belongs to. */
   active?: "docs" | "patterns" | "agents";
+  /** Keeps the page out of search indexes, such as the 404 page. */
+  noindex?: boolean;
+  /** "article" for a docs page, "website" otherwise. */
+  ogType?: "website" | "article";
+  /** Schema.org objects for this page, written as one JSON-LD graph. */
+  jsonLd?: Record<string, unknown>[];
 }
 
-const { title, description, rawUrl, active } = Astro.props;
+const { title, rawUrl, active, noindex = false, ogType = "website", jsonLd = [] } = Astro.props;
+const description = metaDescription(Astro.props.description);
+const canonical = absoluteUrl(Astro.url.pathname);
+const graph = JSON.stringify({ "@context": "https://schema.org", "@graph": [organization, ...jsonLd] });
 const github = "https://github.com/Litenova-Solutions/LiteSpec";
 const links = [
   { href: `/${version}/learn/`, label: "Docs", key: "docs" },
@@ -33,13 +43,35 @@ const links = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1"} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151217" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="LiteSpec" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage.url} />
+    <meta property="og:image:width" content={String(socialImage.width)} />
+    <meta property="og:image:height" content={String(socialImage.height)} />
+    <meta property="og:image:alt" content={socialImage.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage.url} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     {rawUrl && <link rel="alternate" type="text/markdown" href={rawUrl} />}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script type="application/ld+json" set:html={graph} />
     <script is:inline>
       try {
         var theme = window.localStorage.getItem("litespec-theme");
@@ -92,7 +124,7 @@ const links = [
     </div>
     <script is:inline>
       (function () {
-        // Any element with data-copy copies that text. Its first .copy-label child,
+        // Any element with data-copy or data-copy-url copies its text. Its first .copy-label child,
         // or the element itself when it has none, shows "Copied" for a moment.
         function flash(button) {
           var label = button.querySelector(".copy-label") || (button.children.length === 0 ? button : null);
@@ -105,11 +137,20 @@ const links = [
             window.setTimeout(function () { button.removeAttribute("data-copied"); }, 1500);
           }
         }
+        // data-copy holds the text; data-copy-url names a file whose text is fetched and copied,
+        // so a long text such as a whole page stays out of the HTML.
         document.addEventListener("click", function (event) {
           var target = event.target;
           if (!(target instanceof Element)) return;
-          var button = target.closest("[data-copy]");
+          var button = target.closest("[data-copy], [data-copy-url]");
           if (!button) return;
+          var url = button.getAttribute("data-copy-url");
+          if (url) {
+            fetch(url).then(function (response) { return response.ok ? response.text() : Promise.reject(); })
+              .then(function (text) { return navigator.clipboard.writeText(text); })
+              .then(function () { flash(button); }, function () { window.location.href = url; });
+            return;
+          }
           var text = button.getAttribute("data-copy") || "";
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function () { flash(button); }, function () { /* the text stays visible */ });

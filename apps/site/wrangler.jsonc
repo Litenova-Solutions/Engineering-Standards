@@ -1,0 +1,18 @@
+// litespec.dev on Cloudflare Workers: a static-assets-only Worker, so every request is served
+// from dist/ without running a script. The build writes dist/_redirects (/latest).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "litespec",
+  "account_id": "864f2fee2367d77cf443122378ca1366",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "litespec.dev", "custom_domain": true }
+  ],
+  "workers_dev": false,
+  "preview_urls": false
+}

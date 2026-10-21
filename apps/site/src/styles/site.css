@@ -3,6 +3,23 @@
    badges, keys, icons). Page and component styles build on these tokens and
    never use a raw color. Design source: .agents/mockups/litespec-rails-refined.html. */
 
+/* Fonts: Geist and Geist Mono (SIL Open Font License, public/fonts/OFL.txt), served from
+   this site as Latin variable fonts. The site's text is ASCII, so Latin covers it. */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/geist-latin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("/fonts/geist-mono-latin.woff2") format("woff2");
+}
+
 /* Palette. Two colors from the logo, charcoal #3e3643 and amber #f8c258, set the
    family: warm neutrals ending in the logo charcoal, an amber ramp, and three
    muted support hues at the same lightness and low chroma. */

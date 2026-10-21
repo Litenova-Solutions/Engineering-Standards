@@ -2,20 +2,21 @@
 import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import { version } from "../lib/spec";
+import { softwareSource, website } from "../lib/seo";
 
 const description =
-  "LiteSpec is the standards contract for one bounded-context business application, written for software work by people and AI agents.";
+  "LiteSpec is a versioned specification for building business applications with AI coding agents: architecture, code, records, and tests, in a form agents can read and tools can verify.";
 ---
 
-<Base title="LiteSpec - The spec your agents build from" description={description}>
+<Base title="LiteSpec - Specification standard for agent-built applications" description={description} jsonLd={[website, softwareSource]}>
   <section class="hero">
     <div class="hero-body">
       <a class="badge" href="https://github.com/Litenova-Solutions/LiteSpec/blob/main/CHANGELOG.md"><span class="dot"></span>v{version} <Icon name="arrow" class="icon-sm" /></a>
-      <h1>The spec your agents build from.</h1>
-      <p class="tagline">Rules with IDs. Records your agents read. One URL to start.</p>
+      <h1>The specification standard for building business applications with AI agents</h1>
+      <p class="tagline">One versioned standard for the architecture, code, records, and tests of a business application. Agents load the rules that apply to your stack; tools check that the code follows them.</p>
       <div class="actions">
-        <a class="btn" href={`/${version}/select/`}>Start with your agent</a>
-        <a class="btn btn-outline" href={`/${version}/learn/`}>Learn how it works</a>
+        <a class="btn" href={`/${version}/learn/`}>Get started</a>
+        <a class="btn btn-outline" href={`/${version}/select/`}>Connect your agent</a>
       </div>
     </div>
   </section>
@@ -49,17 +50,17 @@ const description =
     padding: 0 64px;
   }
   .hero h1 {
-    font-size: 64px;
-    line-height: 1.05;
-    letter-spacing: -0.045em;
+    font-size: 52px;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
     font-weight: 600;
-    max-width: 12ch;
+    max-width: 22ch;
     margin: 22px 0 18px;
   }
   .tagline {
     font-size: 18px;
     color: var(--muted-fg);
-    max-width: 52ch;
+    max-width: 62ch;
   }
   .actions {
     display: flex;
@@ -78,7 +79,7 @@ const description =
       padding: 0 16px;
     }
     .hero h1 {
-      font-size: 40px;
+      font-size: 32px;
     }
     .actions {
       flex-wrap: wrap;

@@ -12,6 +12,7 @@ import "../../styles/docs.css";
 import "../../styles/prose.css";
 import "../../styles/code.css";
 import { areaOf, sidebarSections } from "../../lib/areas";
+import { breadcrumbs, lastModified, techArticle } from "../../lib/seo";
 import { htmlPath, pageByFile, pages, pageUrl, rawUrl, version, type Page } from "../../lib/spec";
 import { renderPage } from "../../lib/render-markdown";
 
@@ -41,7 +42,11 @@ const plainLead = page.intent
   .replace(/[*_`]/g, "")
   .replace(/\s+/g, " ")
   .trim();
-const description = plainLead === "" ? `${page.title} in LiteSpec ${version}.` : plainLead.slice(0, 300);
+// A short intent gives a search snippet too little to show, so it gains the page title and what LiteSpec is.
+const description =
+  plainLead.length >= 60
+    ? plainLead.slice(0, 300)
+    : `${page.title}: ${plainLead === "" ? "" : `${plainLead} `}Part of LiteSpec ${version}, the specification standard for building business applications with AI agents.`;
 // The lead is the first sentence of the intent only, so it does not repeat the
 // body section that follows. Split at the first ". " followed by an uppercase
 // letter and keep the period.
@@ -71,6 +76,16 @@ const active: "docs" | "patterns" =
   description={description}
   rawUrl={markdownUrl}
   active={active}
+  ogType="article"
+  jsonLd={[
+    techArticle({ title: page.title, description, path: pageUrl(page), modified: lastModified(page.file), section: area.label }),
+    breadcrumbs([
+      { name: "LiteSpec", path: "/" },
+      { name: version, path: `/${version}/` },
+      { name: area.label, path: `/${version}/#area-${area.key}` },
+      { name: page.title, path: pageUrl(page) },
+    ]),
+  ]}
 >
   <div class:list={["doc3", { "doc3--full": isPattern }]}>
     <DocsSidebar current={page.file} />
@@ -92,7 +107,7 @@ const active: "docs" | "patterns" =
         <h1 data-pagefind-meta="title">{page.title}</h1>
         {lead !== "" && <p class="lead">{lead}</p>}
         <div class="tools" data-pagefind-ignore>
-          <button class="btn btn-outline btn-sm" type="button" data-copy={page.markdown}>
+          <button class="btn btn-outline btn-sm" type="button" data-copy-url={markdownUrl}>
             <Icon name="copy" class="icon-sm" /><span class="copy-label">Copy page</span>
           </button>
           <a class="btn btn-outline btn-sm" href={markdownUrl}>
