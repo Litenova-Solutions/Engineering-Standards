@@ -24,7 +24,7 @@
   ]
 }
 ---
-# <Actor display title>
+# <Actor Display Title>
 
 ## Summary
 

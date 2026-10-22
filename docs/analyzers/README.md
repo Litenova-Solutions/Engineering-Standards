@@ -4,11 +4,11 @@
 
 The Analyzers section explains the LiteSpec.Analyzers package, which checks .NET server code against the LiteSpec standard while the compiler runs and reports each break as an error in the editor and the build. The package checks project boundaries, modeling in Domain, the project that holds the business rules, and naming across the 5 application projects, with one assertion rule in test projects, reporting 25 errors, one per rule, with a link from each error to the standard it enforces. A backend developer uses these pages to install the package once and to clear each finding by fixing the code it names.
 
-## How the pages fit together
+## How the Pages Fit Together
 
 Start with [Check .NET Code with the Analyzers](check-dotnet-code-with-the-analyzers.md) to install the package once for every project, confirm each project layer, read the first findings, and record a deviation for a deliberate departure. When a build reports a diagnostic, open its rule page from the [Analyzer rules overview](rules/README.md): the page states the provision the rule enforces, where the diagnostic sits, what the rule ignores, and how to fix the code, with a failing example beside a passing one. Every diagnostic also carries a help link that opens the provision it enforces, so an error in the editor leads straight to the rule it broke.
 
-## How a rule decides to run
+## How a Rule Decides to Run
 
 Three facts predict whether a rule runs in a project.
 
@@ -31,7 +31,7 @@ Third, most rules decide as the compiler reads each declaration. Rules `LS1003`,
 
 Each diagnostic carries a help link of the form `https://litespec.dev/2.0.0/<page>/#<slug>`, which opens the provision the rule enforces.
 
-## Severity and compiler support
+## Severity and Compiler Support
 
 Every rule reports an error and is enabled by default, so a finding fails the build. A project lowers the severity per rule in `.editorconfig`:
 
@@ -45,7 +45,7 @@ When a project departs from the enforced Standard, it records a deviation that c
 
 The package targets `netstandard2.0` and needs the .NET 9.0.300 SDK, Visual Studio 17.14, or later. Older compilers cannot load the analyzers.
 
-## Detection limits
+## Detection Limits
 
 Several rules match names rather than project references, because Domain owns no reference to the outer-layer packages. Judge these findings against the lists below.
 
@@ -90,7 +90,7 @@ Other name-based checks work the same way:
 
 The analyzer does not check that a `Guid` inside an identifier is a version 7 value. Create the value with `Guid.CreateVersion7` and pass it in, which also satisfies `LS1009`.
 
-## Pages in this section
+## Pages in This Section
 
 - [Check .NET Code with the Analyzers](check-dotnet-code-with-the-analyzers.md): install the package once, read the first findings, and raise enforced rules to build errors.
 - [Analyzer rules overview](rules/README.md): find the reference page for each of the 25 rules, grouped by layer.

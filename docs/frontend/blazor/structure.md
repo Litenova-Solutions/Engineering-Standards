@@ -6,13 +6,13 @@ The Blazor client is one WebAssembly application whose folders mirror the backen
 
 ## Concepts
 
-### The client tree
+### The Client Tree
 
 Four production projects hold the client: Domain for rules and state, Application for handlers and interfaces, Infrastructure for browser adapters, and Web for pages and features. [Blazor data](data.md) and [Blazor components](components.md) state what each layer may do; this page states where each file lives.
 
 ## Standards
 
-### Use the client solution tree
+### Use the Client Solution Tree
 
 **Statement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
 
@@ -42,19 +42,19 @@ apps/web/
 
 Framework-generated `bin`, `obj`, and `publish` folders remain untracked.
 
-### Organize features by module and use case
+### Organize Features by Module and Use Case
 
-**Statement:** A feature MUST live under `Features/{Module}/{UseCase}/` using the module and use-case names its specification declares.
+**Statement:** A feature MUST live under `Features/{Module}/{UseCase}/` using the module and use case names its records declare.
 
-**Rationale:** The specification tree names each module and use case, and the client tree repeats those names, so a reader moves from a specification to its code by path alone. A feature filed anywhere else is findable only by search, and a renamed use case leaves its code behind. This realizes litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case.
+**Rationale:** The domain tree names each module and use case, and the client tree repeats those names, so a reader moves from a record to its code by path alone. A feature filed anywhere else is findable only by search, and a renamed use case leaves its code behind. This realizes litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case.
 
-### Isolate module internals
+### Isolate Module Internals
 
 **Statement:** A module MUST NOT reference another module's internal feature types.
 
 **Rationale:** A module's internal types are its own to change. When another module references them, a change in one module breaks code in another. Page composition may still render public components from several modules, because a page is the one place that combines modules. Truly shared code moves to `Components/` only after two real consumers prove the need, so the shared folder never fills with guesses.
 
-### Keep imports directional
+### Keep Imports Directional
 
 **Statement:** A reference MUST point from pages to features to components and Application, and from Infrastructure inward.
 
@@ -67,7 +67,7 @@ Pages -> Features -> Components and Application -> Domain
 Infrastructure -> Application and Domain
 ```
 
-### Keep Domain free of browser concerns
+### Keep Domain Free of Browser Concerns
 
 **Statement:** Domain and Application MUST contain no interop, component, HTTP, browser storage, render-loop timer, or document object model type.
 
@@ -75,7 +75,7 @@ Infrastructure -> Application and Domain
 
 ## Conventions
 
-### Place interop adapters together
+### Place Interop Adapters Together
 
 **Default:** Place browser API wrappers in `{ProjectName}.Infrastructure/Interop/`, one type per API surface.
 
@@ -83,7 +83,7 @@ Infrastructure -> Application and Domain
 
 **Rationale:** One type per browser API surface in `Infrastructure/Interop/`, each implementing an interface declared in Application, puts every browser call in one folder behind a testable boundary. The static scripts they call live in `{ProjectName}.Web/wwwroot/interop/` with matching names, so each wrapper resolves to its script by name. This realizes litespec/frontend/structure#locate-cross-route-values-in-the-frame.
 
-### Keep static content out of the assembly
+### Keep Static Content Out of the Assembly
 
 **Default:** Serve generated runtime content from `wwwroot/` and fetch it rather than embedding it as a resource.
 
@@ -95,10 +95,10 @@ Infrastructure -> Application and Domain
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/blazor/structure#use-the-client-solution-tree | guidance | Do four production projects exist, with no server project? |
-| litespec/frontend/blazor/structure#organize-features-by-module-and-use-case | guidance | Does each feature path resolve to a declared module and use case? |
-| litespec/frontend/blazor/structure#isolate-module-internals | guidance | Does any cross-module reference resolve an internal feature type? |
-| litespec/frontend/blazor/structure#keep-imports-directional | guidance | Does the reference graph match the declared direction? |
-| litespec/frontend/blazor/structure#keep-domain-free-of-browser-concerns | guidance | Do Domain and Application reference any browser or interop type? |
-| litespec/frontend/blazor/structure#place-interop-adapters-together | guidance | Does each adapter sit beside its matching script, or record a replacement? |
-| litespec/frontend/blazor/structure#keep-static-content-out-of-the-assembly | guidance | Does published output serve runtime content from `wwwroot/` rather than embedded resources? |
+| litespec/frontend/blazor/structure#use-the-client-solution-tree | guidance | The client solution holds Domain, Application, Infrastructure, and Web projects with no server project. |
+| litespec/frontend/blazor/structure#organize-features-by-module-and-use-case | guidance | Each feature path under `Features/` resolves to a declared module and use case. |
+| litespec/frontend/blazor/structure#isolate-module-internals | guidance | No cross-module reference resolves an internal feature type. |
+| litespec/frontend/blazor/structure#keep-imports-directional | guidance | The reference graph matches the declared direction from pages inward. |
+| litespec/frontend/blazor/structure#keep-domain-free-of-browser-concerns | guidance | Domain and Application reference no browser or interop type. |
+| litespec/frontend/blazor/structure#place-interop-adapters-together | guidance | Each browser API surface has one adapter type in `Infrastructure/Interop/` with a matching script in `wwwroot/interop/`. |
+| litespec/frontend/blazor/structure#keep-static-content-out-of-the-assembly | guidance | Published output serves runtime content from `wwwroot/` rather than embedded resources. |

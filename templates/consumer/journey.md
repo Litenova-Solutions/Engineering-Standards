@@ -28,7 +28,7 @@
   ]
 }
 ---
-# <Journey display title>
+# <Journey Display Title>
 
 ## Example
 

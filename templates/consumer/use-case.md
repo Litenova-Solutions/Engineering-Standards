@@ -72,7 +72,7 @@
   ]
 }
 ---
-# <Use case display title>
+# <Use Case Display Title>
 
 ## Goal
 

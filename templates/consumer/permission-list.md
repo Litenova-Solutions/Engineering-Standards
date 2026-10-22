@@ -16,4 +16,4 @@
   ]
 }
 ---
-# <Permissions display title>
+# <Permissions Display Title>

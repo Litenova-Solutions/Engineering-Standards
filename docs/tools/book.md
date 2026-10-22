@@ -2,7 +2,7 @@
 
 ## Name
 
-`litespec book` generates the project book: a static website built from a consumer's `model.json` that presents the project model as linked pages for founders and reviewers.
+`litespec book` generates the project book: a static website built from a consumer's `model.json` that presents the project model as linked pages for reviewers.
 
 ## Synopsis
 
@@ -12,15 +12,19 @@ litespec book --model <model.json> --out <folder> [--findings <file>]
 
 ## Description
 
-The book generator reads the `model.json` file that `litespec model build` wrote and writes a self-contained static site from it. The site holds one page per record, one index per record type, one lens per actor, a review page, a glossary, and a search page. A lens is the site's view of one actor: the journeys that actor takes, the roles it holds, and the permissions with the use cases they open. Every count on every page is computed from `model.json` when the site is generated; no count is typed by hand.
+The book generator reads the `model.json` file that `litespec model build` wrote and writes a self-contained static site from it. The site holds one page per record, one index per record type, one lens per actor, one lens per goal, a goals index, a review page, a glossary, and a search page. A lens is the site's view of one actor or one goal: an actor lens lists the journeys that actor takes, the roles it holds, and the permissions with the use cases they open; a goal lens lists the features that serve the goal, each with its requirements and their verified state. Every count on every page is computed from `model.json` when the site is generated; no count is typed by hand.
 
-The home page shows the product record, the record counts by type, the use case status totals, and the entry links per layer. A record page opens with an authority strip: the record's place in the precedence order, its status, owner, decider, and decide-by date. A use case page adds the computed `implemented` and `verified` state, then lists the use case's results and its cases with each case's proof state. Below the strip come the record's fields, its links in both directions, and the computed `implements`, `calls`, and `proves` links with their code, route, and test names.
+The book renders each record's prose body, and every field has a typed renderer that writes words and tables, so raw JSON never reaches a reviewer.
 
-The review page lists every known gap with owner and end date, expired gaps first. It also lists every draft record that awaits a decider, ordered by decide-by date, and every finding. A toggle in the header switches review mode on; when it is on, each record page shows the review notes that touch it: its draft state, its known gaps, and its findings. The review page always shows everything, with or without the toggle. The site needs no server: open the output folder's `index.html` in a browser.
+An aggregate page shows its lifecycle as a generated state diagram with a From, To, Triggered By table of its transitions, and marks each state past the start that no transition reaches. Its data table names each field with its meaning and its handling in words. A use case page lists its results and scenarios as Given, When, Then sentences with their example tables and each scenario's last proof date. A goal lens shows the chain from the goal to its features to each requirement with its kind and its verified or awaiting-proof state, with the verified count beside the total.
+
+Reviewer pages show no identifiers, codes, file paths, or check names: record links show titles, and refusals and checks read as words. A Developer toggle in the header reveals the identifiers, codes, file paths, and check names, with a Developer section on each record page. A Review toggle shows the review notes that touch each page: its draft state, its known gaps, and its findings. The review page always shows everything, with or without the toggle: every known gap with owner and end date, expired gaps first; every draft record that awaits a decider, ordered by decide-by date; every open question; and every finding.
+
+Search covers titles with statements, meanings, and scenario text. The site needs no server: open the output folder's `index.html` in a browser.
 
 ## Arguments
 
-None. Everything passes through options.
+None.
 
 ## Options
 
@@ -31,7 +35,7 @@ None. Everything passes through options.
 | `--findings <file>` | none | Shows these findings on the review page instead of the ones in `model.json`. |
 | `--help` | off | Prints the usage text and exits 0. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|
@@ -56,4 +60,4 @@ litespec book --model ../consumer/.model/model.json --out ../consumer/.book --fi
 
 ## Underneath
 
-The command copies its stylesheet and script into the output folder beside the pages it writes. It writes `search.json`, an index of record titles and identifiers, and embeds that same index in the search page, so search works when the site is opened as files. Nothing beneath this command is separately runnable.
+The command copies its stylesheet, its script, and the vendored Mermaid script with its version file into the output folder's `assets` beside the pages it writes. It writes `search.json`, an index of record titles with statements, meanings, and scenario text, and embeds that same index in the search page, so search works when the site is opened as files. Nothing beneath this command is separately runnable.

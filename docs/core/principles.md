@@ -8,7 +8,7 @@ Engineering principles settle a design choice when no narrower provision prefers
 
 ### One Source for Each Fact
 
-Each fact lives in exactly one home: a requirement on its product topic page, a rule on its home page, a use case on its page, a term in the glossary, stack versions in the manifest. Coverage, history, and status derive from the model; nobody types them by hand.
+Each fact lives in exactly one home: a requirement on its requirement page, a rule on its home page, a use case on its page, a term in the glossary, stack versions in the manifest. Coverage, history, and status derive from the model; nobody types them by hand.
 
 Each record carries its `status`, `owner`, `decider`, and `decideBy` date in its frontmatter, where tools and reviewers read them. Entries inherit their page's `owner` and `status` unless they set their own. The [model page](model.md) defines the common fields and the computed links.
 
@@ -38,7 +38,7 @@ Structural boundaries need mechanical proof: a project or package reference, com
 
 **Rationale:** Status in frontmatter exposes it to tools and reviewers in one predictable place. Entries inherit their page's `owner` and `status` unless they set their own, so one header governs the whole page. Status kept in prose hides from every check and goes stale with the next edit. The [model page](model.md) defines the common fields.
 
-### Prove Scenarios With Tests
+### Prove Scenarios with Tests
 
 **Statement:** A test MUST prove a scenario only by calling its use case and asserting its result.
 
@@ -114,7 +114,7 @@ Structural boundaries need mechanical proof: a project or package reference, com
 
 **Rationale:** Operation-specific code kept beside its operation stays easy to change with the operation. Shared code needs a name and responsibility that stay accurate for both consumers, and the first consumer rarely knows what the second needs. Waiting for two real consumers means the shared unit covers behavior both actually need.
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/principles#prefer-direct-owned-dependencies` and `litespec/core/principles#prefer-local-code-until-reuse-is-real`.
 

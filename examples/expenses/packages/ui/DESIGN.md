@@ -55,7 +55,7 @@ The floorplans this package provides. A route composes exactly one of them, or n
 - Put the deadline beside the work, never in a tooltip.
 - Say what a disabled control is waiting for.
 
-## Do not
+## Do Not
 
 - Do not decorate. A border earns its place, a color earns its place, and nothing else does.
 - Do not nest a card inside a card.

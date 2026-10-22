@@ -6,34 +6,28 @@ Web frontends prove pure logic in Vitest beside the module it covers and navigat
 
 ## Concepts
 
-### Test kinds
+### Test Kinds
 
-Each kind of test runs in one place and proves one thing:
+Each kind of test runs in one place on the web stacks:
 
-| Kind | Where it runs | What it proves |
-|:---|:---|:---|
-| Logic | Vitest beside the module | A mapping, a computed window, a state decision |
-| Structure | Vitest beside the suite | The module tree mirrors the backend |
-| Route contract | Playwright against a running stack | Every route renders one floorplan and passes the browser checks |
-| Evidence | Playwright against a running stack | A use case's Cases, with each declared refusal provoked by name |
+| Kind | Where it runs |
+|:---|:---|
+| Logic | Vitest beside the module |
+| Structure | Vitest beside the suite |
+| Route contract | Playwright against a running stack |
+| Evidence | Playwright against a running stack |
 
-## React
-
-On the React stack, the mocks rule forbids replacing the rendering library, the router, and the query library.
-
-## Svelte
-
-On the Svelte stack, the mocks rule forbids replacing Svelte, SvelteKit, the query library, and the form library.
+What each kind proves is stated on [Frontend Testing](../testing.md).
 
 ## Standards
 
-### Match test level to risk
+### Match Test Level to Risk
 
 **Statement:** A web frontend MUST use Vitest for pure logic, Playwright for navigation and integration, and the route contract for every address.
 
 **Rationale:** Vitest runs beside the module with no browser, so pure logic stays fast and precise. Playwright runs against a running stack, so navigation and integration prove real browser behavior. The route contract visits every address, so no route ships unproved. Each level proves what only it can, and fast tests never pay for a browser. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
-### Assert each declared refusal by its code
+### Assert Each Declared Refusal by Its Code
 
 **Statement:** A web evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its Result's code.
 
@@ -42,16 +36,16 @@ On the Svelte stack, the mocks rule forbids replacing Svelte, SvelteKit, the que
 **Example:** The refusal alert carries the code, so the assertion names it.
 
 ```typescript
-await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout: AFTER_ACTION });
+await expect(refusalFor(page, "orders.not-found")).toBeVisible({ timeout: AFTER_ACTION });
 ```
 
-### Keep mocks at owned boundaries
+### Keep Mocks at Owned Boundaries
 
-**Statement:** A web test MUST NOT replace a library its stack section names.
+**Statement:** A web test MUST NOT replace a library its stack page names.
 
-**Rationale:** A mock replaces what the test owns: its own boundary's answers. Replacing a framework or library instead proves the mock's behavior rather than the product's, and hides the integration the test was meant to cover. The React section names the rendering library, the router, and the query library. The Svelte section names Svelte, SvelteKit, the query library, and the form library. This realizes litespec/frontend/testing#keep-mocks-at-owned-boundaries.
+**Rationale:** A mock replaces what the test owns: its own boundary's answers. Replacing a framework or library instead proves the mock's behavior rather than the product's, and hides the integration the test was meant to cover. Each stack page names the libraries its tests keep. This realizes litespec/frontend/testing#keep-mocks-at-owned-boundaries.
 
-### Use network mocks for component tests
+### Use Network Mocks for Component Tests
 
 **Statement:** A web component or logic test that needs HTTP MUST serve its answers through network mocks generated from the published contract.
 
@@ -59,7 +53,7 @@ await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout
 
 **Example:** The handlers are `msw` handlers derived from the OpenAPI document and run in the browser worker and the Node server alike. The workspace keeps one mock-generation command that regenerates them.
 
-### Prove the module mirror in a structure test
+### Prove the Module Mirror in a Structure Test
 
 **Statement:** A web frontend calling the API MUST hold a Vitest test resolving modules to backend use cases and naming no refused folder.
 
@@ -73,7 +67,7 @@ test("every module folder names a backend use case, and no folder is named for n
 });
 ```
 
-### Run browser checks through the Playwright CLI
+### Run Browser Checks Through the Playwright CLI
 
 **Statement:** A browser suite MUST run through the Playwright CLI, addressable per route and per file.
 
@@ -87,11 +81,11 @@ pnpm --filter @shop/webshop exec playwright test --project=routes --grep "cart k
 
 ## Conventions
 
-### Query by accessible behavior
+### Query by Accessible Behavior
 
 **Default:** Scope a query to one floorplan through its `data-floorplan` attribute and address slot content by accessible role and name.
 
-**Replacement:** A project departs from this default through an Exception record.
+**Replacement:** A consumer can replace this default by naming its query-scoping convention in its test documentation.
 
 **Rationale:** Scoping a query to one floorplan through its `data-floorplan` attribute keeps the test on the page it meant when several render at once. Addressing slot content by accessible role and name proves what a user can actually find and operate. The attribute is structural rather than an identifier, so it scopes without breaking the accessible query. This realizes litespec/frontend/testing#query-by-accessible-behavior.
 
@@ -99,10 +93,10 @@ pnpm --filter @shop/webshop exec playwright test --project=routes --grep "cart k
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/web/testing#match-test-level-to-risk | guidance | Does each web test use Vitest for logic and Playwright for browser behavior? |
-| litespec/frontend/web/testing#assert-each-declared-refusal-by-its-code | guidance | Does each web refusal assertion name its Result code in the page? |
-| litespec/frontend/web/testing#keep-mocks-at-owned-boundaries | guidance | Does each web mock avoid the libraries its stack section names? |
-| litespec/frontend/web/testing#use-network-mocks-for-component-tests | guidance | Does each web HTTP test run through msw handlers from the contract? |
-| litespec/frontend/web/testing#prove-the-module-mirror-in-a-structure-test | guidance | Does the Vitest structure test resolve modules and name no refused folder? |
-| litespec/frontend/web/testing#run-browser-checks-through-the-playwright-cli | guidance | Does each browser check run through the Playwright CLI per route and per file? |
-| litespec/frontend/web/testing#query-by-accessible-behavior | guidance | Does each web query scope by data-floorplan and accessible names? |
+| litespec/frontend/web/testing#match-test-level-to-risk | guidance | Each test uses Vitest beside its module for pure logic and Playwright against a running stack for navigation and integration, with the route contract visiting every address. |
+| litespec/frontend/web/testing#assert-each-declared-refusal-by-its-code | guidance | Each evidence specification for a use case declaring a refusal reaches that refusal and asserts its result code in the page. |
+| litespec/frontend/web/testing#keep-mocks-at-owned-boundaries | guidance | No test replaces a library its stack page names. |
+| litespec/frontend/web/testing#use-network-mocks-for-component-tests | guidance | Each component or logic test needing HTTP serves answers through `msw` handlers generated from the published contract. |
+| litespec/frontend/web/testing#prove-the-module-mirror-in-a-structure-test | guidance | The Vitest structure test resolves each module folder to a backend use case and names no refused folder. |
+| litespec/frontend/web/testing#run-browser-checks-through-the-playwright-cli | guidance | Each browser suite runs through the Playwright CLI, addressable per route and per file. |
+| litespec/frontend/web/testing#query-by-accessible-behavior | guidance | Each browser query scopes to one floorplan through `data-floorplan` and addresses slot content by accessible role and name. |

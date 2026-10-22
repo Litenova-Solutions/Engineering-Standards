@@ -1,14 +1,14 @@
 # LiteSpec.Analyzers
 
-## Who this is for
+## Who This Is For
 
 You maintain the Roslyn analyzers in `apps/analyzers/`. You add a rule, change what a rule reports, change layer resolution, or release the package. After reading this page you know which file owns each behavior, how to add a rule end to end, how the tests prove it, and how to check the package against a real project.
 
-## What it is
+## What It Is
 
 `LiteSpec.Analyzers` is a Roslyn analyzer package that checks a .NET application against the LiteSpec standard: layer boundaries, Domain modeling, and naming. It reports 25 diagnostics in four categories: `LiteSpec.Domain` (`LS1001` to `LS1013`, Domain only), `LiteSpec.Layers` (`LS2001` to `LS2007`, Application, Infrastructure, and WebApi as stated per rule), `LiteSpec.Style` (`LS3001` to `LS3004`, the five production projects), and `LiteSpec.Tests` (`LS4001`, test projects only). Every diagnostic is an error by default, names the provision it enforces, and links to that provision on `litespec.dev` through its help link. The package ships only the analyzer assembly: the project sets `DevelopmentDependency` to `true`, `IncludeBuildOutput` to `false`, and packs the built DLL under `analyzers/dotnet/cs`, so consumers reference it with `PrivateAssets="all"` and it never becomes a runtime dependency. The user-facing rule list lives in the package README at `apps/analyzers/src/LiteSpec.Analyzers/README.md`, and the full per-rule reference with breach and compliant examples lives in one reference page per rule under the [Analyzer rules overview](../../docs/analyzers/rules/README.md). Read both before you change what a rule reports.
 
-## Quick start
+## Quick Start
 
 Run every command in this section from the repository root.
 
@@ -72,7 +72,7 @@ The project references `Microsoft.CodeAnalysis.CSharp` at version `4.14.0` throu
 
 The repository root adds three files the analyzers depend on. `Directory.Build.props` sets the default target to `net10.0` with nullable reference types and implicit usings, and shields this checkout from a consumer root when LiteSpec is pinned as a submodule. The analyzer project overrides the framework back to `netstandard2.0` and disables implicit usings. `Directory.Packages.props` pins the central package versions. `.github/workflows/litespec.yml` builds `LiteSpec.slnx`, tests it, packs the analyzers to `artifacts`, checks the provision index, and validates the repository.
 
-## How a compilation flows through the package
+## How a Compilation Flows Through the Package
 
 Every rule inherits `LayerAnalyzer`, so every rule follows the same path through a compilation. `Initialize` disables analysis of generated code with `GeneratedCodeAnalysisFlags.None`, enables concurrent execution, and registers one compilation-start action. That action calls `LayerResolver.Resolve` once for the compilation and registers the rule only when the layer is not `None` and `AppliesTo` accepts it. A rule in the wrong layer registers nothing and costs nothing.
 
@@ -110,7 +110,7 @@ Release tracking follows the Roslyn convention. `AnalyzerReleases.Unshipped.md` 
 
 The project sets `EnforceExtendedAnalyzerRules` to `true`, so the Roslyn meta-analyzers check the rules themselves. It suppresses `RS1012` and `RS1013` in `NoWarn` because `LayerAnalyzer` registers each rule from its compilation-start action and hands that context to `Register`, which the meta-analyzer cannot see. It also suppresses `NU5128` because the package ships an analyzer with no `lib` folder. `TreatWarningsAsErrors` and `GenerateDocumentationFile` stay on, so analyzer code ships with XML documentation and a warning fails the build.
 
-## Test harness
+## Test Harness
 
 `Verify.AnalyzerAsync` in `tests/LiteSpec.Analyzers.Tests/Support/Verify.cs` runs one analyzer over C# sources and compares its diagnostics with the spans the sources mark. A marked span reads `{|LS1002:OrderStatus|}`: the diagnostic ID, then the exact text the diagnostic covers. The harness strips the markup, builds a compilation from the clean text, runs the analyzer, and asserts that the actual diagnostics match the marked spans exactly, with nothing missing and nothing extra. Locations print as `ID Path(line,column)-(line,column)` with 1-based lines, so a failure tells you which span moved.
 
@@ -149,7 +149,7 @@ public Task ReportsAnEnumInDomain() =>
         """);
 ```
 
-## Add a rule
+## Add a Rule
 
 Follow these steps in order. Each step names the file you change.
 
@@ -161,11 +161,11 @@ Follow these steps in order. Each step names the file you change.
 6. Add the rule row to the Rules table in `src/LiteSpec.Analyzers/README.md` with its ID, layer, short report text, and provision link.
 7. Document the rule with one reference page under the [Analyzer rules overview](../../docs/analyzers/rules/README.md): the provision, the layers, where the diagnostic sits, what the rule ignores, and a breach example beside a compliant example taken from your tests.
 
-## Performance rules
+## Performance Rules
 
 The analyzers run on every keystroke in an IDE, so you keep per-compilation work small and shared. Resolve the layer once in the compilation-start action and never per symbol. Resolve well-known types once with `GetTypeByMetadataName` inside `Register` and close over the results; never look them up per node. In compilation-end actions, walk `context.Compilation.Assembly.GlobalNamespace` only, which is the source assembly under analysis, and skip symbols with no `DeclaringSyntaxReferences`, so referenced packages cost nothing. Never call `GetSemanticModel` yourself: use the symbol, operation, and syntax-node contexts the compiler hands you, which already carry the right model. Pick the narrowest registration the rule allows, and keep `EnableConcurrentExecution` with `ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None)` from the base class. When you add a rule, check its registration against this list before you write the test.
 
-## End-to-end check against a scratch project
+## End-To-End Check Against a Scratch Project
 
 The unit tests prove each rule in isolation. This check proves the packed package reports in a real build. Pack the package, create a scratch project outside the repository, point it at a local feed, and build.
 

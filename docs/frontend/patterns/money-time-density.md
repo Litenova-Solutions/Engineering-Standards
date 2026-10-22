@@ -2,27 +2,27 @@
 
 ## Intent
 
-Money, moments in time, and counts are read across tables, statements, charts, and phone screens. This page holds the patterns for writing amounts, statements, moments, periods, counts, charts, payouts, invoices, VAT, and identifiers at every width. A team building a finance or reporting screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared way of writing figures keeps exports, statements, and screens agreeing, so finance can cite a figure without checking where it was read.
+This page holds the patterns for writing amounts, statements, moments, periods, counts, charts, payouts, invoices, VAT, and identifiers at every width, read across tables, statements, charts, and phone screens. A team building a finance or reporting screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared way of writing figures keeps exports, statements, and screens agreeing, so finance can cite a figure without checking where it was read.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about money, time, or density, such as how an amount reads in a table. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply shop: order SO-1042 for Maria Garcia at EUR 125.00, the September 2026 statement, and the autumn lamp range. Amounts use currency codes with two decimals, moments use the Europe/Amsterdam zone, and counts name what they count. The Standards section states the two rules every option keeps: every amount shows its currency, and a moment shared across zones states its zone.
 
 ## Standards
 
-### Show the currency of every amount
+### Show the Currency of Every Amount
 
 **Statement:** Every amount MUST show its currency.
 
 **Rationale:** A currency on every amount keeps EUR 125.00 distinct from GBP 125.00 on every screen and export. Without it, a second currency turns each bare figure into a guess, and a pasted number carries no way to settle the guess.
 
-### State the time zone of a shared moment
+### State the Time Zone of a Shared Moment
 
 **Statement:** A moment shown to readers in different time zones MUST state its time zone.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply shop: order SO-1042 for Maria Garc
 
 ## Patterns
 
-### Writing an amount
+### Writing an Amount
 
 **Question:** A reader meets amounts in tables, statements, and exports. One table writes EUR 45.00, and one statement writes the euro sign before 45.00. The question is which form the product keeps. It also asks how a negative reads and which separator the product uses.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply shop: order SO-1042 for Maria Garc
 
 Choose the symbol with code in the header only when the back office and the customer surface show the same form. Never ship the no currency option. It loses the currency in exports. Never ship mixed decimals. It breaks the alignment tables exist for.
 
-#### `currency-code-and-two-decimals-everywhere`: Currency code and two decimals, everywhere
+#### `currency-code-and-two-decimals-everywhere`: Currency Code and Two Decimals, Everywhere
 
 ```wireframe
 page
@@ -61,7 +61,7 @@ page
 
 **Cost:** A code is wider than a symbol. A narrow money column holds fewer rows. A Dutch reader pays a translation cost on every glance.
 
-#### `symbol-and-two-decimals-with-the-currency-in-the-header`: Symbol and two decimals, with the currency in the header
+#### `symbol-and-two-decimals-with-the-currency-in-the-header`: Symbol and Two Decimals, with the Currency in the Header
 
 ```wireframe
 page
@@ -82,7 +82,7 @@ page
 
 **Reference:** WCAG 1.4.1
 
-#### `code-and-decimals-only-where-there-are-cents`: Code and decimals only where there are cents
+#### `code-and-decimals-only-where-there-are-cents`: Code and Decimals Only Where There Are Cents
 
 ```wireframe
 page
@@ -106,7 +106,7 @@ page
 
 **Cost:** The decimal point moves between rows. It breaks the alignment tabular figures exist for. Mixed rows are harder to scan.
 
-#### `code-in-the-label-and-a-symbol-in-the-cell`: Code in the label and a symbol in the cell
+#### `code-in-the-label-and-a-symbol-in-the-cell`: Code in the Label and a Symbol in the Cell
 
 ```wireframe
 page
@@ -125,7 +125,7 @@ page
 
 **Cost:** Two carriers for one fact. The label grows, and the column header stops being a field name.
 
-#### `the-customer-s-currency-beside-the-company-s`: The customer's currency beside the company's
+#### `the-customer-s-currency-beside-the-company-s`: The Customer's Currency Beside the Company's
 
 ```wireframe
 page
@@ -144,7 +144,7 @@ page
 
 **Cost:** Two figures make the widest money cell. The reader works out which one answers the question that day.
 
-#### `no-currency-at-all-because-the-account-has-one`: No currency at all, because the account has one
+#### `no-currency-at-all-because-the-account-has-one`: No Currency at All, Because the Account Has One
 
 ```wireframe
 page
@@ -163,7 +163,7 @@ page
 
 **Cost:** An export or pasted figure loses its currency. Support conversations happen around such figures. The form fails when the company adds a second currency.
 
-#### `code-and-decimals-with-the-column-totals-at-the-foot`: Code and decimals, with the column totals at the foot
+#### `code-and-decimals-with-the-column-totals-at-the-foot`: Code and Decimals, with the Column Totals at the Foot
 
 ```wireframe
 page
@@ -185,7 +185,7 @@ page
 
 **Cost:** Two totals disagree by design. Labels need to survive a glance. The all-match total adds a second read on every filter change.
 
-#### `code-and-two-decimals-in-the-reader-s-language-with-a-true-m`: Code and two decimals, in the reader's language, with a true minus
+#### `code-and-two-decimals-in-the-reader-s-language-with-a-true-m`: Code and Two Decimals, in the Reader's Language, with a True Minus
 
 ```wireframe
 page
@@ -208,7 +208,7 @@ page
 
 **Reference:** Stripe dashboard, Shopify admin
 
-#### `money-out-in-red-with-a-true-minus`: Money out in red with a true minus
+#### `money-out-in-red-with-a-true-minus`: Money Out in Red with a True Minus
 
 ```wireframe
 page
@@ -229,7 +229,7 @@ page
 
 **Reference:** Stripe dashboard
 
-#### `money-out-in-parentheses-the-accounting-way`: Money out in parentheses, the accounting way
+#### `money-out-in-parentheses-the-accounting-way`: Money Out in Parentheses, the Accounting Way
 
 ```wireframe
 page
@@ -254,7 +254,7 @@ page
 
 **Reference:** Xero, QuickBooks
 
-### Statement that adds up
+### Statement That Adds Up
 
 **Question:** A statement has one purpose. Money adds up top to bottom. Each kind forms a group with a subtotal. A grand total closes the statement at the foot. A count under each line helps a reader spot a missing line.
 
@@ -266,7 +266,7 @@ page
 
 Add links on every line later as a behavior of the pick. Never ship the one figure option as the statement. It hides how the figure was reached.
 
-#### `groups-subtotals-and-a-grand-total`: Groups, subtotals and a grand total
+#### `groups-subtotals-and-a-grand-total`: Groups, Subtotals and a Grand Total
 
 ```wireframe
 page
@@ -290,7 +290,7 @@ page
 
 **Cost:** The count repeats 1,204 twice. A reader opens the orders list to find which orders a line holds.
 
-#### `a-statement-where-every-line-links-to-its-records`: A statement where every line links to its records
+#### `a-statement-where-every-line-links-to-its-records`: A Statement Where Every Line Links to Its Records
 
 ```wireframe
 page
@@ -316,7 +316,7 @@ page
 
 **Reference:** Stripe
 
-#### `the-paid-out-month-beside-the-month-still-running`: The paid-out month beside the month still running
+#### `the-paid-out-month-beside-the-month-still-running`: The Paid-Out Month Beside the Month Still Running
 
 ```wireframe
 page
@@ -341,7 +341,7 @@ page
 
 **Cost:** Two figures share one page and only one is final. A reader can take the wrong one. Every figure needs its date.
 
-#### `a-statement-with-no-count-on-any-line`: A statement with no count on any line
+#### `a-statement-with-no-count-on-any-line`: A Statement with No Count on Any Line
 
 ```wireframe
 page
@@ -367,7 +367,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-statement-with-each-fee-marked-by-who-set-it`: A statement with each fee marked by who set it
+#### `a-statement-with-each-fee-marked-by-who-set-it`: A Statement with Each Fee Marked by Who Set It
 
 ```wireframe
 page
@@ -392,7 +392,7 @@ page
 
 **Cost:** Two marked lines form a rule to learn. The second section repeats the plan. The billing page already states the plan.
 
-#### `the-whole-figure-first-the-lines-under-it`: The whole figure first, the lines under it
+#### `the-whole-figure-first-the-lines-under-it`: The Whole Figure First, the Lines Under It
 
 ```wireframe
 page
@@ -415,7 +415,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-statement-that-ends-in-the-payouts-it-became`: A statement that ends in the payouts it became
+#### `a-statement-that-ends-in-the-payouts-it-became`: A Statement That Ends in the Payouts It Became
 
 ```wireframe
 page
@@ -443,7 +443,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-statement-with-last-month-beside-this-one`: A statement with last month beside this one
+#### `a-statement-with-last-month-beside-this-one`: A Statement with Last Month Beside This One
 
 ```wireframe
 page
@@ -464,7 +464,7 @@ page
 
 **Reference:** Xero
 
-#### `one-column-per-product-line`: One column per product line
+#### `one-column-per-product-line`: One Column per Product Line
 
 ```wireframe
 page
@@ -482,7 +482,7 @@ page
 
 **Cost:** Three money columns miss a phone width. The table scrolls sideways with line names pinned. Delivery fees split across lines in a way readers do not expect.
 
-### Writing a moment
+### Writing a Moment
 
 **Question:** Every date uses the zone the screen works in. Each table keeps one form. The orders table writes 8 Oct 2026, 09:32. A messages table that mixes Sent 6 hours ago with For 2 Jan 2030, 10:00 in one column breaks that rule.
 
@@ -494,7 +494,7 @@ page
 
 The runner-up puts absolute over relative. It fits incident and delivery surfaces where recency leads. Never ship relative only on a reconciled page. Nothing there can be cited.
 
-#### `one-form-per-table-with-the-zone-stated-once`: One form per table, with the zone stated once
+#### `one-form-per-table-with-the-zone-stated-once`: One Form per Table, with the Zone Stated Once
 
 ```wireframe
 page
@@ -513,7 +513,7 @@ page
 
 **Cost:** Minutes add noise a week later. A reader cannot tell which zone a message used.
 
-#### `absolute-with-a-relative-under-it`: Absolute with a relative under it
+#### `absolute-with-a-relative-under-it`: Absolute with a Relative Under It
 
 ```wireframe
 page
@@ -532,7 +532,7 @@ page
 
 **Cost:** Two lines make every row taller. A relative time goes stale without refresh.
 
-#### `relative-only-for-a-list-of-things-that-just-happened`: Relative only, for a list of things that just happened
+#### `relative-only-for-a-list-of-things-that-just-happened`: Relative Only, for a List of Things That Just Happened
 
 ```wireframe
 page
@@ -551,7 +551,7 @@ page
 
 **Cost:** Nothing here can be cited. A reader cannot say at 22:41. An audit question from March has no answer on the page.
 
-#### `a-date-with-no-year-when-the-year-is-obvious`: A date with no year when the year is obvious
+#### `a-date-with-no-year-when-the-year-is-obvious`: A Date with No Year When the Year Is Obvious
 
 ```wireframe
 page
@@ -569,7 +569,7 @@ page
 
 **Cost:** The year adds noise for lists within one year. It widens a column in a table of six.
 
-#### `grouped-by-day-so-the-column-is-the-day`: Grouped by day, so the column is the day
+#### `grouped-by-day-so-the-column-is-the-day`: Grouped by Day, so the Column Is the Day
 
 ```wireframe
 page
@@ -589,7 +589,7 @@ page
 
 **Cost:** It is no longer sortable as a column. It is no longer a table. Sorting moves to the toolbar. A group heading adds another row to read.
 
-#### `the-relative-first-the-absolute-behind-it`: The relative first, the absolute behind it
+#### `the-relative-first-the-absolute-behind-it`: The Relative First, the Absolute Behind It
 
 ```wireframe
 page
@@ -612,7 +612,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-weekday-with-the-date-inside-seven-days`: The weekday with the date inside seven days
+#### `the-weekday-with-the-date-inside-seven-days`: The Weekday with the Date Inside Seven Days
 
 ```wireframe
 page
@@ -632,7 +632,7 @@ page
 
 **Reference:** Google Calendar, Linear
 
-#### `a-time-with-the-zone-on-every-value`: A time with the zone on every value
+#### `a-time-with-the-zone-on-every-value`: A Time with the Zone on Every Value
 
 ```wireframe
 page
@@ -653,7 +653,7 @@ page
 
 **Cost:** A column of repeated offsets is hard to read. The alternative states the zone once. That alternative reads wrong for another zone.
 
-### Choosing a period
+### Choosing a Period
 
 **Question:** A statements page can put the period in the heading. It offers two plain buttons beside it. Nothing says which is previous and which is next. The period cannot be typed.
 
@@ -663,7 +663,7 @@ page
 
 **Rationale:** Ship chevrons beside the heading with a month dropdown. Walking is one click and jumping avoids twelve clicks. The runner-up uses presets with typeable bounds. It fits charts and exports where the period is not a month. Never ship the period as a filter chip. The period is the subject, not a refinement.
 
-#### `chevrons-either-side-of-the-period-as-the-heading`: Chevrons either side of the period as the heading
+#### `chevrons-either-side-of-the-period-as-the-heading`: Chevrons Either Side of the Period as the Heading
 
 ```wireframe
 page
@@ -687,7 +687,7 @@ page
 
 **Cost:** Walking a quarter takes four clicks. A dropdown to jump stays beside it.
 
-#### `period-tabs-that-read-as-a-choice`: Period tabs that read as a choice
+#### `period-tabs-that-read-as-a-choice`: Period Tabs That Read as a Choice
 
 ```wireframe
 page
@@ -709,7 +709,7 @@ page
 
 **Reference:** GOV.UK, Carbon
 
-#### `a-range-with-presets-and-typeable-bounds`: A range with presets and typeable bounds
+#### `a-range-with-presets-and-typeable-bounds`: A Range with Presets and Typeable Bounds
 
 ```wireframe
 page
@@ -736,7 +736,7 @@ page
 
 **Reference:** Carbon
 
-#### `both-because-a-report-needs-a-month-and-a-chart-needs-a-rang`: Both, because a report needs a month and a chart needs a range
+#### `both-because-a-report-needs-a-month-and-a-chart-needs-a-rang`: Both, Because a Report Needs a Month and a Chart Needs a Range
 
 ```wireframe
 page
@@ -762,7 +762,7 @@ page
 
 **Cost:** Two period controls can disagree. A reader sets September and last 30 days. The page shows two answers to one question.
 
-#### `the-period-as-a-filter-chip-in-the-toolbar`: The period as a filter chip, in the toolbar
+#### `the-period-as-a-filter-chip-in-the-toolbar`: The Period as a Filter Chip, in the Toolbar
 
 ```wireframe
 page
@@ -785,7 +785,7 @@ page
 
 **Cost:** The period is the page subject, not a refinement. A filter row demotes the one thing the report covers.
 
-#### `preset-chips-that-open-a-calendar`: Preset chips that open a calendar
+#### `preset-chips-that-open-a-calendar`: Preset Chips That Open a Calendar
 
 ```wireframe
 page
@@ -810,7 +810,7 @@ page
 
 **Reference:** Stripe
 
-#### `month-and-year-as-two-selects`: Month and year as two selects
+#### `month-and-year-as-two-selects`: Month and Year as Two Selects
 
 ```wireframe
 page
@@ -835,7 +835,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-date-range-across-the-top-typed-as-the-only-control`: A date range across the top, typed, as the only control
+#### `a-date-range-across-the-top-typed-as-the-only-control`: A Date Range Across the Top, Typed, as the Only Control
 
 ```wireframe
 page
@@ -857,7 +857,7 @@ page
 
 **Cost:** A reader who wants last month types it. Typing two dates is slower than one click. Presets exist for that speed and this removes them.
 
-### How much fits before it breaks
+### How Much Fits Before It Breaks
 
 **Question:** A table can run at 47 pixels a row. Three columns hold two lines each. At 390 pixels a five-column table has to drop a column. It truncates names to Garcia with an ellipsis unless the page changes shape.
 
@@ -869,7 +869,7 @@ page
 
 The runner-up wraps rather than truncates. It fits where one column holds names of any length. Never ship shortened figures near a statement. A rounded money figure is not a money figure.
 
-#### `the-full-width-with-nothing-truncated`: The full width, with nothing truncated
+#### `the-full-width-with-nothing-truncated`: The Full Width, with Nothing Truncated
 
 ```wireframe
 page
@@ -901,7 +901,7 @@ page
 
 **Cost:** Five columns reach the ceiling at this width. A seventh column forces a truncation. The second line is where it goes.
 
-#### `at-390-pixels-a-record-list-rather-than-a-table`: At 390 pixels, a record list rather than a table
+#### `at-390-pixels-a-record-list-rather-than-a-table`: At 390 Pixels, a Record List Rather Than a Table
 
 ```wireframe
 page
@@ -920,7 +920,7 @@ page
 
 **Cost:** No sorting by column and no comparison across a column. On a phone a reader seeks one known order. The list serves that case.
 
-#### `at-390-pixels-a-table-with-two-columns-and-no-truncation`: At 390 pixels, a table with two columns and no truncation
+#### `at-390-pixels-a-table-with-two-columns-and-no-truncation`: At 390 Pixels, a Table with Two Columns and No Truncation
 
 ```wireframe
 page
@@ -941,7 +941,7 @@ page
 
 **Cost:** Rows of order numbers and amounts cannot show customers. It works only when the reader arrives with an order number.
 
-#### `three-densities-on-the-same-table`: Three densities on the same table
+#### `three-densities-on-the-same-table`: Three Densities on the Same Table
 
 ```wireframe
 page
@@ -963,7 +963,7 @@ page
 
 **Reference:** Carbon
 
-#### `long-content-that-wraps-rather-than-truncates`: Long content that wraps rather than truncates
+#### `long-content-that-wraps-rather-than-truncates`: Long Content That Wraps Rather Than Truncates
 
 ```wireframe
 page
@@ -982,7 +982,7 @@ page
 
 **Cost:** Rows of different heights break the scan line. A column of wrapped names is harder to compare than short ones.
 
-#### `a-wide-table-that-scrolls-with-its-first-column-pinned`: A wide table that scrolls with its first column pinned
+#### `a-wide-table-that-scrolls-with-its-first-column-pinned`: A Wide Table That Scrolls with Its First Column Pinned
 
 ```wireframe
 page
@@ -1004,7 +1004,7 @@ page
 
 **Reference:** Linear, Notion
 
-#### `one-line-per-row-tap-to-open-the-rest`: One line per row, tap to open the rest
+#### `one-line-per-row-tap-to-open-the-rest`: One Line per Row, Tap to Open the Rest
 
 ```wireframe
 page
@@ -1025,7 +1025,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-number-too-large-for-the-column`: A number too large for the column
+#### `a-number-too-large-for-the-column`: A Number Too Large for the Column
 
 ```wireframe
 page
@@ -1045,7 +1045,7 @@ page
 
 **Cost:** A rounded figure is not a money figure. A reader cannot read the exact amount in the cell. It needs a tooltip or second read. Never use it in a statement.
 
-### Counting things
+### Counting Things
 
 **Question:** One rule governs this whole category: read a number the system can count; never type it. A hand-typed figure will not be updated and a reviewer will trust it anyway.
 
@@ -1057,7 +1057,7 @@ page
 
 It is the better choice for the home page where the question is how large the month is. Never ship counts with the report that produces them, since the report name is system language on a number page.
 
-#### `counts-in-the-sidebar-on-the-rows-that-hold-work`: Counts in the sidebar, on the rows that hold work
+#### `counts-in-the-sidebar-on-the-rows-that-hold-work`: Counts in the Sidebar, on the Rows That Hold Work
 
 ```wireframe
 page
@@ -1081,7 +1081,7 @@ page
 
 **Cost:** Every count is a read on every page load. A count of 0 beside an area is an area that looks finished rather than unused.
 
-#### `counts-as-stat-tiles-with-the-measure-they-describe`: Counts as stat tiles, with the measure they describe
+#### `counts-as-stat-tiles-with-the-measure-they-describe`: Counts as Stat Tiles, with the Measure They Describe
 
 ```wireframe
 page
@@ -1105,7 +1105,7 @@ page
 
 **Reference:** Carbon
 
-#### `the-count-on-the-tab-and-in-the-filter-nowhere-else`: The count on the tab and in the filter, nowhere else
+#### `the-count-on-the-tab-and-in-the-filter-nowhere-else`: The Count on the Tab and in the Filter, Nowhere Else
 
 ```wireframe
 page
@@ -1124,7 +1124,7 @@ page
 
 **Cost:** A reader on a list with no tabs and no filters has nowhere to see the size. The pagination range is the only measure left.
 
-#### `no-count-at-all-only-the-work`: No count at all, only the work
+#### `no-count-at-all-only-the-work`: No Count at All, Only the Work
 
 ```wireframe
 page
@@ -1146,7 +1146,7 @@ page
 
 **Reference:** Carbon
 
-#### `counts-with-the-report-that-produces-them`: Counts with the report that produces them
+#### `counts-with-the-report-that-produces-them`: Counts with the Report That Produces Them
 
 ```wireframe
 page
@@ -1163,7 +1163,7 @@ page
 
 **Cost:** A report name beside every figure is system language on a page where the reader only wants the number. It belongs in documentation, not in the product, unless the reader can open the report from it.
 
-#### `counts-that-say-when-they-were-read`: Counts that say when they were read
+#### `counts-that-say-when-they-were-read`: Counts That Say When They Were Read
 
 ```wireframe
 page
@@ -1186,7 +1186,7 @@ page
 
 **Reference:** Vercel
 
-#### `counts-as-progress-against-a-target`: Counts as progress against a target
+#### `counts-as-progress-against-a-target`: Counts as Progress Against a Target
 
 ```wireframe
 page
@@ -1205,7 +1205,7 @@ page
 
 **Reference:** Shopify, GitHub
 
-#### `a-count-with-its-own-date-so-it-stops-being-a-claim`: A count with its own date, so it stops being a claim
+#### `a-count-with-its-own-date-so-it-stops-being-a-claim`: A Count with Its Own Date, so It Stops Being a Claim
 
 ```wireframe
 page
@@ -1222,7 +1222,7 @@ page
 
 **Cost:** A date under every figure is a wall of dates. It is a data product rather than a dashboard.
 
-### Sales over time
+### Sales over Time
 
 **Question:** A dashboard can answer how the season is going with a number. A number says where the product stands. Only a line says whether it is speeding up or slowing down.
 
@@ -1234,7 +1234,7 @@ page
 
 It is the better choice once the product has a season to beat. Never ship the chart without its table, since a figure nobody can read exactly is a figure nobody can cite.
 
-#### `daily-columns-with-the-total-above`: Daily columns with the total above
+#### `daily-columns-with-the-total-above`: Daily Columns with the Total Above
 
 ```wireframe
 page
@@ -1256,7 +1256,7 @@ page
 
 **Reference:** Shopify
 
-#### `cumulative-sales-against-the-previous-season`: Cumulative sales against the previous season
+#### `cumulative-sales-against-the-previous-season`: Cumulative Sales Against the Previous Season
 
 ```wireframe
 page
@@ -1279,7 +1279,7 @@ page
 
 **Reference:** Vercel
 
-#### `an-area-chart-with-the-weekly-average-beside-it`: An area chart with the weekly average beside it
+#### `an-area-chart-with-the-weekly-average-beside-it`: An Area Chart with the Weekly Average Beside It
 
 ```wireframe
 page
@@ -1301,7 +1301,7 @@ page
 
 **Reference:** Stripe
 
-#### `weekly-columns-with-the-average-marked`: Weekly columns with the average marked
+#### `weekly-columns-with-the-average-marked`: Weekly Columns with the Average Marked
 
 ```wireframe
 page
@@ -1323,7 +1323,7 @@ page
 
 **Reference:** Plausible
 
-#### `the-same-figures-as-a-table`: The same figures as a table
+#### `the-same-figures-as-a-table`: The Same Figures as a Table
 
 ```wireframe
 page
@@ -1344,7 +1344,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `one-sparkline-per-channel`: One sparkline per channel
+#### `one-sparkline-per-channel`: One Sparkline per Channel
 
 ```wireframe
 page
@@ -1365,7 +1365,7 @@ page
 
 **Reference:** Vercel
 
-### Sales by product variant
+### Sales by Product Variant
 
 **Question:** The autumn range sells three lamp variants and a guide. The company asks which variant carries the season, and the answer is a share, not a total.
 
@@ -1377,7 +1377,7 @@ page
 
 It is the better choice once variants gain states such as paused or sold out. Never ship the donut alone, since an angle nobody can read exactly is decoration and not a figure.
 
-#### `horizontal-bars-with-the-figure-on-each-row`: Horizontal bars with the figure on each row
+#### `horizontal-bars-with-the-figure-on-each-row`: Horizontal Bars with the Figure on Each Row
 
 ```wireframe
 page
@@ -1400,7 +1400,7 @@ page
 
 **Reference:** Shopify
 
-#### `one-stacked-bar-for-the-whole-range`: One stacked bar for the whole range
+#### `one-stacked-bar-for-the-whole-range`: One Stacked Bar for the Whole Range
 
 ```wireframe
 page
@@ -1422,7 +1422,7 @@ page
 
 **Reference:** GitHub
 
-#### `a-table-with-a-bar-in-each-row`: A table with a bar in each row
+#### `a-table-with-a-bar-in-each-row`: A Table with a Bar in Each Row
 
 ```wireframe
 page
@@ -1443,7 +1443,7 @@ page
 
 **Reference:** Notion
 
-#### `a-tile-per-type-with-its-share`: A tile per type with its share
+#### `a-tile-per-type-with-its-share`: A Tile per Type with Its Share
 
 ```wireframe
 page
@@ -1463,7 +1463,7 @@ page
 
 **Cost:** Tiles cannot be sorted or compared at a glance the way bars can, and a fourth variant wraps the row. The price each tile needs makes every tile taller than the figure it carries.
 
-#### `a-donut-with-its-legend-as-figures`: A donut with its legend as figures
+#### `a-donut-with-its-legend-as-figures`: A Donut with Its Legend as Figures
 
 ```wireframe
 page
@@ -1485,7 +1485,7 @@ page
 
 **Reference:** Linear
 
-#### `two-types-as-lines-over-the-last-30-days`: Two types as lines over the last 30 days
+#### `two-types-as-lines-over-the-last-30-days`: Two Types as Lines over the Last 30 Days
 
 ```wireframe
 page
@@ -1506,7 +1506,7 @@ page
 
 **Reference:** Vercel
 
-### Sell-through against capacity
+### Sell-Through Against Capacity
 
 **Question:** The autumn run made 10,000 lamps and 9,412 are sold. The distance between the two is the decision to make more variants, move marketing money, or call the run sold out.
 
@@ -1518,7 +1518,7 @@ page
 
 It is the better choice when one variant is gone and the others are not. Never ship the countdown alone, since 468 left without the run size hides whether the stock is nearly gone or barely touched.
 
-#### `a-bar-with-sold-held-and-left-in-words`: A bar with sold, held and left in words
+#### `a-bar-with-sold-held-and-left-in-words`: A Bar with Sold, Held and Left in Words
 
 ```wireframe
 page
@@ -1541,7 +1541,7 @@ page
 
 **Cost:** One bar hides which variant is gone, so a sold-out brass lamp behind a half-empty run reads as room to spare. The per-variant rows answer that, not this bar.
 
-#### `the-percentage-first-the-bar-under-it`: The percentage first, the bar under it
+#### `the-percentage-first-the-bar-under-it`: The Percentage First, the Bar Under It
 
 ```wireframe
 page
@@ -1563,7 +1563,7 @@ page
 
 **Reference:** Kickstarter
 
-#### `sell-through-per-variant`: Sell-through per variant
+#### `sell-through-per-variant`: Sell-Through per Variant
 
 ```wireframe
 page
@@ -1584,7 +1584,7 @@ page
 
 **Reference:** Shopify
 
-#### `the-cumulative-line-with-the-capacity-line`: The cumulative line with the capacity line
+#### `the-cumulative-line-with-the-capacity-line`: The Cumulative Line with the Capacity Line
 
 ```wireframe
 page
@@ -1606,7 +1606,7 @@ page
 
 **Reference:** Metabase
 
-#### `a-countdown-tile-with-the-caution-it-earns`: A countdown tile with the caution it earns
+#### `a-countdown-tile-with-the-caution-it-earns`: A Countdown Tile with the Caution It Earns
 
 ```wireframe
 page
@@ -1627,7 +1627,7 @@ page
 
 **Reference:** Booking.com
 
-#### `capacity-sold-held-and-left-as-a-table`: Capacity, sold, held and left as a table
+#### `capacity-sold-held-and-left-as-a-table`: Capacity, Sold, Held and Left as a Table
 
 ```wireframe
 page
@@ -1648,7 +1648,7 @@ page
 
 **Reference:** Shopify
 
-### Figure against an earlier period
+### Figure Against an Earlier Period
 
 **Question:** A tile that says EUR 63,350.00 answers how much. Only the tile that adds August EUR 48,340.00 beside it answers whether the month was good.
 
@@ -1660,7 +1660,7 @@ page
 
 It is the better choice on the home page where the shape of the month matters more than one earlier figure. Never ship a bare percentage with no basis, since up 12 percent without the basis is a claim and not a comparison.
 
-#### `tiles-with-a-delta-pill-and-the-previous-figure`: Tiles with a delta pill and the previous figure
+#### `tiles-with-a-delta-pill-and-the-previous-figure`: Tiles with a Delta Pill and the Previous Figure
 
 ```wireframe
 page
@@ -1684,7 +1684,7 @@ page
 
 **Reference:** Stripe
 
-#### `tiles-with-sparklines`: Tiles with sparklines
+#### `tiles-with-sparklines`: Tiles with Sparklines
 
 ```wireframe
 page
@@ -1708,7 +1708,7 @@ page
 
 **Reference:** Vercel
 
-#### `a-comparison-column-on-the-statement`: A comparison column on the statement
+#### `a-comparison-column-on-the-statement`: A Comparison Column on the Statement
 
 ```wireframe
 page
@@ -1729,7 +1729,7 @@ page
 
 **Reference:** Xero
 
-#### `the-comparison-in-the-heading`: The comparison in the heading
+#### `the-comparison-in-the-heading`: The Comparison in the Heading
 
 ```wireframe
 page
@@ -1751,7 +1751,7 @@ page
 
 **Reference:** Linear
 
-#### `kpis-as-a-table-with-previous-and-change`: KPIs as a table with previous and change
+#### `kpis-as-a-table-with-previous-and-change`: KPIs as a Table with Previous and Change
 
 ```wireframe
 page
@@ -1772,7 +1772,7 @@ page
 
 **Reference:** Baremetrics
 
-#### `no-comparison-only-the-figure-with-its-date`: No comparison, only the figure with its date
+#### `no-comparison-only-the-figure-with-its-date`: No Comparison, Only the Figure with Its Date
 
 ```wireframe
 page
@@ -1794,7 +1794,7 @@ page
 
 **Reference:** GOV.UK
 
-### When the money arrives
+### When the Money Arrives
 
 **Question:** The payment provider holds the money of the company and pays it out on its own days. The company plans wages and supplier runs around those days, so the schedule is a planning surface, not a history.
 
@@ -1806,7 +1806,7 @@ page
 
 Never ship the single next-payout tile as the page: one arrival without the ones after it cannot plan a month.
 
-#### `upcoming-payouts-with-the-sales-each-one-holds`: Upcoming payouts with the sales each one holds
+#### `upcoming-payouts-with-the-sales-each-one-holds`: Upcoming Payouts with the Sales Each One Holds
 
 ```wireframe
 page
@@ -1826,7 +1826,7 @@ page
 
 **Reference:** Stripe
 
-#### `payouts-grouped-by-week-with-totals`: Payouts grouped by week with totals
+#### `payouts-grouped-by-week-with-totals`: Payouts Grouped by Week with Totals
 
 ```wireframe
 page
@@ -1852,7 +1852,7 @@ page
 
 **Reference:** QuickBooks
 
-#### `one-payout-s-journey-from-sale-to-bank`: One payout's journey from sale to bank
+#### `one-payout-s-journey-from-sale-to-bank`: One Payout's Journey from Sale to Bank
 
 ```wireframe
 page
@@ -1874,7 +1874,7 @@ page
 
 **Reference:** Wise
 
-#### `past-payouts-with-their-bank-references`: Past payouts with their bank references
+#### `past-payouts-with-their-bank-references`: Past Payouts with Their Bank References
 
 ```wireframe
 page
@@ -1896,7 +1896,7 @@ page
 
 **Reference:** Revolut Business
 
-#### `a-month-with-its-payout-days-marked`: A month with its payout days marked
+#### `a-month-with-its-payout-days-marked`: A Month with Its Payout Days Marked
 
 ```wireframe
 page
@@ -1923,7 +1923,7 @@ page
 
 **Reference:** Google Calendar
 
-#### `the-next-payout-as-a-tile-the-rest-behind-a-link`: The next payout as a tile, the rest behind a link
+#### `the-next-payout-as-a-tile-the-rest-behind-a-link`: The Next Payout as a Tile, the Rest Behind a Link
 
 ```wireframe
 page
@@ -1945,7 +1945,7 @@ page
 
 **Reference:** Monzo
 
-### Vendor's invoice to the company
+### Vendor's Invoice to the Company
 
 **Question:** Billing holds what the company owes its software vendor: the Business subscription and anything metered. The invoice is the one document where the vendor is the seller. It reads as the sale of the vendor, not as the sale of the company.
 
@@ -1957,7 +1957,7 @@ page
 
 Never ship the invoice without its VAT lines: a business invoice without VAT is not an invoice.
 
-#### `the-invoice-as-a-document-with-the-usage-behind-each-line`: The invoice as a document, with the usage behind each line
+#### `the-invoice-as-a-document-with-the-usage-behind-each-line`: The Invoice as a Document, with the Usage Behind Each Line
 
 ```wireframe
 page
@@ -1987,7 +1987,7 @@ page
 
 **Reference:** Xero
 
-#### `the-same-invoice-as-statement-lines`: The same invoice as statement lines
+#### `the-same-invoice-as-statement-lines`: The Same Invoice as Statement Lines
 
 ```wireframe
 page
@@ -2014,7 +2014,7 @@ page
 
 **Reference:** Moneybird
 
-#### `paid-with-the-mandate-reference-and-the-date`: Paid, with the mandate reference and the date
+#### `paid-with-the-mandate-reference-and-the-date`: Paid, with the Mandate Reference and the Date
 
 ```wireframe
 page
@@ -2042,7 +2042,7 @@ page
 
 **Reference:** Wise
 
-#### `overdue-with-what-happens-next`: Overdue, with what happens next
+#### `overdue-with-what-happens-next`: Overdue, with What Happens Next
 
 ```wireframe
 page
@@ -2065,7 +2065,7 @@ page
 
 **Reference:** GitHub
 
-#### `every-invoice-with-its-state`: Every invoice with its state
+#### `every-invoice-with-its-state`: Every Invoice with Its State
 
 ```wireframe
 page
@@ -2085,7 +2085,7 @@ page
 
 **Reference:** Stripe
 
-#### `the-usage-fee-line-opened-to-its-orders`: The usage fee line opened to its orders
+#### `the-usage-fee-line-opened-to-its-orders`: The Usage Fee Line Opened to Its Orders
 
 ```wireframe
 page
@@ -2105,7 +2105,7 @@ page
 
 **Reference:** AWS
 
-### Two VAT rates on one page
+### Two VAT Rates on One Page
 
 **Question:** Books carry 9% and a lamp carries 21%. The customer sees one total. The accounts show two rates on the page the tax return is built from.
 
@@ -2117,7 +2117,7 @@ page
 
 Never ship prices with no VAT note at all: a lawful price states what the tax is.
 
-#### `the-vat-split-under-the-order-total`: The VAT split under the order total
+#### `the-vat-split-under-the-order-total`: The VAT Split Under the Order Total
 
 ```wireframe
 page
@@ -2144,7 +2144,7 @@ page
 
 **Reference:** Coolblue
 
-#### `the-rate-on-each-invoice-line`: The rate on each invoice line
+#### `the-rate-on-each-invoice-line`: The Rate on Each Invoice Line
 
 ```wireframe
 page
@@ -2169,7 +2169,7 @@ page
 
 **Reference:** Moneybird
 
-#### `a-per-rate-summary-on-the-statement`: A per-rate summary on the statement
+#### `a-per-rate-summary-on-the-statement`: A Per-Rate Summary on the Statement
 
 ```wireframe
 page
@@ -2196,7 +2196,7 @@ page
 
 **Reference:** Xero
 
-#### `rate-badges-beside-each-product`: Rate badges beside each product
+#### `rate-badges-beside-each-product`: Rate Badges Beside Each Product
 
 ```wireframe
 page
@@ -2217,7 +2217,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-vat-report-with-taxable-bases`: A VAT report with taxable bases
+#### `a-vat-report-with-taxable-bases`: A VAT Report with Taxable Bases
 
 ```wireframe
 page
@@ -2238,7 +2238,7 @@ page
 
 **Reference:** Exact
 
-#### `inclusive-prices-with-a-breakdown-behind-a-note`: Inclusive prices with a breakdown behind a note
+#### `inclusive-prices-with-a-breakdown-behind-a-note`: Inclusive Prices with a Breakdown Behind a Note
 
 ```wireframe
 page
@@ -2263,7 +2263,7 @@ page
 
 **Reference:** Apple
 
-### Numbers at phone width
+### Numbers at Phone Width
 
 **Question:** Alex Morgan checks the dispatch of the day from the warehouse floor on a phone. At 390 pixels a money column, a date column, and a state badge do not fit side by side. The page chooses what the number needs beside it.
 
@@ -2275,7 +2275,7 @@ page
 
 Never ship the desktop table unchanged at 390: a table that scrolls sideways for its money column hides the answer.
 
-#### `kpis-in-pairs-with-the-orders-under-them`: KPIs in pairs with the orders under them
+#### `kpis-in-pairs-with-the-orders-under-them`: KPIs in Pairs with the Orders Under Them
 
 ```wireframe
 page
@@ -2297,7 +2297,7 @@ page
 
 **Reference:** Shopify
 
-#### `one-figure-per-row`: One figure per row
+#### `one-figure-per-row`: One Figure per Row
 
 ```wireframe
 page
@@ -2318,7 +2318,7 @@ page
 
 **Reference:** Revolut
 
-#### `orders-as-records-with-amounts-right-aligned`: Orders as records with amounts right-aligned
+#### `orders-as-records-with-amounts-right-aligned`: Orders as Records with Amounts Right-Aligned
 
 ```wireframe
 page
@@ -2339,7 +2339,7 @@ page
 
 **Reference:** ING
 
-#### `a-statement-that-keeps-its-alignment`: A statement that keeps its alignment
+#### `a-statement-that-keeps-its-alignment`: A Statement That Keeps Its Alignment
 
 ```wireframe
 page
@@ -2366,7 +2366,7 @@ page
 
 **Reference:** Xero
 
-#### `a-chart-with-half-its-labels`: A chart with half its labels
+#### `a-chart-with-half-its-labels`: A Chart with Half Its Labels
 
 ```wireframe
 page
@@ -2388,7 +2388,7 @@ page
 
 **Reference:** Plausible
 
-#### `the-table-that-becomes-a-list`: The table that becomes a list
+#### `the-table-that-becomes-a-list`: The Table That Becomes a List
 
 ```wireframe
 page
@@ -2420,7 +2420,7 @@ page
 
 **Reference:** GitHub
 
-### Showing an identifier
+### Showing an Identifier
 
 **Question:** One design rule governs identifiers: an identifier shown on screen is labeled and copyable, and a raw code never reaches the screen. A serial page that shows SN-0C893968A2 as plain text breaks it, and so does a messages list showing identifiers where a subject should be.
 
@@ -2432,7 +2432,7 @@ page
 
 Never ship the page with no identifier: a record nobody can quote is a record support cannot help with.
 
-#### `a-code-monospaced-labeled-and-copyable`: A code, monospaced, labeled and copyable
+#### `a-code-monospaced-labeled-and-copyable`: A Code, Monospaced, Labeled and Copyable
 
 ```wireframe
 page
@@ -2461,7 +2461,7 @@ page
 
 **Cost:** A copy control on every row of a list is a control per row. And a code in a monospaced font is visibly different from a name, which is correct and slightly louder than the page around it.
 
-#### `the-identifier-labeled-by-what-it-is-not-by-its-form`: The identifier labeled by what it is, not by its form
+#### `the-identifier-labeled-by-what-it-is-not-by-its-form`: The Identifier Labeled by What It Is, Not by Its Form
 
 ```wireframe
 page
@@ -2480,7 +2480,7 @@ page
 
 **Cost:** Some identifiers have no natural name and end up labeled by their kind, which tells a reader nothing about where to use it.
 
-#### `the-identifier-behind-a-disclosure`: The identifier behind a disclosure
+#### `the-identifier-behind-a-disclosure`: The Identifier Behind a Disclosure
 
 ```wireframe
 page
@@ -2504,7 +2504,7 @@ page
 
 **Cost:** A hidden code is a code a reader does not know exists. On the record where a support case is likely, that is the wrong place to hide it.
 
-#### `no-identifier-because-the-reader-knows-the-record`: No identifier, because the reader knows the record
+#### `no-identifier-because-the-reader-knows-the-record`: No Identifier, Because the Reader Knows the Record
 
 ```wireframe
 page
@@ -2529,7 +2529,7 @@ page
 
 **Cost:** It removes the one thing a reader needs to quote in a support conversation. And a reader who arrived by address, which happens, has no way to tell two records apart.
 
-#### `the-identifier-as-the-record-s-name`: The identifier as the record's name
+#### `the-identifier-as-the-record-s-name`: The Identifier as the Record's Name
 
 ```wireframe
 page
@@ -2554,7 +2554,7 @@ page
 
 **Cost:** A code as a heading is not readable aloud. It is the right shape for a system where the code is all there is. It is the wrong shape for one where a person named the thing.
 
-#### `click-the-code-to-copy-it`: Click the code to copy it
+#### `click-the-code-to-copy-it`: Click the Code to Copy It
 
 ```wireframe
 page
@@ -2576,7 +2576,7 @@ page
 
 **Reference:** Vercel
 
-#### `a-short-code-on-the-list-the-full-one-on-the-record`: A short code on the list, the full one on the record
+#### `a-short-code-on-the-list-the-full-one-on-the-record`: A Short Code on the List, the Full One on the Record
 
 ```wireframe
 page
@@ -2603,7 +2603,7 @@ page
 
 **Reference:** Stripe
 
-#### `no-bare-identifier-anywhere-on-a-list`: No bare identifier anywhere on a list
+#### `no-bare-identifier-anywhere-on-a-list`: No Bare Identifier Anywhere on a List
 
 ```wireframe
 page
@@ -2629,20 +2629,20 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/money-time-density#show-the-currency-of-every-amount | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/money-time-density#state-the-time-zone-of-a-shared-moment | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/money-time-density#writing-an-amount | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#statement-that-adds-up | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#writing-a-moment | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#choosing-a-period | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#how-much-fits-before-it-breaks | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#counting-things | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#sales-over-time | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#sales-by-product-variant | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#sell-through-against-capacity | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#figure-against-an-earlier-period | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#when-the-money-arrives | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#vendors-invoice-to-the-company | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#two-vat-rates-on-one-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#numbers-at-phone-width | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/money-time-density#showing-an-identifier | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/money-time-density#show-the-currency-of-every-amount | guidance | Which built figure hides its currency? Open the amounts on built tables, statements, and charts. |
+| litespec/frontend/patterns/money-time-density#state-the-time-zone-of-a-shared-moment | guidance | Which built shared moment omits its zone? Open the dates and times on built screens read across zones. |
+| litespec/frontend/patterns/money-time-density#writing-an-amount | guidance | Which built money text differs from the wireframe its catalog entry chose? Open the built codes, symbols, and red negatives beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#statement-that-adds-up | guidance | Which built totals page differs from the wireframe its catalog entry chose? Open the built groups, subtotals, and payout endings beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#writing-a-moment | guidance | Which built date text differs from the wireframe its catalog entry chose? Open the built absolute, relative, and weekday forms beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#choosing-a-period | guidance | Which built period control differs from the wireframe its catalog entry chose? Open the built chevrons, tabs, and painted calendars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#how-much-fits-before-it-breaks | guidance | Which built dense table differs from the wireframe its catalog entry chose? Open the built 390-pixel lists and pinned first columns beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#counting-things | guidance | Which built tally differs from the wireframe its catalog entry chose? Open the built sidebar counts, tiles, and dated claims beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#sales-over-time | guidance | Which built trend chart differs from the wireframe its catalog entry chose? Open the built columns, areas, and sparklines beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#sales-by-product-variant | guidance | Which built mix chart differs from the wireframe its catalog entry chose? Open the built bars, tiles, and donuts beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#sell-through-against-capacity | guidance | Which built fill-rate view differs from the wireframe its catalog entry chose? Open the built bars, countdowns, and capacity tables beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#figure-against-an-earlier-period | guidance | Which built comparison tile differs from the wireframe its catalog entry chose? Open the built deltas, sparklines, and KPI tables beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#when-the-money-arrives | guidance | Which built payout view differs from the wireframe its catalog entry chose? Open the built upcoming, weekly, and journey views beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#vendors-invoice-to-the-company | guidance | Which built supplier bill differs from the wireframe its catalog entry chose? Open the built documents, states, and usage lines beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#two-vat-rates-on-one-page | guidance | Which built mixed-rate view differs from the wireframe its catalog entry chose? Open the built splits, badges, and per-rate summaries beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#numbers-at-phone-width | guidance | Which built narrow figure differs from the wireframe its catalog entry chose? Open the built pairs, per-row figures, and halved charts at 390 pixels beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/money-time-density#showing-an-identifier | guidance | Which built code display differs from the wireframe its catalog entry chose? Open the built monospaced, labeled, and copyable codes beside the catalog entry recording the chosen option and its reason. |

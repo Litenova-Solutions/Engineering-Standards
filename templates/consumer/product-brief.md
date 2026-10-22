@@ -20,7 +20,7 @@
   ]
 }
 ---
-# <Product display title>
+# <Product Display Title>
 
 ## Summary
 

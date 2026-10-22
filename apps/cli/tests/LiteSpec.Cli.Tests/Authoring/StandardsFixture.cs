@@ -109,7 +109,7 @@ static class StandardsFixture
 
         Enable this extension when the sample capability is required.
 
-        ## Baseline relationship
+        ## Baseline Relationship
 
         This extension replaces no baseline provision.
 
@@ -176,7 +176,7 @@ static class StandardsFixture
         1. Create the artifact in its owning directory.
         2. Run the applicable repository validator.
 
-        ## Verification
+        ## Check
 
         - Confirm that the validator exits with code zero.
         """) + "\n";
@@ -198,7 +198,7 @@ static class StandardsFixture
         1. Create the artifact in its owning directory.
         2. Run the repository validator.
 
-        ## What you built
+        ## What You Built
 
         - Confirm that one validated artifact sits in its owning directory.
         """) + "\n";
@@ -250,7 +250,7 @@ static class StandardsFixture
 
         None.
 
-        ## Exit codes
+        ## Exit Codes
 
         | Code | Meaning |
         |:---|:---|
@@ -272,7 +272,7 @@ static class StandardsFixture
     ///     The routing block a documentation root index names before it links to one.
     /// </summary>
     public static readonly string IndexRouting =
-        "## Which page do you want\n\n" +
+        "## Which Page Do You Want\n\n" +
         "A tutorial takes you through a first working result, one step at a time.\n" +
         "A how-to solves one stated problem for a reader who already has it running.\n" +
         "A reference states exact values, options, and defaults.\n" +

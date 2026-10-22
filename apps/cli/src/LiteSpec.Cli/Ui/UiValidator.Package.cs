@@ -9,7 +9,7 @@ static partial class UiValidator
 
     static readonly string[] DesignSections =
     [
-        "Brand", "Tokens", "Vocabulary", "Patterns", "Do", "Do not", "Motion", "Voice",
+        "Brand", "Tokens", "Vocabulary", "Patterns", "Do", "Do Not", "Motion", "Voice",
     ];
 
     private sealed partial class Session

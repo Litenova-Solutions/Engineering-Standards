@@ -41,6 +41,10 @@ Each type answers one question. Small projects keep the rows marked small. Large
 
 The [product page](product.md) states the product records, the [domain page](domain.md) states the domain records, and the [access page](access.md) states the access records.
 
+The record tree runs from product intent down to the scenario.
+
+![The record tree from product intent to scenario: product branches into constraint, goal, problem, research, decision, and requirement; problem branches into feature; requirement branches into journey, rule, and use case; use case branches into result, and result into scenario, the review line. Across the tree sit module and aggregate, actor, role, and permission, entry point and external system, the glossary, limit and runbook, deviation and known gap, and the computed implemented, verified, reachable, and effective status.](../assets/diagrams/core-model-records.svg)
+
 ### Pages and Entries
 
 A page record is a Markdown file whose opening block names a record type. An entry record is an object in the `records` array of that block. Terms are the exception: each term is an entry in the glossary. Each type has one home.
@@ -210,6 +214,10 @@ Implemented, verified, and reachable are computed, never handwritten. The builde
 | reachable | aggregate state | a transition leads into it |
 
 The builder also writes each record's effective status: draft when the record, a decision deciding it, or a requirement it fulfills is a draft. A result or a scenario takes its use case's effective status.
+
+The written statuses run from draft to retired, and the builder computes the rest.
+
+![Record statuses draft, approved, and retired in order; the builder computes implemented when code exists, verified when every scenario is proven, reachable when a transition leads into the state, and effective status, draft while anything behind the record is draft.](../assets/diagrams/core-record-status.svg)
 
 ### Size and Stacks
 

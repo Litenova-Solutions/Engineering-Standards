@@ -6,7 +6,7 @@ A React component is a function using hooks, with props and events typed under s
 
 ## Standards
 
-### Write components as functions
+### Write Components as Functions
 
 **Statement:** A component MUST be a function component using hooks, not a class component.
 
@@ -23,7 +23,7 @@ function OrderTotal({ orderId }: { orderId: string }) {
 }
 ```
 
-### Keep component boundaries typed
+### Keep Component Boundaries Typed
 
 **Statement:** A component MUST type its props and its events under strict mode.
 
@@ -37,5 +37,5 @@ None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/web/react/components#write-components-as-functions | guidance | Is every component a function component using hooks? |
+| litespec/frontend/web/react/components#write-components-as-functions | guidance | Every component in the workspace is a function component using hooks, with no class component. |
 | litespec/frontend/web/react/components#keep-component-boundaries-typed | checkable | `pnpm type-check` runs under strict mode and fails on an untyped prop or event. |

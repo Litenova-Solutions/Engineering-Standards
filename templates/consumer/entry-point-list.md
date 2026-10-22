@@ -16,4 +16,4 @@
   ]
 }
 ---
-# <Entry points display title>
+# <Entry Points Display Title>

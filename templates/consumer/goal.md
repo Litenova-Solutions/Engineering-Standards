@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <Goal display title>
+# <Goal Display Title>
 
 ## Why It Matters
 

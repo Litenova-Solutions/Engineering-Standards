@@ -8,7 +8,7 @@
   "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# <Cast title>
+# <Cast Title>
 
 Every `Example` section in this documentation draws its people, place, dates, and amounts from this page. One fixed cast makes those sections cumulative.
 

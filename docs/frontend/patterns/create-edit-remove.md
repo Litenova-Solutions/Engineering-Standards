@@ -2,27 +2,27 @@
 
 ## Intent
 
-Staff create records such as orders, deliveries, and products, change them, and remove one or several, including the special cases: draft-first creation, corrections to the past, duplicates, hand ordering, restoring archived work, invitations, publishing, and scheduled changes. This page shows the layout for each task as drawn options with a named default to build. The product owner chooses among the options when the team builds or revises a working screen. One decided shape per task keeps destructive and far-reaching commands predictable, so staff know what a command will do before they commit.
+Staff create records such as orders, deliveries, and products, change them, and remove one or several, and this page shows the layout for each task as drawn options with a named default to build, including the special cases: draft-first creation, corrections to the past, duplicates, hand ordering, restoring archived work, invitations, publishing, and scheduled changes. The product owner chooses among the options when the team builds or revises a working screen. One decided shape per task keeps destructive and far-reaching commands predictable, so staff know what a command will do before they commit.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about working with records, such as how many inputs keep a create in a dialog. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply back office: deliveries such as Garcia Interiors restock, orders such as SO-1042 for Maria Garcia, and products such as the Oak desk lamp at EUR 45.00. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: every removal offers undo or asks for confirmation, and a successful create shows the created record.
 
 ## Standards
 
-### Confirm or undo every removal
+### Confirm or Undo Every Removal
 
 **Statement:** Every removal MUST either offer undo or ask for confirmation before it runs.
 
 **Rationale:** Staff remove the wrong record by misreading a row or misclicking, and without a way back the record is gone. An undo toast restores a reversible removal in one click, while a confirmation dialog makes an irreversible removal a deliberate choice. Either way the reader gets a moment to catch the mistake before it becomes permanent.
 
-### Show the created record
+### Show the Created Record
 
 **Statement:** A successful create MUST take the reader to the created record or show it in place.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply back office: deliveries such as Ga
 
 ## Patterns
 
-### Creating one record
+### Creating One Record
 
 **Question:** Staff create records such as deliveries, refunds, and products. A create with one to four inputs fits a dialog, and a longer one needs a page; a drawer never holds a create. The decision is which shape each create takes: dialog, page, template, copy, inline row, file import, steps, or a shortcut from elsewhere.
 
@@ -40,7 +40,7 @@ The drawings on this page use the Acme Supply back office: deliveries such as Ga
 
 **Rationale:** The dialog stays the pick for one to four inputs: it keeps the list behind it and commits with one verb. The full page is the runner-up and the right one past four inputs or with sections. The inline table row is the one to refuse, because a form inside a table breaks the table structure and hides validation. Of the further options, the split button earns its place on the deliveries list, where three starting points already exist.
 
-#### `a-dialog-for-two-or-three-inputs`: A dialog for two or three inputs
+#### `a-dialog-for-two-or-three-inputs`: A Dialog for Two or Three Inputs
 
 ```wireframe
 page
@@ -64,7 +64,7 @@ page
 
 **Cost:** A create that grows past four inputs has to leave the dialog. The typed values come with it or are lost.
 
-#### `a-full-page-for-the-ones-that-grow`: A full page for the ones that grow
+#### `a-full-page-for-the-ones-that-grow`: A Full Page for the Ones That Grow
 
 ```wireframe
 page
@@ -88,7 +88,7 @@ page
 
 **Cost:** Leaving the list to create one record, and coming back to the list afterwards, is two navigations for every single creation. It only pays when the form is long.
 
-#### `create-from-a-template-chosen-before-the-form`: Create from a template, chosen before the form
+#### `create-from-a-template-chosen-before-the-form`: Create from a Template, Chosen Before the Form
 
 ```wireframe
 page
@@ -111,7 +111,7 @@ page
 
 **Cost:** The starter control sits inside the form but is not part of it. Once a template is chosen the control stays visible with no further use, because the form cannot remove a control mid-create.
 
-#### `create-from-a-copy-of-an-existing-record`: Create from a copy of an existing record
+#### `create-from-a-copy-of-an-existing-record`: Create from a Copy of an Existing Record
 
 ```wireframe
 page
@@ -135,7 +135,7 @@ page
 
 **Cost:** A duplicate of a shipped delivery is nearly meaningless: the orders and the money all belong to the original. It only works for a template-like record with no history.
 
-#### `create-inline-in-the-table-as-an-empty-first-row`: Create inline in the table, as an empty first row
+#### `create-inline-in-the-table-as-an-empty-first-row`: Create Inline in the Table, as an Empty First Row
 
 ```wireframe
 page
@@ -158,7 +158,7 @@ page
 
 **Cost:** Carbon says a modal is for tasks that are not repeated, and this is the most repeated create in the back office. It also puts a form inside a table, where tables hold rows and no rule covers embedded forms.
 
-#### `create-many-at-once-from-a-file`: Create many at once from a file
+#### `create-many-at-once-from-a-file`: Create Many at Once from a File
 
 ```wireframe
 page
@@ -180,7 +180,7 @@ page
 
 **Cost:** An import writes across many records at once. A partial failure has to be reportable and undoable while nothing is charged.
 
-#### `one-question-per-step-kept-as-a-draft`: One question per step, kept as a draft
+#### `one-question-per-step-kept-as-a-draft`: One Question per Step, Kept as a Draft
 
 ```wireframe
 page
@@ -204,7 +204,7 @@ page
 
 **Cost:** Steps hide the whole form, so a reader who knows every answer types slower than on one page. Drafts also need a list, an expiry, and a rule for who can see them.
 
-#### `a-split-button-that-names-the-starting-point`: A split button that names the starting point
+#### `a-split-button-that-names-the-starting-point`: A Split Button That Names the Starting Point
 
 ```wireframe
 page
@@ -229,7 +229,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `a-command-menu-create-from-anywhere`: A command menu create, from anywhere
+#### `a-command-menu-create-from-anywhere`: A Command Menu Create, from Anywhere
 
 ```wireframe
 page
@@ -254,7 +254,7 @@ page
 
 **Reference:** Linear
 
-### Changing a record that already exists
+### Changing a Record That Already Exists
 
 **Question:** Staff change records that already exist, from renaming a delivery to raising a stock target. The decision is how the edit commits: one save per page, one per section, inline in the list, in a dialog or side panel, with impact stated first, blocked with a way out, or saved automatically. The hazard to avoid is the reader who edits one section and saves another, believing both are saved.
 
@@ -264,7 +264,7 @@ page
 
 **Rationale:** One Save per page is the pick. A reader who changed three things saves once, and the dirty banner says what is pending. The impact statement is the runner-up for any change that breaks something. Refuse the inline list-row edit on this wide table. Autosave earns its place only for free text, beside the version history in the after-the-fact pattern.
 
-#### `one-save-per-page`: One Save per page
+#### `one-save-per-page`: One Save per Page
 
 ```wireframe
 page
@@ -286,7 +286,7 @@ page
 
 **Cost:** A partial failure loses every change on the page, and a reader who wants to save the name but leave the dates cannot. The page has to list what changed while edits are unsaved.
 
-#### `one-save-per-section-and-each-says-what-it-saves`: One Save per section, and each says what it saves
+#### `one-save-per-section-and-each-says-what-it-saves`: One Save per Section, and Each Says What It Saves
 
 ```wireframe
 page
@@ -308,7 +308,7 @@ page
 
 **Cost:** It still makes two commits on one screen, so the reader must remember to press both buttons. It works only because each button names what it commits.
 
-#### `editing-in-place-in-the-list-row`: Editing in place in the list row
+#### `editing-in-place-in-the-list-row`: Editing in Place in the List Row
 
 ```wireframe
 page
@@ -329,7 +329,7 @@ page
 
 **Reference:** NN/g
 
-#### `editing-with-the-impact-stated-before-the-save`: Editing with the impact stated before the save
+#### `editing-with-the-impact-stated-before-the-save`: Editing with the Impact Stated Before the Save
 
 ```wireframe
 page
@@ -353,7 +353,7 @@ page
 
 **Cost:** It needs a read that answers a hypothetical, what would change, which is neither the record as it stands nor a command result.
 
-#### `editing-in-a-dialog-for-two-fields`: Editing in a dialog, for two fields
+#### `editing-in-a-dialog-for-two-fields`: Editing in a Dialog, for Two Fields
 
 ```wireframe
 page
@@ -375,7 +375,7 @@ page
 
 **Cost:** Carbon says a modal is not for repeatable work. Renaming a product happens a dozen times a season, which is repeatable enough to matter.
 
-#### `editing-blocked-with-the-reason-and-the-way-out`: Editing blocked, with the reason and the way out
+#### `editing-blocked-with-the-reason-and-the-way-out`: Editing Blocked, with the Reason and the Way Out
 
 ```wireframe
 page
@@ -397,7 +397,7 @@ page
 
 **Cost:** The reader must leave to unblock and come back, and typed input survives only if the page holds it. Showing the field read-only with a link to the unblocking command is the middle ground.
 
-#### `autosave-with-the-saved-state-always-visible`: Autosave, with the saved state always visible
+#### `autosave-with-the-saved-state-always-visible`: Autosave, with the Saved State Always Visible
 
 ```wireframe
 page
@@ -421,7 +421,7 @@ page
 
 **Reference:** Notion
 
-#### `edit-in-a-side-panel-the-list-still-visible`: Edit in a side panel, the list still visible
+#### `edit-in-a-side-panel-the-list-still-visible`: Edit in a Side Panel, the List Still Visible
 
 ```wireframe
 page
@@ -445,7 +445,7 @@ page
 
 **Reference:** HubSpot
 
-### Removing something
+### Removing Something
 
 **Question:** Staff remove records that should no longer be active. The decision is which kind of removal each record gets: archive, delete, blocked removal with the blocker named, reversal for money, void for codes, suspend for running services, a thirty-day trash, or an undo toast. Archive is preferred over delete because it is reversible and keeps the audit trail.
 
@@ -455,7 +455,7 @@ page
 
 **Rationale:** Archive stays the pick. It is reversible, it keeps the audit trail, and the Archived view is the way back. The thirty-day trash is the runner-up where delete is the verb the reader reaches for. Never ship a bare delete for anything with history. The delete dialog is only for records that have to go, and it says what is kept. The Undo toast earns its place for small reversible removes such as a plan entry.
 
-#### `archive-with-what-archiving-means`: Archive, with what archiving means
+#### `archive-with-what-archiving-means`: Archive, with What Archiving Means
 
 ```wireframe
 page
@@ -482,7 +482,7 @@ page
 
 **Cost:** The reader now has two ways to hide something, archive and delete. A list that shows both needs a view or a filter separating them.
 
-#### `delete-where-nothing-may-be-archived`: Delete, where nothing may be archived
+#### `delete-where-nothing-may-be-archived`: Delete, Where Nothing May Be Archived
 
 ```wireframe
 page
@@ -507,7 +507,7 @@ page
 
 **Cost:** Everything the company holds has to stay reconstructable for an audit, which means 'delete' removes the operational record and keeps the evidence. Two different things under one verb.
 
-#### `removal-blocked-naming-what-blocks-it`: Removal blocked, naming what blocks it
+#### `removal-blocked-naming-what-blocks-it`: Removal Blocked, Naming What Blocks It
 
 ```wireframe
 page
@@ -528,7 +528,7 @@ page
 
 **Cost:** No cited design system publishes this pattern. It is an inference from two existing cases: the Cloudscape disabled button and the explained refusal for a blocked edit.
 
-#### `reversal-rather-than-removal-for-money`: Reversal rather than removal, for money
+#### `reversal-rather-than-removal-for-money`: Reversal Rather Than Removal, for Money
 
 ```wireframe
 page
@@ -551,7 +551,7 @@ page
 
 **Cost:** The record grows rather than shrinks. A list of orders has to show an order that was fully reversed without it looking empty.
 
-#### `void-where-the-record-must-stay-but-stop-counting`: Void, where the record must stay but stop counting
+#### `void-where-the-record-must-stay-but-stop-counting`: Void, Where the Record Must Stay but Stop Counting
 
 ```wireframe
 page
@@ -575,7 +575,7 @@ page
 
 **Cost:** Void and refund are different verbs for different effects and a reader has to know which is which. Voiding a code that was already used is refused outright, because the order log holds that.
 
-#### `suspend-for-something-that-must-keep-running`: Suspend, for something that must keep running
+#### `suspend-for-something-that-must-keep-running`: Suspend, for Something That Must Keep Running
 
 ```wireframe
 page
@@ -600,7 +600,7 @@ page
 
 **Cost:** A pause is invisible to a customer unless something tells them. The same page has to answer what happens to somebody who tries to order while this is paused.
 
-#### `trash-with-thirty-days-to-change-your-mind`: Trash with thirty days to change your mind
+#### `trash-with-thirty-days-to-change-your-mind`: Trash with Thirty Days to Change Your Mind
 
 ```wireframe
 page
@@ -624,7 +624,7 @@ page
 
 **Reference:** Google Drive
 
-#### `no-confirmation-one-undo-in-a-toast`: No confirmation, one Undo in a toast
+#### `no-confirmation-one-undo-in-a-toast`: No Confirmation, One Undo in a Toast
 
 ```wireframe
 page
@@ -645,7 +645,7 @@ page
 
 **Reference:** Gmail
 
-### Removing several at once
+### Removing Several at Once
 
 **Question:** Staff remove or refund several records at once. The count itself is the risk, so the reader checks how many records and how much money are involved before committing. The decision is how the confirmation carries that check for small and large selections.
 
@@ -655,7 +655,7 @@ page
 
 **Rationale:** The dialog naming the count and the money stays the pick up to about twenty-five rows. The two figures are what the reader checks. The background job is the runner-up past that size, where a report lands afterwards. Never ship the typed count for an ordinary bulk remove. The dry-run plan earns its place where rows can refuse.
 
-#### `a-dialog-naming-the-count-and-the-money`: A dialog naming the count and the money
+#### `a-dialog-naming-the-count-and-the-money`: A Dialog Naming the Count and the Money
 
 ```wireframe
 page
@@ -679,7 +679,7 @@ page
 
 **Cost:** Twenty-five rows in a dialog mean scrolling inside a dialog. Past about five rows the total carries the meaning, and few readers check each line.
 
-#### `a-dialog-that-names-the-scope-it-is-about-to-use`: A dialog that names the scope it is about to use
+#### `a-dialog-that-names-the-scope-it-is-about-to-use`: A Dialog That Names the Scope It Is About to Use
 
 ```wireframe
 page
@@ -707,7 +707,7 @@ page
 
 **Reference:** Gmail
 
-#### `bulk-removal-as-a-bulk-archive-then-a-dialog-for-the-record`: Bulk removal as a bulk archive, then a dialog for the record
+#### `bulk-removal-as-a-bulk-archive-then-a-dialog-for-the-record`: Bulk Removal as a Bulk Archive, Then a Dialog for the Record
 
 ```wireframe
 page
@@ -731,7 +731,7 @@ page
 
 **Cost:** Archiving 200 deliveries hides 200 deliveries, and the reader has no way back except an Archived view. The safety net is the view, not the dialog.
 
-#### `a-partial-bulk-refusal-some-rows-will-not-do-it`: A partial bulk refusal: some rows will not do it
+#### `a-partial-bulk-refusal-some-rows-will-not-do-it`: A Partial Bulk Refusal: Some Rows Will Not Do It
 
 ```wireframe
 page
@@ -754,7 +754,7 @@ page
 
 **Cost:** A partial result has to be reportable afterwards as well, so the reader ends up reading the same information twice. Better to refuse the whole batch and let them narrow it.
 
-#### `a-typed-confirmation-for-a-bulk-removal`: A typed confirmation for a bulk removal
+#### `a-typed-confirmation-for-a-bulk-removal`: A Typed Confirmation for a Bulk Removal
 
 ```wireframe
 page
@@ -778,7 +778,7 @@ page
 
 **Cost:** Typing 200 trains copy and paste, which is the reflex the pattern exists to break. Cloudscape's own restriction is to the most dangerous object, and this is many objects.
 
-#### `a-bulk-removal-that-is-a-cancellation-with-consequences-per`: A bulk removal that is a cancellation, with consequences per row
+#### `a-bulk-removal-that-is-a-cancellation-with-consequences-per`: A Bulk Removal That Is a Cancellation, with Consequences per Row
 
 ```wireframe
 page
@@ -801,7 +801,7 @@ page
 
 **Cost:** A dialog that varies per row is a table in a dialog, which is a page. Past a handful of rows, the consequence list belongs on a page of its own.
 
-#### `a-background-job-with-a-report-for-the-large-ones`: A background job with a report, for the large ones
+#### `a-background-job-with-a-report-for-the-large-ones`: A Background Job with a Report, for the Large Ones
 
 ```wireframe
 page
@@ -826,7 +826,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-dry-run-first-the-way-a-migration-previews`: A dry run first, the way a migration previews
+#### `a-dry-run-first-the-way-a-migration-previews`: A Dry Run First, the Way a Migration Previews
 
 ```wireframe
 page
@@ -850,7 +850,7 @@ page
 
 **Reference:** Terraform
 
-### Creating a record and then filling it in
+### Creating a Record and Then Filling It In
 
 **Question:** A new record such as a delivery needs a name, a date, a warehouse, a priced product, and a channel before it can sell, but staff may not know all five at once. The decision is how much a create requires up front and how the record gets finished: name-only draft, everything required, series defaults, checklist, wizard, nothing until publish, home-page guide, or point-of-use nudges.
 
@@ -860,7 +860,7 @@ page
 
 **Rationale:** Create with a name and fill the rest later stays the pick. The record exists as a draft and every later addition is its own audited command. The home-page setup guide is the runner-up and the required companion, because a draft nobody finishes is a dead record. Never ship the everything-required option or the nothing-until-publish option. The point-of-use nudge earns its place beside the checklist for readers who skip guides.
 
-#### `create-with-a-name-fill-the-rest-later`: Create with a name, fill the rest later
+#### `create-with-a-name-fill-the-rest-later`: Create with a Name, Fill the Rest Later
 
 ```wireframe
 page
@@ -883,7 +883,7 @@ page
 
 **Cost:** A draft delivery is nearly useless on its own. If nothing prompts the reader to finish it, it sits unfinished on a list. The home-page setup guide is what prompts the reader to finish it.
 
-#### `everything-required-before-the-record-exists`: Everything required before the record exists
+#### `everything-required-before-the-record-exists`: Everything Required Before the Record Exists
 
 ```wireframe
 page
@@ -909,7 +909,7 @@ page
 
 **Cost:** It asks for a five-part form before anything exists, and a reader who only wants to pencil in a date has to do all of it.
 
-#### `create-from-a-series-where-the-series-holds-the-parts`: Create from a series, where the series holds the parts
+#### `create-from-a-series-where-the-series-holds-the-parts`: Create from a Series, Where the Series Holds the Parts
 
 ```wireframe
 page
@@ -933,7 +933,7 @@ page
 
 **Cost:** A delivery created from a plan can be edited away from it, and then the two disagree. The plan has to state which fields are shared and what diverging means.
 
-#### `a-checklist-that-closes-itself`: A checklist that closes itself
+#### `a-checklist-that-closes-itself`: A Checklist That Closes Itself
 
 ```wireframe
 page
@@ -957,7 +957,7 @@ page
 
 **Cost:** A checklist on every draft is a page of work before anything is usable. It is one more place that has to know which commands are already done.
 
-#### `create-inside-a-wizard-that-ends-at-publish`: Create inside a wizard that ends at publish
+#### `create-inside-a-wizard-that-ends-at-publish`: Create Inside a Wizard That Ends at Publish
 
 ```wireframe
 page
@@ -983,7 +983,7 @@ page
 
 **Reference:** Carbon
 
-#### `nothing-created-until-the-reader-says-publish`: Nothing created until the reader says publish
+#### `nothing-created-until-the-reader-says-publish`: Nothing Created Until the Reader Says Publish
 
 ```wireframe
 page
@@ -1006,7 +1006,7 @@ page
 
 **Cost:** Losing the browser loses the work, and a five-step form held in memory is a lot to lose. The record's state during the form does not exist, so nothing else can read it.
 
-#### `a-setup-guide-on-the-home-page-with-progress`: A setup guide on the home page, with progress
+#### `a-setup-guide-on-the-home-page-with-progress`: A Setup Guide on the Home Page, with Progress
 
 ```wireframe
 page
@@ -1029,7 +1029,7 @@ page
 
 **Reference:** Stripe
 
-#### `nudges-at-the-point-of-use-not-a-checklist`: Nudges at the point of use, not a checklist
+#### `nudges-at-the-point-of-use-not-a-checklist`: Nudges at the Point of Use, Not a Checklist
 
 ```wireframe
 page
@@ -1054,7 +1054,7 @@ page
 
 **Reference:** Webflow
 
-### Changing something that has already happened
+### Changing Something That Has Already Happened
 
 **Question:** A record of what is true now cannot always be edited: a charge already priced must stay reconstructable for invoices and audits. The decision is which shape each after-the-fact change takes: old value kept beside the new, refusal with the newer way named, dated correction, scheduled window, scoped change, reversal, version history, or two-person approval.
 
@@ -1064,7 +1064,7 @@ page
 
 **Rationale:** Keeping the old value beside the new stays the pick. An order placed last month still resolves to the delivery it was placed for. The dated correction is the runner-up where a fact was entered wrong, and the reversal is the only shape for money. Never ship a silent overwrite of anything priced or shipped. Where no safe edit exists, the refusal with the newer way named is the option. The version history earns its place for names and text, with two-person approval for corrections to money.
 
-#### `the-old-value-stays-on-the-record-beside-the-new`: The old value stays on the record beside the new
+#### `the-old-value-stays-on-the-record-beside-the-new`: The Old Value Stays on the Record Beside the New
 
 ```wireframe
 page
@@ -1083,7 +1083,7 @@ page
 
 **Cost:** Every edit grows the record, and a reader looking for 'what is this called' has to skip past what it used to be called.
 
-#### `the-edit-is-refused-with-the-newer-way-named`: The edit is refused, with the newer way named
+#### `the-edit-is-refused-with-the-newer-way-named`: The Edit Is Refused, with the Newer Way Named
 
 ```wireframe
 page
@@ -1105,7 +1105,7 @@ page
 
 **Cost:** A reader who wants a price change on a sold unit is told no and offered the replacement command instead. That is the correct answer, but refusals still generate support cases.
 
-#### `a-correction-dated-and-attributed`: A correction, dated and attributed
+#### `a-correction-dated-and-attributed`: A Correction, Dated and Attributed
 
 ```wireframe
 page
@@ -1128,7 +1128,7 @@ page
 
 **Cost:** Two figures for the same thing confuse any page that shows only one of them. Every read has to choose which to show, and the choice is a rule rather than a display decision.
 
-#### `a-change-with-a-window-before-it-takes-effect`: A change with a window, before it takes effect
+#### `a-change-with-a-window-before-it-takes-effect`: A Change with a Window, Before It Takes Effect
 
 ```wireframe
 page
@@ -1149,7 +1149,7 @@ page
 
 **Cost:** Two values on one record is a rule every read honors. What this is worth carries a date that a reader has to notice.
 
-#### `a-change-that-only-reaches-what-has-not-shipped`: A change that only reaches what has not shipped
+#### `a-change-that-only-reaches-what-has-not-shipped`: A Change That Only Reaches What Has Not Shipped
 
 ```wireframe
 page
@@ -1169,7 +1169,7 @@ page
 
 **Cost:** It needs a read that counts the affected population. That count is a fact the API answers rather than a number typed into the copy.
 
-#### `a-reverse-keeping-both-figures-and-the-reason`: A reverse, keeping both figures and the reason
+#### `a-reverse-keeping-both-figures-and-the-reason`: A Reverse, Keeping Both Figures and the Reason
 
 ```wireframe
 page
@@ -1193,7 +1193,7 @@ page
 
 **Cost:** The record holds two values for one thing, and every statement has to decide which one to print. That decision is a rule, not a display preference.
 
-#### `a-version-history-with-restore`: A version history with restore
+#### `a-version-history-with-restore`: A Version History with Restore
 
 ```wireframe
 page
@@ -1214,7 +1214,7 @@ page
 
 **Reference:** Notion
 
-#### `two-people-for-a-change-to-the-past`: Two people for a change to the past
+#### `two-people-for-a-change-to-the-past`: Two People for a Change to the Past
 
 ```wireframe
 page
@@ -1240,7 +1240,7 @@ page
 
 **Reference:** GitHub
 
-### Duplicating a record
+### Duplicating a Record
 
 **Question:** A duplicate is a create that starts from something. The copy carries the setup and never the history: prices and a delivery plan travel, and orders and money stay with the original.
 
@@ -1252,7 +1252,7 @@ page
 
 An order is never duplicated, because it is one customer's payment.
 
-#### `a-dialog-that-says-what-the-copy-carries`: A dialog that says what the copy carries
+#### `a-dialog-that-says-what-the-copy-carries`: A Dialog That Says What the Copy Carries
 
 ```wireframe
 page
@@ -1281,7 +1281,7 @@ page
 
 **Reference:** Shopify
 
-#### `one-click-from-the-row-menu-then-a-toast`: One click from the row menu, then a toast
+#### `one-click-from-the-row-menu-then-a-toast`: One Click from the Row Menu, Then a Toast
 
 ```wireframe
 page
@@ -1303,7 +1303,7 @@ page
 
 **Reference:** Mailchimp
 
-#### `copy-of-renamed-where-it-lands`: Copy of, renamed where it lands
+#### `copy-of-renamed-where-it-lands`: Copy of, Renamed Where It Lands
 
 ```wireframe
 page
@@ -1324,7 +1324,7 @@ page
 
 **Reference:** Figma
 
-#### `choose-what-the-copy-carries`: Choose what the copy carries
+#### `choose-what-the-copy-carries`: Choose What the Copy Carries
 
 ```wireframe
 page
@@ -1350,7 +1350,7 @@ page
 
 **Reference:** Notion
 
-#### `duplication-refused-where-there-is-nothing-to-carry`: Duplication refused where there is nothing to carry
+#### `duplication-refused-where-there-is-nothing-to-carry`: Duplication Refused Where There Is Nothing to Carry
 
 ```wireframe
 page
@@ -1371,7 +1371,7 @@ page
 
 **Reference:** Stripe
 
-#### `duplicate-a-session-inside-its-series`: Duplicate a session inside its series
+#### `duplicate-a-session-inside-its-series`: Duplicate a Session Inside Its Series
 
 ```wireframe
 page
@@ -1394,7 +1394,7 @@ page
 
 **Cost:** Anything the delivery changed away from the series raises the question of which version travels. The page must say the series version wins, or the copy silently keeps the divergence.
 
-### Putting a list in order by hand
+### Putting a List in Order by Hand
 
 **Question:** Products, plan entries, and storefront sections all have an order the reader sets. The customer reads the order the reader left, so the control must work for a mouse, a keyboard, and a finger.
 
@@ -1406,7 +1406,7 @@ page
 
 The storefront preview earns its place for sections, where the order is the design.
 
-#### `drag-handles-in-the-list`: Drag handles in the list
+#### `drag-handles-in-the-list`: Drag Handles in the List
 
 ```wireframe
 page
@@ -1428,7 +1428,7 @@ page
 
 **Reference:** Notion
 
-#### `move-up-and-move-down-in-the-row-menu`: Move up and Move down in the row menu
+#### `move-up-and-move-down-in-the-row-menu`: Move up and Move Down in the Row Menu
 
 ```wireframe
 page
@@ -1454,7 +1454,7 @@ page
 
 **Reference:** Linear
 
-#### `a-position-number-typed-on-each-row`: A position number typed on each row
+#### `a-position-number-typed-on-each-row`: A Position Number Typed on Each Row
 
 ```wireframe
 page
@@ -1477,7 +1477,7 @@ page
 
 **Reference:** WordPress
 
-#### `automatic-order-with-pinned-rows-on-top`: Automatic order, with pinned rows on top
+#### `automatic-order-with-pinned-rows-on-top`: Automatic Order, with Pinned Rows on Top
 
 ```wireframe
 page
@@ -1501,7 +1501,7 @@ page
 
 **Reference:** Shopify
 
-#### `order-the-storefront-sections-on-the-preview`: Order the storefront sections on the preview
+#### `order-the-storefront-sections-on-the-preview`: Order the Storefront Sections on the Preview
 
 ```wireframe
 page
@@ -1527,7 +1527,7 @@ page
 
 **Reference:** Squarespace
 
-#### `move-to-top-and-move-to-bottom-for-long-lists`: Move to top and Move to bottom for long lists
+#### `move-to-top-and-move-to-bottom-for-long-lists`: Move to Top and Move to Bottom for Long Lists
 
 ```wireframe
 page
@@ -1553,7 +1553,7 @@ page
 
 **Reference:** Trello
 
-### Restoring an archived record
+### Restoring an Archived Record
 
 **Question:** Archive is only safe if restore works. A restore returns the record to where it was, with its history, and says so when something changed while it was away, such as a name taken since.
 
@@ -1565,7 +1565,7 @@ page
 
 The Undo toast earns its place in the seconds after archiving, not as the way back days later.
 
-#### `restore-from-the-archived-view`: Restore from the archived view
+#### `restore-from-the-archived-view`: Restore from the Archived View
 
 ```wireframe
 page
@@ -1589,7 +1589,7 @@ page
 
 **Reference:** Shopify
 
-#### `undo-in-the-seconds-after-archiving`: Undo in the seconds after archiving
+#### `undo-in-the-seconds-after-archiving`: Undo in the Seconds After Archiving
 
 ```wireframe
 page
@@ -1613,7 +1613,7 @@ page
 
 **Reference:** Gmail
 
-#### `restore-from-the-record-page`: Restore from the record page
+#### `restore-from-the-record-page`: Restore from the Record Page
 
 ```wireframe
 page
@@ -1634,7 +1634,7 @@ page
 
 **Reference:** GitHub
 
-#### `restore-refused-the-parent-is-still-archived`: Restore refused: the parent is still archived
+#### `restore-refused-the-parent-is-still-archived`: Restore Refused: The Parent Is Still Archived
 
 ```wireframe
 page
@@ -1660,7 +1660,7 @@ page
 
 **Reference:** Jira
 
-#### `restore-with-a-name-taken-since`: Restore with a name taken since
+#### `restore-with-a-name-taken-since`: Restore with a Name Taken Since
 
 ```wireframe
 page
@@ -1686,7 +1686,7 @@ page
 
 **Reference:** Notion
 
-#### `restore-several-at-once`: Restore several at once
+#### `restore-several-at-once`: Restore Several at Once
 
 ```wireframe
 page
@@ -1715,7 +1715,7 @@ page
 
 **Reference:** Google Drive
 
-### Inviting a team member
+### Inviting a Team Member
 
 **Question:** Warehouse crew join per delivery, and staff join per company. An invitation names the person, the role, and the scope before sending, because wrongly granted access must be found and removed later.
 
@@ -1727,7 +1727,7 @@ page
 
 It earns its place only for warehouse crew on one delivery. A request to join is refused: the company invites. Nobody applies.
 
-#### `invite-by-email-with-the-role-chosen-first`: Invite by email, with the role chosen first
+#### `invite-by-email-with-the-role-chosen-first`: Invite by Email, with the Role Chosen First
 
 ```wireframe
 page
@@ -1755,7 +1755,7 @@ page
 
 **Reference:** Slack
 
-#### `an-invite-link-anyone-with-it-can-use`: An invite link anyone with it can use
+#### `an-invite-link-anyone-with-it-can-use`: An Invite Link Anyone with It Can Use
 
 ```wireframe
 page
@@ -1782,7 +1782,7 @@ page
 
 **Reference:** Discord
 
-#### `invite-to-one-delivery-not-the-company`: Invite to one delivery, not the company
+#### `invite-to-one-delivery-not-the-company`: Invite to One Delivery, Not the Company
 
 ```wireframe
 page
@@ -1806,7 +1806,7 @@ page
 
 **Reference:** Linear
 
-#### `pending-invitations-with-resend-and-revoke`: Pending invitations, with resend and revoke
+#### `pending-invitations-with-resend-and-revoke`: Pending Invitations, with Resend and Revoke
 
 ```wireframe
 page
@@ -1828,7 +1828,7 @@ page
 
 **Reference:** GitHub
 
-#### `an-expired-invitation-reissued`: An expired invitation, reissued
+#### `an-expired-invitation-reissued`: An Expired Invitation, Reissued
 
 ```wireframe
 page
@@ -1855,7 +1855,7 @@ page
 
 **Reference:** Google Workspace
 
-#### `a-request-to-join-approved-by-an-owner`: A request to join, approved by an owner
+#### `a-request-to-join-approved-by-an-owner`: A Request to Join, Approved by an Owner
 
 ```wireframe
 page
@@ -1877,7 +1877,7 @@ page
 
 **Reference:** Slack
 
-### Publishing and unpublishing a listing
+### Publishing and Unpublishing a Listing
 
 **Question:** A draft is private until customers can see it. Publishing says what customers will find, and unpublishing says what happens to what they found, because placed orders outlive either command.
 
@@ -1889,7 +1889,7 @@ page
 
 Pause earns its place where the listing stays visible but nothing may sell.
 
-#### `publish-with-the-readiness-check-beside-it`: Publish with the readiness check beside it
+#### `publish-with-the-readiness-check-beside-it`: Publish with the Readiness Check Beside It
 
 ```wireframe
 page
@@ -1918,7 +1918,7 @@ page
 
 **Reference:** Webflow
 
-#### `unpublish-with-the-customer-consequences-stated`: Unpublish with the customer consequences stated
+#### `unpublish-with-the-customer-consequences-stated`: Unpublish with the Customer Consequences Stated
 
 ```wireframe
 page
@@ -1945,7 +1945,7 @@ page
 
 **Reference:** Shopify
 
-#### `publish-on-a-date-set-in-advance`: Publish on a date, set in advance
+#### `publish-on-a-date-set-in-advance`: Publish on a Date, Set in Advance
 
 ```wireframe
 page
@@ -1970,7 +1970,7 @@ page
 
 **Reference:** WordPress
 
-#### `publish-blocked-with-the-missing-pieces-listed`: Publish blocked, with the missing pieces listed
+#### `publish-blocked-with-the-missing-pieces-listed`: Publish Blocked, with the Missing Pieces Listed
 
 ```wireframe
 page
@@ -1993,7 +1993,7 @@ page
 
 **Reference:** Squarespace
 
-#### `pause-sales-without-unpublishing`: Pause sales without unpublishing
+#### `pause-sales-without-unpublishing`: Pause Sales Without Unpublishing
 
 ```wireframe
 page
@@ -2016,7 +2016,7 @@ page
 
 **Reference:** Shopify
 
-#### `publish-per-channel-one-at-a-time`: Publish per channel, one at a time
+#### `publish-per-channel-one-at-a-time`: Publish per Channel, One at a Time
 
 ```wireframe
 page
@@ -2037,7 +2037,7 @@ page
 
 **Reference:** Shopify
 
-### Scheduling a change for later
+### Scheduling a Change for Later
 
 **Question:** Prices, fees, and sale windows change on fixed dates. A scheduled change names the value, the date, and the way to stop it, and the record shows both the current and the coming value until the date arrives.
 
@@ -2049,7 +2049,7 @@ page
 
 The sale window earns its place at creation, where open and close are set together.
 
-#### `a-change-with-a-date-listed-with-the-record`: A change with a date, listed with the record
+#### `a-change-with-a-date-listed-with-the-record`: A Change with a Date, Listed with the Record
 
 ```wireframe
 page
@@ -2073,7 +2073,7 @@ page
 
 **Reference:** WordPress
 
-#### `a-tier-ends-on-its-date`: A tier ends on its date
+#### `a-tier-ends-on-its-date`: A Tier Ends on Its Date
 
 ```wireframe
 page
@@ -2093,7 +2093,7 @@ page
 
 **Cost:** Three rows for one product is three records to read on every invoice and in every report. A customer who finds the old price can ask for the difference back, and the page must not hide that.
 
-#### `a-scheduled-change-canceled-before-it-runs`: A scheduled change canceled before it runs
+#### `a-scheduled-change-canceled-before-it-runs`: A Scheduled Change Canceled Before It Runs
 
 ```wireframe
 page
@@ -2118,7 +2118,7 @@ page
 
 **Reference:** Stripe
 
-#### `two-changes-on-one-date-refused`: Two changes on one date, refused
+#### `two-changes-on-one-date-refused`: Two Changes on One Date, Refused
 
 ```wireframe
 page
@@ -2141,7 +2141,7 @@ page
 
 **Reference:** Google Calendar
 
-#### `the-sale-window-set-at-creation`: The sale window, set at creation
+#### `the-sale-window-set-at-creation`: The Sale Window, Set at Creation
 
 ```wireframe
 page
@@ -2162,7 +2162,7 @@ page
 
 **Cost:** A window set at creation is rarely rechecked: it opens on an unfinished product or closes on a selling one. The product page must show the window beside the state, always.
 
-#### `what-the-customer-sees-before-and-after`: What the customer sees, before and after
+#### `what-the-customer-sees-before-and-after`: What the Customer Sees, Before and After
 
 ```wireframe
 page
@@ -2196,17 +2196,17 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/create-edit-remove#confirm-or-undo-every-removal | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/create-edit-remove#show-the-created-record | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/create-edit-remove#creating-one-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#changing-a-record-that-already-exists | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#removing-something | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#removing-several-at-once | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#creating-a-record-and-then-filling-it-in | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#changing-something-that-has-already-happened | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#duplicating-a-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#putting-a-list-in-order-by-hand | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#restoring-an-archived-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#inviting-a-team-member | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#publishing-and-unpublishing-a-listing | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/create-edit-remove#scheduling-a-change-for-later | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/create-edit-remove#confirm-or-undo-every-removal | guidance | Which built removal runs without asking and offers no way back? Open the archive, delete, void, and suspend flows on built screens. |
+| litespec/frontend/patterns/create-edit-remove#show-the-created-record | guidance | Which built create flow ends away from its new record? Open the create dialogs, pages, and bulk flows on built screens. |
+| litespec/frontend/patterns/create-edit-remove#creating-one-record | guidance | Which built creation form differs from the wireframe its catalog entry chose? Open the built dialog, page, and inline starts beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#changing-a-record-that-already-exists | guidance | Which built edit flow differs from the wireframe its catalog entry chose? Open the built save, autosave, and blocked edits beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#removing-something | guidance | Which built single removal differs from the wireframe its catalog entry chose? Open the built archive, delete, and trash flows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#removing-several-at-once | guidance | Which built bulk removal differs from the wireframe its catalog entry chose? Open the built count-and-money dialogs and background jobs beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#creating-a-record-and-then-filling-it-in | guidance | Which built draft-first flow differs from the wireframe its catalog entry chose? Open the built name-first creates and setup guides beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#changing-something-that-has-already-happened | guidance | Which built correction flow differs from the wireframe its catalog entry chose? Open the built past-change edits, reverses, and version histories beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#duplicating-a-record | guidance | Which built copy flow differs from the wireframe its catalog entry chose? Open the built duplicate dialogs and row-menu copies beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#putting-a-list-in-order-by-hand | guidance | Which built manual ordering differs from the wireframe its catalog entry chose? Open the built drag handles, move commands, and pinned rows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#restoring-an-archived-record | guidance | Which built restore flow differs from the wireframe its catalog entry chose? Open the built archived views and undo toasts beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#inviting-a-team-member | guidance | Which built join flow differs from the wireframe its catalog entry chose? Open the built email invites, links, and pending lists beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#publishing-and-unpublishing-a-listing | guidance | Which built listing-state flow differs from the wireframe its catalog entry chose? Open the built publish, pause, and per-channel controls beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/create-edit-remove#scheduling-a-change-for-later | guidance | Which built dated change differs from the wireframe its catalog entry chose? Open the built sale windows and scheduled tiers beside the catalog entry recording the chosen option and its reason. |

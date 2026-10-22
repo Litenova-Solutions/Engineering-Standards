@@ -22,7 +22,7 @@
   ]
 }
 ---
-# <Feature display title>
+# <Feature Display Title>
 
 ## Offering
 

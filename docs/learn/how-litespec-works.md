@@ -25,7 +25,7 @@ The diagram below shows how the four parts connect in a loop, with the checks se
 
 Expenses lets employees submit work expenses with receipts. In LiteSpec, that behavior is a use case: one command, query, or reaction with its permissions, results, and scenarios.
 
-### 1. The Written Record
+### 1. the Written Record
 
 The record lives in the project at `docs/domain/modules/spending/expenses/submit-expense.md`. Its JSON header states what the use case is, who owns it, and how it connects to other records:
 
@@ -76,7 +76,7 @@ The use case page also carries a scenario: one worked example that leads from a 
 
 Read it as one proven path: given the situation, when the employee acts, the use case reaches the `submitted` result, and the expense is submitted. Each scenario names exactly one result, so a later test knows which ending it proves.
 
-### 2. The Implementation
+### 2. the Implementation
 
 The standard states where the code goes and what shape it takes. A use case is implemented by one command handler in the Application project, in a folder that mirrors the record's module and aggregate:
 
@@ -86,7 +86,7 @@ apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseC
 
 The handler refuses an expense above the threshold that carries no receipt with the refusal code the result entry names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
 
-### 3. The Computed Links
+### 3. the Computed Links
 
 Run the model builder from the project root:
 
@@ -135,7 +135,7 @@ Alongside the record's own fields, the answer holds what the builder worked out 
 
 The use case is implemented: the builder found its handler. Two tests claim its scenario: the test `Submitting_with_a_receipt_succeedsAsync`, whose `when` step belongs to the `SubmitExpenseSteps` class, and an integration test through a helper. Both claims check out, so each entry reads `confirmed`. The use case is still not verified: no test run exists yet, so `passing` is null. Nobody maintains those links by hand, and they cannot go stale, because the builder computes them again on every build.
 
-### 4. The Reported Gaps
+### 4. the Reported Gaps
 
 `litespec model check` turns gaps into findings: a use case with no handler, a result the code never returns, a link to a record that does not exist, or a requirement nothing fulfills. `litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
 

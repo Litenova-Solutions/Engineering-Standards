@@ -38,7 +38,7 @@ static class RecordTypes
     ];
 
     /// <summary>Types only the large size requires.</summary>
-    public static readonly IReadOnlyList<string> LargeAdded = ["problem", "feature", "journey", "scenario"];
+    public static readonly IReadOnlyList<string> LargeAdded = ["goal", "problem", "feature", "journey", "scenario"];
 
     /// <summary>The entry-point kinds that run in the background.</summary>
     public static readonly HashSet<string> BackgroundEntryKinds = new(StringComparer.Ordinal)

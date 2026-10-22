@@ -4,13 +4,13 @@
 
 You maintain the `litespec.dev` site in `apps/site/`. You change its design, its agent endpoints, its routes, or its deployment. After reading this page you know how to run it, where each behavior lives, and how to make the common changes without breaking the build.
 
-## What it is
+## What It Is
 
 The site is the static Astro 7 site that publishes the LiteSpec standard at `https://litespec.dev`. It is maintainer tooling, not part of a consumer project, so it lives in `apps/site/` rather than in the CLI. It builds from the standard at the repository root through one loader, `src/lib/spec.ts`. People read HTML pages. Agents read `/llms.txt`, a raw `.md` copy of every page, one index per selection of shape and stacks, and one bundle per layer. The UI is hand-written CSS. Wireframes are drawn by a TypeScript port of the C# renderer, proved byte-identical by golden SVGs.
 
 The project file is `apps/site/package.json`. It names the package `litespec-site`, the package manager `pnpm@11.1.3`, the engine `node >=24`, the dependencies `astro 7.3.5` and `@astrojs/markdown-remark 7.3.1`, and the dev dependency `pagefind 1.5.2`. The workspace file `apps/site/pnpm-workspace.yaml` allows the `esbuild` build. The TypeScript config `apps/site/tsconfig.json` extends the Astro strict config and excludes `dist/`. The ignore file `apps/site/.gitignore` ignores `node_modules/`, `dist/`, and `.astro/`.
 
-## Quick start
+## Quick Start
 
 Run every command in this section from the repository root.
 
@@ -77,9 +77,9 @@ The config files sit at the top of `apps/site/`. The source lives under `src/lib
 | `src/styles/code.css` | The highlighted code blocks and the Shiki theme selection. |
 | `src/styles/select.css` | The selection page header block. The form carries its own styles in `SelectForm.astro`. |
 
-## How it works
+## How It Works
 
-### The loader
+### The Loader
 
 `src/lib/spec.ts` is the only module that reads the standard. It finds the repository root by walking up from the working directory for `litespec.manifest.json`, so a bundled build never relies on its own URL. It exports `root`, `manifest`, `version` (currently `2.0.0`), `pages`, `provisions`, `selections()`, `layers()`, `appliedPages()`, `selectionLayers()`, `selectionKey()`, `extensionStack()`, `backendStacks`, `frontendStacks`, `schemaFiles`, and the URL helpers `htmlPath()`, `pageUrl()`, `rawUrl()`, `layerUrl()`, and `selectionIndexUrl()`.
 
@@ -91,7 +91,7 @@ It parses every `.md` file under `docs/` once. Each `Page` carries its repositor
 
 `src/lib/code-blocks.ts` wraps each Shiki-highlighted block in a `code-block` figure with a header strip that shows the language name and a copy button. The `languageLabel()` map names `Shell`, `PowerShell`, `JSON`, `TypeScript`, `YAML`, `Markdown`, and the other supported labels. Plain wireframe text blocks carry no `astro-code` class, so they pass through untouched.
 
-### Agent text
+### Agent Text
 
 `src/lib/agent-text.ts` formats every plain-text endpoint from the same loader data, so the endpoints cannot disagree with each other. `rawMarkdown()` returns the file exactly as it is in `docs/`, with relative links between pages rewritten to absolute raw URLs. `concatenatedMarkdown()` joins pages with a comment that names each raw source URL and a line holding `---` between pages. `fullLlmsText()` concatenates every page except the UI pattern pages. `layerText()` concatenates one layer. `versionLlmsText()` groups every page by area with its raw URL, and points at `llms-full.txt` and at the selection indexes. `selectionLlmsText()` lists the pages one selection applies, grouped by layer, then the addable extensions and the UI pattern groups, then how to read the index. `rootLlmsText()` lists the release index, every selection, every layer bundle, and the `AGENTS.md` block. The selection helpers `selectionTitle()` and `selectionLine()` write strings such as `Server with dotnet and react` and `A server project using the dotnet backend stack and the react frontend stack.`
 
@@ -113,7 +113,7 @@ It parses every `.md` file under `docs/` once. Each `Page` carries its repositor
 
 `astro.config.mjs` sets `site` to `https://litespec.dev`, `output` to `static`, `trailingSlash` to `always`, and `build.format` to `directory`. Its `litespec-latest-redirects` integration writes the `_redirects` file in `astro:build:done` with `/latest  /2.0.0/  302` and `/latest/*  /2.0.0/:splat  302`, so Cloudflare Pages redirects the unversioned paths to the manifest version.
 
-### Design system
+### Design System
 
 `src/styles/site.css` owns the palette and the semantic tokens. Every component uses tokens only and never a raw color. The palette starts from the logo charcoal `#3e3643` and amber `#f8c258`: warm neutrals, an amber ramp, and three muted support hues at the same lightness and low chroma (sage, slate, clay). Tokens name roles, not values: `--bg`, `--outside`, `--border`, `--muted`, `--fg`, `--primary`, `--accent`, `--rule-*`, `--conv-*`, `--pat-*`, `--warn-*`, `--code-bg`, and `--stroke`. Rules get amber, conventions get sage, and patterns get slate. Amber marks only the current item, important text, and focus.
 
@@ -144,7 +144,7 @@ The build indexes the output with `pagefind --site dist`, which is the second ha
 
 The indexed text comes from `data-pagefind-body` on the `.docs-body` div in `[...page].astro` and from `data-pagefind-meta="title"` on its `H1`. `data-pagefind-ignore` keeps UI text out of the index: provision badges, tool buttons, code block headers, option tabs, and the `lbl` spans in provision bodies.
 
-### The pattern viewer and the wireframes
+### The Pattern Viewer and the Wireframes
 
 Pattern pages render each option as a card with `Preview` and `Wireframe` tabs and an expand button. The `Preview` panel shows the desktop drawing at 1200 pixels and the phone drawing at 390 pixels. The `Wireframe` panel shows the wireframe text with its copy button. The tabs and the expand button carry a `hidden` attribute that the viewer script removes, and the wireframe panel stays visible until that script hides it, so the card reads fully without JavaScript. The script adds arrow-key tab movement with `Home` and `End`, makes each drawing openable with `Enter` or `Space`, and marks the page with `pattern-js` for the zoom cursor.
 
@@ -152,37 +152,37 @@ Pattern pages render each option as a card with `Preview` and `Wireframe` tabs a
 
 `src/lib/wireframe/parse.ts` ports the CLI wireframe parser and `src/lib/wireframe/render.ts` ports the CLI wireframe renderer. Both use no Node API, so they run at build time and in the browser. The renderer draws one wireframe as an SVG sketch at `DesktopWidth` 1200 or `PhoneWidth` 390 pixels in one neutral style with tone fills for `neutral`, `positive`, `caution`, `critical`, and `info`, estimates text width from the character count so it needs no font, and applies the compact reflow rules at the phone width with the `Compact` block when the page provides one. `wireframe.test.ts` locks the port: every fixture `.wireframe` must draw its checked-in `.desktop.svg` and `.phone.svg` byte for byte, and every `errors.json` entry must fail to parse.
 
-## Common changes
+## Common Changes
 
-### Add a docs page
+### Add a Docs Page
 
 1. Add the Markdown file under `docs/` in lowercase, with one `H1` and the sections of its page style.
 2. Rebuild the site. `[...page].astro` builds its paths from `pages`, so a new page needs no route file.
 3. Check that the sidebar shows it. `DocsSidebar.astro` builds the tree from `pages`, with a `stack.md` or `README.md` file as its folder `Overview`.
 4. Check that the release home lists it under its area.
 
-### Add a site route
+### Add a Site Route
 
 1. Add the file under `src/pages/[version]/`, for example `src/pages/[version]/help.astro` for HTML or `src/pages/[version]/help.txt.ts` for text, with `getStaticPaths()` returning the version param.
 2. Read the standard only through `src/lib/spec.ts` and format agent text only through `src/lib/agent-text.ts`.
 3. Set the content type on API routes, such as `text/plain; charset=utf-8` for an index and `text/markdown; charset=utf-8` for Markdown.
 4. Rebuild and open the new URL with the version prefix.
 
-### Add an icon
+### Add an Icon
 
 1. Add the inner SVG markup to `paths` in `src/lib/icons.ts`, keeping the 24px grid and the 2px stroke style.
 2. Use it with `<Icon name="your-name" />`, and pass a `label` only when the icon carries meaning alone.
 3. Reference the same name from `src/lib/areas.ts` when the icon labels an area or a sidebar section.
 4. Rebuild and check the icon at both color schemes.
 
-### Add a docs area
+### Add a Docs Area
 
 1. Add the folder under `docs/` with its pages.
 2. Add one row to `areas` in `src/lib/areas.ts` with the folder key, the label, the icon name, and the one-line note.
 3. Add the area to `sidebarSections` in the same file, in display order.
 4. Rebuild and check the sidebar group, the release home group, and the area note.
 
-### Change a color
+### Change a Color
 
 1. Add or edit the ramp and the semantic token in `src/styles/site.css`, with both the light value and the dark override.
 2. Use the token as `var(--your-token)` in the component stylesheet.
@@ -203,7 +203,7 @@ wrangler deploy --config wrangler.www.jsonc   # only when the redirect Worker ch
 
 The build writes `dist/_redirects` (`/latest` to the manifest version) and copies `public/_headers`, which sets the security headers, long-lived caching for `/_astro/*` and `/fonts/*`, and `X-Robots-Tag: noindex` on the raw Markdown pages and the agent index files so search shows the HTML page. The zone sets Always Use HTTPS, SSL Full (strict), and TLS 1.2 or later.
 
-## Search engines
+## Search Engines
 
 `src/lib/seo.ts` builds the metadata: `absoluteUrl` for canonical links, `metaDescription` trims a description at a sentence or word boundary to 160 characters, and `techArticle`, `breadcrumbs`, `website`, and `softwareSource` build the schema.org objects. Every page writes the Organization plus its own objects as one JSON-LD graph: docs pages a TechArticle with `dateModified` from git (`lastModified`) and a BreadcrumbList, the landing page the WebSite and the SoftwareSourceCode. `src/pages/sitemap.xml.ts` lists every HTML page with its last change date, `public/robots.txt` allows everything and names the sitemap, `public/og.png` is the 1200 by 630 share image, and the 404 page is `noindex`. A short page intent gains the page title and a sentence about LiteSpec, so every description carries enough for a search snippet.
 

@@ -10,7 +10,7 @@ Every LiteSpec project starts by declaring the same three choices: its size, sha
 
 Three choices in `litespec.project.json` decide everything the project must produce and every page that applies to it.
 
-Size decides the record set and the test projects. A small project carries the core record types with Architecture and Integration test projects. A large project adds problems, features, journeys, and scenarios with the Acceptance project. A project with one web frontend and no journeys fits small; the running Expenses example, which needs journeys, selects large.
+Size decides the record set and the test projects. A small project carries the core record types with Architecture and Integration test projects. A large project adds goals, problems, features, journeys, and scenarios with the Acceptance project. A project with one web frontend and no journeys fits small; the running Expenses example, which needs journeys, selects large.
 
 Shape decides the deployment boundary: `server` for a project with its own backend, `client-only` for one without. A server project names one backend stack. A client-only project names none, and records which backend surfaces stay uncovered.
 
@@ -51,7 +51,7 @@ The size selects the large record set, the shape selects a backend stack, and ea
 
 The diagram shows the three project choices and what each decides.
 
-![Three project choices and what each decides: size, small or large, decides the record types and the test projects, with large adding problems, features, journeys, and scenarios; shape, server or client-only, decides whether the project names a backend stack; stacks, one backend stack and one stack per frontend, decide the technology pages and the checks that apply.](../assets/diagrams/core-scope-selection.svg)
+![Three project choices and what each decides: size, small or large, decides the record types and the test projects, with large adding goals, problems, features, journeys, and scenarios; shape, server or client-only, decides whether the project names a backend stack; stacks, one backend stack and one stack per frontend, decide the technology pages and the checks that apply.](../assets/diagrams/core-scope-selection.svg)
 
 ### Keep One Bounded Context
 
@@ -113,7 +113,7 @@ The diagram shows the three project choices and what each decides.
 
 ## Conventions
 
-### Start With One API and Database
+### Start with One API and Database
 
 **Default:** Use one API deployable and one database.
 
@@ -129,7 +129,7 @@ The diagram shows the three project choices and what each decides.
 
 **Rationale:** Caches, replicas, queues, and partitioning each answer a different limitation, and only measurements show which one the project hit. Recording current load, the latency target, and the observed constraint before expanding proves the added capacity answers the observed limit. Expanding first and measuring later adds machinery that can hide the real bottleneck.
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/scope#select-a-size-a-shape-and-stacks` and `litespec/core/scope#select-conditional-extensions-explicitly`.
 

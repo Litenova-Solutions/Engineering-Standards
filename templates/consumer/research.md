@@ -24,7 +24,7 @@
   ]
 }
 ---
-# <Research display title>
+# <Research Display Title>
 
 ## Answer
 

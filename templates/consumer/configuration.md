@@ -8,7 +8,7 @@
   "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# <Configuration title>
+# <Configuration Title>
 
 ## Intent
 

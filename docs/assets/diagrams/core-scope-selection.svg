@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="326" viewBox="0 0 720 326" role="img" aria-labelledby="core-scope-selection-title core-scope-selection-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
   <title id="core-scope-selection-title">Project choices and what each decides</title>
-  <desc id="core-scope-selection-desc">Three project choices and what each decides. Size, small or large, decides the record types and the test projects; large adds problems, features, journeys, and cases. Shape, server or client-only, decides whether the project names a backend stack. Stacks, one backend stack and one stack per frontend, decide the technology pages and the checks that apply. An arrow points from each choice to what it decides.</desc>
+  <desc id="core-scope-selection-desc">Three project choices and what each decides. Size, small or large, decides the record types and the test projects; large adds goals, problems, features, journeys, and scenarios. Shape, server or client-only, decides whether the project names a backend stack. Stacks, one backend stack and one stack per frontend, decide the technology pages and the checks that apply. An arrow points from each choice to what it decides.</desc>
   <defs>
     <marker id="core-scope-selection-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
@@ -34,7 +34,7 @@
     <text x="36" y="68">small or large</text>
     <text x="36" y="160">server or client-only</text>
     <text x="36" y="252">one backend, one per frontend</text>
-    <text x="336" y="68">large adds problems, features, journeys, cases</text>
+    <text x="336" y="68">large adds goals, problems, features, journeys, scenarios</text>
     <text x="336" y="160">client-only names no backend stack</text>
     <text x="336" y="252">one backend stack, one stack per frontend</text>
   </g>

@@ -1,34 +1,75 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="576" viewBox="0 0 720 576" role="img" aria-labelledby="core-model-records-title core-model-records-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
-  <title id="core-model-records-title">Record types grouped by the question each answers</title>
-  <desc id="core-model-records-desc">Seven groups from the record type table. Why holds product, constraint, research, decision, requirement, and problem. What is offered holds feature. Who acts holds actor, role, and permission. How they arrive holds journey and entry-point. How the business works holds module, business-record, rule, use-case, result, case, and event. Operation holds limit and runbook. How the project builds and speaks holds standard, exception, known-gap, and term.</desc>
+  <title id="core-model-records-title">The record tree from product intent to scenario</title>
+  <desc id="core-model-records-desc">Product branches into constraint, goal, problem, research, decision, and requirement. Problem branches into feature. Requirement branches into journey, rule, and use case. Use case branches into result, and result into scenario, the review line. Across the tree: module and aggregate; actor, role, and permission; entry point and external system; the glossary; limit and runbook; deviation and known gap; and the computed implemented, verified, reachable, and effective status.</desc>
+
+  <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25">
+    <path d="M32 72 V 418" />
+    <path d="M32 108 H 44" />
+    <path d="M32 170 H 44" />
+    <path d="M32 232 H 44" />
+    <path d="M32 356 H 44" />
+    <path d="M32 418 H 44" />
+    <path d="M32 232 H 56 V 294 H 68" />
+    <path d="M340 46 H 380" />
+    <path d="M392 72 V 248" />
+    <path d="M392 108 H 404" />
+    <path d="M392 178 H 404" />
+    <path d="M392 248 H 404" />
+    <path d="M392 248 H 416 V 310 H 428" />
+    <path d="M416 310 H 440 V 372 H 452" />
+  </g>
 
   <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
-    <rect x="20" y="20" width="680" height="62" rx="8" />
-    <rect x="20" y="94" width="680" height="62" rx="8" />
-    <rect x="20" y="168" width="680" height="62" rx="8" />
-    <rect x="20" y="242" width="680" height="62" rx="8" />
-    <rect x="20" y="316" width="680" height="62" rx="8" />
-    <rect x="20" y="390" width="680" height="62" rx="8" />
-    <rect x="20" y="464" width="680" height="62" rx="8" />
+    <rect x="20" y="20" width="320" height="52" rx="8" />
+    <rect x="44" y="82" width="296" height="52" rx="8" />
+    <rect x="44" y="144" width="296" height="52" rx="8" />
+    <rect x="44" y="206" width="296" height="52" rx="8" />
+    <rect x="68" y="268" width="272" height="52" rx="8" />
+    <rect x="44" y="330" width="296" height="52" rx="8" />
+    <rect x="44" y="392" width="296" height="52" rx="8" />
+    <rect x="380" y="20" width="320" height="52" rx="8" />
+    <rect x="404" y="82" width="296" height="52" rx="8" />
+    <rect x="404" y="144" width="296" height="68" rx="8" />
+    <rect x="404" y="222" width="296" height="52" rx="8" />
+    <rect x="428" y="284" width="272" height="52" rx="8" />
   </g>
+  <rect x="452" y="346" width="248" height="52" rx="8" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
 
-  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600">
-    <text x="36" y="45">Why</text>
-    <text x="36" y="119">What is offered</text>
-    <text x="36" y="193">Who acts</text>
-    <text x="36" y="267">How they arrive</text>
-    <text x="36" y="341">How the business works</text>
-    <text x="36" y="415">Operation</text>
-    <text x="36" y="489">How the project builds and speaks</text>
+  <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
+    <text x="180" y="42">product</text>
+    <text x="192" y="104">constraint</text>
+    <text x="192" y="166">goal</text>
+    <text x="192" y="228">problem</text>
+    <text x="204" y="290">feature</text>
+    <text x="192" y="352">research</text>
+    <text x="192" y="414">decision</text>
+    <text x="540" y="42">requirement</text>
+    <text x="552" y="104">journey</text>
+    <text x="552" y="166">rule</text>
+    <text x="552" y="244">use case</text>
+    <text x="564" y="306">result</text>
+    <text x="576" y="368">scenario</text>
   </g>
-  <g style="fill: var(--muted-fg, #77706a)" font-size="12">
-    <text x="36" y="66">product, constraint, research, decision, requirement, problem</text>
-    <text x="36" y="140">feature</text>
-    <text x="36" y="214">actor, role, permission</text>
-    <text x="36" y="288">journey, entry-point</text>
-    <text x="36" y="362">module, business-record, rule, use-case, result, case, event</text>
-    <text x="36" y="436">limit, runbook</text>
-    <text x="36" y="510">standard, exception, known-gap, term</text>
+  <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
+    <text x="180" y="60">what is built, for whom, what it never does</text>
+    <text x="192" y="122">outside rule; binds everything below</text>
+    <text x="192" y="184">measurable outcome the product serves</text>
+    <text x="192" y="246">a pain today</text>
+    <text x="204" y="308">what is offered or refused against it</text>
+    <text x="192" y="370">evidence; informs, never decides</text>
+    <text x="192" y="432">settles a choice; replaced, never edited</text>
+    <text x="540" y="60">functional | quality | business</text>
+    <text x="552" y="122">ordered use cases toward one goal</text>
+    <text x="552" y="184">invariant | precondition |</text>
+    <text x="552" y="200">calculation | cross-aggregate</text>
+    <text x="552" y="262">command | query | reaction</text>
+    <text x="564" y="324">success | refusal with a code</text>
+    <text x="576" y="386">given, when, then; examples table</text>
+    <text x="360" y="462">Module and aggregate hold where it lives, with states, transitions, and data;</text>
+    <text x="360" y="480">actor, role, and permission hold who may do it.</text>
+    <text x="360" y="498">Entry point and external system reach it; the glossary holds what words mean.</text>
+    <text x="360" y="516">Limit and runbook run it; deviation and known gap keep project upkeep.</text>
+    <text x="360" y="534">The builder computes implemented, verified, reachable, and effective status.</text>
   </g>
-  <text x="360" y="556" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">Each row groups the record types that answer one question, from the record type table.</text>
+  <text x="360" y="560" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">A line joins each record to the records it holds, and the highlighted scenario is the review line.</text>
 </svg>

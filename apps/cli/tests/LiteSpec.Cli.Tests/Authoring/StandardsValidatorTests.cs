@@ -55,7 +55,12 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "tutorial that omits what the reader built")]
     public void TutorialOmitsWhatReaderBuilt() => Check(
-        root => StandardsFixture.Write(root, "docs/tutorial/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TutorialPage, "## What you built", "## Verification")),
+        root => StandardsFixture.Write(root, "docs/tutorial/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TutorialPage, "## What You Built", "## Verification")),
+        ["PAGE_MISSING_SECTION", "PAGE_UNKNOWN_SECTION"]);
+
+    [Fact(DisplayName = "how-to that ends in verification")]
+    public void HowToEndingInVerification() => Check(
+        root => StandardsFixture.Write(root, "docs/guide/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.GuidePage, "## Check", "## Verification")),
         ["PAGE_MISSING_SECTION", "PAGE_UNKNOWN_SECTION"]);
 
     [Fact(DisplayName = "analyzer rule page and analyzer procedure pass")]
@@ -99,10 +104,10 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "command page without exit codes")]
     public void CommandWithoutExitCodes() => Check(
-        root => StandardsFixture.Write(root, "docs/tools/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.CommandPage, "## Exit codes", "## Results")),
+        root => StandardsFixture.Write(root, "docs/tools/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.CommandPage, "## Exit Codes", "## Results")),
         ["PAGE_MISSING_SECTION", "PAGE_UNKNOWN_SECTION"]);
 
-    [Fact(DisplayName = "frontend topic with per-stack sections")]
+    [Fact(DisplayName = "frontend topic with per-stack sections rejected")]
     public void FrontendWithPerStackSections() => Check(
         root =>
         {
@@ -111,7 +116,7 @@ public sealed partial class StandardsValidatorTests
             StandardsFixture.Write(root, "docs/frontend/web/sample.md", page);
             StandardsFixture.RebuildIndex(root);
         },
-        []);
+        ["PAGE_UNKNOWN_SECTION", "PAGE_SECTION_ORDER"]);
 
     [Fact(DisplayName = "per-stack section outside frontend pages")]
     public void PerStackOutsideFrontend() => Check(
@@ -126,7 +131,12 @@ public sealed partial class StandardsValidatorTests
     [Fact(DisplayName = "per-stack section after standards")]
     public void PerStackAfterStandards() => Check(
         root => StandardsFixture.Write(root, "docs/frontend/web/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage.Replace("core/topic", "frontend/web/sample"), "## Verification", "## React\n\n- React names the binding the rule above forbids.\n\n## Verification")),
-        ["PAGE_SECTION_ORDER"]);
+        ["PAGE_UNKNOWN_SECTION", "PAGE_SECTION_ORDER"]);
+
+    [Fact(DisplayName = "stack page with a concepts section")]
+    public void StackWithConceptsSection() => Check(
+        root => StandardsFixture.Write(root, "docs/backend/sample/stack.md", StandardsFixture.ReplaceFirst(StandardsFixture.StackPage, "## Standards", "## Concepts\n\nThis stack defines one composition term.\n\n## Standards")),
+        []);
 
     static void CheckActionHeading(string verb)
     {
@@ -166,6 +176,30 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "action heading starting with 'show'")]
     public void ActionHeadingShow() => CheckActionHeading("Show");
+
+    [Fact(DisplayName = "action heading starting with 'author'")]
+    public void ActionHeadingAuthor() => CheckActionHeading("Author");
+
+    [Fact(DisplayName = "action heading starting with 'claim'")]
+    public void ActionHeadingClaim() => CheckActionHeading("Claim");
+
+    [Fact(DisplayName = "action heading starting with 'end'")]
+    public void ActionHeadingEnd() => CheckActionHeading("End");
+
+    [Fact(DisplayName = "action heading starting with 'explain'")]
+    public void ActionHeadingExplain() => CheckActionHeading("Explain");
+
+    [Fact(DisplayName = "action heading starting with 'illustrate'")]
+    public void ActionHeadingIllustrate() => CheckActionHeading("Illustrate");
+
+    [Fact(DisplayName = "action heading starting with 'shape'")]
+    public void ActionHeadingShape() => CheckActionHeading("Shape");
+
+    [Fact(DisplayName = "action heading starting with 'tabulate'")]
+    public void ActionHeadingTabulate() => CheckActionHeading("Tabulate");
+
+    [Fact(DisplayName = "action heading starting with 'trigger'")]
+    public void ActionHeadingTrigger() => CheckActionHeading("Trigger");
 
     [Fact(DisplayName = "index without a routing block")]
     public void IndexWithoutRouting() => Check(

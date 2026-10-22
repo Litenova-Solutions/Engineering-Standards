@@ -187,7 +187,7 @@ Create an optional directory only when its first real artifact exists. Never cre
 
 **Rationale:** Lowercase module, aggregate, use case, journey, rule, event, and decision read as ordinary nouns, while exact record types and code types keep their declared capitalization. The contrast tells a reader whether a word names the concept or the artifact. Capitalizing both blurs that distinction on every page.
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/system#deliver-one-complete-use-case` and `litespec/core/system#update-records-with-behavior`.
 

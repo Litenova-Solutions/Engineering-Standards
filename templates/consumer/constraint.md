@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <Constraint display title>
+# <Constraint Display Title>
 
 ## Summary
 

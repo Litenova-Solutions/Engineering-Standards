@@ -26,7 +26,7 @@ Run this command once in an empty folder, then run `litespec consumer` to valida
 
 ## Arguments
 
-None. Everything passes through options.
+None.
 
 ## Options
 
@@ -38,7 +38,7 @@ None. Everything passes through options.
 | `--name <project>` | the root folder's name | Sets the project name. |
 | `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|

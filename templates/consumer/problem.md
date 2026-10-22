@@ -19,7 +19,7 @@
   ]
 }
 ---
-# <Problem display title>
+# <Problem Display Title>
 
 ## Situation
 

@@ -6,7 +6,7 @@ A Svelte component holds its state in runes, with props from `$props` and derive
 
 ## Standards
 
-### Write components in runes mode
+### Write Components in Runes Mode
 
 **Statement:** A component MUST hold its local state in runes, with props from `$props` and derived values from `$derived`.
 
@@ -23,7 +23,7 @@ A Svelte component holds its state in runes, with props from `$props` and derive
 </script>
 ```
 
-### Keep component boundaries typed
+### Keep Component Boundaries Typed
 
 **Statement:** A component MUST type its props, its events, and its snippets under strict mode.
 

@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <Deviation display title>
+# <Deviation Display Title>
 
 ## Consequences
 

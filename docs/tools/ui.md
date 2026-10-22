@@ -22,7 +22,7 @@ This command reads no page file. The route code is the page contract, and the ro
 
 ## Arguments
 
-None. Everything passes through options.
+None.
 
 ## Options
 
@@ -32,7 +32,7 @@ None. Everything passes through options.
 | `--format json` | off | Writes one JSON object on standard output, with the problems as an array. |
 | `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|

@@ -27,6 +27,11 @@
       "rationale": "<Why this commitment holds, in one line>",
       "measure": "<What is counted>",
       "by": "<The date or milestone the target is met>",
+      "target": "<The value that counts as met, with its unit>",
+      "conditions": "<The load, window and environment the target assumes>",
+      "check": "<The tool and assertion that confirm it, such as k6 http_req_duration p(95)<200>",
+      "runsOn": "<pull-request, nightly, pre-release or production>",
+      "evidence": "<Where the passing run is recorded>",
       "feature": ["feature/<name>"],
       "basedOn": ["<constraint or research id, or remove this line>"]
     },
@@ -49,7 +54,7 @@
   ]
 }
 ---
-# <Topic display title>
+# <Topic Display Title>
 
 ## Summary
 

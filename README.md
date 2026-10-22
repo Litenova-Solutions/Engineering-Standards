@@ -27,7 +27,7 @@ A project names its size (small or large), its shape (server or client-only) and
 - UI patterns with drawn options for recurring interface questions.
 - Pages for agents: `llms.txt` indexes and raw Markdown on [litespec.dev](https://litespec.dev).
 
-The stacks a consumer selects apply first. An extension or project exception names each Standard that it replaces.
+The stacks a consumer selects apply first. An extension or project deviation names each Standard that it replaces.
 
 ## Documentation
 

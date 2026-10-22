@@ -2,13 +2,13 @@
 
 ## Intent
 
-The extensions pages hold conditional rule bundles a project adds only when a specific need appears, from caching and audit trails to multitenancy and container rollout, so a project carries no rule it does not need. Each bundle stays inactive until a current need meets the criterion its page states, and the project records each choice with its criterion and review date. A team facing a need the default rules do not cover reads the candidate page and selects only the extensions whose criteria hold today.
+The extensions pages hold conditional provision bundles a project adds only when a specific need appears, from caching and audit trails to multitenancy and container rollout, so a project carries no provision it does not need. Each bundle stays inactive until a current need meets the criterion its page states, and the project records each choice with its criterion and review date. A team facing a need the default provisions do not cover reads the candidate page and selects only the extensions whose criteria hold today.
 
-## How to select an extension
+## How to Select an Extension
 
-Each extension below states its own activation criterion and whether it applies to the whole project or to named records. A project selects every extension whose criteria hold and no extension whose criteria do not, and lists each selection in `selectedExtensions` in `litespec.project.json` with the criterion it met and a review date. The manifest repeats each scope, replacement list, and switched-on record type where checks read it. Most extensions add rules without replacing any; the audit and outbox pages each name the one baseline provision they replace.
+Each extension below states its own activation criterion and whether it applies to the whole project or to named records. A project selects every extension whose criteria hold and no extension whose criteria do not, and lists each selection in `selectedExtensions` in `litespec.project.json` with the criterion it met and a review date. The manifest repeats each scope, replacement list, and switched-on record type where checks read it. Most extensions add provisions without replacing any; the audit and outbox pages each name the one baseline provision they replace.
 
-## Project extensions
+## Project Extensions
 
 Selected once for the whole project:
 
@@ -19,12 +19,13 @@ Selected once for the whole project:
 - [Localization](locale.md): locales, catalogs, and formatting for a product that ships in more than one locale.
 - [Model Context Protocol](mcp.md): the server a product ships so an LLM client can call its public API.
 - [Multitenancy](tenancy.md): tenant isolation across authorization, storage, jobs, and recovery for one shared deployment.
+- [Plans and Entitlements](plans.md): plans, entitlements, and feature gating for a product that sells tiers.
 - [Release Stage](stage.md): the pre-customer-data stage, what it defers, and the promotion that ends it.
 - [Static Marketing Site](site.md): the static build for marketing pages, pricing, and help articles beside the application.
 
-## Local extensions
+## Local Extensions
 
-Selected per record, for the use cases, journeys, modules, rules, or business records the criterion names:
+Selected per record, for the use cases, journeys, modules, rules, or aggregates the criterion names:
 
 - [Caching](cache.md): staleness contracts and recovery for a repeated expensive read that traces or load tests name.
 - [Concurrency and Idempotency](concurrency.md): versions, client keys, and fingerprints where writes can overlap or retries can duplicate an effect.
@@ -35,7 +36,7 @@ Selected per record, for the use cases, journeys, modules, rules, or business re
 - [Reporting and Exports](report.md): heavy queries and large exports moved off the request path.
 - [Scheduled Jobs](jobs.md): recurring, delayed, and calendar-based work with leases that survive restarts.
 
-## Stack extensions
+## Stack Extensions
 
 Extensions that bind to one stack live beside that stack:
 

@@ -2,27 +2,27 @@
 
 ## Intent
 
-A dialog, drawer, popover, menu, toast, context menu, shortcut overlay, bottom sheet, or persistent bar floats above or beside the page to confirm, edit, preview, or announce without a full navigation. This page shows when each overlay fits and how it opens, holds focus, and closes, as drawn options with a named default to build. The product owner chooses among the options when the team adds a confirmation, a side preview, or any floating layer. Right-sized overlays keep staff oriented: the page stays visible behind short tasks, and irreversible commands get the full attention they need.
+A dialog, drawer, popover, menu, toast, context menu, shortcut overlay, bottom sheet, or persistent bar floats above or beside the page to confirm, edit, preview, or announce without a full navigation, and this page shows when each overlay fits and how it opens, holds focus, and closes, as drawn options with a named default to build. The product owner chooses among the options when the team adds a confirmation, a side preview, or any floating layer. Right-sized overlays keep staff oriented: the page stays visible behind short tasks, and irreversible commands get the full attention they need.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about floating layers, such as when a short task belongs in a dialog. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply back office: the spring lighting launch with 1,204 pre-orders, orders such as SO-1042 for Maria Garcia, and the refund and note commands staff run on them. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a confirmation dialog labels its confirm action with the command it runs, and an overlay returns focus to the control that opened it.
 
 ## Standards
 
-### Name the command on a confirm action
+### Name the Command on a Confirm Action
 
 **Statement:** A confirmation dialog MUST label its confirm action with the command it runs.
 
 **Rationale:** Staff often scan only the buttons before clicking, so the button text is the last chance to state what happens. A button labeled `OK` or `Yes` forces the reader to reread the dialog title to know what they confirm, and under time pressure they click without rereading and run the wrong command.
 
-### Return focus when an overlay closes
+### Return Focus When an Overlay Closes
 
 **Statement:** An overlay MUST return focus to the control that opened it when it closes.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply back office: the spring lighting l
 
 ## Patterns
 
-### Confirming a command that cannot be taken back
+### Confirming a Command That Cannot Be Taken Back
 
 **Question:** When does a command deserve a confirmation step? A launch cancellation cannot be taken back. A confirmation used on routine commands becomes a reflex click that protects nothing.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply back office: the spring lighting l
 
 Prefer the typed name only for the single most dangerous object in a deployment. Never ship the undo toast for an irreversible cancellation. An undo there is a second command rather than a reversal.
 
-#### `name-the-object-state-the-consequence-offer-the-alternative`: Name the object, state the consequence, offer the alternative
+#### `name-the-object-state-the-consequence-offer-the-alternative`: Name the Object, State the Consequence, Offer the Alternative
 
 ```wireframe
 page
@@ -67,7 +67,7 @@ page
 
 **Reference:** MOJ
 
-#### `type-the-launch-name-to-confirm`: Type the launch name to confirm
+#### `type-the-launch-name-to-confirm`: Type the Launch Name to Confirm
 
 ```wireframe
 page
@@ -89,7 +89,7 @@ page
 
 **Reference:** Cloudscape
 
-#### `no-dialog-at-all-act-then-offer-an-undo`: No dialog at all: act, then offer an undo
+#### `no-dialog-at-all-act-then-offer-an-undo`: No Dialog at All: Act, Then Offer an Undo
 
 ```wireframe
 page
@@ -110,7 +110,7 @@ page
 
 **Reference:** Carbon
 
-#### `an-interruption-page-not-a-dialog`: An interruption page, not a dialog
+#### `an-interruption-page-not-a-dialog`: An Interruption Page, Not a Dialog
 
 ```wireframe
 page
@@ -133,7 +133,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-dialog-with-the-consequence-as-numbers`: A dialog with the consequence as numbers
+#### `a-dialog-with-the-consequence-as-numbers`: A Dialog with the Consequence as Numbers
 
 ```wireframe
 page
@@ -160,7 +160,7 @@ page
 
 **Cost:** The dialog reads the number at the moment of the click, which means a read between the button and the command. On a slow connection the dialog waits.
 
-#### `a-dialog-that-says-it-cannot-act-yet`: A dialog that says it cannot act yet
+#### `a-dialog-that-says-it-cannot-act-yet`: A Dialog That Says It Cannot Act Yet
 
 ```wireframe
 page
@@ -184,7 +184,7 @@ page
 
 **Reference:** Cloudscape
 
-#### `confirm-by-ticking-each-consequence`: Confirm by ticking each consequence
+#### `confirm-by-ticking-each-consequence`: Confirm by Ticking Each Consequence
 
 ```wireframe
 page
@@ -206,7 +206,7 @@ page
 
 **Cost:** Three checkboxes for one command is the heaviest confirmation in this pattern. Past one object per deployment it becomes the reflex click the pattern exists to break.
 
-#### `an-alert-dialog-with-the-safe-action-first`: An alert dialog with the safe action first
+#### `an-alert-dialog-with-the-safe-action-first`: An Alert Dialog with the Safe Action First
 
 ```wireframe
 page
@@ -230,7 +230,7 @@ page
 
 **Reference:** GitHub Primer
 
-### Short task in a dialog
+### Short Task in a Dialog
 
 **Question:** A short task with one to four inputs and nothing to consult fits a dialog. More than four inputs, sections, or steps belong on a full page. The decision is which surface each short command takes, and what to do when a dialog would need a second dialog.
 
@@ -242,7 +242,7 @@ page
 
 Prefer the page once a command carries five inputs. Never ship a dialog over a dialog. A helper that supports the nesting does not make it readable.
 
-#### `two-or-three-inputs-one-dialog`: Two or three inputs, one dialog
+#### `two-or-three-inputs-one-dialog`: Two or Three Inputs, One Dialog
 
 ```wireframe
 page
@@ -265,7 +265,7 @@ page
 
 **Cost:** A dialog is a separate surface from the page. A refusal has to be worded in the dialog rather than on the page it came from.
 
-#### `five-inputs-so-it-becomes-a-page`: Five inputs, so it becomes a page
+#### `five-inputs-so-it-becomes-a-page`: Five Inputs, so It Becomes a Page
 
 ```wireframe
 page
@@ -287,7 +287,7 @@ page
 
 **Cost:** The reader loses the page they were on. The linkable result that can be returned to later is worth it when the command has that many parts.
 
-#### `four-inputs-with-a-list-to-choose-from`: Four inputs with a list to choose from
+#### `four-inputs-with-a-list-to-choose-from`: Four Inputs with a List to Choose From
 
 ```wireframe
 page
@@ -315,7 +315,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-dialog-whose-second-step-is-another-dialog`: A dialog whose second step is another dialog
+#### `a-dialog-whose-second-step-is-another-dialog`: A Dialog Whose Second Step Is Another Dialog
 
 ```wireframe
 page
@@ -338,7 +338,7 @@ page
 
 **Reference:** Base UI
 
-#### `the-task-on-the-page-not-in-a-dialog`: The task on the page, not in a dialog
+#### `the-task-on-the-page-not-in-a-dialog`: The Task on the Page, Not in a Dialog
 
 ```wireframe
 page
@@ -362,7 +362,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-dialog-whose-command-needs-a-second-thing-done-first`: A dialog whose command needs a second thing done first
+#### `a-dialog-whose-command-needs-a-second-thing-done-first`: A Dialog Whose Command Needs a Second Thing Done First
 
 ```wireframe
 page
@@ -387,7 +387,7 @@ page
 
 **Reference:** Carbon
 
-#### `stay-open-for-the-next-note`: Stay open for the next note
+#### `stay-open-for-the-next-note`: Stay Open for the Next Note
 
 ```wireframe
 page
@@ -413,7 +413,7 @@ page
 
 **Reference:** Linear
 
-#### `run-the-task-from-the-command-palette`: Run the task from the command palette
+#### `run-the-task-from-the-command-palette`: Run the Task from the Command Palette
 
 ```wireframe
 page
@@ -439,7 +439,7 @@ page
 
 **Reference:** Raycast
 
-### Drawer beside the list
+### Drawer Beside the List
 
 **Question:** A list action opens a drawer so a reader can see a record without leaving the list. The drawer holds read-only context that supports the task. Below a narrow width the drawer takes the whole screen with a Back control.
 
@@ -451,7 +451,7 @@ page
 
 Prefer the tabbed drawer when support compares refunds across facts, history, and messages. Never ship the filter drawer. Filters belong in the toolbar, and a drawer over the results hides the list the filters describe.
 
-#### `read-only-record-beside-the-list`: Read-only record beside the list
+#### `read-only-record-beside-the-list`: Read-Only Record Beside the List
 
 ```wireframe
 page
@@ -480,7 +480,7 @@ page
 
 **Reference:** Atlassian
 
-#### `the-drawer-over-the-list-with-a-scrim`: The drawer over the list, with a scrim
+#### `the-drawer-over-the-list-with-a-scrim`: The Drawer over the List, with a Scrim
 
 ```wireframe
 page
@@ -510,7 +510,7 @@ page
 
 **Reference:** Atlassian
 
-#### `the-drawer-holding-a-small-edit-list-behind`: The drawer holding a small edit, list behind
+#### `the-drawer-holding-a-small-edit-list-behind`: The Drawer Holding a Small Edit, List Behind
 
 ```wireframe
 page
@@ -537,7 +537,7 @@ page
 
 **Reference:** Carbon
 
-#### `the-drawer-as-a-filter-list-results-behind`: The drawer as a filter, list results behind
+#### `the-drawer-as-a-filter-list-results-behind`: The Drawer as a Filter, List Results Behind
 
 ```wireframe
 page
@@ -566,7 +566,7 @@ page
 
 **Reference:** Carbon
 
-#### `the-drawer-as-a-preview-opening-over-a-row`: The drawer as a preview, opening over a row
+#### `the-drawer-as-a-preview-opening-over-a-row`: The Drawer as a Preview, Opening over a Row
 
 ```wireframe
 page
@@ -593,7 +593,7 @@ page
 
 **Reference:** PatternFly
 
-#### `the-drawer-at-phone-width-as-a-page-with-a-back`: The drawer at phone width, as a page with a Back
+#### `the-drawer-at-phone-width-as-a-page-with-a-back`: The Drawer at Phone Width, as a Page with a Back
 
 ```wireframe
 page
@@ -618,7 +618,7 @@ page
 
 **Cost:** Keeping the list alive behind a full-screen view is a navigation model rather than a layout. It has to hold filters and scroll in memory, or the return is a different list.
 
-#### `a-tabbed-drawer-the-record-its-history-its-messages`: A tabbed drawer: the record, its history, its messages
+#### `a-tabbed-drawer-the-record-its-history-its-messages`: A Tabbed Drawer: The Record, Its History, Its Messages
 
 ```wireframe
 page
@@ -647,7 +647,7 @@ page
 
 **Reference:** Linear
 
-#### `a-drawer-with-a-drag-edge`: A drawer with a drag edge
+#### `a-drawer-with-a-drag-edge`: A Drawer with a Drag Edge
 
 ```wireframe
 page
@@ -676,7 +676,7 @@ page
 
 **Reference:** VS Code
 
-### Toast at the edge of the screen
+### Toast at the Edge of the Screen
 
 **Question:** A command ends with a short message at the edge of the screen. One message carries at most one action. Nothing critical belongs in something that disappears on a timer.
 
@@ -688,7 +688,7 @@ page
 
 Never ship two actions on one toast. Two buttons turn a transient message into a small panel with a timer. Never ship a toast as the only route to a result.
 
-#### `a-confirmation-that-closes-by-itself`: A confirmation that closes by itself
+#### `a-confirmation-that-closes-by-itself`: A Confirmation That Closes by Itself
 
 ```wireframe
 page
@@ -710,7 +710,7 @@ page
 
 **Reference:** Base UI
 
-#### `a-confirmation-carrying-an-undo-which-stays`: A confirmation carrying an undo, which stays
+#### `a-confirmation-carrying-an-undo-which-stays`: A Confirmation Carrying an Undo, Which Stays
 
 ```wireframe
 page
@@ -732,7 +732,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-refusal-which-is-not-a-toast`: A refusal, which is not a toast
+#### `a-refusal-which-is-not-a-toast`: A Refusal, Which Is Not a Toast
 
 ```wireframe
 page
@@ -753,7 +753,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-toast-carrying-two-actions`: A toast carrying two actions
+#### `a-toast-carrying-two-actions`: A Toast Carrying Two Actions
 
 ```wireframe
 page
@@ -774,7 +774,7 @@ page
 
 **Reference:** Material Design
 
-#### `a-toast-that-is-the-only-route-to-the-result`: A toast that is the only route to the result
+#### `a-toast-that-is-the-only-route-to-the-result`: A Toast That Is the Only Route to the Result
 
 ```wireframe
 page
@@ -796,7 +796,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-stacked-notification-area`: A stacked notification area
+#### `a-stacked-notification-area`: A Stacked Notification Area
 
 ```wireframe
 page
@@ -819,7 +819,7 @@ page
 
 **Reference:** Base UI
 
-#### `a-toast-that-links-to-the-result`: A toast that links to the result
+#### `a-toast-that-links-to-the-result`: A Toast That Links to the Result
 
 ```wireframe
 page
@@ -840,7 +840,7 @@ page
 
 **Reference:** Vercel
 
-#### `a-progress-toast-while-a-slow-command-runs`: A progress toast while a slow command runs
+#### `a-progress-toast-while-a-slow-command-runs`: A Progress Toast While a Slow Command Runs
 
 ```wireframe
 page
@@ -861,7 +861,7 @@ page
 
 **Reference:** Shopify
 
-### Menu of a row's commands
+### Menu of a Row's Commands
 
 **Question:** A row with several commands shows the first inline and keeps the rest behind a menu. The decision is how that menu groups its items, explains disabled ones, and handles search and submenus.
 
@@ -873,7 +873,7 @@ page
 
 Never ship a confirmation inside a menu. A confirmation there is a dialog over a menu, the same nesting the project forbids for dialogs.
 
-#### `a-menu-with-groups-and-a-destructive-item-last`: A menu with groups and a destructive item last
+#### `a-menu-with-groups-and-a-destructive-item-last`: A Menu with Groups and a Destructive Item Last
 
 ```wireframe
 page
@@ -898,7 +898,7 @@ page
 
 **Cost:** A menu item that is disabled gives no reason in the menu itself. The reader has to hover or press it to learn why. An explained action solves that on the page, not here.
 
-#### `a-menu-that-says-why-an-item-is-disabled`: A menu that says why an item is disabled
+#### `a-menu-that-says-why-an-item-is-disabled`: A Menu That Says Why an Item Is Disabled
 
 ```wireframe
 page
@@ -922,7 +922,7 @@ page
 
 **Cost:** A reason inside a menu is a paragraph among one-word items, so the menu becomes taller than the row that opened it.
 
-#### `a-menu-with-a-confirmation-inside-it`: A menu with a confirmation inside it
+#### `a-menu-with-a-confirmation-inside-it`: A Menu with a Confirmation Inside It
 
 ```wireframe
 page
@@ -949,7 +949,7 @@ page
 
 **Reference:** Atlassian
 
-#### `a-menu-as-a-split-button-the-first-command-and-the-rest`: A menu as a split button: the first command and the rest
+#### `a-menu-as-a-split-button-the-first-command-and-the-rest`: A Menu as a Split Button: The First Command and the Rest
 
 ```wireframe
 page
@@ -972,7 +972,7 @@ page
 
 **Cost:** Two targets share one shape, and the second half is a chevron that a reader may read as open rather than the rest. It also breaks where a button would wrap.
 
-#### `no-menu-the-row-s-commands-are-all-on-the-row`: No menu: the row's commands are all on the row
+#### `no-menu-the-row-s-commands-are-all-on-the-row`: No Menu: The Row's Commands Are All on the Row
 
 ```wireframe
 page
@@ -995,7 +995,7 @@ page
 
 **Reference:** NN/g
 
-#### `a-menu-on-the-page-rather-than-the-row`: A menu on the page rather than the row
+#### `a-menu-on-the-page-rather-than-the-row`: A Menu on the Page Rather Than the Row
 
 ```wireframe
 page
@@ -1020,7 +1020,7 @@ page
 
 **Cost:** A command that applies to one record cannot live in a page-level menu. The row-menu rule gives each row its own menu. This inverts that rule.
 
-#### `a-menu-with-a-search-field-at-the-top`: A menu with a search field at the top
+#### `a-menu-with-a-search-field-at-the-top`: A Menu with a Search Field at the Top
 
 ```wireframe
 page
@@ -1045,7 +1045,7 @@ page
 
 **Reference:** Linear
 
-#### `grouped-commands-behind-submenus`: Grouped commands behind submenus
+#### `grouped-commands-behind-submenus`: Grouped Commands Behind Submenus
 
 ```wireframe
 page
@@ -1074,7 +1074,7 @@ page
 
 **Reference:** Radix UI
 
-### Short panel that opens beside a control
+### Short Panel That Opens Beside a Control
 
 **Question:** A popover is a small panel anchored to a control: not a dialog and not a toast. It closes when the reader looks away. The decision is what earns such a panel: term explanations, row previews, pickers, calendars, copy confirmations, hover cards, or coach marks.
 
@@ -1086,7 +1086,7 @@ page
 
 Never ship a menu and a popover for the same thing. The pair teaches that floating layers stack, and stacked layers confuse readers about which one to dismiss.
 
-#### `a-row-preview-popover-on-hover-and-focus`: A row preview popover on hover and focus
+#### `a-row-preview-popover-on-hover-and-focus`: A Row Preview Popover on Hover and Focus
 
 ```wireframe
 page
@@ -1109,7 +1109,7 @@ page
 
 **Cost:** A hover affordance is invisible on touch and hard to discover on desktop. It needs focus as well as hover, which means two ways to render every row.
 
-#### `a-popover-that-explains-what-a-term-means`: A popover that explains what a term means
+#### `a-popover-that-explains-what-a-term-means`: A Popover That Explains What a Term Means
 
 ```wireframe
 page
@@ -1130,7 +1130,7 @@ page
 
 **Cost:** This is only for a term the application has defined. A hint on every unfamiliar word becomes noise, and the glossary has to stay in step with the hint.
 
-#### `a-popover-carrying-the-whole-picker`: A popover carrying the whole picker
+#### `a-popover-carrying-the-whole-picker`: A Popover Carrying the Whole Picker
 
 ```wireframe
 page
@@ -1151,7 +1151,7 @@ page
 
 **Cost:** This is the picker the forms page already describes. It only works while the list is short enough to sit under the field without leaving the viewport.
 
-#### `a-popover-for-the-calendar`: A popover for the calendar
+#### `a-popover-for-the-calendar`: A Popover for the Calendar
 
 ```wireframe
 page
@@ -1176,7 +1176,7 @@ page
 
 **Reference:** APG
 
-#### `a-popover-on-the-copy-button-saying-what-was-copied`: A popover on the copy button, saying what was copied
+#### `a-popover-on-the-copy-button-saying-what-was-copied`: A Popover on the Copy Button, Saying What Was Copied
 
 ```wireframe
 page
@@ -1199,7 +1199,7 @@ page
 
 **Cost:** A confirmation for a copy is easy to miss and the value is already on screen. It is politeness rather than information.
 
-#### `a-menu-and-a-popover-used-for-the-same-thing`: A menu and a popover used for the same thing
+#### `a-menu-and-a-popover-used-for-the-same-thing`: A Menu and a Popover Used for the Same Thing
 
 ```wireframe
 page
@@ -1223,7 +1223,7 @@ page
 
 **Cost:** A page with both holds three floating layers counting the dialog, and a reader must learn which is which. This is why a page should show one overlay at a time.
 
-#### `a-customer-hover-card-with-recent-orders`: A customer hover card with recent orders
+#### `a-customer-hover-card-with-recent-orders`: A Customer Hover Card with Recent Orders
 
 ```wireframe
 page
@@ -1249,7 +1249,7 @@ page
 
 **Reference:** GitHub Primer
 
-#### `a-coach-mark-pinned-to-the-control`: A coach mark pinned to the control
+#### `a-coach-mark-pinned-to-the-control`: A Coach Mark Pinned to the Control
 
 ```wireframe
 page
@@ -1274,7 +1274,7 @@ page
 
 **Reference:** Atlassian
 
-### Bar that stays while the reader works
+### Bar That Stays While the Reader Works
 
 **Question:** A persistent bar is a band the page keeps, worded as a fact about the page, the deployment, or the record. A tone may not paint a full-width band on a page about other work. The decision is which facts earn a bar and where each bar sits.
 
@@ -1286,7 +1286,7 @@ page
 
 Never ship the bar naming a deadline: a full-width caution band paints the whole page, and the tone covers work the page is not about.
 
-#### `a-neutral-band-for-what-this-page-is`: A neutral band for what this page is
+#### `a-neutral-band-for-what-this-page-is`: A Neutral Band for What This Page Is
 
 ```wireframe
 page
@@ -1305,7 +1305,7 @@ page
 
 **Cost:** A band on every page is chrome the reader cannot remove, and it competes with the heading for the top of the screen. It has to earn its height.
 
-#### `a-bar-for-unsaved-work-pinned-to-the-foot`: A bar for unsaved work, pinned to the foot
+#### `a-bar-for-unsaved-work-pinned-to-the-foot`: A Bar for Unsaved Work, Pinned to the Foot
 
 ```wireframe
 page
@@ -1326,7 +1326,7 @@ page
 
 **Cost:** It covers the bottom of the page, which on a table is where the pagination lives. A neutral band over a form is still a full-width band.
 
-#### `a-bar-naming-a-deadline-that-is-closing`: A bar naming a deadline that is closing
+#### `a-bar-naming-a-deadline-that-is-closing`: A Bar Naming a Deadline That Is Closing
 
 ```wireframe
 page
@@ -1344,7 +1344,7 @@ page
 
 **Cost:** A full-width caution band on a page about disputes is exactly the case the tone rule forbids. The tone paints the whole page rather than the thing in that state.
 
-#### `a-bar-saying-what-is-read-only-and-why`: A bar saying what is read-only and why
+#### `a-bar-saying-what-is-read-only-and-why`: A Bar Saying What Is Read-Only and Why
 
 ```wireframe
 page
@@ -1363,7 +1363,7 @@ page
 
 **Cost:** Every page of the area repeats the band. The reader's eye skips it after the first and then misses the one place it changes.
 
-#### `a-bar-on-the-record-page-not-the-console`: A bar on the record page, not the console
+#### `a-bar-on-the-record-page-not-the-console`: A Bar on the Record Page, Not the Console
 
 ```wireframe
 page
@@ -1383,7 +1383,7 @@ page
 
 **Cost:** The reader learns the band on one page and then has to learn that another page does not have one. A scoped band is not a deployment marker. It is a per-record notice.
 
-#### `no-bar-the-fact-goes-in-the-heading-instead`: No bar: the fact goes in the heading instead
+#### `no-bar-the-fact-goes-in-the-heading-instead`: No Bar: The Fact Goes in the Heading Instead
 
 ```wireframe
 page
@@ -1402,7 +1402,7 @@ page
 
 **Cost:** A reader who has seen four pages without the word `sandbox` may not notice it. The heading already carries the record or the page job.
 
-#### `a-save-bar-pinned-under-the-header`: A save bar pinned under the header
+#### `a-save-bar-pinned-under-the-header`: A Save Bar Pinned Under the Header
 
 ```wireframe
 page
@@ -1425,7 +1425,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `a-band-the-reader-dismisses-for-the-session`: A band the reader dismisses for the session
+#### `a-band-the-reader-dismisses-for-the-session`: A Band the Reader Dismisses for the Session
 
 ```wireframe
 page
@@ -1447,7 +1447,7 @@ page
 
 **Reference:** GitHub Primer
 
-### Bottom sheet on a phone
+### Bottom Sheet on a Phone
 
 **Question:** On a phone there is no beside and no center: a dialog becomes a sheet from the bottom edge. Material keeps a modal bottom sheet one swipe from dismissed, with a handle, a title, and actions stacked full width.
 
@@ -1459,7 +1459,7 @@ page
 
 Never ship the sheet with no dismissal: it traps the reader on the smallest screen, where every trap costs the most.
 
-#### `order-actions-in-a-bottom-sheet`: Order actions in a bottom sheet
+#### `order-actions-in-a-bottom-sheet`: Order Actions in a Bottom Sheet
 
 ```wireframe
 page
@@ -1487,7 +1487,7 @@ page
 
 **Reference:** Material Design
 
-#### `filters-with-a-sticky-apply-bar`: Filters with a sticky apply bar
+#### `filters-with-a-sticky-apply-bar`: Filters with a Sticky Apply Bar
 
 ```wireframe
 page
@@ -1515,7 +1515,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-sheet-that-opens-half-and-expands-full`: A sheet that opens half and expands full
+#### `a-sheet-that-opens-half-and-expands-full`: A Sheet That Opens Half and Expands Full
 
 ```wireframe
 page
@@ -1542,7 +1542,7 @@ page
 
 **Reference:** Apple Maps
 
-#### `a-sheet-with-a-destructive-section`: A sheet with a destructive section
+#### `a-sheet-with-a-destructive-section`: A Sheet with a Destructive Section
 
 ```wireframe
 page
@@ -1568,7 +1568,7 @@ page
 
 **Reference:** Apple
 
-#### `a-full-screen-sheet-takeover`: A full-screen sheet takeover
+#### `a-full-screen-sheet-takeover`: A Full-Screen Sheet Takeover
 
 ```wireframe
 page
@@ -1595,7 +1595,7 @@ page
 
 **Reference:** Material Design
 
-#### `a-sheet-with-no-handle-and-no-dismissal`: A sheet with no handle and no dismissal
+#### `a-sheet-with-no-handle-and-no-dismissal`: A Sheet with No Handle and No Dismissal
 
 ```wireframe
 page
@@ -1618,7 +1618,7 @@ page
 
 **Cost:** It traps the reader on the smallest screen, where every trap costs the most. Only a command that cannot wait earns this, and a refund route can always wait.
 
-### Dialog with a long body and a sticky footer
+### Dialog with a Long Body and a Sticky Footer
 
 **Question:** Some commands need more words than a dialog holds: terms, line items, per-audience consequences. The footer must stay where the thumb is while the body scrolls, or the reader agrees to what they cannot see.
 
@@ -1630,7 +1630,7 @@ page
 
 Never ship the dialog with no pinned footer: buttons that scroll away ask the reader to agree first and find how after.
 
-#### `a-scrolling-body-with-a-pinned-footer`: A scrolling body with a pinned footer
+#### `a-scrolling-body-with-a-pinned-footer`: A Scrolling Body with a Pinned Footer
 
 ```wireframe
 page
@@ -1657,7 +1657,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-pinned-header-and-footer-with-a-section-read`: A pinned header and footer with a section read
+#### `a-pinned-header-and-footer-with-a-section-read`: A Pinned Header and Footer with a Section Read
 
 ```wireframe
 page
@@ -1690,7 +1690,7 @@ page
 
 **Reference:** Atlassian
 
-#### `sections-that-collapse`: Sections that collapse
+#### `sections-that-collapse`: Sections That Collapse
 
 ```wireframe
 page
@@ -1717,7 +1717,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-summary-pinned-above-the-footer`: A summary pinned above the footer
+#### `a-summary-pinned-above-the-footer`: A Summary Pinned Above the Footer
 
 ```wireframe
 page
@@ -1744,7 +1744,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-wide-dialog-for-dense-facts`: A wide dialog for dense facts
+#### `a-wide-dialog-for-dense-facts`: A Wide Dialog for Dense Facts
 
 ```wireframe
 page
@@ -1777,7 +1777,7 @@ page
 
 **Reference:** Vercel
 
-#### `no-pinned-footer-the-buttons-scroll-away`: No pinned footer: the buttons scroll away
+#### `no-pinned-footer-the-buttons-scroll-away`: No Pinned Footer: The Buttons Scroll Away
 
 ```wireframe
 page
@@ -1802,7 +1802,7 @@ page
 
 **Cost:** On a phone the footer is two screens down, past terms nobody scrolled to. This is the shape every other option in this pattern exists to replace.
 
-### Keyboard shortcut help overlay
+### Keyboard Shortcut Help Overlay
 
 **Question:** Staff who live in lists learn keys faster than clicks. Linear and GitHub both answer `?` with an overlay, grouped by where the keys work, closable with the same key.
 
@@ -1814,7 +1814,7 @@ page
 
 Never ship tooltips alone: they hide the catalog from the reader who would learn it fastest.
 
-#### `a-grouped-grid-of-shortcuts`: A grouped grid of shortcuts
+#### `a-grouped-grid-of-shortcuts`: A Grouped Grid of Shortcuts
 
 ```wireframe
 page
@@ -1848,7 +1848,7 @@ page
 
 **Reference:** Linear
 
-#### `a-single-column-list`: A single-column list
+#### `a-single-column-list`: A Single-Column List
 
 ```wireframe
 page
@@ -1875,7 +1875,7 @@ page
 
 **Reference:** Superhuman
 
-#### `shortcuts-inside-the-command-palette`: Shortcuts inside the command palette
+#### `shortcuts-inside-the-command-palette`: Shortcuts Inside the Command Palette
 
 ```wireframe
 page
@@ -1901,7 +1901,7 @@ page
 
 **Reference:** Raycast
 
-#### `shortcuts-for-this-page-only`: Shortcuts for this page only
+#### `shortcuts-for-this-page-only`: Shortcuts for This Page Only
 
 ```wireframe
 page
@@ -1929,7 +1929,7 @@ page
 
 **Reference:** Figma
 
-#### `a-printable-cheat-sheet-page`: A printable cheat sheet page
+#### `a-printable-cheat-sheet-page`: A Printable Cheat Sheet Page
 
 ```wireframe
 page
@@ -1956,7 +1956,7 @@ page
 
 **Reference:** GitHub Docs
 
-#### `no-overlay-hints-only-on-tooltips`: No overlay: hints only on tooltips
+#### `no-overlay-hints-only-on-tooltips`: No Overlay: Hints Only on Tooltips
 
 ```wireframe
 page
@@ -1978,7 +1978,7 @@ page
 
 **Cost:** Each hint is accurate and each is undiscoverable. The tooltip teaches the key for a control already found, which is the one key that reader needed least.
 
-### Context menu where the pointer is
+### Context Menu Where the Pointer Is
 
 **Question:** A right click asks what this thing can do. Linear and VS Code answer at the pointer with the same commands the row menu holds. The menu is a shortcut rather than a second set.
 
@@ -1990,7 +1990,7 @@ page
 
 Never ship silence: it hands the gesture to the browser, whose commands act on the page rather than the record.
 
-#### `a-right-click-menu-on-a-row`: A right-click menu on a row
+#### `a-right-click-menu-on-a-row`: A Right-Click Menu on a Row
 
 ```wireframe
 page
@@ -2016,7 +2016,7 @@ page
 
 **Reference:** Linear
 
-#### `a-context-menu-with-icons-and-shortcuts`: A context menu with icons and shortcuts
+#### `a-context-menu-with-icons-and-shortcuts`: A Context Menu with Icons and Shortcuts
 
 ```wireframe
 page
@@ -2042,7 +2042,7 @@ page
 
 **Reference:** VS Code
 
-#### `a-context-menu-for-a-bulk-selection`: A context menu for a bulk selection
+#### `a-context-menu-for-a-bulk-selection`: A Context Menu for a Bulk Selection
 
 ```wireframe
 page
@@ -2067,7 +2067,7 @@ page
 
 **Reference:** Figma
 
-#### `a-long-press-menu-on-touch`: A long-press menu on touch
+#### `a-long-press-menu-on-touch`: A Long-Press Menu on Touch
 
 ```wireframe
 page
@@ -2093,7 +2093,7 @@ page
 
 **Reference:** iOS
 
-#### `a-context-menu-on-empty-space`: A context menu on empty space
+#### `a-context-menu-on-empty-space`: A Context Menu on Empty Space
 
 ```wireframe
 page
@@ -2118,7 +2118,7 @@ page
 
 **Reference:** VS Code
 
-#### `no-menu-the-browser-default-answers`: No menu: the browser default answers
+#### `no-menu-the-browser-default-answers`: No Menu: The Browser Default Answers
 
 ```wireframe
 page
@@ -2147,16 +2147,16 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/dialogs-and-overlays#name-the-command-on-a-confirm-action | guidance | Does every built page of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/dialogs-and-overlays#return-focus-when-an-overlay-closes | guidance | Does every built page of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/dialogs-and-overlays#confirming-a-command-that-cannot-be-taken-back | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#short-task-in-a-dialog | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#drawer-beside-the-list | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#toast-at-the-edge-of-the-screen | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#menu-of-a-rows-commands | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#short-panel-that-opens-beside-a-control | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#bar-that-stays-while-the-reader-works | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#bottom-sheet-on-a-phone | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#dialog-with-a-long-body-and-a-sticky-footer | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#keyboard-shortcut-help-overlay | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/dialogs-and-overlays#context-menu-where-the-pointer-is | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/dialogs-and-overlays#name-the-command-on-a-confirm-action | guidance | Which built confirmation labels its commit button with a bare Yes or OK? Open the confirm dialogs on built screens. |
+| litespec/frontend/patterns/dialogs-and-overlays#return-focus-when-an-overlay-closes | guidance | Which built overlay leaves focus lost after it closes? Open and dismiss each dialog, drawer, popover, menu, and toast on built screens with a keyboard. |
+| litespec/frontend/patterns/dialogs-and-overlays#confirming-a-command-that-cannot-be-taken-back | guidance | Which built irreversible step departs from the wireframe its catalog entry chose? Open the built typed confirms and undo offers beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#short-task-in-a-dialog | guidance | Which built two-input task departs from the wireframe its catalog entry chose? Open the built small dialogs and palette runs beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#drawer-beside-the-list | guidance | Which built side preview departs from the wireframe its catalog entry chose? Open the built drawer variants over and next to the list, with the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#toast-at-the-edge-of-the-screen | guidance | Which built edge notice departs from the wireframe its catalog entry chose? Open the built confirmations, undos, and refusal slots beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#menu-of-a-rows-commands | guidance | Which built row menu departs from the wireframe its catalog entry chose? Open the built grouped menus, split buttons, and search fields beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#short-panel-that-opens-beside-a-control | guidance | Which built hover card or hint departs from the wireframe its catalog entry chose? Open the built popovers, previews, and coach marks beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#bar-that-stays-while-the-reader-works | guidance | Which built persistent band departs from the wireframe its catalog entry chose? Open the built unsaved-work, deadline, and read-only bars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#bottom-sheet-on-a-phone | guidance | Which built thumb-reach sheet departs from the wireframe its catalog entry chose? Open the built half, full, and filter sheets beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#dialog-with-a-long-body-and-a-sticky-footer | guidance | Which built scrolling dialog departs from the wireframe its catalog entry chose? Open the built pinned footers and collapsed sections beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#keyboard-shortcut-help-overlay | guidance | Which built shortcut list departs from the wireframe its catalog entry chose? Open the built grouped grids and palette shortcut views beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/dialogs-and-overlays#context-menu-where-the-pointer-is | guidance | Which built right-click menu departs from the wireframe its catalog entry chose? Open the built row, bulk, and empty-space menus beside the catalog entry recording the chosen option and its reason. |

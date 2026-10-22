@@ -146,7 +146,7 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Rationale:** A journey names its `actor`, its `goal` in words, and its ordered `steps`: each step names its use case, the actor walking it, what it requires, and what it gives. The order shows how the steps join toward the goal, so a step that fits nowhere is visible. Example shows the journey walked once, Between the Steps carries the failure branches and handoffs, and Before It Starts holds the state preconditions. The journey names in `fulfills` the requirements it carries.
 
-### Keep Behavior out of Product Pages
+### Keep Behavior Out of Product Pages
 
 **Statement:** A product page MUST NOT describe states, results, codes, or code.
 

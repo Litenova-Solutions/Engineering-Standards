@@ -98,7 +98,7 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
     | `actor/manager` | `role/approver` at team scope | `permission/approve-expense` |
     | `actor/finance` | `role/finance` at platform scope | `permission/reimburse-expense` |
 
-10. Write the use cases. Give each use case a name that is unique across the project, so its results and scenarios resolve. Name the kind, the needed permissions, the entry points, the raised events, and the fulfilled requirements. This satisfies `litespec/backend/application#use-this-operation-layout` and `litespec/core/domain#give-each-use-case-one-kind`.
+10. Write the use cases. Give each use case a name that is unique across the project, so its results and scenarios resolve. Name the kind, the needed permissions, the entry points, the raised events, and the fulfilled requirements. This satisfies `litespec/backend/application#use-this-use-case-layout` and `litespec/core/domain#give-each-use-case-one-kind`.
 
     | Use case | Kind | Needs | Raises |
     |:---|:---|:---|:---|
@@ -108,7 +108,7 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
     | `use-case/spending.list-expenses` | `query` | `permission/list-expenses` | None |
 
     A query changes nothing and declares its `output`. It loads no aggregate for presentation. This satisfies `litespec/core/domain#declare-every-query-output`.
-11. Write one result per ending. A result is one way a use case ends: `success`, or a named `refusal` with its stable `code`. This satisfies `litespec/core/domain#end-every-use-case-in-named-results` and `litespec/backend/application#model-expected-use-case-failures-explicitly`.
+11. Write one result per ending. A result is one way a use case ends: `success`, or a named `refusal` with its stable `code`. This satisfies `litespec/core/domain#end-every-use-case-in-named-results` and `litespec/backend/application#model-expected-use-case-refusals-explicitly`.
 
     | Result | Outcome | Code | Meaning |
     |:---|:---|:---|:---|

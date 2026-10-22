@@ -44,7 +44,7 @@
   ]
 }
 ---
-# <Aggregate display title>
+# <Aggregate Display Title>
 
 ## Transitions
 

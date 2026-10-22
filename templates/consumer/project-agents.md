@@ -10,11 +10,11 @@ A project Deviation record overrides a Standard only when it names the provision
 
 An explicit project convention can replace a baseline Convention when local documentation cites its ID. (litespec/core/agent#apply-guidance-precedence)
 
-Read `docs/product/brief.md` and the affected product topics before changing behavior that touches price, money, markets, customers, or terms. (litespec/core/product#load-product-intent-before-commercial-work)
+Read `docs/product/brief.md` and the affected requirement pages before changing behavior that touches price, money, markets, customers, or terms. (litespec/core/product#load-product-intent-before-commercial-work)
 
 Draft a product decision for any changed business choice, and leave its approval to the accountable person. Research outside `docs/` is source material, never authority. (litespec/core/product#name-the-person-who-approved-a-decision, litespec/core/product#treat-generated-research-as-source-material)
 
-## Project commands
+## Project Commands
 
 Run the backend gates for every changed API boundary. (litespec/core/release#run-boundary-selected-checks)
 

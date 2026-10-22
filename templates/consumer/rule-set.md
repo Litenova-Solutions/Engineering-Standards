@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <Rule set display title>
+# <Rule Set Display Title>
 
 ## Summary
 

@@ -2,27 +2,27 @@
 
 ## Intent
 
-Screens spend part of their life empty, loading, forbidden, offline, signed out, conflicted, missing, failed, rate-limited, or under maintenance, and every command the reader runs reports whether it worked. This page states what each state shows and how results read, as drawn options with a named default to build. The product owner chooses among the options when the team builds a list, a form, or any command that can fail. Decided states keep staff informed instead of guessing: each screen says what happened, what it means, and what to do next.
+This page states what each screen state shows and how results read, as drawn options with a named default to build: empty, loading, forbidden, offline, signed out, conflicted, missing, failed, rate-limited, and under maintenance. The product owner chooses among the options when the team builds a list, a form, or any command that can fail. Decided states keep staff informed instead of guessing: each screen says what happened, what it means, and what to do next.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about screen states, such as what a list shows before its first records exist. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply back office: 268 orders including SO-1042 for Maria Garcia, refunds such as the EUR 125.00 on that order, and the delivery, payment, and warehouse facts around them. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a refusal or error message states what failed and the next step, and a failed save keeps the reader's input on screen.
 
 ## Standards
 
-### State what failed and the next step
+### State What Failed and the Next Step
 
 **Statement:** A refusal or error message MUST state what failed and the next step the reader can take.
 
 **Rationale:** A message that only says something went wrong leaves the reader guessing whether to retry, fix input, or ask for help, and most readers retry blindly or give up. Naming what failed plus the one next step turns the dead end into a task the reader can complete.
 
-### Keep the reader's input through a failure
+### Keep the Reader's Input Through a Failure
 
 **Statement:** A failed save MUST keep the reader's unsaved input on the screen.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply back office: 268 orders including 
 
 ## Patterns
 
-### Nothing has ever existed
+### Nothing Has Ever Existed
 
 **Question:** No record of this kind exists yet. The page states that plainly, says what the first record is for, and offers the one command that creates it.
 
@@ -40,7 +40,7 @@ The drawings on this page use the Acme Supply back office: 268 orders including 
 
 **Rationale:** The pick stays on the positive title with one action. It is the smallest shape and the only option that asks nothing of a reader who has nothing yet. The runner-up is the setup guide on Home. Prefer it when the first order needs steps across several pages. Never ship the table with a dashed sample row. It shows a record that does not exist, and opening it leads nowhere.
 
-#### `positive-title-one-action`: Positive title, one action
+#### `positive-title-one-action`: Positive Title, One Action
 
 ```wireframe
 page
@@ -60,7 +60,7 @@ page
 
 **Reference:** Carbon
 
-#### `the-empty-state-beside-the-thing-it-fills`: The empty state beside the thing it fills
+#### `the-empty-state-beside-the-thing-it-fills`: The Empty State Beside the Thing It Fills
 
 ```wireframe
 page
@@ -82,7 +82,7 @@ page
 
 **Cost:** A list page whose job is finding becomes a setup page while empty. A reader with no products has no reason to want a list at all.
 
-#### `empty-with-the-first-record-s-shape-shown`: Empty with the first record's shape shown
+#### `empty-with-the-first-record-s-shape-shown`: Empty with the First Record's Shape Shown
 
 ```wireframe
 page
@@ -107,7 +107,7 @@ page
 
 **Reference:** Carbon
 
-#### `empty-inside-a-section-beside-the-sections-that-do-have-thin`: Empty inside a section, beside the sections that do have things
+#### `empty-inside-a-section-beside-the-sections-that-do-have-thin`: Empty Inside a Section, Beside the Sections That Do Have Things
 
 ```wireframe
 page
@@ -129,7 +129,7 @@ page
 
 **Cost:** A section with an empty state is taller than a section with three rows, which breaks the rhythm of a page of sections. It also invites a per-section action bar.
 
-#### `empty-with-a-reason-and-a-way-to-fix-it`: Empty with a reason and a way to fix it
+#### `empty-with-a-reason-and-a-way-to-fix-it`: Empty with a Reason and a Way to Fix It
 
 ```wireframe
 page
@@ -151,7 +151,7 @@ page
 
 **Cost:** A page whose empty state depends on why it is empty needs a read that answers why. That answer is a second thing the API must be able to say.
 
-#### `empty-because-a-permission-hides-everything`: Empty because a permission hides everything
+#### `empty-because-a-permission-hides-everything`: Empty Because a Permission Hides Everything
 
 ```wireframe
 page
@@ -171,7 +171,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-sample-the-reader-can-open-keep-or-remove`: A sample the reader can open, keep, or remove
+#### `a-sample-the-reader-can-open-keep-or-remove`: A Sample the Reader Can Open, Keep, or Remove
 
 ```wireframe
 page
@@ -195,7 +195,7 @@ page
 
 **Cost:** Samples must stay out of every export, total, and customer surface. A sample left in place at go-live ships fake data as the company's own.
 
-#### `one-primary-action-and-two-quieter-ways-to-start`: One primary action and two quieter ways to start
+#### `one-primary-action-and-two-quieter-ways-to-start`: One Primary Action and Two Quieter Ways to Start
 
 ```wireframe
 page
@@ -216,7 +216,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `a-setup-guide-on-home-plain-empty-states-elsewhere`: A setup guide on Home, plain empty states elsewhere
+#### `a-setup-guide-on-home-plain-empty-states-elsewhere`: A Setup Guide on Home, Plain Empty States Elsewhere
 
 ```wireframe
 page
@@ -236,7 +236,7 @@ page
 
 **Reference:** Shopify, Stripe
 
-### Nothing matches what was asked for
+### Nothing Matches What Was Asked For
 
 **Question:** A search found nothing, but records exist. The page must say so, name the term that failed, and offer a way back.
 
@@ -246,7 +246,7 @@ page
 
 **Rationale:** The pick stays on the copy that names the term. It says what failed and what to change, with the count proving the data exists. The runner-up is the table that keeps its headers. Prefer it where readers filter all day and want the columns to stay put. Never ship the empty state with no actions. A search that names its term can always offer to clear it.
 
-#### `different-copy-and-it-names-the-term`: Different copy, and it names the term
+#### `different-copy-and-it-names-the-term`: Different Copy, and It Names the Term
 
 ```wireframe
 page
@@ -270,7 +270,7 @@ page
 
 **Reference:** Carbon
 
-#### `the-controls-stay-editable-above-the-empty-state`: The controls stay editable above the empty state
+#### `the-controls-stay-editable-above-the-empty-state`: The Controls Stay Editable Above the Empty State
 
 ```wireframe
 page
@@ -293,7 +293,7 @@ page
 
 **Cost:** An empty state with live controls above it is taller than one alone, and the reader has to know which control to change.
 
-#### `suggesting-what-does-match`: Suggesting what does match
+#### `suggesting-what-does-match`: Suggesting What Does Match
 
 ```wireframe
 page
@@ -315,7 +315,7 @@ page
 
 **Cost:** Every suggestion is a read the API must be able to answer. A wrong suggestion is worse than none, because it sends the reader further away.
 
-#### `a-filters-panel-instead-of-an-empty-state`: A filters panel instead of an empty state
+#### `a-filters-panel-instead-of-an-empty-state`: A Filters Panel Instead of an Empty State
 
 ```wireframe
 page
@@ -339,7 +339,7 @@ page
 
 **Cost:** The list is gone, so the reader cannot see how many records the unfiltered list holds unless the panel says so.
 
-#### `the-same-empty-state-with-no-actions-at-all`: The same empty state with no actions at all
+#### `the-same-empty-state-with-no-actions-at-all`: The Same Empty State with No Actions at All
 
 ```wireframe
 page
@@ -358,7 +358,7 @@ page
 
 **Reference:** Carbon
 
-#### `an-empty-state-that-carries-the-count-it-should-have`: An empty state that carries the count it should have
+#### `an-empty-state-that-carries-the-count-it-should-have`: An Empty State That Carries the Count It Should Have
 
 ```wireframe
 page
@@ -376,7 +376,7 @@ page
 
 **Cost:** The count needs a second read, and it puts a number on a page that otherwise shows none.
 
-#### `one-line-in-place-of-the-rows-with-one-link-that-clears-ever`: One line in place of the rows, with one link that clears everything
+#### `one-line-in-place-of-the-rows-with-one-link-that-clears-ever`: One Line in Place of the Rows, with One Link That Clears Everything
 
 ```wireframe
 page
@@ -400,7 +400,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-table-header-stays-with-the-message-as-its-only-row`: The table header stays, with the message as its only row
+#### `the-table-header-stays-with-the-message-as-its-only-row`: The Table Header Stays, with the Message as Its Only Row
 
 ```wireframe
 page
@@ -435,7 +435,7 @@ page
 
 **Rationale:** The pick stays on skeletons at the real row height. Nothing moves when the data lands, even on a slow phone read. The runner-up is the thin bar over the old rows. Prefer it for a re-read where the reader keeps their place, such as a changed filter. Never ship nothing at all. Any read slower than a blink reads as a failed page.
 
-#### `skeletons-at-the-real-row-height`: Skeletons at the real row height
+#### `skeletons-at-the-real-row-height`: Skeletons at the Real Row Height
 
 ```wireframe
 page
@@ -457,7 +457,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-spinner-in-the-control-that-is-waiting`: A spinner in the control that is waiting
+#### `a-spinner-in-the-control-that-is-waiting`: A Spinner in the Control That Is Waiting
 
 ```wireframe
 page
@@ -483,7 +483,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-spinner-in-the-submit-button-while-it-sends`: A spinner in the submit button while it sends
+#### `a-spinner-in-the-submit-button-while-it-sends`: A Spinner in the Submit Button While It Sends
 
 ```wireframe
 page
@@ -504,7 +504,7 @@ page
 
 **Cost:** A button whose label is replaced by a spinner loses its width, so the layout shifts unless the button holds its size. It also says nothing about how long the wait will be.
 
-#### `progress-for-work-that-takes-a-while`: Progress for work that takes a while
+#### `progress-for-work-that-takes-a-while`: Progress for Work That Takes a While
 
 ```wireframe
 page
@@ -528,7 +528,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-dimmed-page-with-the-spinner-centered`: A dimmed page with the spinner centered
+#### `a-dimmed-page-with-the-spinner-centered`: A Dimmed Page with the Spinner Centered
 
 ```wireframe
 page
@@ -549,7 +549,7 @@ page
 
 **Cost:** A scrim over the page is neither a shared component nor a page slot. It hides the page a reader may want to scroll.
 
-#### `nothing-at-all-briefly`: Nothing at all, briefly
+#### `nothing-at-all-briefly`: Nothing at All, Briefly
 
 ```wireframe
 page
@@ -572,7 +572,7 @@ page
 
 **Cost:** Anything slower reads as a page that failed. Every read needs a loading state, so this is the shape the rule refuses.
 
-#### `the-last-rows-stay-a-thin-bar-says-a-new-read-is-running`: The last rows stay, a thin bar says a new read is running
+#### `the-last-rows-stay-a-thin-bar-says-a-new-read-is-running`: The Last Rows Stay, a Thin Bar Says a New Read Is Running
 
 ```wireframe
 page
@@ -601,7 +601,7 @@ page
 
 **Reference:** Linear, Vercel
 
-#### `a-skeleton-that-admits-a-slow-read-after-a-few-seconds`: A skeleton that admits a slow read after a few seconds
+#### `a-skeleton-that-admits-a-slow-read-after-a-few-seconds`: A Skeleton That Admits a Slow Read After a Few Seconds
 
 ```wireframe
 page
@@ -623,7 +623,7 @@ page
 
 **Reference:** Shopify Polaris, Material
 
-### Command the API refused
+### Command the API Refused
 
 **Question:** The API refused a command. The page must say what went wrong, why, and what the reader can do instead.
 
@@ -633,7 +633,7 @@ page
 
 **Rationale:** The pick stays on the refusal sentence with its code and fix. It meets WCAG 3.3.1 and 3.3.3 in one place. The runner-up is the refusal inside the dialog that sent it. Prefer it where closing would lose what the reader typed, such as a refund amount. Never ship the refusal only on the record timeline. A reader who sent the command from elsewhere never returns to find it.
 
-#### `the-refusal-sentence-its-code-and-a-way-to-fix-it`: The refusal sentence, its code and a way to fix it
+#### `the-refusal-sentence-its-code-and-a-way-to-fix-it`: The Refusal Sentence, Its Code and a Way to Fix It
 
 ```wireframe
 page
@@ -655,7 +655,7 @@ page
 
 **Cost:** Each refusal code needs three pieces in two languages, and every new command that can be refused adds a code. The dictionary is the second copy of the domain rules.
 
-#### `the-refusal-beside-the-button-that-caused-it`: The refusal beside the button that caused it
+#### `the-refusal-beside-the-button-that-caused-it`: The Refusal Beside the Button That Caused It
 
 ```wireframe
 page
@@ -675,7 +675,7 @@ page
 
 **Cost:** On a page with several forms, one refusal sits above the form and one sits under a button. The reader needs to learn which placement means what.
 
-#### `the-refusal-with-a-code-for-support`: The refusal with a code, for support
+#### `the-refusal-with-a-code-for-support`: The Refusal with a Code, for Support
 
 ```wireframe
 page
@@ -697,7 +697,7 @@ page
 
 **Cost:** A code on screen breaks the usual rule: do not show a raw code. Shown deliberately, it needs to be labeled and copyable rather than bare.
 
-#### `a-refusal-that-changed-nothing-stated-plainly`: A refusal that changed nothing, stated plainly
+#### `a-refusal-that-changed-nothing-stated-plainly`: A Refusal That Changed Nothing, Stated Plainly
 
 ```wireframe
 page
@@ -714,7 +714,7 @@ page
 
 **Cost:** The reader cannot tell a no-op from a failure unless the tone differs, and the tone is the only signal. A refusal that was correct should not be red.
 
-#### `a-refusal-with-nothing-lost-said-first`: A refusal with nothing lost, said first
+#### `a-refusal-with-nothing-lost-said-first`: A Refusal with Nothing Lost, Said First
 
 ```wireframe
 page
@@ -737,7 +737,7 @@ page
 
 **Reference:** NN/g
 
-#### `the-refusal-on-the-record-it-happened-to-not-a-banner`: The refusal on the record it happened to, not a banner
+#### `the-refusal-on-the-record-it-happened-to-not-a-banner`: The Refusal on the Record It Happened to, Not a Banner
 
 ```wireframe
 page
@@ -760,7 +760,7 @@ page
 
 **Cost:** The refusal is invisible elsewhere. A reader who sent the command from somewhere else will not come back to this page to find out why it did not happen.
 
-#### `the-refusal-inside-the-dialog-that-sent-it`: The refusal inside the dialog that sent it
+#### `the-refusal-inside-the-dialog-that-sent-it`: The Refusal Inside the Dialog That Sent It
 
 ```wireframe
 page
@@ -786,7 +786,7 @@ page
 
 **Reference:** Stripe
 
-#### `refused-before-it-is-sent-the-button-explains`: Refused before it is sent: the button explains
+#### `refused-before-it-is-sent-the-button-explains`: Refused Before It Is Sent: The Button Explains
 
 ```wireframe
 page
@@ -809,7 +809,7 @@ page
 
 **Reference:** GitHub
 
-### Command that worked
+### Command That Worked
 
 **Question:** A command worked. The page must show what changed, so the reader trusts the result without asking.
 
@@ -819,7 +819,7 @@ page
 
 **Rationale:** The pick stays on evidence on the page. State, money, and timeline all say what changed after a refund. The runner-up is the toast with `Undo`. Prefer it for a reversible change such as hiding a product from the store. Never ship no message at all. It fails WCAG 4.1.3, since a screen reader user gets no signal.
 
-#### `evidence-on-the-page-not-only-a-toast`: Evidence on the page, not only a toast
+#### `evidence-on-the-page-not-only-a-toast`: Evidence on the Page, Not Only a Toast
 
 ```wireframe
 page
@@ -842,7 +842,7 @@ page
 
 **Cost:** The reader needs to find the evidence. A toast is faster and leaves nothing once it goes, so a toast alone is not evidence.
 
-#### `a-toast-for-a-change-with-no-evidence-to-leave`: A toast, for a change with no evidence to leave
+#### `a-toast-for-a-change-with-no-evidence-to-leave`: A Toast, for a Change with No Evidence to Leave
 
 ```wireframe
 page
@@ -863,7 +863,7 @@ page
 
 **Reference:** Material, Android
 
-#### `a-success-notice-that-persists-for-a-change-in-progress`: A success notice that persists, for a change in progress
+#### `a-success-notice-that-persists-for-a-change-in-progress`: A Success Notice That Persists, for a Change in Progress
 
 ```wireframe
 page
@@ -883,7 +883,7 @@ page
 
 **Cost:** A success message that waits is a status, not an alert, so it must not take a tone. A notice that persists needs to resolve into something else.
 
-#### `a-success-with-a-count-when-a-batch-partly-worked`: A success with a count, when a batch partly worked
+#### `a-success-with-a-count-when-a-batch-partly-worked`: A Success with a Count, When a Batch Partly Worked
 
 ```wireframe
 page
@@ -903,7 +903,7 @@ page
 
 **Cost:** A count that is not expected raises a question the message then needs to answer. A partial success needs its own copy per command.
 
-#### `no-message-because-the-record-says-it`: No message, because the record says it
+#### `no-message-because-the-record-says-it`: No Message, Because the Record Says It
 
 ```wireframe
 page
@@ -926,7 +926,7 @@ page
 
 **Reference:** WCAG
 
-#### `a-success-and-a-next-step-where-the-flow-is-not-finished`: A success and a next step, where the flow is not finished
+#### `a-success-and-a-next-step-where-the-flow-is-not-finished`: A Success and a Next Step, Where the Flow Is Not Finished
 
 ```wireframe
 page
@@ -946,7 +946,7 @@ page
 
 **Cost:** It sits between a success and a checklist, so it needs its own place. A full outcome page already owns that place.
 
-#### `a-toast-with-undo-for-a-change-that-can-be-taken-back`: A toast with Undo, for a change that can be taken back
+#### `a-toast-with-undo-for-a-change-that-can-be-taken-back`: A Toast with Undo, for a Change That Can Be Taken Back
 
 ```wireframe
 page
@@ -967,7 +967,7 @@ page
 
 **Reference:** Gmail, Linear
 
-#### `saved-said-quietly-beside-the-button`: Saved, said quietly beside the button
+#### `saved-said-quietly-beside-the-button`: Saved, Said Quietly Beside the Button
 
 ```wireframe
 page
@@ -990,7 +990,7 @@ page
 
 **Reference:** Stripe, Notion
 
-### Fact somebody has to read before acting
+### Fact Somebody Has to Read Before Acting
 
 **Question:** Some pages must state a fact before staff act, such as low stock or a closing window. Only a command result is an alert; a static fact is a notice. A tone paints the object in that state, never a full band across other work.
 
@@ -1002,7 +1002,7 @@ page
 
 A banner stays for facts on every page, such as `Sandbox`.
 
-#### `a-neutral-notice-above-the-page`: A neutral notice above the page
+#### `a-neutral-notice-above-the-page`: A Neutral Notice Above the Page
 
 ```wireframe
 page
@@ -1024,7 +1024,7 @@ page
 
 **Cost:** It sits above the sections, so it is the first thing and the last thing read. A long notice pushes the work down on every visit.
 
-#### `the-notice-inside-the-section-it-is-about`: The notice inside the section it is about
+#### `the-notice-inside-the-section-it-is-about`: The Notice Inside the Section It Is About
 
 ```wireframe
 page
@@ -1046,7 +1046,7 @@ page
 
 **Cost:** The reader needs to open the section to learn something that may change whether they should be in the section at all.
 
-#### `a-callout-inside-a-form-about-what-the-form-will-do`: A callout inside a form, about what the form will do
+#### `a-callout-inside-a-form-about-what-the-form-will-do`: A Callout Inside a Form, About What the Form Will Do
 
 ```wireframe
 page
@@ -1068,7 +1068,7 @@ page
 
 **Cost:** A callout inside a form is a paragraph among fields, and it is the least visible of the alert shapes. It is also the one a reader reads before committing rather than after.
 
-#### `a-hint-under-the-field-with-no-tone-at-all`: A hint under the field, with no tone at all
+#### `a-hint-under-the-field-with-no-tone-at-all`: A Hint Under the Field, with No Tone at All
 
 ```wireframe
 page
@@ -1091,7 +1091,7 @@ page
 
 **Cost:** A hint has no visual weight, so it is the first thing a reader skips. It works for a definition and not for a consequence.
 
-#### `a-tool-tip-on-the-word-that-carries-the-fact`: A tool tip on the word that carries the fact
+#### `a-tool-tip-on-the-word-that-carries-the-fact`: A Tool Tip on the Word That Carries the Fact
 
 ```wireframe
 page
@@ -1111,7 +1111,7 @@ page
 
 **Cost:** Use it only for a term that is genuinely the product's and genuinely unclear. On any other word it is noise, and every term needs a glossary entry to keep in step.
 
-#### `the-fact-as-the-heading-instead-of-an-alert`: The fact as the heading, instead of an alert
+#### `the-fact-as-the-heading-instead-of-an-alert`: The Fact as the Heading, Instead of an Alert
 
 ```wireframe
 page
@@ -1134,7 +1134,7 @@ page
 
 **Cost:** The heading cannot carry a tone, so severity has nowhere to go. The description is one line, which is not much room for a consequence.
 
-#### `the-shipped-banner-for-a-fact-about-the-whole-console`: The shipped Banner, for a fact about the whole console
+#### `the-shipped-banner-for-a-fact-about-the-whole-console`: The Shipped Banner, for a Fact About the Whole Console
 
 ```wireframe
 page
@@ -1155,7 +1155,7 @@ page
 
 **Reference:** GitHub, Stripe
 
-#### `the-fact-beside-the-record-in-its-side-column`: The fact beside the record, in its side column
+#### `the-fact-beside-the-record-in-its-side-column`: The Fact Beside the Record, in Its Side Column
 
 ```wireframe
 page
@@ -1184,7 +1184,7 @@ page
 
 **Reference:** Stripe, GitHub
 
-### Reader may not do this
+### Reader May Not Do This
 
 **Question:** Staff meet pages their role cannot use, so each such page must show the reason and the grant that would help. A back office with several roles meets this state on most pages, so it needs one shape.
 
@@ -1196,7 +1196,7 @@ page
 
 Never refuse the whole page to a warehouse lead. Hiding a customer name needed at the counter costs more than the secrecy gains.
 
-#### `the-commands-are-refused-each-with-its-grant-named`: The commands are refused, each with its grant named
+#### `the-commands-are-refused-each-with-its-grant-named`: The Commands Are Refused, Each with Its Grant Named
 
 ```wireframe
 page
@@ -1221,7 +1221,7 @@ page
 
 **Cost:** A page of refused commands looks broken to someone who does not know their role. The role's name in the reason is what makes it legible.
 
-#### `the-page-itself-is-refused`: The page itself is refused
+#### `the-page-itself-is-refused`: The Page Itself Is Refused
 
 ```wireframe
 page
@@ -1239,7 +1239,7 @@ page
 
 **Cost:** Nothing at all is shown, so a warehouse lead cannot read a customer name to answer a question at the counter. That is a real cost on the surface where names matter.
 
-#### `the-tab-is-absent-so-the-reader-never-sees-the-gap`: The tab is absent, so the reader never sees the gap
+#### `the-tab-is-absent-so-the-reader-never-sees-the-gap`: The Tab Is Absent, so the Reader Never Sees the Gap
 
 ```wireframe
 page
@@ -1263,7 +1263,7 @@ page
 
 **Cost:** The reader cannot find out the capability exists. On a surface where someone is guessing at what the product can do, that is a real cost.
 
-#### `a-banner-naming-what-this-role-cannot-do-once`: A banner naming what this role cannot do, once
+#### `a-banner-naming-what-this-role-cannot-do-once`: A Banner Naming What This Role Cannot Do, Once
 
 ```wireframe
 page
@@ -1283,7 +1283,7 @@ page
 
 **Cost:** It repeats on every page of the area, and the reader's eye skips it after the first. A tone may not paint a full-width band on a page about other work.
 
-#### `the-names-are-hidden-the-figures-are-not`: The names are hidden, the figures are not
+#### `the-names-are-hidden-the-figures-are-not`: The Names Are Hidden, the Figures Are Not
 
 ```wireframe
 page
@@ -1305,7 +1305,7 @@ page
 
 **Cost:** A screen reader reads whatever is in the `DOM`, so anything hidden this way needs to be absent rather than blurred. Blur alone is not a boundary.
 
-#### `the-role-is-named-in-the-refusal-and-the-way-to-change-it`: The role is named in the refusal, and the way to change it
+#### `the-role-is-named-in-the-refusal-and-the-way-to-change-it`: The Role Is Named in the Refusal, and the Way to Change It
 
 ```wireframe
 page
@@ -1325,7 +1325,7 @@ page
 
 **Cost:** A request that reaches an owner is a message someone reads, and a busy owner ignores it. It should not be the only route, so the page needs to stay useful read-only.
 
-#### `the-page-refused-with-a-request-sent-to-a-named-person`: The page refused, with a request sent to a named person
+#### `the-page-refused-with-a-request-sent-to-a-named-person`: The Page Refused, with a Request Sent to a Named Person
 
 ```wireframe
 page
@@ -1346,7 +1346,7 @@ page
 
 **Reference:** Google Drive
 
-#### `a-read-only-section-values-as-text-one-line-saying-why`: A read-only section: values as text, one line saying why
+#### `a-read-only-section-values-as-text-one-line-saying-why`: A Read-Only Section: Values as Text, One Line Saying Why
 
 ```wireframe
 page
@@ -1367,7 +1367,7 @@ page
 
 **Reference:** Stripe
 
-### Connection is gone
+### Connection Is Gone
 
 **Question:** Staff lose the connection while working, so the page on screen goes stale. The decision is what a stale page says: how fresh its data is, what still works, and when to retry.
 
@@ -1379,7 +1379,7 @@ page
 
 Never ship a queued refund as a quiet default. A refund nobody confirmed is a liability, and the page says plainly that the money has not moved.
 
-#### `a-banner-saying-what-is-stale-and-what-still-works`: A banner saying what is stale and what still works
+#### `a-banner-saying-what-is-stale-and-what-still-works`: A Banner Saying What Is Stale and What Still Works
 
 ```wireframe
 page
@@ -1402,7 +1402,7 @@ page
 
 **Cost:** Every page needs a last-read time and a notion of which commands are safe offline. Commands that change money are almost never safe offline.
 
-#### `read-only-with-every-command-refused-and-why`: Read-only, with every command refused and why
+#### `read-only-with-every-command-refused-and-why`: Read-Only, with Every Command Refused and Why
 
 ```wireframe
 page
@@ -1424,7 +1424,7 @@ page
 
 **Cost:** A reader on a train sees a page they cannot use. The refusals are truthful but frustrating, and the page cannot fix the connection.
 
-#### `a-queued-command-so-the-reader-does-not-lose-the-work`: A queued command, so the reader does not lose the work
+#### `a-queued-command-so-the-reader-does-not-lose-the-work`: A Queued Command, so the Reader Does Not Lose the Work
 
 ```wireframe
 page
@@ -1447,7 +1447,7 @@ page
 
 **Cost:** A queued refund is a refund nobody has confirmed, and a queue of them is a liability. The page needs to say plainly that the money has not moved.
 
-#### `a-connection-control-in-the-header-always-present`: A connection control in the header, always present
+#### `a-connection-control-in-the-header-always-present`: A Connection Control in the Header, Always Present
 
 ```wireframe
 page
@@ -1466,7 +1466,7 @@ page
 
 **Cost:** A second status sits in a header that already carries the theme and the language. A header-level indicator is easy to learn and then easy to ignore.
 
-#### `nothing-shown-because-a-stale-page-is-a-dangerous-one`: Nothing shown, because a stale page is a dangerous one
+#### `nothing-shown-because-a-stale-page-is-a-dangerous-one`: Nothing Shown, Because a Stale Page Is a Dangerous One
 
 ```wireframe
 page
@@ -1483,7 +1483,7 @@ page
 
 **Cost:** A reader who needs to answer a question at the counter gets nothing. The printed pick list exists precisely because the counter cannot refuse, which is why the two surfaces answer this differently.
 
-#### `the-staleness-stated-on-the-values-themselves`: The staleness stated on the values themselves
+#### `the-staleness-stated-on-the-values-themselves`: The Staleness Stated on the Values Themselves
 
 ```wireframe
 page
@@ -1503,7 +1503,7 @@ page
 
 **Cost:** A timestamp on every money cell makes a table unreadable. It works on a page with two or three figures and not on a list.
 
-#### `the-read-fails-in-place-the-server-could-not-be-reached`: The read fails in place: the server could not be reached
+#### `the-read-fails-in-place-the-server-could-not-be-reached`: The Read Fails in Place: The Server Could Not Be Reached
 
 ```wireframe
 page
@@ -1523,7 +1523,7 @@ page
 
 **Cost:** It only appears when a read is tried. A page that loaded before the connection dropped looks normal until the reader does something.
 
-#### `a-small-bar-that-retries-by-itself-and-says-when`: A small bar that retries by itself and says when
+#### `a-small-bar-that-retries-by-itself-and-says-when`: A Small Bar That Retries by Itself and Says When
 
 ```wireframe
 page
@@ -1544,7 +1544,7 @@ page
 
 **Reference:** Gmail
 
-### Sign-in ran out
+### Sign-In Ran Out
 
 **Question:** A session ends while the reader is working. Sign-in runs on the application's own origin, and a refused or ended session lands on `/signed-out`. The reader's unsent work is what this state must not lose.
 
@@ -1556,7 +1556,7 @@ page
 
 Never ship the toast alone. The message leaves in seconds and the typed work leaves with it.
 
-#### `signed-out-on-its-own-page`: Signed out, on its own page
+#### `signed-out-on-its-own-page`: Signed Out, on Its Own Page
 
 ```wireframe
 page
@@ -1574,7 +1574,7 @@ page
 
 **Cost:** The reader leaves their work to sign in again. Whether anything typed survives depends on the browser keeping the page, which is exactly what the other options make explicit.
 
-#### `a-dialog-over-the-work-which-stays-where-it-is`: A dialog over the work, which stays where it is
+#### `a-dialog-over-the-work-which-stays-where-it-is`: A Dialog over the Work, Which Stays Where It Is
 
 ```wireframe
 page
@@ -1600,7 +1600,7 @@ page
 
 **Reference:** Stripe, Linear
 
-#### `the-form-says-so-where-save-was`: The form says so where Save was
+#### `the-form-says-so-where-save-was`: The Form Says so Where Save Was
 
 ```wireframe
 page
@@ -1625,7 +1625,7 @@ page
 
 **Reference:** Notion
 
-#### `warned-before-it-ends`: Warned before it ends
+#### `warned-before-it-ends`: Warned Before It Ends
 
 ```wireframe
 page
@@ -1647,7 +1647,7 @@ page
 
 **Reference:** DigiD
 
-#### `refused-as-a-command-worded-by-its-code`: Refused as a command, worded by its code
+#### `refused-as-a-command-worded-by-its-code`: Refused as a Command, Worded by Its Code
 
 ```wireframe
 page
@@ -1669,7 +1669,7 @@ page
 
 **Cost:** The reader learns it only when they save. An expiry discovered at `Save` is later than one discovered at reading, and the typed work waits longer.
 
-#### `a-toast-and-the-typed-work-goes-with-it`: A toast, and the typed work goes with it
+#### `a-toast-and-the-typed-work-goes-with-it`: A Toast, and the Typed Work Goes with It
 
 ```wireframe
 page
@@ -1691,7 +1691,7 @@ page
 
 **Cost:** The message leaves and the typed notes leave with it. A reader who looked away loses work they cannot reconstruct.
 
-### Somebody else saved first
+### Somebody Else Saved First
 
 **Question:** Two people edit one record. The API refuses the second save with `concurrency/record.changed-elsewhere`, worded as `Someone else changed this`. The reader's unsent edits are still on the page.
 
@@ -1703,7 +1703,7 @@ page
 
 Never ship `read-only-until-reload`. It deletes Alex's notes to resolve an arrival time.
 
-#### `the-refusal-above-save-with-her-value-under-the-field`: The refusal above Save, with her value under the field
+#### `the-refusal-above-save-with-her-value-under-the-field`: The Refusal Above Save, with Her Value Under the Field
 
 ```wireframe
 page
@@ -1729,7 +1729,7 @@ page
 
 **Reference:** Linear
 
-#### `field-by-field-keep-mine-or-use-hers`: Field by field: keep mine or use hers
+#### `field-by-field-keep-mine-or-use-hers`: Field by Field: Keep Mine or Use Hers
 
 ```wireframe
 page
@@ -1757,7 +1757,7 @@ page
 
 **Reference:** Contentful, Airtable
 
-#### `a-dialog-with-three-ways-out`: A dialog with three ways out
+#### `a-dialog-with-three-ways-out`: A Dialog with Three Ways Out
 
 ```wireframe
 page
@@ -1785,7 +1785,7 @@ page
 
 **Reference:** Dropbox, Office
 
-#### `presence-first-so-the-conflict-never-happens`: Presence first, so the conflict never happens
+#### `presence-first-so-the-conflict-never-happens`: Presence First, so the Conflict Never Happens
 
 ```wireframe
 page
@@ -1812,7 +1812,7 @@ page
 
 **Reference:** Figma, Google Docs
 
-#### `merged-where-you-did-not-overlap`: Merged where you did not overlap
+#### `merged-where-you-did-not-overlap`: Merged Where You Did Not Overlap
 
 ```wireframe
 page
@@ -1838,7 +1838,7 @@ page
 
 **Reference:** Git
 
-#### `read-only-until-reload`: Read-only until reload
+#### `read-only-until-reload`: Read-Only Until Reload
 
 ```wireframe
 page
@@ -1858,7 +1858,7 @@ page
 
 **Cost:** Alex's notes are gone. A lock that deletes work teaches the reader to type notes somewhere else first.
 
-### Work that runs without you
+### Work That Runs Without You
 
 **Question:** An import or a bulk refund runs for minutes, longer than the reader waits on one page. The reader starts it and does other work. The job must stay visible while it runs and report its result when it is done.
 
@@ -1870,7 +1870,7 @@ page
 
 It suits a bulk refund where 2 of 31 need a person and the rest do not. Never ship the dialog that holds the reader. Minutes of a blocked page are the cost this pattern exists to remove.
 
-#### `an-activity-tray-like-an-upload-panel`: An activity tray, like an upload panel
+#### `an-activity-tray-like-an-upload-panel`: An Activity Tray, Like an Upload Panel
 
 ```wireframe
 page
@@ -1899,7 +1899,7 @@ page
 
 **Reference:** Vercel, Linear, Figma
 
-#### `a-jobs-section-on-the-page-that-started-it`: A jobs section on the page that started it
+#### `a-jobs-section-on-the-page-that-started-it`: A Jobs Section on the Page That Started It
 
 ```wireframe
 page
@@ -1923,7 +1923,7 @@ page
 
 **Reference:** Shopify, Stripe
 
-#### `told-when-it-is-done-not-while-it-runs`: Told when it is done, not while it runs
+#### `told-when-it-is-done-not-while-it-runs`: Told When It Is Done, Not While It Runs
 
 ```wireframe
 page
@@ -1946,7 +1946,7 @@ page
 
 **Reference:** GitHub Actions
 
-#### `progress-on-the-rows-it-changes`: Progress on the rows it changes
+#### `progress-on-the-rows-it-changes`: Progress on the Rows It Changes
 
 ```wireframe
 page
@@ -1965,7 +1965,7 @@ page
 
 **Reference:** Mailchimp, Intercom
 
-#### `a-job-page-with-the-failures-listed`: A job page with the failures listed
+#### `a-job-page-with-the-failures-listed`: A Job Page with the Failures Listed
 
 ```wireframe
 page
@@ -1985,7 +1985,7 @@ page
 
 **Reference:** Stripe, Shopify
 
-#### `a-dialog-that-holds-the-reader-until-it-is-done`: A dialog that holds the reader until it is done
+#### `a-dialog-that-holds-the-reader-until-it-is-done`: A Dialog That Holds the Reader Until It Is Done
 
 ```wireframe
 page
@@ -2007,7 +2007,7 @@ page
 
 **Cost:** The reader cannot do other work while the job runs. `Stop` is the only choice, and it wastes the minutes already spent.
 
-### This record does not exist
+### This Record Does Not Exist
 
 **Question:** A link names a record that is gone, mistyped, or at another company. A problem state words it as `Not found`. The reader needs a way back, not a code.
 
@@ -2019,7 +2019,7 @@ page
 
 It suits a section whose read failed rather than a page whose record is gone. Never ship the bare code. A code means nothing to a reader, and a dead end with a number on it is still a dead end.
 
-#### `the-shipped-record-state`: The shipped record state
+#### `the-shipped-record-state`: The Shipped Record State
 
 ```wireframe
 page
@@ -2036,7 +2036,7 @@ page
 
 **Cost:** No retry and no way back: the record is not there, so there is nothing to retry. The way back in the recommended option is what the reader needs.
 
-#### `not-found-with-the-way-back`: Not found, with the way back
+#### `not-found-with-the-way-back`: Not Found, with the Way Back
 
 ```wireframe
 page
@@ -2055,7 +2055,7 @@ page
 
 **Reference:** Stripe, Linear
 
-#### `the-section-says-so-the-page-stays`: The section says so, the page stays
+#### `the-section-says-so-the-page-stays`: The Section Says so, the Page Stays
 
 ```wireframe
 page
@@ -2079,7 +2079,7 @@ page
 
 **Reference:** GitHub
 
-#### `gone-and-when`: Gone, and when
+#### `gone-and-when`: Gone, and When
 
 ```wireframe
 page
@@ -2098,7 +2098,7 @@ page
 
 **Reference:** Linear, Notion
 
-#### `search-from-the-dead-end`: Search from the dead end
+#### `search-from-the-dead-end`: Search from the Dead End
 
 ```wireframe
 page
@@ -2119,7 +2119,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-big-code`: The big code
+#### `the-big-code`: The Big Code
 
 ```wireframe
 page
@@ -2138,7 +2138,7 @@ page
 
 **Reference:** Vercel, Next.js
 
-### Something went wrong on our side
+### Something Went Wrong on Our Side
 
 **Question:** The server fails a read or a command. A problem state words it as `That did not go through`, with a reference the reader can quote. The reader must know what did not happen.
 
@@ -2150,7 +2150,7 @@ page
 
 It suits a failed command where the money sentence deserves a page of its own. Never ship the old data with its quiet line. Figures the server could not confirm are misinformation, and a quiet line does not make them honest.
 
-#### `the-shipped-failure-with-its-reference`: The shipped failure with its reference
+#### `the-shipped-failure-with-its-reference`: The Shipped Failure with Its Reference
 
 ```wireframe
 page
@@ -2171,7 +2171,7 @@ page
 
 **Cost:** A reference is only useful if support can read it back. Without that lookup it is a number that comforts nobody.
 
-#### `an-outcome-page-that-says-what-did-not-happen`: An outcome page that says what did not happen
+#### `an-outcome-page-that-says-what-did-not-happen`: An Outcome Page That Says What Did Not Happen
 
 ```wireframe
 page
@@ -2192,7 +2192,7 @@ page
 
 **Reference:** Stripe
 
-#### `tried-again-by-itself-and-says-when`: Tried again by itself, and says when
+#### `tried-again-by-itself-and-says-when`: Tried Again by Itself, and Says When
 
 ```wireframe
 page
@@ -2214,7 +2214,7 @@ page
 
 **Reference:** Gmail
 
-#### `a-toast-for-a-background-command-that-failed`: A toast for a background command that failed
+#### `a-toast-for-a-background-command-that-failed`: A Toast for a Background Command That Failed
 
 ```wireframe
 page
@@ -2235,7 +2235,7 @@ page
 
 **Reference:** Gmail, Linear
 
-#### `the-section-fails-the-page-stays`: The section fails, the page stays
+#### `the-section-fails-the-page-stays`: The Section Fails, the Page Stays
 
 ```wireframe
 page
@@ -2260,7 +2260,7 @@ page
 
 **Reference:** React, Vercel
 
-#### `the-old-data-with-a-quiet-line`: The old data with a quiet line
+#### `the-old-data-with-a-quiet-line`: The Old Data with a Quiet Line
 
 ```wireframe
 page
@@ -2280,7 +2280,7 @@ page
 
 **Cost:** The reader acts on figures the server could not confirm. For money this is not a degradation. It is misinformation.
 
-### Back office is down for a short while
+### Back Office Is Down for a Short While
 
 **Question:** A planned window stops the back office. The warehouse keeps its printed pick lists, but the dispatch desk checks every parcel against the system, so dispatch waits too. The reader needs the window, what still works, and when to come back.
 
@@ -2292,7 +2292,7 @@ page
 
 It is what every page becomes while the window runs. Never ship the message alone as the only signal. A Thursday message tells, and only the back office reminds on Sunday at 02:00.
 
-#### `told-ahead-of-time-on-every-page`: Told ahead of time, on every page
+#### `told-ahead-of-time-on-every-page`: Told Ahead of Time, on Every Page
 
 ```wireframe
 page
@@ -2313,7 +2313,7 @@ page
 
 **Reference:** Stripe, Linear
 
-#### `the-maintenance-page-itself`: The maintenance page itself
+#### `the-maintenance-page-itself`: The Maintenance Page Itself
 
 ```wireframe
 page
@@ -2332,7 +2332,7 @@ page
 
 **Reference:** GitHub, Vercel
 
-#### `read-only-while-it-lasts`: Read-only while it lasts
+#### `read-only-while-it-lasts`: Read-Only While It Lasts
 
 ```wireframe
 page
@@ -2355,7 +2355,7 @@ page
 
 **Reference:** Shopify, Notion
 
-#### `a-countdown-with-what-still-works`: A countdown with what still works
+#### `a-countdown-with-what-still-works`: A Countdown with What Still Works
 
 ```wireframe
 page
@@ -2378,7 +2378,7 @@ page
 
 **Reference:** Cloudflare
 
-#### `the-window-as-a-calendar-fact-on-home`: The window as a calendar fact on Home
+#### `the-window-as-a-calendar-fact-on-home`: The Window as a Calendar Fact on Home
 
 ```wireframe
 page
@@ -2399,7 +2399,7 @@ page
 
 **Reference:** Incident.io, Linear
 
-#### `a-message-beforehand-nothing-on-screen`: A message beforehand, nothing on screen
+#### `a-message-beforehand-nothing-on-screen`: A Message Beforehand, Nothing on Screen
 
 ```wireframe
 page
@@ -2419,7 +2419,7 @@ page
 
 **Cost:** Nobody reads a Thursday message on Sunday at 02:00. A message tells. Only the back office can remind.
 
-### Too many tries
+### Too Many Tries
 
 **Question:** The reader hits a limit: too many exports, too many sign-in tries, or too many sends. The API answers `429` with when to try again. The page must state the wait and the reason, briefly.
 
@@ -2431,7 +2431,7 @@ page
 
 It suits a reader planning a month of exports rather than one too many. Never ship the spinner that never says why. A wait the reader cannot name reads as a page that broke, and reloading restarts it.
 
-#### `the-button-waits-and-says-how-long`: The button waits, and says how long
+#### `the-button-waits-and-says-how-long`: The Button Waits, and Says How Long
 
 ```wireframe
 page
@@ -2452,7 +2452,7 @@ page
 
 **Reference:** GitHub, Stripe
 
-#### `sign-in-tries-counted-down`: Sign-in tries, counted down
+#### `sign-in-tries-counted-down`: Sign-In Tries, Counted Down
 
 ```wireframe
 page
@@ -2472,7 +2472,7 @@ page
 
 **Reference:** DigiD
 
-#### `queued-behind-the-others`: Queued behind the others
+#### `queued-behind-the-others`: Queued Behind the Others
 
 ```wireframe
 page
@@ -2495,7 +2495,7 @@ page
 
 **Reference:** Cloudflare
 
-#### `the-limit-stated-before-it-hits`: The limit stated before it hits
+#### `the-limit-stated-before-it-hits`: The Limit Stated Before It Hits
 
 ```wireframe
 page
@@ -2519,7 +2519,7 @@ page
 
 **Reference:** Stripe, Linear
 
-#### `the-429-page`: The 429 page
+#### `the-429-page`: The 429 Page
 
 ```wireframe
 page
@@ -2538,7 +2538,7 @@ page
 
 **Reference:** Cloudflare
 
-#### `a-spinner-that-never-says-why`: A spinner that never says why
+#### `a-spinner-that-never-says-why`: A Spinner That Never Says Why
 
 ```wireframe
 page
@@ -2563,20 +2563,20 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/feedback-and-states#state-what-failed-and-the-next-step | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/feedback-and-states#keep-the-readers-input-through-a-failure | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/feedback-and-states#nothing-has-ever-existed | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#nothing-matches-what-was-asked-for | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#loading | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#command-the-api-refused | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#command-that-worked | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#fact-somebody-has-to-read-before-acting | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#reader-may-not-do-this | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#connection-is-gone | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#sign-in-ran-out | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#somebody-else-saved-first | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#work-that-runs-without-you | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#this-record-does-not-exist | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#something-went-wrong-on-our-side | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#back-office-is-down-for-a-short-while | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/feedback-and-states#too-many-tries | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/feedback-and-states#state-what-failed-and-the-next-step | guidance | Which built failure message omits the cause or the way forward? Open the refused commands and failed reads on built screens. |
+| litespec/frontend/patterns/feedback-and-states#keep-the-readers-input-through-a-failure | guidance | Which built form drops typed values after a refused save? Open the failed submits on built forms and check every field. |
+| litespec/frontend/patterns/feedback-and-states#nothing-has-ever-existed | guidance | Which built first-run screen departs from the wireframe its catalog entry chose? Open the built empty lists and setup guides beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#nothing-matches-what-was-asked-for | guidance | Which built no-results screen departs from the wireframe its catalog entry chose? Open the built filtered empties and suggestion rows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#loading | guidance | Which built waiting state departs from the wireframe its catalog entry chose? Open the built skeletons, spinners, and progress bars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#command-the-api-refused | guidance | Which built refusal notice departs from the wireframe its catalog entry chose? Open the built refused commands, with codes and fixes, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#command-that-worked | guidance | Which built success notice departs from the wireframe its catalog entry chose? Open the built confirmations, toasts, and quiet saves beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#fact-somebody-has-to-read-before-acting | guidance | Which built must-read notice departs from the wireframe its catalog entry chose? Open the built callouts, hints, and banners beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#reader-may-not-do-this | guidance | Which built forbidden view departs from the wireframe its catalog entry chose? Open the built refused pages, absent tabs, and read-only sections beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#connection-is-gone | guidance | Which built offline screen departs from the wireframe its catalog entry chose? Open the built stale banners and queued commands beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#sign-in-ran-out | guidance | Which built expired session departs from the wireframe its catalog entry chose? Open the built sign-out pages and re-auth dialogs beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#somebody-else-saved-first | guidance | Which built conflict screen departs from the wireframe its catalog entry chose? Open the built field-by-field merges and presence cues beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#work-that-runs-without-you | guidance | Which built background job departs from the wireframe its catalog entry chose? Open the built trays, job sections, and progress rows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#this-record-does-not-exist | guidance | Which built missing-record screen departs from the wireframe its catalog entry chose? Open the built not-found and gone states beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#something-went-wrong-on-our-side | guidance | Which built server-failure screen departs from the wireframe its catalog entry chose? Open the built outage pages and retrying bars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#back-office-is-down-for-a-short-while | guidance | Which built maintenance screen departs from the wireframe its catalog entry chose? Open the built countdowns and read-only windows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/feedback-and-states#too-many-tries | guidance | Which built rate-limit screen departs from the wireframe its catalog entry chose? Open the built waits, queues, and 429 pages beside the catalog entry recording the chosen option and its reason. |

@@ -2,7 +2,7 @@
 
 ## Intent
 
-Realtime updates push a change to open screens seconds after it happens, faster than polling (repeat requests) delivers at an acceptable cost. This page states when a team replaces polling with realtime transport, which transport fits which need, and which protections each connection carries: authentication, revalidation, recovery, and resource bounds. A team selects it for each use case (one operation the product offers) or journey (steps toward one goal) after measuring polling against the update target, so the product pays for open connections only where a measured target requires live data.
+Realtime updates push a change to open screens seconds after it happens, faster than polling delivers at an acceptable cost. This page states when a team replaces polling with realtime transport, which transport fits which need, and which protections each connection carries: authentication, revalidation, recovery, and resource bounds. A team selects it for each use case or journey after measuring polling against the update target, so the product pays for open connections only where a measured target requires live data.
 
 ## Activation
 
@@ -12,75 +12,75 @@ Applicable specification kinds: `use-case`, `journey`.
 
 A use case or journey selects this extension after the team measures polling against the update target: the polling interval, the visible delay, the request cost, and the required update speed. The selection also names the accepted cost of disconnects and missed messages: how the client recovers when the connection drops or a notification never arrives.
 
-## Baseline relationship
+## Baseline Relationship
 
 This extension replaces no baseline provision. One-way notifications travel over server-sent events, which need no added package because the platform ships them.
 
-Selecting `realtime` switches on the Event and Limit record types: each notification carries an Event record, and each resource bound lives in a Limit record.
+Selecting `realtime` switches on the event and limit record types: each notification carries an event record, and each resource bound lives in a limit record.
 
 ## Standards
 
-### Record realtime need
+### Record Realtime Need
 
 **Statement:** A realtime use case MUST document polling behavior, measured cost, update latency, expected connections, and recovery behavior.
 
-**Rationale:** Open connections cost memory, CPU, and operating attention on every host, so the team writes down what polling costs, what the update target requires, and how many connections to expect before choosing transport. The use-case page carries that record with its owner and status, so a later reader sees which measurements justified the choice.
+**Rationale:** Open connections cost memory, CPU, and operating attention on every host, so the team writes down what polling costs, what the update target requires, and how many connections to expect before choosing transport. The use case page carries that record with its owner and status, so a later reader sees which measurements justified the choice.
 
-### Reject cosmetic realtime adoption
+### Reject Cosmetic Realtime Adoption
 
 **Statement:** A product MUST NOT activate realtime only to make an interface feel immediate.
 
 **Rationale:** Realtime transport that serves only a feeling of immediacy spends connection capacity and operating attention without moving any target. The extension asks for a measured update requirement first, so polling stays where polling suffices.
 
-### Use server-sent events for notifications
+### Use Server-Sent Events for Notifications
 
 **Statement:** A one-way server notification use case MUST use server-sent events.
 
 **Rationale:** A notification that flows one way, from server to browser, needs no bidirectional channel with groups and fallback. Server-sent events carry it over plain HTTP, which passes through proxies and firewalls without extra negotiation.
 
-### Use SignalR for interactive messaging
+### Use SignalR for Interactive Messaging
 
 **Statement:** A use case requiring bidirectional messages, server groups, or transport fallback MUST use SignalR.
 
 **Rationale:** Two-way messages, server-managed groups, and transport fallback need a channel built for interaction, which one-way events cannot provide. SignalR supplies all three, so the use case that needs them takes SignalR instead of stretching events past their shape.
 
-### Record transport support
+### Record Transport Support
 
 **Statement:** A realtime use case MUST record its transport choice and expected hosted-platform support.
 
 **Rationale:** Hosted platforms limit connection duration, idle timeouts, and transport upgrades in ways that differ per host. Recording the transport choice with its expected platform support surfaces the mismatch before deployment instead of during the first long-lived connection.
 
-### Authenticate and authorize subscriptions
+### Authenticate and Authorize Subscriptions
 
 **Statement:** A realtime server MUST authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription.
 
 **Rationale:** Connecting proves who the caller is; it says nothing about which user's, tenant's, or resource's updates the caller may hear. Each user-, tenant-, or resource-scoped subscription checks its own authorization, so one valid connection cannot listen in on another tenant's data.
 
-### Revalidate long-lived access
+### Revalidate Long-Lived Access
 
 **Statement:** A realtime server MUST revalidate long-lived access according to token and session lifetime.
 
 **Rationale:** A connection can outlive the grant that opened it: tokens expire, roles change, sessions end. Revalidating access on token and session lifetime closes the connection whose grant died instead of streaming updates to a caller who no longer qualifies.
 
-### Reconnect and refresh authoritative state
+### Reconnect and Refresh Authoritative State
 
 **Statement:** A realtime client MUST reconnect with bounded backoff and refresh authoritative state after a connection gap.
 
 **Rationale:** Connections drop, and a notification sent during the gap never arrives. Bounded backoff reconnects without hammering the server, and refreshing authoritative state after the gap replaces whatever the missed notifications would have changed.
 
-### Tolerate notification ordering differences
+### Tolerate Notification Ordering Differences
 
 **Statement:** A realtime client MUST safely handle duplicate and out-of-order notifications.
 
 **Rationale:** The transport can deliver a notification twice or deliver two of them out of order. A client that applies each notification as an absolute update corrupts its state on the first duplicate; a client built for repeats and reordering converges on the truth either way.
 
-### Bound realtime resources
+### Bound Realtime Resources
 
-**Statement:** A realtime deployment MUST set four Limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
+**Statement:** A realtime deployment MUST set four limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
 
-**Rationale:** Each open connection holds memory, each message costs CPU, and a flood of either starves the host. The deployment sets four bounds as Limit records - concurrent connections per host, receive message size, parallel invocations per connection, and client timeout - with each value drawn from the deployment's own connection count and message size and the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
+**Rationale:** Each open connection holds memory, each message costs CPU, and a flood of either starves the host. The deployment sets four bounds as limit records - concurrent connections per host, receive message size, parallel invocations per connection, and client timeout - with each value drawn from the deployment's own connection count and message size and the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
 
-### Reject unbounded slow-client buffering
+### Reject Unbounded Slow-Client Buffering
 
 **Statement:** A realtime server MUST NOT buffer an unbounded stream for a slow client.
 
@@ -88,40 +88,44 @@ Selecting `realtime` switches on the Event and Limit record types: each notifica
 
 ## Conventions
 
-### Place realtime code at outer boundaries
+### Place Realtime Code at Outer Boundaries
 
 **Default:** Keep hubs or endpoints in WebApi, publication adapters in Infrastructure, and browser connections under `lib/realtime/`.
 
-**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+**Replacement:** A consumer records a realtime-placement convention naming where its transport code lives.
 
 **Rationale:** Hubs, endpoints, publication adapters, and browser connections deal in transport and provider detail, not business rules. Keeping them at the outer boundaries leaves business features owning only the narrow functions they call.
 
-### Subscribe through narrow functions
+### Subscribe Through Narrow Functions
 
-**Default:** Let feature modules subscribe through narrow operation-specific functions.
+**Default:** Let feature modules subscribe through narrow use-case-specific functions.
 
-**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+**Replacement:** A consumer records a realtime-subscription convention naming how its features subscribe.
 
-**Rationale:** A feature that touches the raw connection spreads subscription strings and payload shapes through business code. Narrow operation-specific functions show each subscription's inputs and effects beside the feature that owns them.
+**Rationale:** A feature that touches the raw connection spreads subscription strings and payload shapes through business code. Narrow use-case-specific functions show each subscription's inputs and effects beside the feature that owns them.
 
 ## Dependencies
 
-- Selecting SignalR adds `@microsoft/signalr`. The project records a Decision for the package and pins it in the manifest.
+Packages: Selecting SignalR adds `@microsoft/signalr`. The project records a decision for the package and pins it in the manifest.
+
+Related extensions: None.
+
+Guides: None.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/realtime#record-realtime-need | guidance | Does the use-case page record polling, cost, target latency, connections, and recovery? |
-| litespec/ext/realtime#reject-cosmetic-realtime-adoption | guidance | Does the realtime decision cite a measurable update requirement? |
-| litespec/ext/realtime#use-server-sent-events-for-notifications | guidance | Does each one-way notification use the server-sent events boundary? |
-| litespec/ext/realtime#use-signalr-for-interactive-messaging | guidance | Does each bidirectional use case use SignalR capabilities? |
-| litespec/ext/realtime#record-transport-support | guidance | Does the use-case page record the transport and hosting support? |
-| litespec/ext/realtime#authenticate-and-authorize-subscriptions | guidance | Do anonymous, unrelated, owner, and tenant-scoped connections meet the authorization rule? |
-| litespec/ext/realtime#revalidate-long-lived-access | guidance | Does an expired session or token lose access? |
-| litespec/ext/realtime#reconnect-and-refresh-authoritative-state | guidance | Does the client reconnect with bounded backoff and refresh authoritative state? |
-| litespec/ext/realtime#tolerate-notification-ordering-differences | guidance | Do duplicate and reordered notifications leave client state correct? |
-| litespec/ext/realtime#bound-realtime-resources | guidance | Does each of the four bounds live as a Limit record with its value? |
-| litespec/ext/realtime#reject-unbounded-slow-client-buffering | guidance | Is slow-client buffering bounded with controlled backpressure? |
-| litespec/ext/realtime#place-realtime-code-at-outer-boundaries | guidance | Does realtime transport code sit at the documented boundaries or a recorded Exception? |
-| litespec/ext/realtime#subscribe-through-narrow-functions | guidance | Do features subscribe through operation-specific functions or a recorded Exception? |
+| litespec/ext/realtime#record-realtime-need | guidance | The use case page holds the polling record, measured cost, update target, expected connections, and recovery behavior. |
+| litespec/ext/realtime#reject-cosmetic-realtime-adoption | guidance | The realtime decision cites a measured update requirement. |
+| litespec/ext/realtime#use-server-sent-events-for-notifications | guidance | Each one-way notification travels over the server-sent events boundary in code. |
+| litespec/ext/realtime#use-signalr-for-interactive-messaging | guidance | Each bidirectional use case runs on SignalR groups, messages, or fallback in code. |
+| litespec/ext/realtime#record-transport-support | guidance | The use case page names its transport choice with the expected hosted-platform support. |
+| litespec/ext/realtime#authenticate-and-authorize-subscriptions | guidance | The connection tests show authenticated connections only, with each scoped subscription authorized. |
+| litespec/ext/realtime#revalidate-long-lived-access | guidance | A connection whose token or session expired loses access in the revalidation tests. |
+| litespec/ext/realtime#reconnect-and-refresh-authoritative-state | guidance | The client reconnects with bounded backoff and refreshes authoritative state after a gap in the recovery tests. |
+| litespec/ext/realtime#tolerate-notification-ordering-differences | guidance | Duplicate and reordered notifications leave client state correct in the client tests. |
+| litespec/ext/realtime#bound-realtime-resources | guidance | The four deployment bounds live as limit records with their values in `docs/operations/limits.md`. |
+| litespec/ext/realtime#reject-unbounded-slow-client-buffering | guidance | Slow-client buffering in the server code is bounded with backpressure. |
+| litespec/ext/realtime#place-realtime-code-at-outer-boundaries | guidance | Realtime transport code sits at the documented boundaries, or the realtime-placement convention names where it lives. |
+| litespec/ext/realtime#subscribe-through-narrow-functions | guidance | Features subscribe through use-case-specific functions, or the realtime-subscription convention names how they subscribe. |

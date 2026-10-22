@@ -43,7 +43,7 @@ What each field means and what reads it:
 
 - `$schema` holds the editor hint that points at the project schema. Only the editor reads it.
 - `project` names the project and its identifier sources. `litespec consumer` checks it against the schema. See the `project` object below.
-- `size` is `small` or `large`. Small requires the core record types with Architecture and Integration test projects, and large adds problems, features, journeys, and scenarios with the Acceptance project. `litespec consumer` checks the value, and the model builder sizes the record set it expects.
+- `size` is `small` or `large`. Small requires the core record types with Architecture and Integration test projects, and large adds goals, problems, features, journeys, and scenarios with the Acceptance project. `litespec consumer` checks the value, and the model builder sizes the record set it expects.
 - `shape` is `server` or `client-only`. A server names exactly one backend stack, and a client-only project names no backend stack. `litespec init` writes it from the preset, `litespec consumer` checks the backend count, and the model builder applies the shape.
 - `stacks` lists the selected stack ids: `dotnet` for the backend and one entry per frontend from its platform. `litespec consumer` refuses an id the pinned release does not ship.
 - `optionalTypes` lists the extra record types written beside what the size requires: `goal`, `constraint`, `research`, `external-system`, `limit`, and `runbook`. The model builder reads the list when it collects records.

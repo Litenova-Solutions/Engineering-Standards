@@ -33,7 +33,7 @@ internal static class Descriptors
     private static readonly Provision ImplementationStyle = Provision.Of("backend/dotnet/naming", "keep-implementation-style-consistent");
     private static readonly Provision ModuleFolders = Provision.Of("backend/domain", "organize-a-module-by-aggregate-and-concept");
     private static readonly Provision RoleSuffixes = Provision.Of("workspace/naming", "use-architectural-suffixes");
-    private static readonly Provision ScenarioProof = Provision.Of("backend/dotnet/testing", "prove-each-case-with-a-test-that-calls-its-use-case");
+    private static readonly Provision ScenarioProof = Provision.Of("backend/dotnet/testing", "prove-each-scenario-with-a-test-that-calls-its-use-case");
 
     public static readonly DiagnosticDescriptor LS1001 = Create("LS1001", DomainCategory, DomainOuterLayers,
         "Domain references an outer-layer concern",

@@ -25,7 +25,7 @@ public sealed partial class StandardsValidatorTests
 
         Enable this extension when the sample capability is required.
 
-        ## Baseline relationship
+        ## Baseline Relationship
 
         This extension replaces no baseline provision.
 

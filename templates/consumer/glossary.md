@@ -8,7 +8,7 @@
   "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# <Project> glossary
+# <Project> Glossary
 
 This page renders from the Term entries in `docs/glossary.json`. Edit terms there, never here.
 

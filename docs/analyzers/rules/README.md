@@ -4,7 +4,7 @@
 
 This index lists the 25 analyzer rules, one reference page per rule, grouped by the projects each rule runs in. A developer who meets an error opens the page with the same ID to see what the rule reports, where the error sits, and how to fix the code. Each entry carries a 1-line summary of what the rule reports.
 
-## Domain rules
+## Domain Rules
 
 Rules `LS1001` to `LS1013` run in Domain only.
 
@@ -22,7 +22,7 @@ Rules `LS1001` to `LS1013` run in Domain only.
 - [LS1012: Identifier Is Not a Strongly Typed Value](ls1012.md): reports an identifier that is not a strongly typed value.
 - [LS1013: Domain Event Sits Outside the Events Folder](ls1013.md): reports a domain event outside the `Events` folder.
 
-## Outer-layer rules
+## Outer-Layer Rules
 
 Rules `LS2001` to `LS2007` run in Application, Infrastructure, or WebApi, as each page states.
 
@@ -34,7 +34,7 @@ Rules `LS2001` to `LS2007` run in Application, Infrastructure, or WebApi, as eac
 - [LS2006: Endpoint Name Lacks Its Suffix](ls2006.md): reports an endpoint whose name does not end in `Endpoint`.
 - [LS2007: Reaction or Job Name Hides Its Kind](ls2007.md): reports a reaction or job whose name hides its kind.
 
-## Naming and style rules
+## Naming and Style Rules
 
 Rules `LS3001` to `LS3004` run in the five production projects.
 
@@ -43,7 +43,7 @@ Rules `LS3001` to `LS3004` run in the five production projects.
 - [LS3003: File Does Not Match Its Primary Type](ls3003.md): reports a file that does not match its primary type.
 - [LS3004: Concrete Class Is Not Sealed](ls3004.md): reports a concrete leaf class that is not sealed.
 
-## Test rules
+## Test Rules
 
 Rule `LS4001` runs in test projects only.
 

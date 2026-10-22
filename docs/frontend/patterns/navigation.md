@@ -2,27 +2,27 @@
 
 ## Intent
 
-The product frame around every screen lets a reader move between areas and know where they are. This page holds the patterns for that frame: sidebar, breadcrumb, header bar, tabs, icons, language and theme, command palette, account menu, notifications, help, workspace switching, and phone navigation. A team building the product frame starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared product frame keeps every page reachable by address and marked in place, so a reader never loses where they are.
+This page holds the patterns for the product frame around every screen, which lets a reader move between areas and know where they are: sidebar, breadcrumb, header bar, tabs, icons, language and theme, command palette, account menu, notifications, help, workspace switching, and phone navigation. A team building the product frame starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared product frame keeps every page reachable by address and marked in place, so a reader never loses where they are.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about moving through the product, such as how the sidebar shows seven areas. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply console: seven areas from Home to Settings, order SO-1042 for Maria Garcia, and the Amsterdam warehouse. The frame marks the current area, and every page carries its own address. The Standards section states the two rules every option keeps: the navigation marks the section holding the current page, and every page opens directly from its own URL.
 
 ## Standards
 
-### Mark the current section
+### Mark the Current Section
 
 **Statement:** The navigation MUST mark the section that holds the current page.
 
 **Rationale:** A marked section tells a reader who arrived from a link, a notification, or a search which area holds the open page. Without it, every page looks like the start, and the reader reopens the sidebar to learn where they already are.
 
-### Give every page its own address
+### Give Every Page Its Own Address
 
 **Statement:** Every page MUST have its own URL that opens it directly.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply console: seven areas from Home to 
 
 A count beside every area reports status the reader did not ask for. Never ship the flat list of every page. Over a hundred entries is an index, not a map, and it belongs in the command palette.
 
-#### `grouped-areas-with-expandable-sub-items`: Grouped areas with expandable sub-items
+#### `grouped-areas-with-expandable-sub-items`: Grouped Areas with Expandable Sub-Items
 
 ```wireframe
 page
@@ -74,7 +74,7 @@ page
 
 **Cost:** Thirty settings routes in one group means a group longer than the screen. Settings stays open on every settings page, so it never collapses.
 
-#### `two-levels-with-the-group-showing-a-live-count`: Two levels, with the group showing a live count
+#### `two-levels-with-the-group-showing-a-live-count`: Two Levels, with the Group Showing a Live Count
 
 ```wireframe
 page
@@ -106,7 +106,7 @@ page
 
 **Cost:** A count beside every area is a claim on every read. An area with a zero count looks finished rather than empty.
 
-#### `a-flat-list-with-a-search-box`: A flat list with a search box
+#### `a-flat-list-with-a-search-box`: A Flat List with a Search Box
 
 ```wireframe
 page
@@ -135,7 +135,7 @@ page
 
 **Cost:** Thirty settings routes is the reason a tree exists at all. A flat list of over a hundred entries is a wall, and the sidebar stops being a map.
 
-#### `a-command-palette-for-the-whole-product`: A command palette for the whole product
+#### `a-command-palette-for-the-whole-product`: A Command Palette for the Whole Product
 
 ```wireframe
 page
@@ -169,7 +169,7 @@ page
 
 **Cost:** It only works if the reader knows the key exists. It cannot be the only way to anything. WCAG 2.1.1 requires every function to work from the keyboard. A hidden palette is a discoverability problem rather than an accessibility one.
 
-#### `the-sidebar-as-a-page-opened-over-the-content`: The sidebar as a page, opened over the content
+#### `the-sidebar-as-a-page-opened-over-the-content`: The Sidebar as a Page, Opened over the Content
 
 ```wireframe
 page
@@ -189,7 +189,7 @@ page
 
 **Cost:** One more navigation level on a phone on the warehouse floor. A warehouse lead holding a phone pays one extra tap at the worst time.
 
-#### `the-sidebar-as-an-accordion-with-only-one-open`: The sidebar as an accordion with only one open
+#### `the-sidebar-as-an-accordion-with-only-one-open`: The Sidebar as an Accordion with Only One Open
 
 ```wireframe
 page
@@ -217,7 +217,7 @@ page
 
 **Cost:** Fluent guidance says the indicator stays visible on a collapsed parent with a current child. A reader then looks at a closed group to see where they are.
 
-#### `recent-pages-pinned-above-the-areas`: Recent pages pinned above the areas
+#### `recent-pages-pinned-above-the-areas`: Recent Pages Pinned Above the Areas
 
 ```wireframe
 page
@@ -246,7 +246,7 @@ page
 
 **Cost:** Recents are per person, so a shared screen shows another person's trail. A recent that was archived or renamed also needs a rule for what its row says.
 
-#### `collapsed-to-an-icon-rail-on-a-narrow-screen`: Collapsed to an icon rail on a narrow screen
+#### `collapsed-to-an-icon-rail-on-a-narrow-screen`: Collapsed to an Icon Rail on a Narrow Screen
 
 ```wireframe
 page
@@ -277,7 +277,7 @@ page
 
 **Reference:** Linear
 
-#### `the-sidebar-as-an-off-canvas-sheet-on-a-phone`: The sidebar as an off-canvas sheet on a phone
+#### `the-sidebar-as-an-off-canvas-sheet-on-a-phone`: The Sidebar as an Off-Canvas Sheet on a Phone
 
 ```wireframe
 page
@@ -318,7 +318,7 @@ page
 
 Never ship no trail at all: on a phone the sidebar is closed, so the trail is the only statement of where a record sits.
 
-#### `the-trail-as-the-parent-chain`: The trail as the parent chain
+#### `the-trail-as-the-parent-chain`: The Trail as the Parent Chain
 
 ```wireframe
 page
@@ -338,7 +338,7 @@ page
 
 **Cost:** Four levels on a price tier, and Fluent's no-wrap rule pushes the last item off a phone unless the trail scrolls.
 
-#### `a-trail-that-truncates-from-the-left`: A trail that truncates from the left
+#### `a-trail-that-truncates-from-the-left`: A Trail That Truncates from the Left
 
 ```wireframe
 page
@@ -362,7 +362,7 @@ page
 
 **Reference:** Fluent
 
-#### `no-trail-because-the-sidebar-already-says-it`: No trail, because the sidebar already says it
+#### `no-trail-because-the-sidebar-already-says-it`: No Trail, Because the Sidebar Already Says It
 
 ```wireframe
 page
@@ -388,7 +388,7 @@ page
 
 **Cost:** It fails WCAG 2.4.8 in the practical sense on a phone. The sidebar is closed there, so no evidence shows where a record sits in the tree. GOV.UK's own rule is that the trail appears when a parent page exists.
 
-#### `a-trail-with-the-state-on-the-parent-link`: A trail with the state on the parent link
+#### `a-trail-with-the-state-on-the-parent-link`: A Trail with the State on the Parent Link
 
 ```wireframe
 page
@@ -407,7 +407,7 @@ page
 
 **Cost:** Fluent truncates a trail item at 80 characters. A product name plus a state badge plus an ellipsis is three things in eighty characters. The breadcrumb stops being a navigation control.
 
-#### `a-trail-with-the-area-s-other-pages-beside-it`: A trail with the area's other pages beside it
+#### `a-trail-with-the-area-s-other-pages-beside-it`: A Trail with the Area's Other Pages Beside It
 
 ```wireframe
 page
@@ -427,7 +427,7 @@ page
 
 **Cost:** Two navigation mechanisms for the same tree: sibling pages of one area already have their own navigation, and this adds a second beside it.
 
-#### `a-trail-that-scrolls-sideways-rather-than-truncating`: A trail that scrolls sideways rather than truncating
+#### `a-trail-that-scrolls-sideways-rather-than-truncating`: A Trail That Scrolls Sideways Rather Than Truncating
 
 ```wireframe
 page
@@ -446,7 +446,7 @@ page
 
 **Reference:** Fluent
 
-#### `back-to-the-parent-on-a-phone`: Back to the parent on a phone
+#### `back-to-the-parent-on-a-phone`: Back to the Parent on a Phone
 
 ```wireframe
 page
@@ -467,7 +467,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-current-title-as-a-sibling-menu`: The current title as a sibling menu
+#### `the-current-title-as-a-sibling-menu`: The Current Title as a Sibling Menu
 
 ```wireframe
 page
@@ -494,7 +494,7 @@ page
 
 **Reference:** Notion
 
-### Header bar
+### Header Bar
 
 **Question:** The bar carries the page title, a sidebar toggle, a help control, and the theme. It does not carry the company name. It does not say who is acting. It says nothing about location beyond the page title.
 
@@ -506,7 +506,7 @@ page
 
 The deployment identity band is the runner-up for sandbox deployments only, where naming the deployment on every page avoids confusion with production. Never ship no bar at all: burying the theme and language in the sidebar foot turns a visible control into three taps.
 
-#### `the-bar-with-the-company-name`: The bar with the company name
+#### `the-bar-with-the-company-name`: The Bar with the Company Name
 
 ```wireframe
 page
@@ -529,7 +529,7 @@ page
 
 **Cost:** Four things in a bar above the content on every page, and a brand mark that repeats what the sidebar already says.
 
-#### `the-bar-as-the-breadcrumb-replacing-the-trail`: The bar as the breadcrumb, replacing the trail
+#### `the-bar-as-the-breadcrumb-replacing-the-trail`: The Bar as the Breadcrumb, Replacing the Trail
 
 ```wireframe
 page
@@ -552,7 +552,7 @@ page
 
 **Cost:** The bar is present on every page including the list pages where there is no chain, so the bar has two different shapes. Fluent treats the breadcrumb as a page-level element below the header.
 
-#### `a-bar-that-carries-nothing-but-the-frame`: A bar that carries nothing but the frame
+#### `a-bar-that-carries-nothing-but-the-frame`: A Bar That Carries Nothing but the Frame
 
 ```wireframe
 page
@@ -573,7 +573,7 @@ page
 
 **Cost:** The reader loses the company name and who they are acting as, which are the two facts a support conversation needs before anything else.
 
-#### `the-bar-with-a-persona-switcher-which-is-the-same-as-being-s`: The bar with a persona switcher, which is the same as being somebody else
+#### `the-bar-with-a-persona-switcher-which-is-the-same-as-being-s`: The Bar with a Persona Switcher, Which Is the Same as Being Somebody Else
 
 ```wireframe
 page
@@ -600,7 +600,7 @@ page
 
 **Cost:** On a production deployment with one real account there is nothing to switch to. A switcher that always lists one person is a control that cannot do anything.
 
-#### `the-bar-with-the-deployment-identity`: The bar with the deployment identity
+#### `the-bar-with-the-deployment-identity`: The Bar with the Deployment Identity
 
 ```wireframe
 page
@@ -622,7 +622,7 @@ page
 
 **Cost:** A deployment identity in the bar competes with the page title for space. A reader who has seen it fifty times stops seeing it.
 
-#### `no-bar-at-all-with-the-theme-and-language-in-the-sidebar-foo`: No bar at all, with the theme and language in the sidebar foot
+#### `no-bar-at-all-with-the-theme-and-language-in-the-sidebar-foo`: No Bar at All, with the Theme and Language in the Sidebar Foot
 
 ```wireframe
 page
@@ -656,7 +656,7 @@ page
 
 **Cost:** Three global controls become three taps on every visit, and removing the header landmark is a structural change rather than a preference.
 
-#### `search-inbox-and-account-in-the-bar`: Search, inbox and account in the bar
+#### `search-inbox-and-account-in-the-bar`: Search, Inbox and Account in the Bar
 
 ```wireframe
 page
@@ -680,7 +680,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-record-name-and-state-in-the-bar-on-a-record-page`: The record name and state in the bar on a record page
+#### `the-record-name-and-state-in-the-bar-on-a-record-page`: The Record Name and State in the Bar on a Record Page
 
 ```wireframe
 page
@@ -707,7 +707,7 @@ page
 
 **Reference:** Linear
 
-### Tabs within a page
+### Tabs Within a Page
 
 **Question:** Sibling pages of one area sit in a sub-page navigation. A second tab row uses a subordinate level. Tab sets stay small, at about six. The active tab belongs in the URL.
 
@@ -719,7 +719,7 @@ page
 
 Tabs as real links are the runner-up and the most defensible alternative. Middle click and the back button then behave as expected. Prefer them where each facet is its own route. Never ship the segmented control for facets: three segments is its ceiling and it cannot carry counts or overflow.
 
-#### `the-shipped-tab-row-with-the-tab-in-the-url`: The shipped tab row, with the tab in the URL
+#### `the-shipped-tab-row-with-the-tab-in-the-url`: The Shipped Tab Row, with the Tab in the URL
 
 ```wireframe
 page
@@ -739,7 +739,7 @@ page
 
 **Cost:** A reader cannot compare two facets, and every new backend facet adds a tab. Carbon and GOV.UK both cap tabs at about six for this reason.
 
-#### `tabs-carrying-counts`: Tabs carrying counts
+#### `tabs-carrying-counts`: Tabs Carrying Counts
 
 ```wireframe
 page
@@ -759,7 +759,7 @@ page
 
 **Cost:** A count of 0 invites a click that leads to an empty state. A count has to be a read per tab rather than a number in a template.
 
-#### `tabs-below-the-summary-as-a-sub-page-navigation`: Tabs below the summary, as a sub-page navigation
+#### `tabs-below-the-summary-as-a-sub-page-navigation`: Tabs Below the Summary, as a Sub-Page Navigation
 
 ```wireframe
 page
@@ -782,7 +782,7 @@ page
 
 **Cost:** The tab row is lower on the page. A reader scrolls to reach it. On a long record the facets sit below the fold.
 
-#### `tabs-as-links-so-a-middle-click-works`: Tabs as links, so a middle click works
+#### `tabs-as-links-so-a-middle-click-works`: Tabs as Links, so a Middle Click Works
 
 ```wireframe
 page
@@ -804,7 +804,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-segmented-control-instead-of-tabs`: A segmented control instead of tabs
+#### `a-segmented-control-instead-of-tabs`: A Segmented Control Instead of Tabs
 
 ```wireframe
 page
@@ -829,7 +829,7 @@ page
 
 **Reference:** Carbon
 
-#### `no-tabs-because-the-facets-are-a-checklist`: No tabs, because the facets are a checklist
+#### `no-tabs-because-the-facets-are-a-checklist`: No Tabs, Because the Facets Are a Checklist
 
 ```wireframe
 page
@@ -857,7 +857,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `overflow-tabs-in-a-more-menu`: Overflow tabs in a More menu
+#### `overflow-tabs-in-a-more-menu`: Overflow Tabs in a More Menu
 
 ```wireframe
 page
@@ -883,7 +883,7 @@ page
 
 **Reference:** GitHub Primer
 
-#### `vertical-tabs-on-a-settings-page`: Vertical tabs on a settings page
+#### `vertical-tabs-on-a-settings-page`: Vertical Tabs on a Settings Page
 
 ```wireframe
 page
@@ -911,7 +911,7 @@ page
 
 **Reference:** Stripe
 
-### Icons in the frame
+### Icons in the Frame
 
 **Question:** Seven area icons, a sidebar toggle, a help mark, and the theme. Every one of these is a named component with an accessible label, never a raw element.
 
@@ -923,7 +923,7 @@ page
 
 Words-only areas with icon-only actions are the runner-up where icon budget is short, with each action carrying a tooltip and an accessible name. Never ship state-carrying icons in the frame: theme and language as bare glyphs force the reader to hover both to tell them apart.
 
-#### `an-icon-beside-every-label`: An icon beside every label
+#### `an-icon-beside-every-label`: An Icon Beside Every Label
 
 ```wireframe
 page
@@ -946,7 +946,7 @@ page
 
 **Cost:** Seven icons is seven drawings to keep consistent and to give a name to. Carbon's tab guidance refuses icons in tab labels for the same reason.
 
-#### `words-only-no-icons`: Words only, no icons
+#### `words-only-no-icons`: Words Only, No Icons
 
 ```wireframe
 page
@@ -974,7 +974,7 @@ page
 
 **Cost:** Seven areas of the same weight in the same style is a wall of text, and the eye has nothing to catch on. This is the shape that needs a bold current item to work.
 
-#### `icons-with-labels-and-the-label-hidden-on-a-phone`: Icons with labels, and the label hidden on a phone
+#### `icons-with-labels-and-the-label-hidden-on-a-phone`: Icons with Labels, and the Label Hidden on a Phone
 
 ```wireframe
 page
@@ -995,7 +995,7 @@ page
 
 **Cost:** An icon-only sidebar on a phone is seven drawings with no labels, which is the case Carbon refuses in tab labels. It works only if the phone also keeps the labels somewhere.
 
-#### `a-section-of-the-sidebar-with-a-heading`: A section of the sidebar with a heading
+#### `a-section-of-the-sidebar-with-a-heading`: A Section of the Sidebar with a Heading
 
 ```wireframe
 page
@@ -1025,7 +1025,7 @@ page
 
 **Cost:** Grouping an area tree by job means a reader decides which group holds an area. Grouping by object is the convention everywhere else in the product.
 
-#### `icons-only-for-the-actions-words-only-for-the-areas`: Icons only for the actions, words only for the areas
+#### `icons-only-for-the-actions-words-only-for-the-areas`: Icons Only for the Actions, Words Only for the Areas
 
 ```wireframe
 page
@@ -1056,7 +1056,7 @@ page
 
 **Cost:** An action that has to be learned has to be hovered. Material's rule allows one action per notification and no Dismiss. That is the same economy applied to a button.
 
-#### `icons-that-carry-a-state-as-well-as-a-meaning`: Icons that carry a state as well as a meaning
+#### `icons-that-carry-a-state-as-well-as-a-meaning`: Icons That Carry a State as Well as a Meaning
 
 ```wireframe
 page
@@ -1078,7 +1078,7 @@ page
 
 **Cost:** Theme and language are two icons with only conventional meanings. A reader who has not used one cannot tell them apart without hovering both.
 
-#### `the-current-item-with-a-left-indicator-bar`: The current item with a left indicator bar
+#### `the-current-item-with-a-left-indicator-bar`: The Current Item with a Left Indicator Bar
 
 ```wireframe
 page
@@ -1107,7 +1107,7 @@ page
 
 **Reference:** VS Code
 
-#### `lucide-icons-at-one-size-from-one-set`: Lucide icons at one size, from one set
+#### `lucide-icons-at-one-size-from-one-set`: Lucide Icons at One Size, from One Set
 
 ```wireframe
 page
@@ -1133,7 +1133,7 @@ page
 
 **Reference:** Lucide
 
-### Language and theme
+### Language and Theme
 
 **Question:** Two switches change nothing about the data. They are the most error-prone controls on the page. An explicit choice is preferred to the account default. A missing translation falls back to the other language.
 
@@ -1145,7 +1145,7 @@ page
 
 The account menu is the runner-up for language only, since language rarely changes and the menu groups it with the account it belongs to. Never ship no switch at all. One language is a commercial decision about which companies the product serves. It is not a UI simplification. The product already serves companies in two languages.
 
-#### `both-switches-in-the-header-each-showing-its-value`: Both switches in the header, each showing its value
+#### `both-switches-in-the-header-each-showing-its-value`: Both Switches in the Header, Each Showing Its Value
 
 ```wireframe
 page
@@ -1166,7 +1166,7 @@ page
 
 **Cost:** Two text buttons in a header of text, and a reader who wants to change the language twice a day reads 'EN' as decoration.
 
-#### `both-switches-in-the-account-menu`: Both switches in the account menu
+#### `both-switches-in-the-account-menu`: Both Switches in the Account Menu
 
 ```wireframe
 page
@@ -1193,7 +1193,7 @@ page
 
 **Cost:** Two taps for a reader who only wants dark at the end of a shift. The theme is not something a reader opens an account menu to find.
 
-#### `the-theme-following-the-system-with-an-override`: The theme following the system, with an override
+#### `the-theme-following-the-system-with-an-override`: The Theme Following the System, with an Override
 
 ```wireframe
 page
@@ -1214,7 +1214,7 @@ page
 
 **Cost:** A reader whose system is dark gets a dark console without asking. That is the correct behavior. A company filming a screen for a customer then gets a dark screenshot.
 
-#### `a-language-choice-made-once-on-the-account`: A language choice made once, on the account
+#### `a-language-choice-made-once-on-the-account`: A Language Choice Made Once, on the Account
 
 ```wireframe
 page
@@ -1233,7 +1233,7 @@ page
 
 **Cost:** A company whose colleague changes the account language changes it for everyone. And a reader who cannot find the switch cannot say they do not speak it.
 
-#### `the-theme-in-the-sidebar-foot-with-the-language`: The theme in the sidebar foot, with the language
+#### `the-theme-in-the-sidebar-foot-with-the-language`: The Theme in the Sidebar Foot, with the Language
 
 ```wireframe
 page
@@ -1263,7 +1263,7 @@ page
 
 **Cost:** The foot of a 900-pixel sidebar is a long way from the top of the page. On a phone the sidebar is a page the reader opens to reach either control.
 
-#### `no-switch-at-all-because-the-company-is-in-one-country`: No switch at all, because the company is in one country
+#### `no-switch-at-all-because-the-company-is-in-one-country`: No Switch at All, Because the Company Is in One Country
 
 ```wireframe
 page
@@ -1283,7 +1283,7 @@ page
 
 **Cost:** The product already serves companies in two languages. One language is a real commercial decision, not a UI one.
 
-#### `theme-on-the-device-language-on-the-account`: Theme on the device, language on the account
+#### `theme-on-the-device-language-on-the-account`: Theme on the Device, Language on the Account
 
 ```wireframe
 page
@@ -1310,7 +1310,7 @@ page
 
 **Reference:** Vercel
 
-#### `the-browser-language-offered-once`: The browser language offered once
+#### `the-browser-language-offered-once`: The Browser Language Offered Once
 
 ```wireframe
 page
@@ -1333,7 +1333,7 @@ page
 
 **Reference:** Atlassian
 
-### Command palette
+### Command Palette
 
 **Question:** An operations manager working a list often needs one record or one command and then the list again. The palette jumps straight to the order for Garcia Interiors. It runs the next step from the keyboard, so the reader never loses the page they were working.
 
@@ -1347,7 +1347,7 @@ Recent items first is the runner-up. It fits warehouse and support work that mov
 
 Never ship command verbs with a preview as the default palette. Every verb becomes a second path to a use case. Each one needs its own permission and refusal wording to keep.
 
-#### `cmd-k-dialog-with-grouped-results`: Cmd+K dialog with grouped results
+#### `cmd-k-dialog-with-grouped-results`: Cmd+K Dialog with Grouped Results
 
 ```wireframe
 page
@@ -1370,7 +1370,7 @@ page
 
 **Cost:** Grouped results compete for the same short list, so a page the reader wants can sit below records they do not.
 
-#### `search-scoped-to-current-area`: Search scoped to current area
+#### `search-scoped-to-current-area`: Search Scoped to Current Area
 
 ```wireframe
 page
@@ -1391,7 +1391,7 @@ page
 
 **Cost:** A scoped default hides matches elsewhere, so a reader who mistakes the scope concludes a record is missing.
 
-#### `recent-items-first`: Recent items first
+#### `recent-items-first`: Recent Items First
 
 ```wireframe
 page
@@ -1414,7 +1414,7 @@ page
 
 **Cost:** Recency is personal state on a shared machine, so the next person at the keyboard sees what the last person opened.
 
-#### `command-verbs-with-preview`: Command verbs with preview
+#### `command-verbs-with-preview`: Command Verbs with Preview
 
 ```wireframe
 page
@@ -1439,7 +1439,7 @@ page
 
 **Cost:** Every verb in the palette is a second path to a use case. Each one needs the same permission and refusal wording as its page.
 
-#### `no-results-state`: No-results state
+#### `no-results-state`: No-Results State
 
 ```wireframe
 page
@@ -1457,7 +1457,7 @@ page
 
 **Cost:** A named scope in the empty state repeats wording the dialog already shows, so the state reads twice on a narrow dialog.
 
-#### `keyboard-only-operation-with-visible-hints`: Keyboard-only operation with visible hints
+#### `keyboard-only-operation-with-visible-hints`: Keyboard-Only Operation with Visible Hints
 
 ```wireframe
 page
@@ -1477,7 +1477,7 @@ page
 
 **Cost:** Visible hints take a row of the dialog on every state, so the results list shows one fewer row than it could.
 
-#### `a-verb-first-then-the-record`: A verb first, then the record
+#### `a-verb-first-then-the-record`: A Verb First, Then the Record
 
 ```wireframe
 page
@@ -1501,7 +1501,7 @@ page
 
 **Reference:** Raycast
 
-#### `the-palette-as-a-bottom-sheet-on-a-phone`: The palette as a bottom sheet on a phone
+#### `the-palette-as-a-bottom-sheet-on-a-phone`: The Palette as a Bottom Sheet on a Phone
 
 ```wireframe
 page
@@ -1523,7 +1523,7 @@ page
 
 **Reference:** Linear
 
-### Account menu
+### Account Menu
 
 **Question:** The frame names who is acting, for which company, with what access. The account sits at the foot of the sidebar with a way to switch identity beside it on a development deployment.
 
@@ -1537,7 +1537,7 @@ The sidebar foot is the runner-up, but the foot is far from the top of a long pa
 
 Never ship the bare sign-out link. An account with no page turns language, sessions, and closing into support messages.
 
-#### `the-account-in-the-sidebar-foot`: The account in the sidebar foot
+#### `the-account-in-the-sidebar-foot`: The Account in the Sidebar Foot
 
 ```wireframe
 page
@@ -1566,7 +1566,7 @@ page
 
 **Cost:** The foot of a long sidebar is far from the top of the page. On a phone the whole account hides inside the sheet. The bar says nothing about who is acting.
 
-#### `an-avatar-menu-in-the-header`: An avatar menu in the header
+#### `an-avatar-menu-in-the-header`: An Avatar Menu in the Header
 
 ```wireframe
 page
@@ -1592,7 +1592,7 @@ page
 
 **Reference:** Linear
 
-#### `the-account-as-a-page-reached-from-the-menu`: The account as a page, reached from the menu
+#### `the-account-as-a-page-reached-from-the-menu`: The Account as a Page, Reached from the Menu
 
 ```wireframe
 page
@@ -1614,7 +1614,7 @@ page
 
 **Cost:** Four pages for one account is a tree of its own, and closing an account sits two levels from anywhere. The menu has to name the right page, not the account alone.
 
-#### `the-menu-states-what-the-role-can-do`: The menu states what the role can do
+#### `the-menu-states-what-the-role-can-do`: The Menu States What the Role Can Do
 
 ```wireframe
 page
@@ -1638,7 +1638,7 @@ page
 
 **Cost:** Access stated in prose drifts from access enforced in code, so the menu has to render from the same permission read the commands check. A second source drifts from the first.
 
-#### `a-persona-switcher-on-development-only`: A persona switcher, on development only
+#### `a-persona-switcher-on-development-only`: A Persona Switcher, on Development Only
 
 ```wireframe
 page
@@ -1662,7 +1662,7 @@ page
 
 **Cost:** A switcher that ships to production lets anyone act as anyone. It stays behind the development flag with no setting to enable it elsewhere. The menu is the part that reaches production first.
 
-#### `no-menu-a-sign-out-link-in-the-foot`: No menu, a sign-out link in the foot
+#### `no-menu-a-sign-out-link-in-the-foot`: No Menu, a Sign-Out Link in the Foot
 
 ```wireframe
 page
@@ -1682,7 +1682,7 @@ page
 
 **Cost:** An account with no page has nowhere to put language, sessions, or closing, so each of those becomes a support message instead. Never ship this where more than one person administers a company.
 
-### Notification inbox
+### Notification Inbox
 
 **Question:** Refunds, disputes, invitations, and warehouse incidents all need somebody who was looking elsewhere. The console lists them under Needs attention on Home and nowhere else.
 
@@ -1696,7 +1696,7 @@ The inbox page is the runner-up for support days with dozens of items, where tri
 
 Never ship no notifications. Polling seven areas by hand is how a dispute deadline is missed.
 
-#### `needs-attention-on-the-home-page`: Needs attention on the Home page
+#### `needs-attention-on-the-home-page`: Needs Attention on the Home Page
 
 ```wireframe
 page
@@ -1714,7 +1714,7 @@ page
 
 **Cost:** Home is one page among many, so a reader working a list all day never sees it. Anything urgent waits for a visit that may not come.
 
-#### `a-bell-in-the-header-with-a-dropdown-panel`: A bell in the header with a dropdown panel
+#### `a-bell-in-the-header-with-a-dropdown-panel`: A Bell in the Header with a Dropdown Panel
 
 ```wireframe
 page
@@ -1739,7 +1739,7 @@ page
 
 **Reference:** GitHub
 
-#### `an-inbox-page-with-triage`: An inbox page with triage
+#### `an-inbox-page-with-triage`: An Inbox Page with Triage
 
 ```wireframe
 page
@@ -1760,7 +1760,7 @@ page
 
 **Reference:** Linear
 
-#### `email-for-the-urgent-home-for-the-rest`: Email for the urgent, Home for the rest
+#### `email-for-the-urgent-home-for-the-rest`: Email for the Urgent, Home for the Rest
 
 ```wireframe
 page
@@ -1779,7 +1779,7 @@ page
 
 **Reference:** Shopify
 
-#### `the-unread-first-in-a-phone-sheet`: The unread first, in a phone sheet
+#### `the-unread-first-in-a-phone-sheet`: The Unread First, in a Phone Sheet
 
 ```wireframe
 page
@@ -1801,7 +1801,7 @@ page
 
 **Reference:** Linear
 
-#### `no-notifications-at-all`: No notifications at all
+#### `no-notifications-at-all`: No Notifications at All
 
 ```wireframe
 page
@@ -1821,7 +1821,7 @@ page
 
 **Cost:** Walking seven areas by hand is how a dispute deadline is missed. Never ship this: it moves the cost of knowing from one bell to every reader, every day.
 
-### Help and support
+### Help and Support
 
 **Question:** The navigation names a help topic per page, so help can open the guide for the page on screen. The console links a help page from the sidebar.
 
@@ -1833,7 +1833,7 @@ page
 
 Never ship no help entry: a warehouse lead stuck at the dock with a queue has nowhere else to turn.
 
-#### `a-help-page-from-the-sidebar`: A help page from the sidebar
+#### `a-help-page-from-the-sidebar`: A Help Page from the Sidebar
 
 ```wireframe
 page
@@ -1855,7 +1855,7 @@ page
 
 **Cost:** An index answers the reader who knows what to ask. A reader stuck on a record has to translate the record into a search query first.
 
-#### `a-help-menu-in-the-sidebar-foot`: A help menu in the sidebar foot
+#### `a-help-menu-in-the-sidebar-foot`: A Help Menu in the Sidebar Foot
 
 ```wireframe
 page
@@ -1876,7 +1876,7 @@ page
 
 **Cost:** A menu that opens upward from the foot fights the sheet on a phone, where the foot is already inside an overlay. Three entries is also all a menu holds before it wants to be a page.
 
-#### `contextual-help-beside-the-page-it-explains`: Contextual help beside the page it explains
+#### `contextual-help-beside-the-page-it-explains`: Contextual Help Beside the Page It Explains
 
 ```wireframe
 page
@@ -1903,7 +1903,7 @@ page
 
 **Reference:** Stripe
 
-#### `help-search-inside-the-command-palette`: Help search inside the command palette
+#### `help-search-inside-the-command-palette`: Help Search Inside the Command Palette
 
 ```wireframe
 page
@@ -1927,7 +1927,7 @@ page
 
 **Reference:** Linear
 
-#### `contact-support-as-a-dialog`: Contact support as a dialog
+#### `contact-support-as-a-dialog`: Contact Support as a Dialog
 
 ```wireframe
 page
@@ -1947,7 +1947,7 @@ page
 
 **Cost:** A dialog with four fields is a small page inside a modal frame, and on a phone it wants to be a sheet. It also promises an answer without saying when, so the response line has to be honest.
 
-#### `no-help-entry-at-all`: No help entry at all
+#### `no-help-entry-at-all`: No Help Entry at All
 
 ```wireframe
 page
@@ -1972,7 +1972,7 @@ page
 
 **Cost:** A warehouse lead stuck at the dock with a queue has nowhere to turn inside the product. Never ship this: the guides are also where the refund policy the company answers for is recorded.
 
-### Workspace switcher
+### Workspace Switcher
 
 **Question:** People who run several sites think in sites: one warehouse at a time, switched between often. The console carries a warehouse's sections as tabs on the warehouse page.
 
@@ -1986,7 +1986,7 @@ The trail sibling menu is the runner-up on record pages four levels deep, where 
 
 Never ship back-to-list as the only path. It costs the most to exactly the companies with the most sites.
 
-#### `warehouse-sections-as-tabs-on-the-warehouse-page`: Warehouse sections as tabs on the warehouse page
+#### `warehouse-sections-as-tabs-on-the-warehouse-page`: Warehouse Sections as Tabs on the Warehouse Page
 
 ```wireframe
 page
@@ -2006,7 +2006,7 @@ page
 
 **Cost:** Eight tabs overflow a phone and crowd a laptop, and the row says nothing about the other sites. Sections are covered. Switching is not.
 
-#### `a-workspace-switcher-at-the-top-of-the-sidebar`: A workspace switcher at the top of the sidebar
+#### `a-workspace-switcher-at-the-top-of-the-sidebar`: A Workspace Switcher at the Top of the Sidebar
 
 ```wireframe
 page
@@ -2032,7 +2032,7 @@ page
 
 **Reference:** Vercel
 
-#### `recent-workspaces-first-in-the-palette`: Recent workspaces first in the palette
+#### `recent-workspaces-first-in-the-palette`: Recent Workspaces First in the Palette
 
 ```wireframe
 page
@@ -2057,7 +2057,7 @@ page
 
 **Reference:** Linear
 
-#### `the-workspace-level-of-the-trail-as-a-sibling-menu`: The workspace level of the trail as a sibling menu
+#### `the-workspace-level-of-the-trail-as-a-sibling-menu`: The Workspace Level of the Trail as a Sibling Menu
 
 ```wireframe
 page
@@ -2081,7 +2081,7 @@ page
 
 **Reference:** Notion
 
-#### `a-workspace-picker-sheet-on-a-phone`: A workspace picker sheet on a phone
+#### `a-workspace-picker-sheet-on-a-phone`: A Workspace Picker Sheet on a Phone
 
 ```wireframe
 page
@@ -2098,7 +2098,7 @@ page
 
 **Cost:** Dozens of sites in a sheet need a search row the sheet barely fits, and the sheet covers the site it came from. Recent sites first would shorten most visits.
 
-#### `no-switcher-back-to-the-warehouse-list`: No switcher, back to the warehouse list
+#### `no-switcher-back-to-the-warehouse-list`: No Switcher, Back to the Warehouse List
 
 ```wireframe
 page
@@ -2118,7 +2118,7 @@ page
 
 **Cost:** One click each way on every switch, paid dozens of times a day by anyone running two sites. Never ship this as the only path: it costs the most to exactly the companies with the most sites.
 
-### Phone navigation
+### Phone Navigation
 
 **Question:** Below 768 px the sidebar hides and a menu glyph shows in the bar. The question is what the glyph opens, and whether a phone wants a bottom bar instead.
 
@@ -2132,7 +2132,7 @@ The sheet with recent pages above the areas is the runner-up once recents exist,
 
 Never ship the desktop table unchanged on a phone: a warehouse lead pinching across 268 orders is a refusal to design.
 
-#### `the-sidebar-as-an-off-canvas-sheet`: The sidebar as an off-canvas sheet
+#### `the-sidebar-as-an-off-canvas-sheet`: The Sidebar as an Off-Canvas Sheet
 
 ```wireframe
 page
@@ -2162,7 +2162,7 @@ page
 
 **Reference:** shadcn
 
-#### `a-bottom-tab-bar-with-four-destinations-and-more`: A bottom tab bar with four destinations and More
+#### `a-bottom-tab-bar-with-four-destinations-and-more`: A Bottom Tab Bar with Four Destinations and More
 
 ```wireframe
 page
@@ -2188,7 +2188,7 @@ page
 
 **Reference:** GitHub
 
-#### `a-bottom-bar-for-the-areas-a-sheet-for-the-rest`: A bottom bar for the areas, a sheet for the rest
+#### `a-bottom-bar-for-the-areas-a-sheet-for-the-rest`: A Bottom Bar for the Areas, a Sheet for the Rest
 
 ```wireframe
 page
@@ -2213,7 +2213,7 @@ page
 
 **Cost:** Two navigation patterns on one screen where desktop has one, and Invoices hides behind More on the surface where a refund question arrives. The split has to be watched, not set once.
 
-#### `the-sheet-with-recent-pages-above-the-areas`: The sheet with recent pages above the areas
+#### `the-sheet-with-recent-pages-above-the-areas`: The Sheet with Recent Pages Above the Areas
 
 ```wireframe
 page
@@ -2243,7 +2243,7 @@ page
 
 **Cost:** Recents are personal state on a shared device, and a recent with a changed name needs a rule for what its row says. The areas below also start below the fold on a short phone.
 
-#### `a-segmented-control-for-sibling-pages`: A segmented control for sibling pages
+#### `a-segmented-control-for-sibling-pages`: A Segmented Control for Sibling Pages
 
 ```wireframe
 page
@@ -2264,7 +2264,7 @@ page
 
 **Reference:** iOS
 
-#### `no-phone-layout-the-desktop-table-unchanged`: No phone layout, the desktop table unchanged
+#### `no-phone-layout-the-desktop-table-unchanged`: No Phone Layout, the Desktop Table Unchanged
 
 ```wireframe
 page
@@ -2285,17 +2285,17 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/navigation#mark-the-current-section | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/navigation#give-every-page-its-own-address | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/navigation#sidebar | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#breadcrumb | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#header-bar | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#tabs-within-a-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#icons-in-the-frame | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#language-and-theme | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#command-palette | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#account-menu | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#notification-inbox | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#help-and-support | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#workspace-switcher | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/navigation#phone-navigation | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/navigation#mark-the-current-section | guidance | Which built screen fails to highlight the area holding its open page? Open three built screens reached by link, notification, and search. |
+| litespec/frontend/patterns/navigation#give-every-page-its-own-address | guidance | Which built screen cannot be opened directly from its copied link? Paste three copied addresses into a fresh tab. |
+| litespec/frontend/patterns/navigation#sidebar | guidance | Which built area list breaks from the wireframe its catalog entry chose? Open the built console frame, with its grouped areas and marked item, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#breadcrumb | guidance | Which built parent chain differs from the wireframe its catalog entry chose? Open a built four-level trail, with its truncation and parent links, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#header-bar | guidance | Which built top band breaks from the wireframe its catalog entry chose? Open the built product header, with its company name and deployment identity, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#tabs-within-a-page | guidance | Which built tab row differs from the wireframe its catalog entry chose? Open the built in-page tabs, with the active tab in the URL, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#icons-in-the-frame | guidance | Which built label or action carries an icon outside the recorded set? Open the built frame, with its labeled actions and marked current item, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#language-and-theme | guidance | Which built switch differs from the wireframe its catalog entry chose? Open the built locale and appearance controls, in the header and account menu, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#command-palette | guidance | Which built jump-to dialog breaks from the wireframe its catalog entry chose? Open the built palette, with its grouped results and recent items, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#account-menu | guidance | Which built sign-in menu differs from the wireframe its catalog entry chose? Open the built account controls, in the sidebar foot or header, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#notification-inbox | guidance | Which built attention list breaks from the wireframe its catalog entry chose? Open the built inbox and bell, with triage and unread states, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#help-and-support | guidance | Which built guidance entry differs from the wireframe its catalog entry chose? Open the built help surfaces, from sidebar entry to contextual hints, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#workspace-switcher | guidance | Which built warehouse picker breaks from the wireframe its catalog entry chose? Open the built switcher, with recent workspaces first, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/navigation#phone-navigation | guidance | Which built narrow-screen frame differs from the wireframe its catalog entry chose? Open the built phone layout, with its bottom bar or sheet, beside the catalog entry recording the chosen option and its reason. |

@@ -31,7 +31,7 @@ Model the audit record once, using the fields the extension requires in `litespe
 | `action` | Use case identity | The invoked use case | `litespec/ext/audit#state-the-action-as-use-case-identity` |
 | `category` | Closed set | Retention and review classification | `litespec/ext/audit#use-a-fixed-category-vocabulary` |
 | `outcome` | Closed set | `succeeded`, `denied`, or `failed` | `litespec/ext/audit#record-every-attempt-outcome` |
-| `failureCode` | Stable code | The refusal or failure reason | `litespec/ext/audit#record-the-failure-code-on-an-unsuccessful-attempt` |
+| `failureCode` | Stable code | The refusal or failure reason | `litespec/ext/audit#record-the-refusal-code-on-an-unsuccessful-attempt` |
 | `actorKind` | Closed set | Person, device, or named process | `litespec/ext/audit#use-a-closed-actor-set` |
 | `actorId` | Pseudonymous identifier | The acting account | `litespec/ext/audit#record-the-required-audit-fields` |
 | `actorDeviceId` | Pseudonymous identifier | The acting device | `litespec/ext/audit#use-a-closed-actor-set` |

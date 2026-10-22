@@ -2,27 +2,27 @@
 
 ## Intent
 
-Settings screens configure the company itself: the team and its roles, API keys and webhooks, spreadsheet imports, the payment account, supplier invoices, and discount codes. This page shows each screen as drawn options with a named default to build. The product owner chooses among the options when the team builds or revises a settings area. Consistent admin layouts keep powerful commands, such as granting access, rotating secrets, and paying invoices, safe to operate.
+Settings screens configure the company itself, and this page shows each screen as drawn options with a named default to build: the team and its roles, API keys and webhooks, spreadsheet imports, the payment account, supplier invoices, and discount codes. The product owner chooses among the options when the team builds or revises a settings area. Consistent admin layouts keep powerful commands, such as granting access, rotating secrets, and paying invoices, safe to operate.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about a settings screen, such as how the team page shows members and invitations. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply settings: the team with Sam Rivera as Owner, the Counter sync API key, the contacts-2026-01.csv import, the Stripe payment account, supplier invoice INV-2026-09, and discount code DESK10. On this page, the reader is the staff member using the screen. The Standards section states the two rules every option keeps: a new secret shows in full only once, and an invitation or role change shows what the role allows before it is sent.
 
 ## Standards
 
-### Show a new secret once
+### Show a New Secret Once
 
 **Statement:** A screen MUST show a newly created API key or secret in full only once, at creation.
 
 **Rationale:** A secret that stays readable on screen can be copied by anyone who later opens the page, including from a shared screen or a screenshot. Showing it once forces the person creating it to store it in a vault or environment file at once, so no later visit can leak it.
 
-### Show what a role allows before granting it
+### Show What a Role Allows Before Granting It
 
 **Statement:** An invitation or role change MUST show what the chosen role allows before it is sent.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply settings: the team with Sam Rivera
 
 ## Patterns
 
-### Team members and their roles
+### Team Members and Their Roles
 
 **Question:** The team is the staff who work for the company, and a role states what each person may do. The staff member holding the Owner role invites people, grants roles, limits some staff to one warehouse, and suspends or removes people. Everyone else sees names and roles, and nothing more.
 
@@ -40,7 +40,7 @@ The drawings on this page use the Acme Supply settings: the team with Sam Rivera
 
 **Rationale:** The members table with invitations below is the default because it answers three questions in one scan: who is in, who is invited, and what each may do. The permission matrix is the runner-up; prefer it on the role page, where capabilities are compared across roles. Never ship the matrix as the team page, because the team page manages people, and a capability grid hides who holds what.
 
-#### `members-with-the-invitations-below`: Members with the invitations below
+#### `members-with-the-invitations-below`: Members with the Invitations Below
 
 ```wireframe
 page
@@ -63,7 +63,7 @@ page
 
 **Reference:** Linear
 
-#### `permission-matrix-per-role`: Permission matrix per role
+#### `permission-matrix-per-role`: Permission Matrix per Role
 
 ```wireframe
 page
@@ -84,7 +84,7 @@ page
 
 **Reference:** GitHub
 
-#### `inviting-one-member-in-a-dialog`: Inviting one member in a dialog
+#### `inviting-one-member-in-a-dialog`: Inviting One Member in a Dialog
 
 ```wireframe
 page
@@ -111,7 +111,7 @@ page
 
 **Reference:** Clerk
 
-#### `warehouse-scoped-staff-cards`: Warehouse-scoped staff cards
+#### `warehouse-scoped-staff-cards`: Warehouse-Scoped Staff Cards
 
 ```wireframe
 page
@@ -132,7 +132,7 @@ page
 
 **Reference:** Vercel
 
-#### `suspending-a-member-with-the-reason`: Suspending a member with the reason
+#### `suspending-a-member-with-the-reason`: Suspending a Member with the Reason
 
 ```wireframe
 page
@@ -159,7 +159,7 @@ page
 
 **Reference:** GitHub
 
-#### `the-team-as-a-member-without-controls-sees-it`: The team as a member without controls sees it
+#### `the-team-as-a-member-without-controls-sees-it`: The Team as a Member Without Controls Sees It
 
 ```wireframe
 page
@@ -179,7 +179,7 @@ page
 
 **Reference:** Linear
 
-### API keys and webhooks
+### API Keys and Webhooks
 
 **Question:** Company systems read the product through API keys. Order updates reach those systems through webhooks. A key secret shows once and never again. Each webhook delivery states whether it arrived. A missed order update is money unaccounted for.
 
@@ -189,7 +189,7 @@ page
 
 **Rationale:** The keys table with the shown-once dialog is the default: the list states each key's grants, and the dialog protects the secret at creation. The endpoint with its delivery log is the runner-up; prefer it on the webhooks tab, where deliveries are the work. Never show the secret outside the creation dialog: a secret that can be read again is not a secret.
 
-#### `keys-table-with-the-grants-in-line`: Keys table with the grants in line
+#### `keys-table-with-the-grants-in-line`: Keys Table with the Grants in Line
 
 ```wireframe
 page
@@ -210,7 +210,7 @@ page
 
 **Reference:** Stripe
 
-#### `the-secret-shown-once`: The secret, shown once
+#### `the-secret-shown-once`: The Secret, Shown Once
 
 ```wireframe
 page
@@ -236,7 +236,7 @@ page
 
 **Reference:** GitHub
 
-#### `webhook-endpoints-with-their-deliveries`: Webhook endpoints with their deliveries
+#### `webhook-endpoints-with-their-deliveries`: Webhook Endpoints with Their Deliveries
 
 ```wireframe
 page
@@ -260,7 +260,7 @@ page
 
 **Reference:** Svix
 
-#### `grant-picker-on-a-new-key`: Grant picker on a new key
+#### `grant-picker-on-a-new-key`: Grant Picker on a New Key
 
 ```wireframe
 page
@@ -289,7 +289,7 @@ page
 
 **Reference:** GitHub
 
-#### `rotating-a-key-that-may-have-leaked`: Rotating a key that may have leaked
+#### `rotating-a-key-that-may-have-leaked`: Rotating a Key That May Have Leaked
 
 ```wireframe
 page
@@ -316,7 +316,7 @@ page
 
 **Reference:** Vercel
 
-#### `embedding-origins-beside-the-keys`: Embedding origins beside the keys
+#### `embedding-origins-beside-the-keys`: Embedding Origins Beside the Keys
 
 ```wireframe
 page
@@ -338,7 +338,7 @@ page
 
 **Reference:** Clerk
 
-### Bringing data from spreadsheets
+### Bringing Data from Spreadsheets
 
 **Question:** Contacts, budget lines, and newsletter consents arrive from spreadsheets. Each import names what was brought in and what was refused. Each refusal names why. The back office fixes refused rows without importing the file twice.
 
@@ -348,7 +348,7 @@ page
 
 **Rationale:** The imports table with the refused rows below is the best option. History and repairs sit on one page. The column mapping is the runner-up. Prefer it at import time where the match is decided. Never ship the dropzone alone. An import without refused rows hides the work it creates.
 
-#### `imports-with-the-refused-rows-below`: Imports with the refused rows below
+#### `imports-with-the-refused-rows-below`: Imports with the Refused Rows Below
 
 ```wireframe
 page
@@ -371,7 +371,7 @@ page
 
 **Reference:** Shopify
 
-#### `matching-columns-to-fields`: Matching columns to fields
+#### `matching-columns-to-fields`: Matching Columns to Fields
 
 ```wireframe
 page
@@ -393,7 +393,7 @@ page
 
 **Reference:** Mailchimp
 
-#### `dropzone-with-the-template-beside-it`: Dropzone with the template beside it
+#### `dropzone-with-the-template-beside-it`: Dropzone with the Template Beside It
 
 ```wireframe
 page
@@ -417,7 +417,7 @@ page
 
 **Reference:** Intercom
 
-#### `dry-run-before-the-import`: Dry run before the import
+#### `dry-run-before-the-import`: Dry Run Before the Import
 
 ```wireframe
 page
@@ -441,7 +441,7 @@ page
 
 **Reference:** Stripe
 
-#### `repairing-one-refused-row`: Repairing one refused row
+#### `repairing-one-refused-row`: Repairing One Refused Row
 
 ```wireframe
 page
@@ -467,7 +467,7 @@ page
 
 **Reference:** Shopify
 
-#### `consent-import-refused-outright`: Consent import refused outright
+#### `consent-import-refused-outright`: Consent Import Refused Outright
 
 ```wireframe
 page
@@ -489,7 +489,7 @@ page
 
 **Reference:** Customer.io
 
-### Connecting the payment account
+### Connecting the Payment Account
 
 **Question:** Customer money arrives through the company payment account. Each refund reverses a charge that customer made. The company connects the account once. It chooses which methods customers may use. It reads what each method costs.
 
@@ -499,7 +499,7 @@ page
 
 **Rationale:** The connected account card with the methods list is the best option. Connection state and methods each have their place and costs sit in line. The capability checklist is the runner-up. Prefer it while the connection is new and methods still need approval. Never show the methods without the account card. A method means nothing while the account is disconnected.
 
-#### `connected-account-with-the-methods-below`: Connected account with the methods below
+#### `connected-account-with-the-methods-below`: Connected Account with the Methods Below
 
 ```wireframe
 page
@@ -527,7 +527,7 @@ page
 
 **Reference:** Stripe
 
-#### `connecting-a-new-account-in-steps`: Connecting a new account in steps
+#### `connecting-a-new-account-in-steps`: Connecting a New Account in Steps
 
 ```wireframe
 page
@@ -548,7 +548,7 @@ page
 
 **Reference:** Stripe
 
-#### `method-capabilities-as-a-checklist`: Method capabilities as a checklist
+#### `method-capabilities-as-a-checklist`: Method Capabilities as a Checklist
 
 ```wireframe
 page
@@ -568,7 +568,7 @@ page
 
 **Reference:** Adyen
 
-#### `method-costs-side-by-side`: Method costs side by side
+#### `method-costs-side-by-side`: Method Costs Side by Side
 
 ```wireframe
 page
@@ -588,7 +588,7 @@ page
 
 **Reference:** Mollie
 
-#### `disconnecting-with-the-consequences-stated`: Disconnecting with the consequences stated
+#### `disconnecting-with-the-consequences-stated`: Disconnecting with the Consequences Stated
 
 ```wireframe
 page
@@ -614,7 +614,7 @@ page
 
 **Reference:** GitHub
 
-#### `no-account-connected-yet`: No account connected yet
+#### `no-account-connected-yet`: No Account Connected Yet
 
 ```wireframe
 page
@@ -637,7 +637,7 @@ page
 
 **Reference:** Stripe
 
-### Supplier invoice
+### Supplier Invoice
 
 **Question:** The supplier invoices the company each month. The invoice holds the plan, the fee per order, and the text-message cost. The company reads what each line charges. It downloads the invoice for the books. It pays by direct debit under its mandate.
 
@@ -647,7 +647,7 @@ page
 
 **Rationale:** The invoice sheet with its lines is the best option. It reads as the document the books need, with the mandate and the download beside it. The plan page with the mandate is the runner-up. Prefer it for changing the plan rather than reading a month. Never show usage lines without their rates. A metered figure without its rate cannot be checked.
 
-#### `invoice-sheet-with-its-lines`: Invoice sheet with its lines
+#### `invoice-sheet-with-its-lines`: Invoice Sheet with Its Lines
 
 ```wireframe
 page
@@ -671,7 +671,7 @@ page
 
 **Reference:** Stripe Billing
 
-#### `invoices-newest-first`: Invoices newest first
+#### `invoices-newest-first`: Invoices Newest First
 
 ```wireframe
 page
@@ -691,7 +691,7 @@ page
 
 **Reference:** Chargebee
 
-#### `plan-with-the-mandate-beside-it`: Plan with the mandate beside it
+#### `plan-with-the-mandate-beside-it`: Plan with the Mandate Beside It
 
 ```wireframe
 page
@@ -719,7 +719,7 @@ page
 
 **Reference:** Stripe Billing
 
-#### `usage-lines-with-their-rates`: Usage lines with their rates
+#### `usage-lines-with-their-rates`: Usage Lines with Their Rates
 
 ```wireframe
 page
@@ -739,7 +739,7 @@ page
 
 **Reference:** Vercel
 
-#### `overdue-with-the-retry-stated`: Overdue with the retry stated
+#### `overdue-with-the-retry-stated`: Overdue with the Retry Stated
 
 ```wireframe
 page
@@ -763,7 +763,7 @@ page
 
 **Reference:** Chargebee
 
-#### `text-message-cost-for-the-month`: Text-message cost for the month
+#### `text-message-cost-for-the-month`: Text-Message Cost for the Month
 
 ```wireframe
 page
@@ -783,7 +783,7 @@ page
 
 **Reference:** Resend
 
-### Discount and promotion codes
+### Discount and Promotion Codes
 
 **Question:** A code takes money off an order. Each code has its own value, use limit, and dates. The company watches what each code costs. It retires what leaks. It issues new codes for partners and campaigns.
 
@@ -795,7 +795,7 @@ page
 
 Prefer it for creating a code with several conditions. Never ship the redemption-only list. Redemptions explain the past and the company manages the codes.
 
-#### `code-table-with-use-and-state`: Code table with use and state
+#### `code-table-with-use-and-state`: Code Table with Use and State
 
 ```wireframe
 page
@@ -816,7 +816,7 @@ page
 
 **Reference:** Shopify
 
-#### `code-editor-with-its-conditions`: Code editor with its conditions
+#### `code-editor-with-its-conditions`: Code Editor with Its Conditions
 
 ```wireframe
 page
@@ -846,7 +846,7 @@ page
 
 **Reference:** Shopify
 
-#### `vouchers-with-their-balances`: Vouchers with their balances
+#### `vouchers-with-their-balances`: Vouchers with Their Balances
 
 ```wireframe
 page
@@ -867,7 +867,7 @@ page
 
 **Reference:** Shopify
 
-#### `redemptions-newest-first`: Redemptions, newest first
+#### `redemptions-newest-first`: Redemptions, Newest First
 
 ```wireframe
 page
@@ -888,7 +888,7 @@ page
 
 **Reference:** Shopify
 
-#### `issuing-one-code-in-a-dialog`: Issuing one code in a dialog
+#### `issuing-one-code-in-a-dialog`: Issuing One Code in a Dialog
 
 ```wireframe
 page
@@ -916,7 +916,7 @@ page
 
 **Reference:** Shopify
 
-#### `retiring-a-leaked-code`: Retiring a leaked code
+#### `retiring-a-leaked-code`: Retiring a Leaked Code
 
 ```wireframe
 page
@@ -946,11 +946,11 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/admin-screens#show-a-new-secret-once | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/admin-screens#show-what-a-role-allows-before-granting-it | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/admin-screens#team-members-and-their-roles | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/admin-screens#api-keys-and-webhooks | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/admin-screens#bringing-data-from-spreadsheets | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/admin-screens#connecting-the-payment-account | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/admin-screens#supplier-invoice | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/admin-screens#discount-and-promotion-codes | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/admin-screens#show-a-new-secret-once | guidance | Which newly created credential stays readable after its creation dialog closes? Open the creation flow for keys and secrets on a built settings screen. |
+| litespec/frontend/patterns/admin-screens#show-what-a-role-allows-before-granting-it | guidance | Which invitation or role change goes out without listing the chosen capabilities? Open the invite and role-change flows on a built team screen. |
+| litespec/frontend/patterns/admin-screens#team-members-and-their-roles | guidance | Which built staff list or invitation breaks from the chosen wireframe? Open the built team screen, with its invitations, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/admin-screens#api-keys-and-webhooks | guidance | Which built credential or delivery list breaks from the chosen wireframe? Open the built keys screen, with grants in line, beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/admin-screens#bringing-data-from-spreadsheets | guidance | Which built column match or refused row breaks from the chosen wireframe? Open the built import flow beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/admin-screens#connecting-the-payment-account | guidance | Which built connection step or method list breaks from the chosen wireframe? Open the built payment setup beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/admin-screens#supplier-invoice | guidance | Which built invoice sheet or usage line breaks from the chosen wireframe? Open the built billing screens beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/admin-screens#discount-and-promotion-codes | guidance | Which built code table or redemption list breaks from the chosen wireframe? Open the built promotion screens beside the catalog entry recording the chosen option and its reason. |

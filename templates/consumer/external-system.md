@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <External system display title>
+# <External System Display Title>
 
 ## Summary
 

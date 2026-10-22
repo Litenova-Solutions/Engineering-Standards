@@ -396,19 +396,19 @@ static partial class StandardsValidator
 
     /// <summary>The action verbs a provision heading may start with.</summary>
     static readonly HashSet<string> ActionVerbs = new(
-        ("Accept Activate Add Advance Describe Order Prefetch Reuse Sanitize Share Take Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
-        "Authenticate Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Classify " +
+        ("Accept Activate Add Observe Seed Advance Describe Order Prefetch Reuse Sanitize Share Take Align Anchor Announce Answer Apply Approve Ask Assert Assign Attach Audit " +
+        "Authenticate Author Authorize Avoid Await Back Bind Bound Build Call Canonicalize Centralize Check Cite Claim Classify " +
         "Co-locate Collect Commit Compare Complete Compose Compute Configure Confirm Connect Control Copy Cover Create " +
         "Declare Default Defer Define Delay Deliver Deploy Deprecate Derive Diff Discard Dispatch Distinguish Document " +
-        "Drive Emit Enforce Escalate Escape Evolve Exclude Exercise Expose Express Finish Follow Format Gate Generate " +
-        "Give Govern Grant Group Handle Hide Hold Identify Implement Inject Inspect Isolate Keep Lease Limit List Load " +
+        "Drive Emit End Enforce Escalate Escape Evolve Exclude Exercise Explain Expose Express Finish Follow Format Gate Generate " +
+        "Give Govern Grant Group Handle Hide Hold Identify Illustrate Implement Inject Inspect Isolate Keep Lease Limit List Load " +
         "Localize Locate Make Map Mark Match Measure Meet Minimize Mirror Model Move Name Note Operate Organize Own " +
         "Parameterize Parse Pass Persist Pin Place Plan Point Prefer Preserve Prevent Process Project Promote Protect " +
         "Prove Provide Publish Purge Query Raise Reach Read Reconnect Record Recover Reference Reflect Refuse Regenerate " +
         "Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve " +
-        "Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set " +
-        "Show Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tag Test Tolerate Trace " +
-        "Track Translate Treat Update Use Validate Verify Version Wait Write").Split(' '),
+        "Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Shape " +
+        "Show Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tabulate Tag Test Tolerate Trace " +
+        "Track Translate Treat Trigger Update Use Validate Verify Version Wait Write").Split(' '),
         StringComparer.Ordinal);
 
     // Naming the codepoint tells an author which character to hunt for. Naming the

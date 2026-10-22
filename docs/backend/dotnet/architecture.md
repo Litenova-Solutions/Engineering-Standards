@@ -2,21 +2,21 @@
 
 ## Intent
 
-A .NET backend is 5 projects: Domain, Application.Abstractions, Application, Infrastructure, and WebApi, wired together by host projects that own service registration. This page states the .NET form of that shape: which projects exist, what each may hold, which types stay internal, and where service registration lives. Fixed projects and host-owned wiring keep dependencies pointing inward and give every type one home. The shared architecture rules live on [Backend Architecture](../architecture.md); this page holds only their .NET form.
+A .NET backend is 5 projects: Domain, Application.Abstractions, Application, Infrastructure, and WebApi, wired together by host projects that own service registration. This page states the .NET form of that shape: which projects exist, what each holds, which types stay internal, and where service registration lives, so every type keeps one home and dependencies point inward. The shared architecture rules live on [Backend Architecture](../architecture.md); this page holds only their .NET form.
 
 ## Concepts
 
-### The five projects
+### The Five Projects
 
 Each part of the backend is a .NET project with one job. Domain holds the business model. Application.Abstractions holds the contracts that more than one module names. Application holds the messages, handlers, and module-owned ports. Infrastructure holds the technical adapters, and WebApi hosts the HTTP boundary. `AppHost` and `ServiceDefaults` support local hosting and diagnostics; they are hosts, not application layers.
 
-### Visibility and composition
+### Visibility and Composition
 
 A type is visible only to the projects that need it: implementations stay `internal sealed`, and a message, port, or marker is public only when another project names it. Service registration lives in the hosts, because Domain and Application declare abstractions and a registration call inside either would point the dependency the wrong way.
 
 ## Standards
 
-### Use five application projects
+### Use Five Application Projects
 
 **Statement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
@@ -38,7 +38,7 @@ apps/api/src/{ProjectName}.Infrastructure/
 apps/api/src/{ProjectName}.WebApi/
 ```
 
-### Keep one Application assembly
+### Keep One Application Assembly
 
 **Statement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
@@ -46,7 +46,22 @@ apps/api/src/{ProjectName}.WebApi/
 
 This provision states the .NET form of `litespec/backend/architecture#keep-one-application-part`.
 
-### Keep implementation types internal
+### Mirror Modules in Folders and Namespaces
+
+**Statement:** Every project MUST give each module one folder and namespace.
+
+**Rationale:** The folder name derives from the module identifier, so `module/spending` owns the `Spending` folder in every project, and the namespace follows the folder under `litespec/workspace/naming#keep-namespaces-aligned-with-folders`. The same module names in every layer let a reader move from a Domain aggregate to its handler, its repository, and its endpoint without a map. This provision states the .NET form of `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
+
+**Example:** The `Spending` module owns one folder in every project, and each namespace follows its folder:
+
+```text
+Expenses.Domain/Spending/Expenses/Expense.cs
+Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
+```
+
+The handler above lives in namespace `Expenses.Application.Spending.Expenses.SubmitExpense`.
+
+### Keep Implementation Types Internal
 
 **Statement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
 
@@ -56,11 +71,11 @@ This provision states the .NET form of `litespec/backend/architecture#keep-imple
 
 ## Conventions
 
-### Keep composition in hosts
+### Keep Composition in Hosts
 
 **Default:** Keep service registration in `Program.cs` and host registration modules.
 
-**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+**Replacement:** A project names its registration layout in its host documentation.
 
 **Rationale:** Domain and Application declare abstractions for the hosts to implement. A registration call inside either layer makes the abstraction depend on the thing it abstracts, inverting the dependency direction. Registration in `Program.cs` and host modules keeps that direction intact, and one visible call order shows which layer wires first.
 
@@ -75,11 +90,11 @@ WebApiServiceRegistration.AddWebApi(...)
 
 `AddInfrastructure` receives configuration and host environment values needed to bind and validate provider options. `AddWebApi` owns Problem Details, authentication, authorization, endpoint discovery, and OpenAPI. `Program.cs` keeps their call order visible.
 
-### Use one public assembly marker per scanned project
+### Use One Public Assembly Marker per Scanned Project
 
 **Default:** Expose one `public static` assembly marker in each project that an approved scanner reads.
 
-**Replacement:** A consumer replaces this default by recording an Exception for this provision, with reason and review date.
+**Replacement:** A project names its scanner assembly reference in its host documentation.
 
 **Rationale:** Scanners need an assembly reference, and without a marker developers make handlers public to supply one. One public static marker per scanned project gives the scanner its reference while every handler stays internal.
 
@@ -87,8 +102,9 @@ WebApiServiceRegistration.AddWebApi(...)
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/backend/dotnet/architecture#use-five-application-projects | guidance | Does the solution hold exactly the five baseline projects? |
-| litespec/backend/dotnet/architecture#keep-one-application-assembly | guidance | Does one Application project hold every message, handler, and module-owned port? |
-| litespec/backend/dotnet/architecture#keep-implementation-types-internal | guidance | Is every handler, validator, definition, and endpoint implementation `internal` and `sealed`? |
-| litespec/backend/dotnet/architecture#keep-composition-in-hosts | guidance | Does all service registration live in hosts and host modules? |
-| litespec/backend/dotnet/architecture#use-one-public-assembly-marker-per-scanned-project | guidance | Does each scanned project expose exactly one public assembly marker? |
+| litespec/backend/dotnet/architecture#use-five-application-projects | guidance | The solution projects: exactly Domain, Application.Abstractions, Application, Infrastructure, and WebApi. |
+| litespec/backend/dotnet/architecture#keep-one-application-assembly | guidance | The Application project files: every command, query, result, validator, handler, reaction, and module-owned port, with cross-module contracts in Application.Abstractions. |
+| litespec/backend/dotnet/architecture#mirror-modules-in-folders-and-namespaces | guidance | The module folders and namespaces in every project: one folder and namespace per module, named for the module. |
+| litespec/backend/dotnet/architecture#keep-implementation-types-internal | guidance | Handler, validator, definition, persistence, and endpoint implementation declarations: each `internal sealed`. |
+| litespec/backend/dotnet/architecture#keep-composition-in-hosts | guidance | Service registration calls: each one in `Program.cs` or a host registration module. |
+| litespec/backend/dotnet/architecture#use-one-public-assembly-marker-per-scanned-project | guidance | Each scanned project: exactly one public static assembly marker. |

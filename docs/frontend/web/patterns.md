@@ -6,7 +6,7 @@ A product records its UI pattern choices in one catalog, and each chosen pattern
 
 ## Standards
 
-### Implement a chosen pattern once
+### Implement a Chosen Pattern Once
 
 **Statement:** The shared web UI packages MUST implement each chosen pattern once at the source paths the catalog names for `react` and `svelte`.
 
@@ -16,7 +16,7 @@ A product records its UI pattern choices in one catalog, and each chosen pattern
 
 ## Conventions
 
-### Keep a visual registry
+### Keep a Visual Registry
 
 **Default:** Review LiteSpec options in `litespec patterns preview` at 390 and 1200 CSS pixels, and draw only product-specific options in a product registry at 390 and 1280.
 
@@ -28,5 +28,5 @@ A product records its UI pattern choices in one catalog, and each chosen pattern
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/web/patterns#implement-a-chosen-pattern-once | checkable | `litespec ui` reports a named React or Svelte component path that does not exist. |
-| litespec/frontend/web/patterns#keep-a-visual-registry | guidance | Does the registry render every product-added option at 390 and 1280 pixels? |
+| litespec/frontend/web/patterns#implement-a-chosen-pattern-once | checkable | `litespec ui` reports each named React or Svelte component path that does not exist. |
+| litespec/frontend/web/patterns#keep-a-visual-registry | guidance | The product registry renders every product-added option at 390 and 1280 pixels, and `litespec patterns preview` draws every LiteSpec option at 390 and 1200. |

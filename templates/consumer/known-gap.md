@@ -21,7 +21,7 @@
   ]
 }
 ---
-# <Known gap display title>
+# <Known Gap Display Title>
 
 ## Exit
 

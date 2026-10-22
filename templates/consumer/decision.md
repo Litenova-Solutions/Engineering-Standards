@@ -30,7 +30,7 @@
   ]
 }
 ---
-# <Decision display title>
+# <Decision Display Title>
 
 ## Context
 

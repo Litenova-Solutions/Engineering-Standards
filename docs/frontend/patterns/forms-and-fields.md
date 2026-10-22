@@ -2,27 +2,27 @@
 
 ## Intent
 
-Forms collect typed values to create or change records such as orders, deliveries, and products. This page shows how each field kind takes its value, and how a form reports a refused submit or unsaved work: money, record pickers, dates, text, single choices, switches, uploads, periods, slugs, capacity, colors, repeated groups, tags, addresses, and message templates. Each answer is drawn as options with a named default to build, and the product owner chooses among the options when the team builds or revises a form. One decided shape per field keeps entry fast and errors fixable, so staff type once and repair only what the message names.
+This page shows how each field kind takes its value to create or change records such as orders, deliveries, and products, and how a form reports a refused submit or unsaved work: money, record pickers, dates, text, single choices, switches, uploads, periods, slugs, capacity, colors, repeated groups, tags, addresses, and message templates. Each answer is drawn as options with a named default to build, and the product owner chooses among the options when the team builds or revises a form. One decided shape per field keeps entry fast and errors fixable, so staff type once and repair only what the message names.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about a field kind, such as how a money field names its currency. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply catalog: the Oak desk lamp at EUR 45.00, its Standard, Trade, and Bulk price tiers, the Amsterdam warehouse holding 10,000 units, and deliveries such as Garcia Interiors restock. On this page, `you` means the staff member entering values. The Standards section states the two rules every option keeps: every field carries a visible label naming its value, and a form keeps every entered value when the API refuses a submit.
 
 ## Standards
 
-### Name every field with a visible label
+### Name Every Field with a Visible Label
 
 **Statement:** Every field MUST carry a visible label that names its value.
 
 **Rationale:** A placeholder disappears on the first keystroke, so a filled field with no label no longer says what it holds. Screen readers announce the label, and sighted staff returning to a filled form read it to check each value before saving. Without a visible label, both groups guess what each value means.
 
-### Keep entered values after a refused submit
+### Keep Entered Values After a Refused Submit
 
 **Statement:** A form MUST keep every entered value when the API refuses a submit.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply catalog: the Oak desk lamp at EUR 
 
 ## Patterns
 
-### Money field
+### Money Field
 
 **Question:** The back office holds prices, fees, refunds, and settlement figures, and staff type every one of them; the software chooses none. The field is where that rule meets a keyboard. The decision is how a money field takes its value: text input shape, currency naming, symbol prefix, error wording, and totals restated beside it.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply catalog: the Oak desk lamp at EUR 
 
 The customer total restatement is the runner-up. It belongs on every price the customer sees. It stops the fee from surprising either side at checkout. Never ship the stepper. You cannot reach a continuous price by stepping.
 
-#### `text-input-currency-in-the-label-symbol-inside`: Text input, currency in the label, symbol inside
+#### `text-input-currency-in-the-label-symbol-inside`: Text Input, Currency in the Label, Symbol Inside
 
 ```wireframe
 page
@@ -63,7 +63,7 @@ page
 
 **Reference:** HMRC
 
-#### `currency-as-a-separate-select`: Currency as a separate select
+#### `currency-as-a-separate-select`: Currency as a Separate Select
 
 ```wireframe
 page
@@ -85,7 +85,7 @@ page
 
 **Cost:** No design system in this set publishes a currency select beside an amount, and the company invoices in one currency. A select for a closed set of one is a control that cannot do anything.
 
-#### `amount-with-a-unit-suffix-for-a-count`: Amount with a unit suffix, for a count
+#### `amount-with-a-unit-suffix-for-a-count`: Amount with a Unit Suffix, for a Count
 
 ```wireframe
 page
@@ -108,7 +108,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `money-with-an-error-that-says-what-to-do`: Money with an error that says what to do
+#### `money-with-an-error-that-says-what-to-do`: Money with an Error That Says What to Do
 
 ```wireframe
 page
@@ -129,7 +129,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `amount-with-a-stepper`: Amount with a stepper
+#### `amount-with-a-stepper`: Amount with a Stepper
 
 ```wireframe
 page
@@ -149,7 +149,7 @@ page
 
 **Cost:** NN/g and Carbon both warn against a stepper for a price. You cannot reach a continuous value by stepping. You cannot express an amount of 1.50 units. This is the wrong control for this field.
 
-#### `money-as-a-read-only-fact-with-an-edit-command`: Money as a read-only fact with an edit command
+#### `money-as-a-read-only-fact-with-an-edit-command`: Money as a Read-Only Fact with an Edit Command
 
 ```wireframe
 page
@@ -169,7 +169,7 @@ page
 
 **Cost:** Editing moves to a second surface for a field you touch often. A charge already priced is a versioned fact rather than a field.
 
-#### `price-with-the-customer-facing-total-restated`: Price with the customer-facing total restated
+#### `price-with-the-customer-facing-total-restated`: Price with the Customer-Facing Total Restated
 
 ```wireframe
 page
@@ -188,7 +188,7 @@ page
 
 **Cost:** The restated total must update as you type, which a static wireframe cannot show. It costs one line under every price field, even where the fee is zero.
 
-#### `gross-price-with-the-net-and-tax-restated`: Gross price with the net and tax restated
+#### `gross-price-with-the-net-and-tax-restated`: Gross Price with the Net and Tax Restated
 
 ```wireframe
 page
@@ -211,7 +211,7 @@ page
 
 **Reference:** Stripe
 
-#### `preset-price-chips-for-the-common-price-points`: Preset price chips for the common price points
+#### `preset-price-chips-for-the-common-price-points`: Preset Price Chips for the Common Price Points
 
 ```wireframe
 page
@@ -234,7 +234,7 @@ page
 
 **Cost:** The presets are company data that must be learned or configured, and a stale set pushes you toward last year's prices. Five chips plus a field is also wider than a field alone on a phone.
 
-### Choosing a record
+### Choosing a Record
 
 **Question:** You choose a reference to another record from a picker showing names. Nobody types an identifier. The failure to avoid is a select reading "Choose a warehouse" beside a field holding "WH-0C893968A2" as if it were a value to type.
 
@@ -244,7 +244,7 @@ page
 
 **Rationale:** The searchable picker over names stays the pick: nobody types an identifier, and search beats scrolling for every list longer than a screen. The picker with one distinguishing fact per row is the runner-up for records that share a name. Never ship a bare identifier field: a code such as WH-0C893968A2 is not a value you can type or check.
 
-#### `searchable-picker-showing-names`: Searchable picker showing names
+#### `searchable-picker-showing-names`: Searchable Picker Showing Names
 
 ```wireframe
 page
@@ -264,7 +264,7 @@ page
 
 **Cost:** A picker hides how many records exist. If you know the warehouse is in "Zaandam", you still have to search rather than scan. It needs an empty-result state that offers creating one.
 
-#### `picker-with-the-record-s-facts-beside-its-name`: Picker with the record's facts beside its name
+#### `picker-with-the-record-s-facts-beside-its-name`: Picker with the Record's Facts Beside Its Name
 
 ```wireframe
 page
@@ -283,7 +283,7 @@ page
 
 **Cost:** The list grows wider, and the extra column is only useful for records that share a name. For a record set where names are already unique it is noise.
 
-#### `a-select-of-names`: A select of names
+#### `a-select-of-names`: A Select of Names
 
 ```wireframe
 page
@@ -302,7 +302,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-picker-whose-options-are-typed`: A picker whose options are typed
+#### `a-picker-whose-options-are-typed`: A Picker Whose Options Are Typed
 
 ```wireframe
 page
@@ -324,7 +324,7 @@ page
 
 **Reference:** APG
 
-#### `a-read-only-reference-showing-what-is-linked`: A read-only reference showing what is linked
+#### `a-read-only-reference-showing-what-is-linked`: A Read-Only Reference Showing What Is Linked
 
 ```wireframe
 page
@@ -344,7 +344,7 @@ page
 
 **Cost:** Changing a relation takes two steps, and on a page with several relations it takes several such facts. It belongs on a record page, not on a create form.
 
-#### `a-picker-that-also-creates`: A picker that also creates
+#### `a-picker-that-also-creates`: A Picker That Also Creates
 
 ```wireframe
 page
@@ -364,7 +364,7 @@ page
 
 **Cost:** The field opens a second surface, and a dialog must never open another dialog. Creating a warehouse has to be a page, which means losing the contents of the form.
 
-#### `recent-records-above-the-search`: Recent records above the search
+#### `recent-records-above-the-search`: Recent Records Above the Search
 
 ```wireframe
 page
@@ -388,7 +388,7 @@ page
 
 **Reference:** Linear
 
-#### `results-grouped-by-state-with-counts`: Results grouped by state with counts
+#### `results-grouped-by-state-with-counts`: Results Grouped by State with Counts
 
 ```wireframe
 page
@@ -412,7 +412,7 @@ page
 
 **Reference:** GitHub
 
-### Date and time field
+### Date and Time Field
 
 **Question:** Staff enter dates and times for deliveries, shifts, and dispatch plans. The decision is which control takes the value: three text inputs, one field with a calendar, date and time side by side, relative entry, or presets. The native browser date input is refused: it draws the browser chrome instead of the application control, and GDS rejected it for implementation problems across browsers.
 
@@ -424,7 +424,7 @@ page
 
 The three GDS inputs are the runner-up where accessibility review demands them. They cost the slowest entry in the form. Never ship the native date input. It draws the browser chrome instead of the application control. It renders differently everywhere.
 
-#### `three-text-inputs-with-a-format-hint`: Three text inputs with a format hint
+#### `three-text-inputs-with-a-format-hint`: Three Text Inputs with a Format Hint
 
 ```wireframe
 page
@@ -450,7 +450,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `one-text-field-with-a-calendar-that-opens-beside-it`: One text field with a calendar that opens beside it
+#### `one-text-field-with-a-calendar-that-opens-beside-it`: One Text Field with a Calendar That Opens Beside It
 
 ```wireframe
 page
@@ -473,7 +473,7 @@ page
 
 **Reference:** APG
 
-#### `date-and-time-on-one-row-the-time-zone-named-once`: Date and time on one row, the time zone named once
+#### `date-and-time-on-one-row-the-time-zone-named-once`: Date and Time on One Row, the Time Zone Named Once
 
 ```wireframe
 page
@@ -495,7 +495,7 @@ page
 
 **Cost:** On a narrow screen two fields plus the row wraps to three lines. You have to read a time zone that is stated once before the second field. It does not sit next to that field.
 
-#### `relative-dates-for-the-near-future-absolute-for-the-far`: Relative dates for the near future, absolute for the far
+#### `relative-dates-for-the-near-future-absolute-for-the-far`: Relative Dates for the Near Future, Absolute for the Far
 
 ```wireframe
 page
@@ -514,7 +514,7 @@ page
 
 **Cost:** The page derives an absolute time and shows it, so you never hold it in your head. A relative field cannot express the anchor itself: dispatch at 08:00 must come from the delivery date.
 
-#### `a-duration-field-for-a-length-of-time`: A duration field for a length of time
+#### `a-duration-field-for-a-length-of-time`: A Duration Field for a Length of Time
 
 ```wireframe
 page
@@ -534,7 +534,7 @@ page
 
 **Cost:** Two fields do the work where one number would do, and they cannot express "2h30". A single field parsing both needs error wording for every way a duration can be wrong.
 
-#### `the-date-refused-with-the-date-that-was-wrong`: The date refused, with the date that was wrong
+#### `the-date-refused-with-the-date-that-was-wrong`: The Date Refused, with the Date That Was Wrong
 
 ```wireframe
 page
@@ -555,7 +555,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `preset-chips-for-the-usual-dispatch-times`: Preset chips for the usual dispatch times
+#### `preset-chips-for-the-usual-dispatch-times`: Preset Chips for the Usual Dispatch Times
 
 ```wireframe
 page
@@ -578,7 +578,7 @@ page
 
 **Reference:** Calendly
 
-#### `start-and-end-as-one-range-with-a-length-readout`: Start and end as one range with a length readout
+#### `start-and-end-as-one-range-with-a-length-readout`: Start and End as One Range with a Length Readout
 
 ```wireframe
 page
@@ -599,7 +599,7 @@ page
 
 **Reference:** Airbnb
 
-### Text field and its states
+### Text Field and Its States
 
 **Question:** Every text field draws several states: empty, filled, focused, refused, disabled, and read-only. The label stays visible above the input in all of them. A placeholder is never the label, because it vanishes on the first keystroke.
 
@@ -609,7 +609,7 @@ page
 
 **Rationale:** The six-state reference page stays the pick, because it is the only option that pins every state one field must draw. Inline validation that confirms a good value is the runner-up for create forms, where it saves a refused submit. Never ship the placeholder as the label: it vanishes on first keystroke, and its color misses contrast.
 
-#### `label-above-help-under-six-states-on-one-page`: Label above, help under, six states on one page
+#### `label-above-help-under-six-states-on-one-page`: Label Above, Help Under, Six States on One Page
 
 ```wireframe
 page
@@ -632,7 +632,7 @@ page
 
 **Cost:** Six instances of one field is a style guide, not a screen. It never appears in the product. It exists so the states cannot drift apart.
 
-#### `label-above-placeholder-as-a-hint`: Label above, placeholder as a hint
+#### `label-above-placeholder-as-a-hint`: Label Above, Placeholder as a Hint
 
 ```wireframe
 page
@@ -653,7 +653,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `placeholder-as-the-label`: Placeholder as the label
+#### `placeholder-as-the-label`: Placeholder as the Label
 
 ```wireframe
 page
@@ -672,7 +672,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `character-count-under-a-long-answer-field`: Character count under a long-answer field
+#### `character-count-under-a-long-answer-field`: Character Count Under a Long-Answer Field
 
 ```wireframe
 page
@@ -692,7 +692,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-textarea-with-the-customer-s-words-preserved`: A textarea with the customer's words preserved
+#### `a-textarea-with-the-customer-s-words-preserved`: A Textarea with the Customer's Words Preserved
 
 ```wireframe
 page
@@ -711,7 +711,7 @@ page
 
 **Cost:** Uncontrolled line breaks in stored text are a rendering hazard on a customer page. The width there differs from the width of the editor. Normalize it somewhere.
 
-#### `a-field-that-grows-as-the-answer-does`: A field that grows as the answer does
+#### `a-field-that-grows-as-the-answer-does`: A Field That Grows as the Answer Does
 
 ```wireframe
 page
@@ -732,7 +732,7 @@ page
 
 **Cost:** A growing field pushes everything below it down as you type, which moves the button you are about to press. Most implementations stop growing at about six lines.
 
-#### `inline-confirmation-of-a-good-value`: Inline confirmation of a good value
+#### `inline-confirmation-of-a-good-value`: Inline Confirmation of a Good Value
 
 ```wireframe
 page
@@ -755,7 +755,7 @@ page
 
 **Reference:** Stripe
 
-#### `floating-labels-that-shrink-when-filled`: Floating labels that shrink when filled
+#### `floating-labels-that-shrink-when-filled`: Floating Labels That Shrink When Filled
 
 ```wireframe
 page
@@ -779,7 +779,7 @@ page
 
 **Reference:** Material Design
 
-### Choosing one of a few options
+### Choosing One of a Few Options
 
 **Question:** You choose from a closed set, such as a naming rule or a plan. The GOV.UK rules say a select is a last resort and radios beat a select. Nothing is pre-selected in a question, though settings allow it. The decision is which control carries the choice: radio list, segmented control, cards, select, checkbox list, listbox, or plain buttons.
 
@@ -791,7 +791,7 @@ page
 
 Never ship the native `multi-select`. GOV.UK rules it out for its usability and assistive record. A checkbox list replaces it.
 
-#### `a-radio-list-with-a-description-per-option`: A radio list with a description per option
+#### `a-radio-list-with-a-description-per-option`: A Radio List with a Description per Option
 
 ```wireframe
 page
@@ -813,7 +813,7 @@ page
 
 **Cost:** Three options at 22 pixels each is a tall block, and it does not scale to twelve options, which a permission picker does need.
 
-#### `a-segmented-control-for-two-or-three`: A segmented control for two or three
+#### `a-segmented-control-for-two-or-three`: A Segmented Control for Two or Three
 
 ```wireframe
 page
@@ -833,7 +833,7 @@ page
 
 **Cost:** Labels have to fit, so "A blank product" and "A template" are both shortened. The control grows with its longest label.
 
-#### `plan-cards-for-a-priced-choice`: Plan cards for a priced choice
+#### `plan-cards-for-a-priced-choice`: Plan Cards for a Priced Choice
 
 ```wireframe
 page
@@ -860,7 +860,7 @@ page
 
 **Cost:** Sections are the only boxes and never nest, so three plan cards inside a section break that rule three times.
 
-#### `cards-with-a-radio-inside-each`: Cards with a radio inside each
+#### `cards-with-a-radio-inside-each`: Cards with a Radio Inside Each
 
 ```wireframe
 page
@@ -890,7 +890,7 @@ page
 
 **Cost:** One card holds two nested controls. The whole card has to forward the click to the radio, and the radio still has to be reachable by Tab.
 
-#### `a-select-in-a-settings-page-where-nothing-is-pre-selected`: A select, in a settings page where nothing is pre-selected
+#### `a-select-in-a-settings-page-where-nothing-is-pre-selected`: A Select, in a Settings Page Where Nothing Is Pre-Selected
 
 ```wireframe
 page
@@ -912,7 +912,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-multi-select-as-a-list-of-checkboxes`: A multi-select as a list of checkboxes
+#### `a-multi-select-as-a-list-of-checkboxes`: A Multi-Select as a List of Checkboxes
 
 ```wireframe
 page
@@ -937,7 +937,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-listbox-with-a-checkmark-and-descriptions`: A listbox with a checkmark and descriptions
+#### `a-listbox-with-a-checkmark-and-descriptions`: A Listbox with a Checkmark and Descriptions
 
 ```wireframe
 page
@@ -959,7 +959,7 @@ page
 
 **Reference:** Apple HIG
 
-#### `a-binary-question-as-two-plain-buttons`: A binary question as two plain buttons
+#### `a-binary-question-as-two-plain-buttons`: A Binary Question as Two Plain Buttons
 
 ```wireframe
 page
@@ -982,7 +982,7 @@ page
 
 **Reference:** Typeform
 
-### Switch or a checkbox
+### Switch or a Checkbox
 
 **Question:** The storefront editor holds a toggle for the platform credit line, and settings pages hold many more switches and checkboxes. This pattern decides which control each setting deserves: switch or checkbox. It also decides what the label must say, since the label carries the difference between the two.
 
@@ -994,7 +994,7 @@ page
 
 The instant-apply switch with an undo toast is the runner-up for low-risk settings you flip often. Never ship a switch whose label names the control instead of the outcome. You need no documentation to learn what on means.
 
-#### `a-switch-with-the-label-and-its-consequence`: A switch with the label and its consequence
+#### `a-switch-with-the-label-and-its-consequence`: A Switch with the Label and Its Consequence
 
 ```wireframe
 page
@@ -1015,7 +1015,7 @@ page
 
 **Cost:** A switch has no pressed state on first paint, so you cannot tell what is currently on without looking twice. It carries no visible text.
 
-#### `a-checkbox-where-the-off-state-is-the-default`: A checkbox where the off state is the default
+#### `a-checkbox-where-the-off-state-is-the-default`: A Checkbox Where the off State Is the Default
 
 ```wireframe
 page
@@ -1039,7 +1039,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-checkbox-with-the-consequence-under-it-no-state-carried`: A checkbox with the consequence under it, no state carried
+#### `a-checkbox-with-the-consequence-under-it-no-state-carried`: A Checkbox with the Consequence Under It, No State Carried
 
 ```wireframe
 page
@@ -1061,7 +1061,7 @@ page
 
 **Cost:** You cannot see at a glance which are on without reading the boxes. On a settings page with eight such settings that matters.
 
-#### `two-options-where-the-difference-is-the-money`: Two options where the difference is the money
+#### `two-options-where-the-difference-is-the-money`: Two Options Where the Difference Is the Money
 
 ```wireframe
 page
@@ -1087,7 +1087,7 @@ page
 
 **Cost:** Cards for a two-way choice are heavy, and the amounts are derived figures that have to be computed per company to stay correct.
 
-#### `a-switch-that-is-refused-with-the-reason`: A switch that is refused, with the reason
+#### `a-switch-that-is-refused-with-the-reason`: A Switch That Is Refused, with the Reason
 
 ```wireframe
 page
@@ -1106,7 +1106,7 @@ page
 
 **Cost:** A disabled switch with no value is a dead pixel if you do not notice the reason. The reason has to sit directly under it, not at the foot of the section.
 
-#### `a-switch-with-the-number-it-would-change`: A switch with the number it would change
+#### `a-switch-with-the-number-it-would-change`: A Switch with the Number It Would Change
 
 ```wireframe
 page
@@ -1127,7 +1127,7 @@ page
 
 **Cost:** A derived figure beside a control has to be current, which means a read that the switch itself depends on. It also puts a number on a page that was otherwise free of them.
 
-#### `instant-apply-with-an-undo-toast`: Instant apply with an undo toast
+#### `instant-apply-with-an-undo-toast`: Instant Apply with an Undo Toast
 
 ```wireframe
 page
@@ -1151,7 +1151,7 @@ page
 
 **Reference:** Linear
 
-#### `a-three-way-choice-as-a-segmented-control`: A three-way choice as a segmented control
+#### `a-three-way-choice-as-a-segmented-control`: A Three-Way Choice as a Segmented Control
 
 ```wireframe
 page
@@ -1176,7 +1176,7 @@ page
 
 **Reference:** Slack
 
-### Upload field
+### Upload Field
 
 **Question:** Acme Supply records take files: a logo image or a customer spreadsheet. A logo needs a stated type and size, and a customer import needs stated columns and row-level refusals. The decision is how the upload field states its contract and reports progress and refusals.
 
@@ -1186,7 +1186,7 @@ page
 
 **Rationale:** Keep the drop zone that states its types and size limit. Nobody learns the limit by being refused. The per-file progress tray is the runner-up for imports of several files, where one bar per file beats one bar for all. Never ship a CSV upload with no stated columns: a file refused for a format nobody stated is a refusal the application caused.
 
-#### `a-drop-zone-that-states-what-it-accepts`: A drop zone that states what it accepts
+#### `a-drop-zone-that-states-what-it-accepts`: A Drop Zone That States What It Accepts
 
 ```wireframe
 page
@@ -1207,7 +1207,7 @@ page
 
 **Cost:** A drop zone invites a click anywhere, and if you drop a file on the page outside the zone you get nothing at all. No affordance says where the zone is.
 
-#### `the-file-already-chosen-with-what-it-will-do`: The file already chosen, with what it will do
+#### `the-file-already-chosen-with-what-it-will-do`: The File Already Chosen, with What It Will Do
 
 ```wireframe
 page
@@ -1229,7 +1229,7 @@ page
 
 **Cost:** A file that has been uploaded but not saved is a resource that exists and is not referenced. It needs cleanup, or the storage fills with orphans.
 
-#### `a-csv-upload-that-states-its-columns-first`: A CSV upload that states its columns first
+#### `a-csv-upload-that-states-its-columns-first`: A CSV Upload That States Its Columns First
 
 ```wireframe
 page
@@ -1252,7 +1252,7 @@ page
 
 **Cost:** Stating four columns above the zone is a paragraph of prose, and prose belongs on the page beside the field, not inside a component.
 
-#### `the-upload-refused-naming-the-row-that-failed`: The upload refused, naming the row that failed
+#### `the-upload-refused-naming-the-row-that-failed`: The Upload Refused, Naming the Row That Failed
 
 ```wireframe
 page
@@ -1272,7 +1272,7 @@ page
 
 **Cost:** Naming one row out of 2,000 needs a read of the whole file before answering. The upload is not instant, and you wait without knowing why.
 
-#### `an-image-field-with-the-dimensions-stated`: An image field with the dimensions stated
+#### `an-image-field-with-the-dimensions-stated`: An Image Field with the Dimensions Stated
 
 ```wireframe
 page
@@ -1294,7 +1294,7 @@ page
 
 **Cost:** The stored image box follows the page layout, not the dimensions of the image file. A field that demands a ratio re-decides that per field.
 
-#### `an-import-that-reports-what-it-made`: An import that reports what it made
+#### `an-import-that-reports-what-it-made`: An Import That Reports What It Made
 
 ```wireframe
 page
@@ -1317,7 +1317,7 @@ page
 
 **Cost:** A real import is a command whose effect spans many records, which the architecture reserves for a named exception. The report has to be a real read, not a summary of the session.
 
-#### `one-progress-row-per-file`: One progress row per file
+#### `one-progress-row-per-file`: One Progress Row per File
 
 ```wireframe
 page
@@ -1342,7 +1342,7 @@ page
 
 **Reference:** Dropbox
 
-#### `drop-anywhere-on-the-section`: Drop anywhere on the section
+#### `drop-anywhere-on-the-section`: Drop Anywhere on the Section
 
 ```wireframe
 page
@@ -1365,7 +1365,7 @@ page
 
 **Reference:** GitHub
 
-### Reporting a refused submit
+### Reporting a Refused Submit
 
 **Question:** A submit refused by the API must report what is wrong and where. GOV.UK asks for a summary with focus and links, plus a message on each field, meeting WCAG 3.3.1 and 3.3.3. The decision is how the form carries that report.
 
@@ -1375,7 +1375,7 @@ page
 
 **Rationale:** Keep the GOV.UK summary with focus, plus per-field messages. It meets WCAG 3.3.1 and 3.3.3, and the links carry you to each field. Inline validation on blur is the runner-up as a complement, never a replacement. It confirms good values early but cannot orient you facing three errors. Never ship the dialog summary: it hides the form you must fix.
 
-#### `a-summary-above-the-form-plus-a-message-on-each-field`: A summary above the form, plus a message on each field
+#### `a-summary-above-the-form-plus-a-message-on-each-field`: A Summary Above the Form, Plus a Message on Each Field
 
 ```wireframe
 page
@@ -1402,7 +1402,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `messages-on-the-fields-only`: Messages on the fields only
+#### `messages-on-the-fields-only`: Messages on the Fields Only
 
 ```wireframe
 page
@@ -1425,7 +1425,7 @@ page
 
 **Cost:** On a long form the first error may be below the fold. You submit, see nothing change, and conclude the button is broken. G139 exists to jump to the errors.
 
-#### `a-summary-in-a-dialog-above-the-form`: A summary in a dialog above the form
+#### `a-summary-in-a-dialog-above-the-form`: A Summary in a Dialog Above the Form
 
 ```wireframe
 page
@@ -1448,7 +1448,7 @@ page
 
 **Cost:** A dialog over a form breaks focus rules: a dialog never opens another layer, and a form is not a dialog. It also hides the form you have to fix.
 
-#### `a-summary-as-a-banner-above-the-page-not-the-form`: A summary as a banner above the page, not the form
+#### `a-summary-as-a-banner-above-the-page-not-the-form`: A Summary as a Banner Above the Page, Not the Form
 
 ```wireframe
 page
@@ -1474,7 +1474,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `the-refused-field-only-with-no-summary-at-all`: The refused field only, with no summary at all
+#### `the-refused-field-only-with-no-summary-at-all`: The Refused Field Only, with No Summary at All
 
 ```wireframe
 page
@@ -1496,7 +1496,7 @@ page
 
 **Cost:** This common behavior meets WCAG 3.3.1 but not 3.3.3, because "Invalid date" names no field and says nothing about what to do.
 
-#### `the-refused-command-with-what-to-do-instead`: The refused command, with what to do instead
+#### `the-refused-command-with-what-to-do-instead`: The Refused Command, with What to Do Instead
 
 ```wireframe
 page
@@ -1517,7 +1517,7 @@ page
 
 **Cost:** The refusal is not attached to anything you can click, so it explains rather than navigates. It suits a business rule, not a typo.
 
-#### `validation-on-leaving-each-field`: Validation on leaving each field
+#### `validation-on-leaving-each-field`: Validation on Leaving Each Field
 
 ```wireframe
 page
@@ -1542,7 +1542,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `one-question-per-screen-with-a-progress-marker`: One question per screen with a progress marker
+#### `one-question-per-screen-with-a-progress-marker`: One Question per Screen with a Progress Marker
 
 ```wireframe
 page
@@ -1565,7 +1565,7 @@ page
 
 **Reference:** Typeform
 
-### Work that is not saved
+### Work That Is Not Saved
 
 **Question:** A form must show work that is not saved. Nothing may read as saved before it is, and leaving must not drop typed work without a warning. The decision is how the form marks unsaved work and guards the way out.
 
@@ -1575,7 +1575,7 @@ page
 
 **Rationale:** Keep the visible unsaved marker beside Save. You never have to remember whether anything was typed. The sticky save bar is the runner-up for long settings pages where the form actions scroll out of view. Never ship silent autosave on money or access. Each save would be an audited command. An audit entry per keystroke batch is not a trail you can read.
 
-#### `a-visible-unsaved-marker-beside-the-save`: A visible unsaved marker beside the Save
+#### `a-visible-unsaved-marker-beside-the-save`: A Visible Unsaved Marker Beside the Save
 
 ```wireframe
 page
@@ -1597,7 +1597,7 @@ page
 
 **Cost:** A note naming one changed field states a derived fact. It has to come from the form rather than the route. A Save that changes its own label moves under the pointer.
 
-#### `leave-with-a-question-when-there-is-something-to-lose`: Leave-with-a-question when there is something to lose
+#### `leave-with-a-question-when-there-is-something-to-lose`: Leave-with-a-Question When There Is Something to Lose
 
 ```wireframe
 page
@@ -1623,7 +1623,7 @@ page
 
 **Reference:** Cloudcape
 
-#### `autosave-with-a-saved-marker`: Autosave, with a saved marker
+#### `autosave-with-a-saved-marker`: Autosave, with a Saved Marker
 
 ```wireframe
 page
@@ -1640,7 +1640,7 @@ page
 
 **Cost:** Autosave makes each save a command against money and access, which means an audit entry per keystroke batch. A past decision must stay reconstructable, and a trail of keystroke batches is not one you can read.
 
-#### `a-draft-saved-and-left-on-the-server`: A draft, saved and left on the server
+#### `a-draft-saved-and-left-on-the-server`: A Draft, Saved and Left on the Server
 
 ```wireframe
 page
@@ -1662,7 +1662,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `saved-silently-with-the-command-in-the-page-header`: Saved silently, with the command in the page header
+#### `saved-silently-with-the-command-in-the-page-header`: Saved Silently, with the Command in the Page Header
 
 ```wireframe
 page
@@ -1684,7 +1684,7 @@ page
 
 **Cost:** Two Saves on one screen is the case where you edit one form and save the other. The rule has to be one Save per page or one per section, never a mix.
 
-#### `a-read-only-form-because-the-state-forbids-it`: A read-only form because the state forbids it
+#### `a-read-only-form-because-the-state-forbids-it`: A Read-Only Form Because the State Forbids It
 
 ```wireframe
 page
@@ -1705,7 +1705,7 @@ page
 
 **Cost:** A read-only field with no command leaves you stuck, unless the command to change it is stated. The explained-action pattern exists for exactly this case.
 
-#### `a-save-bar-pinned-to-the-top-while-dirty`: A save bar pinned to the top while dirty
+#### `a-save-bar-pinned-to-the-top-while-dirty`: A Save Bar Pinned to the Top While Dirty
 
 ```wireframe
 page
@@ -1728,7 +1728,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `per-field-revert-to-the-saved-value`: Per-field revert to the saved value
+#### `per-field-revert-to-the-saved-value`: Per-Field Revert to the Saved Value
 
 ```wireframe
 page
@@ -1754,7 +1754,7 @@ page
 
 **Reference:** Figma
 
-### Picking a period
+### Picking a Period
 
 **Question:** Settlement and reporting run on periods. Two typed dates cover every window but ask for both edges, while presets cover the common windows in one tap. The decision is how the period control combines typing and presets.
 
@@ -1764,7 +1764,7 @@ page
 
 **Rationale:** Keep two typed dates with presets. One tap covers the common windows, typing covers the rare ones, and both edges stay visible. The two-month painted calendar is the runner-up for reporting screens where the window itself is the question. Never ship presets alone with no typed fallback: no preset reaches the launch to delivery window the settlement check wants.
 
-#### `two-date-inputs-with-presets`: Two date inputs with presets
+#### `two-date-inputs-with-presets`: Two Date Inputs with Presets
 
 ```wireframe
 page
@@ -1785,7 +1785,7 @@ page
 
 **Cost:** Two controls describe one value. The preset shows Custom the moment either date is edited, or the row claims a window it no longer holds.
 
-#### `preset-segmented-control-7-30-90-days`: Preset segmented control: 7, 30, 90 days
+#### `preset-segmented-control-7-30-90-days`: Preset Segmented Control: 7, 30, 90 Days
 
 ```wireframe
 page
@@ -1804,7 +1804,7 @@ page
 
 **Cost:** No preset reaches a launch-anchored window like the launch to the delivery, so a custom range still needs a second control beside this one.
 
-#### `month-picker`: Month picker
+#### `month-picker`: Month Picker
 
 ```wireframe
 page
@@ -1824,7 +1824,7 @@ page
 
 **Cost:** You cannot express a window that crosses a month edge, like the fortnight around the delivery. Whole months are the only shape this control draws.
 
-#### `open-start-rolling-window`: Open-start rolling window
+#### `open-start-rolling-window`: Open-Start Rolling Window
 
 ```wireframe
 page
@@ -1844,7 +1844,7 @@ page
 
 **Cost:** An open start silently includes old test orders, so the resolved start must be shown back under the field. Without it you cannot tell what the window holds.
 
-#### `refusal-when-the-end-precedes-the-start`: Refusal when the end precedes the start
+#### `refusal-when-the-end-precedes-the-start`: Refusal When the End Precedes the Start
 
 ```wireframe
 page
@@ -1867,7 +1867,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `timezone-safe-inclusive-day-boundaries`: Timezone-safe inclusive day boundaries
+#### `timezone-safe-inclusive-day-boundaries`: Timezone-Safe Inclusive Day Boundaries
 
 ```wireframe
 page
@@ -1889,7 +1889,7 @@ page
 
 **Cost:** The sentence must be read to work, and if you think in UTC you see different instants. Stating the zone once keeps it from being repeated under each field.
 
-#### `a-calendar-with-the-range-painted`: A calendar with the range painted
+#### `a-calendar-with-the-range-painted`: A Calendar with the Range Painted
 
 ```wireframe
 page
@@ -1932,7 +1932,7 @@ page
 
 **Reference:** Airbnb
 
-#### `delivery-anchored-presets`: Delivery-anchored presets
+#### `delivery-anchored-presets`: Delivery-Anchored Presets
 
 ```wireframe
 page
@@ -1955,7 +1955,7 @@ page
 
 **Reference:** Mixpanel
 
-### Slug or URL field with a preview
+### Slug or URL Field with a Preview
 
 **Question:** A product takes a slug, the short part typed in, and customers read the full address: they link it and print it. The decision is how the field takes the slug and previews the address before saving.
 
@@ -1965,7 +1965,7 @@ page
 
 **Rationale:** Keep the slug with its live address under it. You type the short part and read the full address before saving. The transliteration from the name is the runner-up for creation, where typing the same words twice is pure overhead. Never ship an address that cannot be read before it is saved.
 
-#### `slug-with-the-live-address-under-it`: Slug with the live address under it
+#### `slug-with-the-live-address-under-it`: Slug with the Live Address Under It
 
 ```wireframe
 page
@@ -1990,7 +1990,7 @@ page
 
 **Reference:** Shopify
 
-#### `the-address-as-a-fact-with-a-change-command`: The address as a fact with a change command
+#### `the-address-as-a-fact-with-a-change-command`: The Address as a Fact with a Change Command
 
 ```wireframe
 page
@@ -2013,7 +2013,7 @@ page
 
 **Reference:** GitHub
 
-#### `transliterated-from-the-name-with-an-edit-toggle`: Transliterated from the name with an edit toggle
+#### `transliterated-from-the-name-with-an-edit-toggle`: Transliterated from the Name with an Edit Toggle
 
 ```wireframe
 page
@@ -2037,7 +2037,7 @@ page
 
 **Reference:** WordPress
 
-#### `availability-check-with-alternatives-offered`: Availability check with alternatives offered
+#### `availability-check-with-alternatives-offered`: Availability Check with Alternatives Offered
 
 ```wireframe
 page
@@ -2061,7 +2061,7 @@ page
 
 **Reference:** Namecheap
 
-#### `the-slug-refused-with-the-rule-that-refused-it`: The slug refused with the rule that refused it
+#### `the-slug-refused-with-the-rule-that-refused-it`: The Slug Refused with the Rule That Refused It
 
 ```wireframe
 page
@@ -2085,7 +2085,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `custom-domain-with-its-dns-instructions`: Custom domain with its DNS instructions
+#### `custom-domain-with-its-dns-instructions`: Custom Domain with Its DNS Instructions
 
 ```wireframe
 page
@@ -2110,7 +2110,7 @@ page
 
 **Reference:** Vercel
 
-### Capacity field
+### Capacity Field
 
 **Question:** A price tier takes units from one warehouse stock: the Amsterdam warehouse holds 10,000 units, and every tier draws from the same shelves. The decision is how the capacity field shows the ceiling, the split, and the refusal past it.
 
@@ -2120,7 +2120,7 @@ page
 
 **Rationale:** Keep the number with the warehouse ceiling restated. One field, the stock it draws from, and what is left sit on the same screen. The split across tiers is the runner-up for the product page, where the question is the whole stock rather than one tier. Never ship a capacity with no ceiling stated: a number without its stock is a number that oversells.
 
-#### `a-number-with-the-warehouse-ceiling-restated`: A number with the warehouse ceiling restated
+#### `a-number-with-the-warehouse-ceiling-restated`: A Number with the Warehouse Ceiling Restated
 
 ```wireframe
 page
@@ -2143,7 +2143,7 @@ page
 
 **Cost:** The restated ceiling must update when another tier changes, or two screens state two stocks. It is a read of the whole product behind one field.
 
-#### `the-split-across-types-with-what-is-left`: The split across types with what is left
+#### `the-split-across-types-with-what-is-left`: The Split Across Types with What Is Left
 
 ```wireframe
 page
@@ -2164,7 +2164,7 @@ page
 
 **Cost:** A row per tier is a table wearing a list costume, and at twelve tiers it needs the table back. Editing still jumps to one tier at a time.
 
-#### `a-stepper-for-a-small-count`: A stepper for a small count
+#### `a-stepper-for-a-small-count`: A Stepper for a Small Count
 
 ```wireframe
 page
@@ -2189,7 +2189,7 @@ page
 
 **Reference:** Apple HIG
 
-#### `a-percentage-held-back-from-sale`: A percentage held back from sale
+#### `a-percentage-held-back-from-sale`: A Percentage Held Back from Sale
 
 ```wireframe
 page
@@ -2211,7 +2211,7 @@ page
 
 **Cost:** Two numbers describe one hold, and they round differently: 5% of 10,000 is 500 until the stock becomes 9,999. The units win and the percentage follows.
 
-#### `the-capacity-refused-with-the-overage-named`: The capacity refused with the overage named
+#### `the-capacity-refused-with-the-overage-named`: The Capacity Refused with the Overage Named
 
 ```wireframe
 page
@@ -2235,7 +2235,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `sold-as-a-read-only-fact-beside-an-editable-cap`: Sold as a read-only fact beside an editable cap
+#### `sold-as-a-read-only-fact-beside-an-editable-cap`: Sold as a Read-Only Fact Beside an Editable Cap
 
 ```wireframe
 page
@@ -2261,7 +2261,7 @@ page
 
 **Reference:** Stripe
 
-### Color field for the storefront accent
+### Color Field for the Storefront Accent
 
 **Question:** The company brands its storefront with one accent color: a `#RRGGBB` value dark enough for white button text to read on it. The field takes the value and proves the contrast before the page refuses it.
 
@@ -2271,7 +2271,7 @@ page
 
 **Rationale:** The hex field with a swatch and a contrast readout is the pick. It takes any color, shows it, and states the ratio the validation enforces. The customer-button preview is the runner-up beside it, because a ratio is believed once it is seen. Never ship a free color with no contrast check: a pale accent ships white text nobody can read.
 
-#### `hex-field-with-a-swatch-and-a-contrast-readout`: Hex field with a swatch and a contrast readout
+#### `hex-field-with-a-swatch-and-a-contrast-readout`: Hex Field with a Swatch and a Contrast Readout
 
 ```wireframe
 page
@@ -2296,7 +2296,7 @@ page
 
 **Reference:** Shopify
 
-#### `preset-swatches-plus-a-custom-value`: Preset swatches plus a custom value
+#### `preset-swatches-plus-a-custom-value`: Preset Swatches Plus a Custom Value
 
 ```wireframe
 page
@@ -2326,7 +2326,7 @@ page
 
 **Reference:** Slack
 
-#### `the-accent-previewed-on-a-customer-button`: The accent previewed on a customer button
+#### `the-accent-previewed-on-a-customer-button`: The Accent Previewed on a Customer Button
 
 ```wireframe
 page
@@ -2356,7 +2356,7 @@ page
 
 **Reference:** Mailchimp
 
-#### `the-browser-color-well-beside-the-hex`: The browser color well beside the hex
+#### `the-browser-color-well-beside-the-hex`: The Browser Color Well Beside the Hex
 
 ```wireframe
 page
@@ -2382,7 +2382,7 @@ page
 
 **Reference:** MDN
 
-#### `a-pale-color-refused-with-the-ratio-that-failed`: A pale color refused with the ratio that failed
+#### `a-pale-color-refused-with-the-ratio-that-failed`: A Pale Color Refused with the Ratio That Failed
 
 ```wireframe
 page
@@ -2405,7 +2405,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `an-inherited-accent-with-an-override-command`: An inherited accent with an override command
+#### `an-inherited-accent-with-an-override-command`: An Inherited Accent with an Override Command
 
 ```wireframe
 page
@@ -2426,7 +2426,7 @@ page
 
 **Reference:** Figma
 
-### Repeatable group for price tiers
+### Repeatable Group for Price Tiers
 
 **Question:** The Oak desk lamp sells in Standard, Trade, and Bulk: three groups with the same fields, each with its own name, price, and allocation. The group repeats, and the stock counts every repetition.
 
@@ -2436,7 +2436,7 @@ page
 
 **Rationale:** The stacked cards are the pick: one card per tier with its price and allocation readable at once, and one command to add another. The dated price steps are the runner-up for launches, where time decides the price rather than the customer choice. Never ship a group whose repetitions cannot be removed: a tier added by mistake must leave without taking its sold units with it.
 
-#### `stacked-cards-one-per-type`: Stacked cards, one per type
+#### `stacked-cards-one-per-type`: Stacked Cards, One per Type
 
 ```wireframe
 page
@@ -2458,7 +2458,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-table-with-inline-editing`: A table with inline editing
+#### `a-table-with-inline-editing`: A Table with Inline Editing
 
 ```wireframe
 page
@@ -2495,7 +2495,7 @@ page
 
 **Reference:** Airtable
 
-#### `one-section-per-type-with-add-another`: One section per type with add another
+#### `one-section-per-type-with-add-another`: One Section per Type with Add Another
 
 ```wireframe
 page
@@ -2526,7 +2526,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `dated-price-steps-for-the-launch`: Dated price steps for the launch
+#### `dated-price-steps-for-the-launch`: Dated Price Steps for the Launch
 
 ```wireframe
 page
@@ -2547,7 +2547,7 @@ page
 
 **Cost:** Dated steps plus per-tier allocations divide one stock in two ways. They can disagree. A step can close with units left, or sell out with days left. One of the two has to win.
 
-#### `drag-to-reorder-with-the-customer-order-shown`: Drag to reorder with the customer order shown
+#### `drag-to-reorder-with-the-customer-order-shown`: Drag to Reorder with the Customer Order Shown
 
 ```wireframe
 page
@@ -2569,7 +2569,7 @@ page
 
 **Reference:** Linear
 
-#### `the-group-refused-naming-the-type-that-breaks-the-ceiling`: The group refused, naming the type that breaks the ceiling
+#### `the-group-refused-naming-the-type-that-breaks-the-ceiling`: The Group Refused, Naming the Type That Breaks the Ceiling
 
 ```wireframe
 page
@@ -2592,7 +2592,7 @@ page
 
 **Reference:** GOV.UK
 
-### Tag input
+### Tag Input
 
 **Question:** Products and customers carry short labels: oak, home, trade. Tags are typed freely but read everywhere, so the input must take new words and still keep old ones spelled one way.
 
@@ -2602,7 +2602,7 @@ page
 
 **Rationale:** The chips with type-to-add and suggestions are the pick: new words are allowed and old ones are offered, so `oak` is spelled once. The checkbox list is the runner-up where the tag set is closed and counted. Never ship free text with no suggestions: it grows `oak`, `Oak`, and `oak-desk` side by side.
 
-#### `chips-with-type-to-add-and-suggestions`: Chips with type-to-add and suggestions
+#### `chips-with-type-to-add-and-suggestions`: Chips with Type-to-Add and Suggestions
 
 ```wireframe
 page
@@ -2632,7 +2632,7 @@ page
 
 **Reference:** GitHub
 
-#### `a-checkbox-list-in-a-popover-with-a-count`: A checkbox list in a popover with a count
+#### `a-checkbox-list-in-a-popover-with-a-count`: A Checkbox List in a Popover with a Count
 
 ```wireframe
 page
@@ -2667,7 +2667,7 @@ page
 
 **Reference:** Shopify
 
-#### `free-text-split-on-commas`: Free text split on commas
+#### `free-text-split-on-commas`: Free Text Split on Commas
 
 ```wireframe
 page
@@ -2694,7 +2694,7 @@ page
 
 **Reference:** WordPress
 
-#### `color-coded-tags-for-audience-segments`: Color-coded tags for audience segments
+#### `color-coded-tags-for-audience-segments`: Color-Coded Tags for Audience Segments
 
 ```wireframe
 page
@@ -2722,7 +2722,7 @@ page
 
 **Reference:** Mailchimp
 
-#### `a-tag-refused-with-the-rule`: A tag refused with the rule
+#### `a-tag-refused-with-the-rule`: A Tag Refused with the Rule
 
 ```wireframe
 page
@@ -2747,7 +2747,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `inherited-tags-with-their-source-named`: Inherited tags with their source named
+#### `inherited-tags-with-their-source-named`: Inherited Tags with Their Source Named
 
 ```wireframe
 page
@@ -2774,7 +2774,7 @@ page
 
 **Reference:** HubSpot
 
-### Address field
+### Address Field
 
 **Question:** Acme Supply answers for its orders with a name, an address, and a telephone number on every customer message. The address field takes the street the law asks for and the postcode the mail needs.
 
@@ -2784,7 +2784,7 @@ page
 
 **Rationale:** The postcode lookup is the pick: two short values you know produce the street you would mistype. The country-first manual entry is the runner-up for companies outside the lookup coverage. Never ship a single free-text address box: one line cannot be split into street, postcode, and city again.
 
-#### `postcode-lookup-that-fills-the-street`: Postcode lookup that fills the street
+#### `postcode-lookup-that-fills-the-street`: Postcode Lookup That Fills the Street
 
 ```wireframe
 page
@@ -2812,7 +2812,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `one-search-that-fills-the-address`: One search that fills the address
+#### `one-search-that-fills-the-address`: One Search That Fills the Address
 
 ```wireframe
 page
@@ -2837,7 +2837,7 @@ page
 
 **Reference:** Google Places
 
-#### `country-first-then-the-local-shape`: Country first, then the local shape
+#### `country-first-then-the-local-shape`: Country First, Then the Local Shape
 
 ```wireframe
 page
@@ -2863,7 +2863,7 @@ page
 
 **Reference:** Stripe
 
-#### `warehouse-address-with-a-map-pin`: Warehouse address with a map pin
+#### `warehouse-address-with-a-map-pin`: Warehouse Address with a Map Pin
 
 ```wireframe
 page
@@ -2885,7 +2885,7 @@ page
 
 **Cost:** A map is a third-party surface with its own terms and its own load time. A static pin box proves the pattern. The live map is a dependency, not a field.
 
-#### `the-postcode-refused-with-the-expected-shape`: The postcode refused with the expected shape
+#### `the-postcode-refused-with-the-expected-shape`: The Postcode Refused with the Expected Shape
 
 ```wireframe
 page
@@ -2910,7 +2910,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-verified-address-with-a-change-command`: A verified address with a change command
+#### `a-verified-address-with-a-change-command`: A Verified Address with a Change Command
 
 ```wireframe
 page
@@ -2931,7 +2931,7 @@ page
 
 **Cost:** Verification is a check against a register the back office does not hold, so the badge only grows older from its check date. A move the company forgets to report leaves a true badge on a false address.
 
-### Email body editor
+### Email Body Editor
 
 **Question:** Acme Supply mails every customer when goods are dispatched, and the message carries the customer name, the order number, and the delivery window. The editor takes the company words once and fills the customer facts per order.
 
@@ -2941,7 +2941,7 @@ page
 
 **Rationale:** The subject plus body with variable chips is the pick: you write the sentence and place the facts where they belong. The side-by-side customer preview is the runner-up beside it, because a template is believed once it is seen filled. Never ship a template with no preview: variables are spelled in one place and filled in another, and only the filled copy proves they meet.
 
-#### `subject-plus-body-with-variable-chips`: Subject plus body with variable chips
+#### `subject-plus-body-with-variable-chips`: Subject Plus Body with Variable Chips
 
 ```wireframe
 page
@@ -2969,7 +2969,7 @@ page
 
 **Reference:** Mailchimp
 
-#### `side-by-side-preview-of-the-customer-message`: Side-by-side preview of the customer message
+#### `side-by-side-preview-of-the-customer-message`: Side-by-Side Preview of the Customer Message
 
 ```wireframe
 page
@@ -2997,7 +2997,7 @@ page
 
 **Reference:** Postmark
 
-#### `plain-text-with-a-variable-list-beside-it`: Plain text with a variable list beside it
+#### `plain-text-with-a-variable-list-beside-it`: Plain Text with a Variable List Beside It
 
 ```wireframe
 page
@@ -3025,7 +3025,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `one-tab-per-language`: One tab per language
+#### `one-tab-per-language`: One Tab per Language
 
 ```wireframe
 page
@@ -3048,7 +3048,7 @@ page
 
 **Reference:** Shopify
 
-#### `the-send-refused-with-the-missing-variable-named`: The send refused with the missing variable named
+#### `the-send-refused-with-the-missing-variable-named`: The Send Refused with the Missing Variable Named
 
 ```wireframe
 page
@@ -3072,7 +3072,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-sent-copy-with-the-values-filled-in`: A sent copy with the values filled in
+#### `a-sent-copy-with-the-values-filled-in`: A Sent Copy with the Values Filled In
 
 ```wireframe
 page
@@ -3101,22 +3101,22 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/forms-and-fields#name-every-field-with-a-visible-label | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/forms-and-fields#keep-entered-values-after-a-refused-submit | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/forms-and-fields#money-field | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#choosing-a-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#date-and-time-field | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#text-field-and-its-states | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#choosing-one-of-a-few-options | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#switch-or-a-checkbox | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#upload-field | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#reporting-a-refused-submit | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#work-that-is-not-saved | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#picking-a-period | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#slug-or-url-field-with-a-preview | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#capacity-field | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#color-field-for-the-storefront-accent | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#repeatable-group-for-price-tiers | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#tag-input | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#address-field | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/forms-and-fields#email-body-editor | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/forms-and-fields#name-every-field-with-a-visible-label | guidance | Which built input lacks a shown label naming its value? Open every form on built screens and read each field's label. |
+| litespec/frontend/patterns/forms-and-fields#keep-entered-values-after-a-refused-submit | guidance | Which built form drops typed values after a refused submit? Open the refused submits on built forms and check every field. |
+| litespec/frontend/patterns/forms-and-fields#money-field | guidance | Which built amount input breaks from the wireframe its catalog entry chose? Open the built price, currency, and total fields beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#choosing-a-record | guidance | Which built record picker breaks from the wireframe its catalog entry chose? Open the built searchable pickers and recent lists beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#date-and-time-field | guidance | Which built calendar input breaks from the wireframe its catalog entry chose? Open the built date, duration, and range fields beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#text-field-and-its-states | guidance | Which built text input breaks from the wireframe its catalog entry chose? Open the built labels, counts, and growing areas beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#choosing-one-of-a-few-options | guidance | Which built single-choice control breaks from the wireframe its catalog entry chose? Open the built radios, segments, and plan cards beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#switch-or-a-checkbox | guidance | Which built toggle breaks from the wireframe its catalog entry chose? Open the built switches, checkboxes, and instant applies beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#upload-field | guidance | Which built file input breaks from the wireframe its catalog entry chose? Open the built drop zones, CSV reads, and progress rows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#reporting-a-refused-submit | guidance | Which built submit-error report breaks from the wireframe its catalog entry chose? Open the built summaries and per-field messages beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#work-that-is-not-saved | guidance | Which built unsaved marker breaks from the wireframe its catalog entry chose? Open the built dirty flags, drafts, and save bars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#picking-a-period | guidance | Which built range picker breaks from the wireframe its catalog entry chose? Open the built presets, month pickers, and painted calendars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#slug-or-url-field-with-a-preview | guidance | Which built address input breaks from the wireframe its catalog entry chose? Open the built slugs, transliterations, and availability checks beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#capacity-field | guidance | Which built ceiling input breaks from the wireframe its catalog entry chose? Open the built splits, steppers, and overage messages beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#color-field-for-the-storefront-accent | guidance | Which built accent picker breaks from the wireframe its catalog entry chose? Open the built swatches, wells, and contrast readouts beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#repeatable-group-for-price-tiers | guidance | Which built tier group breaks from the wireframe its catalog entry chose? Open the built stacked cards and inline tables beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#tag-input | guidance | Which built label chip breaks from the wireframe its catalog entry chose? Open the built chips, popover lists, and inherited tags beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#address-field | guidance | Which built location input breaks from the wireframe its catalog entry chose? Open the built lookups, country shapes, and map pins beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/forms-and-fields#email-body-editor | guidance | Which built message composer breaks from the wireframe its catalog entry chose? Open the built subject-plus-body forms and variable chips beside the catalog entry recording the chosen option and its reason. |

@@ -19,7 +19,7 @@
   ]
 }
 ---
-# <Runbook display title>
+# <Runbook Display Title>
 
 ## Impact
 

@@ -21,13 +21,14 @@ static partial class StandardsValidator
         ["how-to.md"] = "docs/guide/template.md",
         ["tutorial.md"] = "docs/tutorial/template.md",
         ["command.md"] = "docs/tools/template.md",
+        ["reference.md"] = "docs/reference/template.md",
     };
 
     static readonly HashSet<string> ReservedTemplateStems = new(
         [.. TemplateVirtualPath.Values, "docs/core/template.md"],
         StringComparer.Ordinal);
 
-    const string RoutingHeading = "Which page do you want";
+    const string RoutingHeading = "Which Page Do You Want";
 
     static void CheckPageIdentity(List<ParsedPage> parsedPages, Action<string, int, string, string> add)
     {
@@ -85,7 +86,8 @@ static partial class StandardsValidator
         .Replace("{Extension Title}", "Extension Title", StringComparison.Ordinal)
         .Replace("{How-To Title}", "How-To Title", StringComparison.Ordinal)
         .Replace("{Tutorial Title}", "Tutorial Title", StringComparison.Ordinal)
-        .Replace("{Command Title}", "Command Title", StringComparison.Ordinal);
+        .Replace("{Command Title}", "Command Title", StringComparison.Ordinal)
+        .Replace("{Reference Title}", "Reference Title", StringComparison.Ordinal);
 
     static void CheckAuthoringTemplates(string root, Dictionary<string, string> globalIds, Action<string, int, string, string> add)
     {

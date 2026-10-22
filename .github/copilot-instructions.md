@@ -2,7 +2,7 @@
 
 Read `AGENTS.md` as the canonical agent protocol. In a consumer repository, read `litespec/AGENTS.md`, `litespec.project.json`, the model query result for the active records, and enabled extensions.
 
-## Working in this repository
+## Working in This Repository
 
 Every provision ID is `litespec/<page>#<slug>`: the page path under `docs/` and the heading slug, with no ID written in the heading. `litespec/frontend/components#compose-composites-in-page-code` lives in `docs/frontend/components.md`, so a citation needs no lookup step.
 

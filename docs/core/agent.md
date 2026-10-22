@@ -86,7 +86,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 **Rationale:** A change that stops at code and skips its records, tests, or operating evidence leaves the workspace claiming behavior nothing proves. A change that sprawls past the request drags unrelated files into review. The smallest coherent change keeps the records, code, tests, and evidence that belong together in one reviewable unit.
 
-### Take Expected Values From the Scenario
+### Take Expected Values from the Scenario
 
 **Statement:** An agent MUST take a test's expected values only from the scenario's Then, never from running the code.
 
@@ -138,7 +138,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
   scratch/
 ```
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/agent#select-task-context`, `litespec/core/agent#load-applicable-extensions`, and `litespec/core/agent#inspect-local-examples-after-standards`.
 

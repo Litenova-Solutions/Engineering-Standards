@@ -6,22 +6,22 @@ The Blazor stack is the technology binding for a product that has no server of i
 
 ## Standards
 
-### Keep Blazor outside the UI contract
+### Keep Blazor Outside the UI Contract
 
 **Statement:** A consumer selecting this stack MUST NOT apply the controlled UI contract.
 
 **Rationale:** The controlled UI contract's route checks read TypeScript sources, so they cannot read a `.razor` component. Applying them to this stack would fail every check for lack of readable input. The Blazor pages state the styling, accessibility, and state rules that apply instead, so nothing is left ungoverned.
 
-### Publish static WebAssembly output
+### Publish Static WebAssembly Output
 
 **Statement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
 
-**Rationale:** Standalone WebAssembly compiles to static files, which is what lets the product run with no server and offline. Blazor Server, interactive server rendering, and prerendering each reintroduce a server dependency, which removes offline operation and contradicts the `client-only` shape.
+**Rationale:** Standalone WebAssembly compiles to static files, which is what lets the product run with no server and offline. Blazor Server, interactive server rendering, and prerendering each reintroduce a server dependency, which stops the product working offline and contradicts the `client-only` shape.
 
 
 ## Conventions
 
-### Verify with the .NET toolchain
+### Verify with the .NET Toolchain
 
 **Default:** Run client verification through `dotnet` rather than a Node package manager.
 
@@ -36,9 +36,9 @@ dotnet build apps/web/{ProjectName}.slnx --configuration Release
 dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 ```
 
-### Record a first-load budget
+### Record a First-Load Budget
 
-**Default:** Record the compressed transfer size of the framework payload as a Limit record in Operating Limits.
+**Default:** Record the compressed transfer size of the framework payload as a limit entry in `docs/operations/limits.md`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -48,7 +48,7 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/blazor/stack#keep-blazor-outside-the-ui-contract | guidance | Does the consumer apply any UI contract page or route check? |
-| litespec/frontend/blazor/stack#publish-static-webassembly-output | guidance | Does the published output hold no server assembly or server render mode? |
-| litespec/frontend/blazor/stack#verify-with-the-net-toolchain | guidance | Does the CI client job run `dotnet build` and `dotnet test`? |
-| litespec/frontend/blazor/stack#record-a-first-load-budget | guidance | Does Operating Limits record the budget the publish job enforces? |
+| litespec/frontend/blazor/stack#keep-blazor-outside-the-ui-contract | guidance | The consumer's stack selection and CI jobs apply no UI contract page or route check. |
+| litespec/frontend/blazor/stack#publish-static-webassembly-output | guidance | The published output holds static files with no server assembly or server render mode. |
+| litespec/frontend/blazor/stack#verify-with-the-net-toolchain | guidance | The CI client job runs `dotnet build` and `dotnet test`. |
+| litespec/frontend/blazor/stack#record-a-first-load-budget | guidance | A limit entry in `docs/operations/limits.md` records the compressed transfer size budget the publish job enforces. |

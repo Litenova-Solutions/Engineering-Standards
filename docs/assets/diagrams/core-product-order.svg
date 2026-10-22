@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="378" viewBox="0 0 720 378" role="img" aria-labelledby="core-product-order-title core-product-order-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
   <title id="core-product-order-title">The order of work from intent to code</title>
-  <desc id="core-product-order-desc">Four steps in order. Product brief and topic pages state what the business commits. Research, decision, and requirement hold the evidence, the choice, and the commitment. Specification records carry the rules, use cases, and journeys. Code and tests are what the product does today. An arrow points from each earlier step to the next step.</desc>
+  <desc id="core-product-order-desc">Four steps in order. Product brief and requirement pages state what the business commits. Research, decision, and requirement hold the evidence, the choice, and the commitment. Specification records carry the rules, use cases, and journeys. Code and tests are what the product does today. An arrow points from each earlier step to the next step.</desc>
   <defs>
     <marker id="core-product-order-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
@@ -21,7 +21,7 @@
   <rect x="180" y="272" width="360" height="56" rx="8" style="fill: var(--accent-subtle, #fffaf0); stroke: var(--accent, #f8c258)" stroke-width="1.5" />
 
   <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
-    <text x="360" y="44">Product brief and topic pages</text>
+    <text x="360" y="44">Product brief and requirement pages</text>
     <text x="360" y="128">Research, decision, requirement</text>
     <text x="360" y="212">Specification records</text>
     <text x="360" y="296">Code and tests</text>

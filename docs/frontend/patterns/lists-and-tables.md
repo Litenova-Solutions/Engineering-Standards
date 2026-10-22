@@ -2,27 +2,27 @@
 
 ## Intent
 
-A back-office list shows many records of one kind, such as orders, so a reader can find one record, compare rows, and act on them. This page holds the patterns for those lists: columns, sorting, filters, row density, selection, paging, row actions, table states, status, money, export, search, grouping, expansion, pinning, cards, and phone layout. A team building a list screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared set of answers keeps every list in the product behaving the same way, so a reader who learns one list knows them all.
+This page holds the patterns for the back-office list, which shows many records of one kind so a reader can find one record, compare rows, and act on them: columns, sorting, filters, row density, selection, paging, row actions, table states, status, money, export, search, grouping, expansion, pinning, cards, and phone layout. A team building a list screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared set of answers keeps every list in the product behaving the same way, so a reader who learns one list knows them all.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about lists, such as which columns a table shows. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply orders list: 268 orders across many customers and deliveries, with order 7K4Q2M for Maria Garcia as one row. Filters, sorting, and paging narrow that list, and the money column shows amounts such as EUR 125.00. The Standards section states the two rules every option keeps: the list view lives in the address, and money columns align right with their currency.
 
 ## Standards
 
-### Keep a list's view in its address
+### Keep a List's View in Its Address
 
 **Statement:** A list MUST keep its filters, sort order, and page in the URL.
 
 **Rationale:** A view kept in the address survives the back button, a refresh, and a pasted link, so all three return to the same rows. Without it, opening one record loses the filters the reader set, and a link sent to a colleague opens the unfiltered first page instead of the rows under discussion.
 
-### Align money to the right with its currency
+### Align Money to the Right with Its Currency
 
 **Statement:** A table MUST right-align a money column and show the currency of every amount in it.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply orders list: 268 orders across man
 
 ## Patterns
 
-### Choosing the columns
+### Choosing the Columns
 
 **Question:** Which columns does the orders table show. The reader picks rows by order, customer, date, state, and money. The delivery name sits under the order code as a second line.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply orders list: 268 orders across man
 
 Saved views are the later answer, when finance and the warehouse want different tables. Never ship the question-shaped headers. They cost width and read as a form.
 
-#### `five-columns-nothing-removable`: Five columns, nothing removable
+#### `five-columns-nothing-removable`: Five Columns, Nothing Removable
 
 ```wireframe
 page
@@ -65,7 +65,7 @@ page
 
 **Cost:** Nothing can be dropped or added. A team that wants the delivery as its own column, or that hides the email, has no way to get there.
 
-#### `six-columns-with-a-column-chooser`: Six columns with a column chooser
+#### `six-columns-with-a-column-chooser`: Six Columns with a Column Chooser
 
 ```wireframe
 page
@@ -92,7 +92,7 @@ page
 
 **Reference:** TanStack
 
-#### `a-chooser-that-shows-the-current-set`: A chooser that shows the current set
+#### `a-chooser-that-shows-the-current-set`: A Chooser That Shows the Current Set
 
 ```wireframe
 page
@@ -127,7 +127,7 @@ page
 
 **Cost:** Two panes, so the table is squeezed while the chooser is open. A popover narrow enough to fit beside the button avoids that.
 
-#### `two-lines-per-row-one-column-per-fact-group`: Two lines per row, one column per fact group
+#### `two-lines-per-row-one-column-per-fact-group`: Two Lines per Row, One Column per Fact Group
 
 ```wireframe
 page
@@ -150,7 +150,7 @@ page
 
 **Cost:** Sorting by delivery becomes impossible, because delivery is not a column. Carbon wants sorting in the headers, and a folded cell has nowhere to put an arrow.
 
-#### `columns-sized-to-their-content`: Columns sized to their content
+#### `columns-sized-to-their-content`: Columns Sized to Their Content
 
 ```wireframe
 page
@@ -173,7 +173,7 @@ page
 
 **Cost:** A long customer name pushes its column wider on one row and narrower on the rest, because table layout is content-driven. Fixed widths are the only way to stop that.
 
-#### `one-column-per-question-headers-that-name-the-question`: One column per question, headers that name the question
+#### `one-column-per-question-headers-that-name-the-question`: One Column per Question, Headers That Name the Question
 
 ```wireframe
 page
@@ -198,7 +198,7 @@ page
 
 **Cost:** Longer headers take width from the data. A question-shaped header breaks the one-word-per-column feel.
 
-#### `customer-first-order-code-deferred-to-the-record`: Customer first, order code deferred to the record
+#### `customer-first-order-code-deferred-to-the-record`: Customer First, Order Code Deferred to the Record
 
 ```wireframe
 page
@@ -223,7 +223,7 @@ page
 
 **Cost:** Two orders by one customer for one delivery read as near-identical rows until one is opened. Nothing on the row tells them apart, which costs the scannable identity the default order column gives.
 
-#### `a-columns-popover-listing-every-column`: A Columns popover listing every column
+#### `a-columns-popover-listing-every-column`: A Columns Popover Listing Every Column
 
 ```wireframe
 page
@@ -259,7 +259,7 @@ page
 
 **Reference:** shadcn/ui
 
-#### `saved-views-carry-their-own-columns`: Saved views carry their own columns
+#### `saved-views-carry-their-own-columns`: Saved Views Carry Their Own Columns
 
 ```wireframe
 page
@@ -298,7 +298,7 @@ page
 
 Never ship multi-column sort. No back-office question needs two keys.
 
-#### `arrow-on-the-sorted-column-only`: Arrow on the sorted column only
+#### `arrow-on-the-sorted-column-only`: Arrow on the Sorted Column Only
 
 ```wireframe
 page
@@ -321,7 +321,7 @@ page
 
 **Cost:** Nothing tells a reader that the other headers sort at all until they hover, which is invisible on a touch screen.
 
-#### `sort-as-a-control-above-the-table`: Sort as a control above the table
+#### `sort-as-a-control-above-the-table`: Sort as a Control Above the Table
 
 ```wireframe
 page
@@ -346,7 +346,7 @@ page
 
 **Cost:** The reader has to find the control to change the order, and Carbon guidance states that sorting belongs in the headers.
 
-#### `arrows-on-hover-plus-a-reset`: Arrows on hover plus a reset
+#### `arrows-on-hover-plus-a-reset`: Arrows on Hover Plus a Reset
 
 ```wireframe
 page
@@ -370,7 +370,7 @@ page
 
 **Cost:** The reset is a control that only sometimes exists, which is its own inconsistency. It is also invisible until a sort has been applied.
 
-#### `multi-column-sort-shown-as-a-stack`: Multi-column sort, shown as a stack
+#### `multi-column-sort-shown-as-a-stack`: Multi-Column Sort, Shown as a Stack
 
 ```wireframe
 page
@@ -395,7 +395,7 @@ page
 
 **Cost:** Almost no reader needs two keys, and the control is a menu of menus. Carbon treats sorting as one column at a time.
 
-#### `sorting-stated-in-the-page-description`: Sorting stated in the page description
+#### `sorting-stated-in-the-page-description`: Sorting Stated in the Page Description
 
 ```wireframe
 page
@@ -418,7 +418,7 @@ page
 
 **Cost:** The statement goes stale the moment a reader sorts by clicking, so the page contradicts itself unless the description updates too.
 
-#### `sort-only-the-column-that-has-choices`: Sort only the column that has choices
+#### `sort-only-the-column-that-has-choices`: Sort Only the Column That Has Choices
 
 ```wireframe
 page
@@ -442,7 +442,7 @@ page
 
 **Cost:** Selective sorting breaks the expectation that every header is a control, and it hides a capability rather than offering it.
 
-#### `every-sortable-header-carries-an-arrow`: Every sortable header carries an arrow
+#### `every-sortable-header-carries-an-arrow`: Every Sortable Header Carries an Arrow
 
 ```wireframe
 page
@@ -467,7 +467,7 @@ page
 
 **Reference:** shadcn/ui
 
-#### `headers-on-a-desktop-a-sort-control-on-a-phone`: Headers on a desktop, a sort control on a phone
+#### `headers-on-a-desktop-a-sort-control-on-a-phone`: Headers on a Desktop, a Sort Control on a Phone
 
 ```wireframe
 page
@@ -519,7 +519,7 @@ page
 
 Never ship every category inside one dropdown. It hides the applied state and contradicts the stated rule.
 
-#### `one-filter-per-category-visible`: One filter per category, visible
+#### `one-filter-per-category-visible`: One Filter per Category, Visible
 
 ```wireframe
 page
@@ -546,7 +546,7 @@ page
 
 **Cost:** Four controls plus a search box is a wide toolbar. Below about 700 pixels they have to wrap or collapse, which is where the complexity moves.
 
-#### `applied-filters-restated-as-chips`: Applied filters restated as chips
+#### `applied-filters-restated-as-chips`: Applied Filters Restated as Chips
 
 ```wireframe
 page
@@ -576,7 +576,7 @@ page
 
 **Cost:** The chips restate the controls, saying one thing twice on one page.
 
-#### `filters-with-an-applied-count-on-the-control`: Filters with an applied count on the control
+#### `filters-with-an-applied-count-on-the-control`: Filters with an Applied Count on the Control
 
 ```wireframe
 page
@@ -606,7 +606,7 @@ page
 
 **Cost:** A count of one on a select reads as decoration unless the reader knows what it means. It is only clear beside a label.
 
-#### `a-filter-panel-beside-the-table`: A filter panel beside the table
+#### `a-filter-panel-beside-the-table`: A Filter Panel Beside the Table
 
 ```wireframe
 page
@@ -638,7 +638,7 @@ page
 
 **Reference:** Carbon
 
-#### `filters-in-one-dropdown`: Filters in one dropdown
+#### `filters-in-one-dropdown`: Filters in One Dropdown
 
 ```wireframe
 page
@@ -662,7 +662,7 @@ page
 
 **Cost:** Carbon states that multiple filter categories never sit inside a menu. A reader cannot see that a date filter exists without opening it, and closing it hides the applied state again.
 
-#### `views-as-tabs-filters-as-controls`: Views as tabs, filters as controls
+#### `views-as-tabs-filters-as-controls`: Views as Tabs, Filters as Controls
 
 ```wireframe
 page
@@ -690,7 +690,7 @@ page
 
 **Cost:** Two mechanisms over one table, and the reader has to work out whether to click a tab or a filter. HubSpot makes views do both jobs instead.
 
-#### `every-option-carries-its-count-before-it-is-applied`: Every option carries its count before it is applied
+#### `every-option-carries-its-count-before-it-is-applied`: Every Option Carries Its Count Before It Is Applied
 
 ```wireframe
 page
@@ -718,7 +718,7 @@ page
 
 **Cost:** Each count is a read against the other filters, so opening one select costs several queries. Counts also go stale the moment another user acts, and a stale zero is worse than none.
 
-#### `faceted-filter-buttons-with-counts`: Faceted filter buttons with counts
+#### `faceted-filter-buttons-with-counts`: Faceted Filter Buttons with Counts
 
 ```wireframe
 page
@@ -753,7 +753,7 @@ page
 
 **Reference:** shadcn/ui
 
-#### `filter-conditions-as-removable-chips`: Filter conditions as removable chips
+#### `filter-conditions-as-removable-chips`: Filter Conditions as Removable Chips
 
 ```wireframe
 page
@@ -783,7 +783,7 @@ page
 
 **Reference:** Linear
 
-### Row density
+### Row Density
 
 **Question:** How tall is a row in the orders table. Carbon defines five heights from 24 to 64 pixels, and the header, toolbar, and pagination match the row size. The default table runs near 47 pixels per row, between `md` and `lg`.
 
@@ -795,7 +795,7 @@ page
 
 Never ship a density control the reader sets. Most readers set it once, and a screenshot suite then holds three versions of every page. The phone answer is a record list.
 
-#### `40-pixels-the-default`: 40 pixels, the default
+#### `40-pixels-the-default`: 40 Pixels, the Default
 
 ```wireframe
 page
@@ -820,7 +820,7 @@ page
 
 **Reference:** Carbon
 
-#### `24-pixels-scannable`: 24 pixels, scannable
+#### `24-pixels-scannable`: 24 Pixels, Scannable
 
 ```wireframe
 page
@@ -846,7 +846,7 @@ page
 
 **Reference:** Carbon
 
-#### `32-pixels-a-working-table`: 32 pixels, a working table
+#### `32-pixels-a-working-table`: 32 Pixels, a Working Table
 
 ```wireframe
 page
@@ -872,7 +872,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-density-control-the-reader-sets`: A density control the reader sets
+#### `a-density-control-the-reader-sets`: A Density Control the Reader Sets
 
 ```wireframe
 page
@@ -898,7 +898,7 @@ page
 
 **Reference:** Carbon
 
-#### `dense-rows-with-a-zebra-pass`: Dense rows with a zebra pass
+#### `dense-rows-with-a-zebra-pass`: Dense Rows with a Zebra Pass
 
 ```wireframe
 page
@@ -924,7 +924,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-record-list-instead-of-a-table`: A record list instead of a table
+#### `a-record-list-instead-of-a-table`: A Record List Instead of a Table
 
 ```wireframe
 page
@@ -948,7 +948,7 @@ page
 
 **Cost:** No columns, so no sorting and no comparison across a column. It trades every table capability for reading one record well.
 
-#### `comfortable-48-px-rows-for-a-delivery-list`: Comfortable 48 px rows for a delivery list
+#### `comfortable-48-px-rows-for-a-delivery-list`: Comfortable 48 Px Rows for a Delivery List
 
 ```wireframe
 page
@@ -974,7 +974,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `compact-rows-with-a-header-that-stays`: Compact rows with a header that stays
+#### `compact-rows-with-a-header-that-stays`: Compact Rows with a Header That Stays
 
 ```wireframe
 page
@@ -1001,7 +1001,7 @@ page
 
 **Reference:** Linear
 
-### Bulk action bar
+### Bulk Action Bar
 
 **Question:** What appears once order rows are selected. The bar names the count and the money, then offers the commands. A refund on the wrong scope is the expensive mistake this pattern guards against.
 
@@ -1013,7 +1013,7 @@ page
 
 Never ship the bar at the foot. On a long table the action sits off screen while the checkboxes that enabled it do not.
 
-#### `a-bar-above-the-table-naming-the-count`: A bar above the table naming the count
+#### `a-bar-above-the-table-naming-the-count`: A Bar Above the Table Naming the Count
 
 ```wireframe
 page
@@ -1040,7 +1040,7 @@ page
 
 **Cost:** The toolbar is still visible above the bar, so two rows of controls stack. Either the toolbar goes or the page gets taller.
 
-#### `the-bar-replaces-the-toolbar`: The bar replaces the toolbar
+#### `the-bar-replaces-the-toolbar`: The Bar Replaces the Toolbar
 
 ```wireframe
 page
@@ -1063,7 +1063,7 @@ page
 
 **Cost:** The layout shifts under the reader mid-decision. The search box they wanted to refine with is gone exactly when they are about to act.
 
-#### `bar-at-the-foot-above-the-pagination`: Bar at the foot, above the pagination
+#### `bar-at-the-foot-above-the-pagination`: Bar at the Foot, Above the Pagination
 
 ```wireframe
 page
@@ -1092,7 +1092,7 @@ page
 
 **Cost:** On a long table the foot is off screen while the checkboxes are not. The reader scrolls to find the action its checkboxes enabled.
 
-#### `bar-with-the-escalation-and-money-named`: Bar with the escalation, and money named
+#### `bar-with-the-escalation-and-money-named`: Bar with the Escalation, and Money Named
 
 ```wireframe
 page
@@ -1119,7 +1119,7 @@ page
 
 **Cost:** A long bar with two numbers and three buttons. It only fits above about 900 pixels, so the phone needs its own version of the same warning.
 
-#### `bar-with-a-confirm-before-it-commits`: Bar with a confirm before it commits
+#### `bar-with-a-confirm-before-it-commits`: Bar with a Confirm Before It Commits
 
 ```wireframe
 page
@@ -1155,7 +1155,7 @@ page
 
 **Reference:** NN/g
 
-#### `bar-with-the-action-inline-and-an-undo-after`: Bar with the action inline and an undo after
+#### `bar-with-the-action-inline-and-an-undo-after`: Bar with the Action Inline and an Undo After
 
 ```wireframe
 page
@@ -1180,7 +1180,7 @@ page
 
 **Cost:** On money the evidence argues against this option. NN/g reports reflex clicking when confirmations are routine. A refund is not the place to train that reflex.
 
-#### `a-floating-pill-with-the-count-and-one-menu`: A floating pill with the count and one menu
+#### `a-floating-pill-with-the-count-and-one-menu`: A Floating Pill with the Count and One Menu
 
 ```wireframe
 page
@@ -1211,7 +1211,7 @@ page
 
 **Reference:** Notion
 
-#### `bulk-actions-behind-one-dropdown`: Bulk actions behind one dropdown
+#### `bulk-actions-behind-one-dropdown`: Bulk Actions Behind One Dropdown
 
 ```wireframe
 page
@@ -1254,7 +1254,7 @@ page
 
 Never ship the jump field. Typing a page number then Enter is slower than clicking for almost every reader.
 
-#### `count-left-numbered-pages-right`: Count left, numbered pages right
+#### `count-left-numbered-pages-right`: Count Left, Numbered Pages Right
 
 ```wireframe
 page
@@ -1282,7 +1282,7 @@ page
 
 **Cost:** Seven page numbers plus two chevrons is a wide control, and it has to collapse on a phone. The count and the numbers still overlap slightly.
 
-#### `count-page-size-and-chevrons`: Count, page size and chevrons
+#### `count-page-size-and-chevrons`: Count, Page Size and Chevrons
 
 ```wireframe
 page
@@ -1309,7 +1309,7 @@ page
 
 **Reference:** Carbon
 
-#### `first-previous-numbers-next-last`: First, previous, numbers, next, last
+#### `first-previous-numbers-next-last`: First, Previous, Numbers, Next, Last
 
 ```wireframe
 page
@@ -1339,7 +1339,7 @@ page
 
 **Cost:** The widest pagination control there is, and the numbers still have to window or overflow. On a 268-row list it saves at most four clicks.
 
-#### `count-chevrons-and-jump-to-a-page`: Count, chevrons, and jump to a page
+#### `count-chevrons-and-jump-to-a-page`: Count, Chevrons, and Jump to a Page
 
 ```wireframe
 page
@@ -1364,7 +1364,7 @@ page
 
 **Cost:** The jump field is a fourth thing to learn, and typing 11 then Enter is slower than clicking for most readers.
 
-#### `load-more-as-a-button-at-the-foot`: Load more as a button at the foot
+#### `load-more-as-a-button-at-the-foot`: Load More as a Button at the Foot
 
 ```wireframe
 page
@@ -1388,7 +1388,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `no-pagination-because-the-list-is-short`: No pagination, because the list is short
+#### `no-pagination-because-the-list-is-short`: No Pagination, Because the List Is Short
 
 ```wireframe
 page
@@ -1408,7 +1408,7 @@ page
 
 **Cost:** It cannot be a rule for the whole back office. Orders reach thousands and deliveries reach hundreds, so the list page has to decide per query.
 
-#### `a-compact-pager-range-plus-two-chevrons`: A compact pager: range plus two chevrons
+#### `a-compact-pager-range-plus-two-chevrons`: A Compact Pager: Range Plus Two Chevrons
 
 ```wireframe
 page
@@ -1433,7 +1433,7 @@ page
 
 **Reference:** Stripe
 
-#### `no-pager-at-all-while-everything-fits`: No pager at all while everything fits
+#### `no-pager-at-all-while-everything-fits`: No Pager at All While Everything Fits
 
 ```wireframe
 page
@@ -1454,7 +1454,7 @@ page
 
 **Reference:** GitHub
 
-### Row actions
+### Row Actions
 
 **Question:** The orders table shows rows of orders. Each row may carry its own commands. How many commands sit on the row, and where do the rest live.
 
@@ -1464,7 +1464,7 @@ page
 
 **Rationale:** Keep one inline command with the rest in the row menu. The common job stays one click away and the row stays narrow. Prefer the side preview where acting needs the record context, such as the lines before a resend. Never ship hover-revealed actions. Hover fails on touch, and a second focusable render doubles the table for no gain.
 
-#### `one-inline-action-the-rest-in-a-row-menu`: One inline action, the rest in a row menu
+#### `one-inline-action-the-rest-in-a-row-menu`: One Inline Action, the Rest in a Row Menu
 
 ```wireframe
 page
@@ -1486,7 +1486,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `the-row-is-the-only-action`: The row is the only action
+#### `the-row-is-the-only-action`: The Row Is the Only Action
 
 ```wireframe
 page
@@ -1505,7 +1505,7 @@ page
 
 **Cost:** A bulk job becomes one row at a time, so this shape fits finding, not acting.
 
-#### `two-inline-actions-no-menu`: Two inline actions, no menu
+#### `two-inline-actions-no-menu`: Two Inline Actions, No Menu
 
 ```wireframe
 page
@@ -1527,7 +1527,7 @@ page
 
 **Reference:** NN/g
 
-#### `row-menu-only`: Row menu only
+#### `row-menu-only`: Row Menu Only
 
 ```wireframe
 page
@@ -1546,7 +1546,7 @@ page
 
 **Cost:** Nothing on the row says what can be done. The reader has to open a menu to learn that anything can be done at all.
 
-#### `hover-reveals-the-action-always-focusable`: Hover reveals the action, always focusable
+#### `hover-reveals-the-action-always-focusable`: Hover Reveals the Action, Always Focusable
 
 ```wireframe
 page
@@ -1566,7 +1566,7 @@ page
 
 **Cost:** It still fails on touch, where there is no hover, and the two fixes together mean two renders of every row. Polaris and NN/g both warn about hover-only affordances.
 
-#### `one-destructive-command-in-the-row-guarded`: One destructive command in the row, guarded
+#### `one-destructive-command-in-the-row-guarded`: One Destructive Command in the Row, Guarded
 
 ```wireframe
 page
@@ -1589,7 +1589,7 @@ page
 
 **Cost:** A red word in every row is visual noise on a page for scanning states. Carbon warns that a tone with no action required stays plain text.
 
-#### `the-row-menu-drawn-open`: The row menu drawn open
+#### `the-row-menu-drawn-open`: The Row Menu Drawn Open
 
 ```wireframe
 page
@@ -1615,7 +1615,7 @@ page
 
 **Reference:** shadcn/ui
 
-#### `open-in-a-side-preview-act-from-there`: Open in a side preview, act from there
+#### `open-in-a-side-preview-act-from-there`: Open in a Side Preview, Act from There
 
 ```wireframe
 page
@@ -1644,7 +1644,7 @@ page
 
 **Reference:** Shopify
 
-### Table's own states
+### Table's Own States
 
 **Question:** The orders table is sometimes empty, still loading, or failed to load. Each case needs its own words and layout. What shows for each state of the table itself.
 
@@ -1654,7 +1654,7 @@ page
 
 **Rationale:** Keep three sentences for three facts. No data yet, no results, and loading each replace the table they stand for. Prefer the slow-read note that names what is loading when the list takes seconds. Never ship a bare spinner over the table body. Rows that shift when the data lands move the row the reader already chose.
 
-#### `no-data-yet-table-replaced`: No data yet, table replaced
+#### `no-data-yet-table-replaced`: No Data yet, Table Replaced
 
 ```wireframe
 page
@@ -1672,7 +1672,7 @@ page
 
 **Cost:** The reader cannot see what a row will look like, so the columns are undiscoverable until there is data.
 
-#### `no-results-for-a-search-filters-named`: No results for a search, filters named
+#### `no-results-for-a-search-filters-named`: No Results for a Search, Filters Named
 
 ```wireframe
 page
@@ -1694,7 +1694,7 @@ page
 
 **Cost:** Two empty states means two pieces of copy per list page, both of which have to stay true as filters change.
 
-#### `loading-as-skeletons-at-the-real-row-height`: Loading as skeletons at the real row height
+#### `loading-as-skeletons-at-the-real-row-height`: Loading as Skeletons at the Real Row Height
 
 ```wireframe
 page
@@ -1715,7 +1715,7 @@ page
 
 **Reference:** Carbon
 
-#### `a-failed-read-keeps-the-chrome`: A failed read keeps the chrome
+#### `a-failed-read-keeps-the-chrome`: A Failed Read Keeps the Chrome
 
 ```wireframe
 page
@@ -1736,7 +1736,7 @@ page
 
 **Cost:** Old rows under an error can be acted on by mistake, which is the opposite of what the message wants to prevent.
 
-#### `a-failed-first-read-drops-the-table`: A failed first read drops the table
+#### `a-failed-first-read-drops-the-table`: A Failed First Read Drops the Table
 
 ```wireframe
 page
@@ -1757,7 +1757,7 @@ page
 
 **Reference:** Carbon
 
-#### `refreshing-in-place-with-the-last-read-stated`: Refreshing in place, with the last read stated
+#### `refreshing-in-place-with-the-last-read-stated`: Refreshing in Place, with the Last Read Stated
 
 ```wireframe
 page
@@ -1778,7 +1778,7 @@ page
 
 **Cost:** A timer on a page holding money means the reader may act on a value that changes a second later. A statement of when it last read is the mitigation, not a fix.
 
-#### `no-results-with-recent-searches`: No results with recent searches
+#### `no-results-with-recent-searches`: No Results with Recent Searches
 
 ```wireframe
 page
@@ -1803,7 +1803,7 @@ page
 
 **Reference:** Linear
 
-#### `a-slow-read-that-says-what-it-is-doing`: A slow read that says what it is doing
+#### `a-slow-read-that-says-what-it-is-doing`: A Slow Read That Says What It Is Doing
 
 ```wireframe
 page
@@ -1826,7 +1826,7 @@ page
 
 **Reference:** Vercel
 
-### Status in a column
+### Status in a Column
 
 **Question:** Each order row carries a state such as Paid or Disputed. Some states need a decision and some need none. How does the State column tell them apart.
 
@@ -1836,7 +1836,7 @@ page
 
 **Rationale:** Give a tone only to the states that block. Disputed and Awaiting payment take a badge because somebody must act. Paid and Completed stay plain words. Prefer the reason on a second line for a disputes queue where the word alone never answers why. Never ship progress marks. Four blocks per row on a 268-row list cannot serve a lifecycle that branches.
 
-#### `a-badge-for-every-state`: A badge for every state
+#### `a-badge-for-every-state`: A Badge for Every State
 
 ```wireframe
 page
@@ -1855,7 +1855,7 @@ page
 
 **Cost:** Carbon warns that more than five or six status indicators overwhelm the eye. A status needing no action stays plain text. A badge on all twenty-five rows is exactly that.
 
-#### `plain-text-and-the-label-says-which-state`: Plain text, and the label says which state
+#### `plain-text-and-the-label-says-which-state`: Plain Text, and the Label Says Which State
 
 ```wireframe
 page
@@ -1875,7 +1875,7 @@ page
 
 **Cost:** A reader scanning for a problem has to read every word. With 268 rows that is slow, which is the case for badges.
 
-#### `tone-only-on-the-states-that-block`: Tone only on the states that block
+#### `tone-only-on-the-states-that-block`: Tone Only on the States That Block
 
 ```wireframe
 page
@@ -1895,7 +1895,7 @@ page
 
 **Cost:** The reader has to learn which states are toned, and a new state added later has to be classified before it is used.
 
-#### `two-states-side-by-side-both-named`: Two states side by side, both named
+#### `two-states-side-by-side-both-named`: Two States Side by Side, Both Named
 
 ```wireframe
 page
@@ -1916,7 +1916,7 @@ page
 
 **Cost:** A seventh column on a table that already carries five, for a distinction most readers do not need until something is wrong.
 
-#### `a-dot-beside-the-word`: A dot beside the word
+#### `a-dot-beside-the-word`: A Dot Beside the Word
 
 ```wireframe
 page
@@ -1935,7 +1935,7 @@ page
 
 **Cost:** A dot beside a word is a third channel after word and badge. It adds an element that has to be explained once. It is also below 3:1 against the row background unless the token is chosen for it.
 
-#### `the-state-as-a-progress-of-three-steps`: The state as a progress of three steps
+#### `the-state-as-a-progress-of-three-steps`: The State as a Progress of Three Steps
 
 ```wireframe
 page
@@ -1955,7 +1955,7 @@ page
 
 **Cost:** Four marks per row is heavy on a 268-row list, and it only works because the order lifecycle genuinely is linear. A state with branches cannot use it.
 
-#### `status-with-the-reason-on-a-second-line`: Status with the reason on a second line
+#### `status-with-the-reason-on-a-second-line`: Status with the Reason on a Second Line
 
 ```wireframe
 page
@@ -1977,7 +1977,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-stale-wait-takes-a-stronger-tone`: A stale wait takes a stronger tone
+#### `a-stale-wait-takes-a-stronger-tone`: A Stale Wait Takes a Stronger Tone
 
 ```wireframe
 page
@@ -2000,7 +2000,7 @@ page
 
 **Reference:** Zendesk
 
-### Money column
+### Money Column
 
 **Question:** Each order row shows what the customer paid. The column header names the currency. What does the money cell say beyond the number.
 
@@ -2010,7 +2010,7 @@ page
 
 **Rationale:** Keep the number only. The header names the currency and repeating EUR on every row is noise. Prefer the refunded part under the charged amount where refunds are the work rather than the exception. Never ship money as a share of the total. A derived percentage column answers a question no orders list is asked.
 
-#### `number-only-right-aligned`: Number only, right-aligned
+#### `number-only-right-aligned`: Number Only, Right-Aligned
 
 ```wireframe
 page
@@ -2029,7 +2029,7 @@ page
 
 **Cost:** EUR 0.00 reads as an error rather than as a fact. Two of the eight default rows are zero, and neither says why.
 
-#### `symbol-and-value-one-column`: Symbol and value, one column
+#### `symbol-and-value-one-column`: Symbol and Value, One Column
 
 ```wireframe
 page
@@ -2048,7 +2048,7 @@ page
 
 **Cost:** A symbol alone fails WCAG 2.2 SC 1.4.1 if it is the only distinction. A screen reader does not always read a symbol prefix. The currency belongs in the label as well.
 
-#### `a-zero-amount-says-why`: A zero amount says why
+#### `a-zero-amount-says-why`: A Zero Amount Says Why
 
 ```wireframe
 page
@@ -2068,7 +2068,7 @@ page
 
 **Cost:** A word in a numeric column breaks the alignment. It has to be short enough not to push the column wide.
 
-#### `two-money-columns-charged-and-refunded`: Two money columns: charged and refunded
+#### `two-money-columns-charged-and-refunded`: Two Money Columns: Charged and Refunded
 
 ```wireframe
 page
@@ -2089,7 +2089,7 @@ page
 
 **Cost:** Two money columns on a five-column table is a lot of numbers. Most rows are identical in both, so the reader scans two equal columns to learn nothing.
 
-#### `money-as-a-share-of-the-total`: Money as a share of the total
+#### `money-as-a-share-of-the-total`: Money as a Share of the Total
 
 ```wireframe
 page
@@ -2109,7 +2109,7 @@ page
 
 **Cost:** A share is derived from the total, so it goes stale the moment the filter changes. One column of derived percentages is a small exception, not a pattern.
 
-#### `amounts-grouped-by-day`: Amounts grouped by day
+#### `amounts-grouped-by-day`: Amounts Grouped by Day
 
 ```wireframe
 page
@@ -2133,7 +2133,7 @@ page
 
 **Cost:** Grouping removes the flat row order and makes the table a different component, so pagination and select-all both get harder to reason about.
 
-#### `a-totals-footer-under-the-money`: A totals footer under the money
+#### `a-totals-footer-under-the-money`: A Totals Footer Under the Money
 
 ```wireframe
 page
@@ -2157,7 +2157,7 @@ page
 
 **Reference:** Shopify
 
-#### `refunded-shown-under-the-charged-amount`: Refunded shown under the charged amount
+#### `refunded-shown-under-the-charged-amount`: Refunded Shown Under the Charged Amount
 
 ```wireframe
 page
@@ -2179,7 +2179,7 @@ page
 
 **Reference:** Stripe
 
-### Exporting the list
+### Exporting the List
 
 **Question:** A reader takes the orders list elsewhere. Download serves one spreadsheet now. Print serves a paper sheet. A schedule serves a repeated question. Which export does the list offer.
 
@@ -2189,7 +2189,7 @@ page
 
 **Rationale:** Keep one Export button that downloads the filtered rows as CSV. The accountant job costs one click and no decisions. Prefer a background export past a few thousand rows where a download would time out. Never ship copy as the only export. Copying the visible page silently drops every row past the pager.
 
-#### `one-export-button-that-downloads-csv`: One Export button that downloads CSV
+#### `one-export-button-that-downloads-csv`: One Export Button That Downloads CSV
 
 ```wireframe
 page
@@ -2209,7 +2209,7 @@ page
 
 **Cost:** There is no choice of columns or format. A reader who wants only order number and paid, or an Excel file, trims or converts it elsewhere.
 
-#### `export-dialog-with-columns-and-format`: Export dialog with columns and format
+#### `export-dialog-with-columns-and-format`: Export Dialog with Columns and Format
 
 ```wireframe
 page
@@ -2240,7 +2240,7 @@ page
 
 **Cost:** Two steps instead of one. The dialog has to remember or reset its choices on the next visit. The single button never has to decide.
 
-#### `scheduled-email-export`: Scheduled email export
+#### `scheduled-email-export`: Scheduled Email Export
 
 ```wireframe
 page
@@ -2261,7 +2261,7 @@ page
 
 **Cost:** A schedule is invisible state. Nobody sees it on the orders page. A stale recipient keeps receiving figures until someone remembers the schedule exists.
 
-#### `print-stylesheet-with-a-print-button`: Print stylesheet with a Print button
+#### `print-stylesheet-with-a-print-button`: Print Stylesheet with a Print Button
 
 ```wireframe
 page
@@ -2282,7 +2282,7 @@ page
 
 **Cost:** Paper freezes the list at print time. An order paid after printing is missing. Nothing on the sheet says how old it is except the printed date.
 
-#### `per-row-receipt-download`: Per-row receipt download
+#### `per-row-receipt-download`: Per-Row Receipt Download
 
 ```wireframe
 page
@@ -2302,7 +2302,7 @@ page
 
 **Cost:** A button on every row narrows the table. It invites downloading receipts one by one for a job that wants the whole list. That is slower than one export.
 
-#### `copy-the-list-to-the-clipboard`: Copy the list to the clipboard
+#### `copy-the-list-to-the-clipboard`: Copy the List to the Clipboard
 
 ```wireframe
 page
@@ -2323,7 +2323,7 @@ page
 
 **Cost:** Only the visible page is copied. Pasting 25 rows when the filter holds 268 silently drops the rest unless the reader notices the pager.
 
-#### `a-large-export-that-runs-in-the-background`: A large export that runs in the background
+#### `a-large-export-that-runs-in-the-background`: A Large Export That Runs in the Background
 
 ```wireframe
 page
@@ -2347,7 +2347,7 @@ page
 
 **Reference:** Shopify
 
-#### `export-history-with-repeat-download`: Export history with repeat download
+#### `export-history-with-repeat-download`: Export History with Repeat Download
 
 ```wireframe
 page
@@ -2368,7 +2368,7 @@ page
 
 **Reference:** Stripe
 
-### Searching with highlighted matches
+### Searching with Highlighted Matches
 
 **Question:** A search box filters the orders table. A match on an email looks the same as a match on a name. How does the list show why each row matched.
 
@@ -2378,7 +2378,7 @@ page
 
 **Rationale:** Highlight the matches in the cells. The reader sees why each row matched without opening it. Prefer a scope control once readers search across deliveries and must say which one. Never ship a match column on its own. It spends a column stating what the highlight already shows.
 
-#### `matches-highlighted-in-the-cells`: Matches highlighted in the cells
+#### `matches-highlighted-in-the-cells`: Matches Highlighted in the Cells
 
 ```wireframe
 page
@@ -2399,7 +2399,7 @@ page
 
 **Reference:** GitHub
 
-#### `scoped-search-this-delivery-or-all-deliveries`: Scoped search: this delivery or all deliveries
+#### `scoped-search-this-delivery-or-all-deliveries`: Scoped Search: This Delivery or All Deliveries
 
 ```wireframe
 page
@@ -2422,7 +2422,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-match-column-naming-where-it-matched`: A match column naming where it matched
+#### `a-match-column-naming-where-it-matched`: A Match Column Naming Where It Matched
 
 ```wireframe
 page
@@ -2443,7 +2443,7 @@ page
 
 **Reference:** GitHub
 
-#### `first-match-focused-for-the-keyboard`: First match focused for the keyboard
+#### `first-match-focused-for-the-keyboard`: First Match Focused for the Keyboard
 
 ```wireframe
 page
@@ -2465,7 +2465,7 @@ page
 
 **Reference:** Linear
 
-#### `recent-searches-under-the-box`: Recent searches under the box
+#### `recent-searches-under-the-box`: Recent Searches Under the Box
 
 ```wireframe
 page
@@ -2492,7 +2492,7 @@ page
 
 **Reference:** Vercel
 
-#### `a-searching-indicator-while-the-server-answers`: A searching indicator while the server answers
+#### `a-searching-indicator-while-the-server-answers`: A Searching Indicator While the Server Answers
 
 ```wireframe
 page
@@ -2513,7 +2513,7 @@ page
 
 **Reference:** Stripe
 
-### Grouped rows
+### Grouped Rows
 
 **Question:** Some questions are asked per group, not per row: what did today take, what does each delivery hold. A flat table answers them only after an export, while a group header with its own subtotal answers them on the page.
 
@@ -2523,7 +2523,7 @@ page
 
 **Rationale:** Keep grouped by day with subtotals. It answers what today took without a chart and without leaving the list. The runner-up is grouped by delivery with collapse toggles. Prefer it once deliveries grow so one day of rows stops fitting. Never ship two group levels: month-then-day nesting turns the list into a tree that paging cannot cross.
 
-#### `grouped-by-day-with-subtotals`: Grouped by day with subtotals
+#### `grouped-by-day-with-subtotals`: Grouped by Day with Subtotals
 
 ```wireframe
 page
@@ -2550,7 +2550,7 @@ page
 
 **Reference:** Stripe
 
-#### `grouped-by-delivery-with-collapse-toggles`: Grouped by delivery with collapse toggles
+#### `grouped-by-delivery-with-collapse-toggles`: Grouped by Delivery with Collapse Toggles
 
 ```wireframe
 page
@@ -2580,7 +2580,7 @@ page
 
 **Reference:** Linear
 
-#### `grouped-by-state`: Grouped by state
+#### `grouped-by-state`: Grouped by State
 
 ```wireframe
 page
@@ -2611,7 +2611,7 @@ page
 
 **Reference:** Linear
 
-#### `no-grouping-a-group-column-that-sorts`: No grouping: a group column that sorts
+#### `no-grouping-a-group-column-that-sorts`: No Grouping: A Group Column That Sorts
 
 ```wireframe
 page
@@ -2632,7 +2632,7 @@ page
 
 **Reference:** Carbon
 
-#### `group-headers-that-select-the-group`: Group headers that select the group
+#### `group-headers-that-select-the-group`: Group Headers That Select the Group
 
 ```wireframe
 page
@@ -2661,7 +2661,7 @@ page
 
 **Reference:** Outlook
 
-#### `two-levels-month-then-day`: Two levels: month, then day
+#### `two-levels-month-then-day`: Two Levels: Month, Then Day
 
 ```wireframe
 page
@@ -2687,7 +2687,7 @@ page
 
 **Reference:** Xero
 
-### Inline row expansion
+### Inline Row Expansion
 
 **Question:** Some rows hold a second level: an order holds its lines, its units, its history. Opening the record for each one costs a page load per row. An expansion row under the row itself answers the question where it was asked.
 
@@ -2697,7 +2697,7 @@ page
 
 **Rationale:** Keep expansion to the order lines. It answers what the customer bought, which is the question asked from the list. The runner-up is expansion to units with pickup state. Prefer it on the pickup list where handover is the work. Never ship expand-all: twenty expanded rows is a page nobody can scan, and one click fires a read per row.
 
-#### `expand-to-the-order-lines`: Expand to the order lines
+#### `expand-to-the-order-lines`: Expand to the Order Lines
 
 ```wireframe
 page
@@ -2721,7 +2721,7 @@ page
 
 **Reference:** Stripe
 
-#### `expand-to-the-order-timeline`: Expand to the order timeline
+#### `expand-to-the-order-timeline`: Expand to the Order Timeline
 
 ```wireframe
 page
@@ -2745,7 +2745,7 @@ page
 
 **Reference:** Zendesk
 
-#### `expand-to-units-and-pickup-state`: Expand to units and pickup state
+#### `expand-to-units-and-pickup-state`: Expand to Units and Pickup State
 
 ```wireframe
 page
@@ -2767,7 +2767,7 @@ page
 
 **Cost:** Pickup state changes by the second at busy times, so an expanded row goes stale while it is open. It needs the same refresh the pickup screen has.
 
-#### `one-row-open-at-a-time`: One row open at a time
+#### `one-row-open-at-a-time`: One Row Open at a Time
 
 ```wireframe
 page
@@ -2791,7 +2791,7 @@ page
 
 **Reference:** Carbon
 
-#### `an-expand-all-control-above-the-table`: An expand-all control above the table
+#### `an-expand-all-control-above-the-table`: An Expand-All Control Above the Table
 
 ```wireframe
 page
@@ -2818,7 +2818,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `no-expansion-the-row-opens-the-record`: No expansion: the row opens the record
+#### `no-expansion-the-row-opens-the-record`: No Expansion: The Row Opens the Record
 
 ```wireframe
 page
@@ -2836,7 +2836,7 @@ page
 
 **Cost:** Every question costs a page load and a back button. Checking three orders means six page loads where expansion needs none.
 
-### Pinned and resizing columns
+### Pinned and Resizing Columns
 
 **Question:** A wide table scrolls, and a scrolling table loses its bearings. The order code leaves as the money arrives. Pinning the identity column keeps the row named, and resizing lets the reader spend width where their own data needs it.
 
@@ -2846,7 +2846,7 @@ page
 
 **Rationale:** Keep the order column pinned while the rest scroll. The row stays named at any scroll position, and it costs no control. The runner-up pins the actions too. Prefer it once rows carry inline commands that must stay reachable. Never ship draggable widths in a first release: per-user widths are stored state that support cannot see and screenshots cannot hold.
 
-#### `the-order-column-pinned-while-the-rest-scroll`: The order column pinned while the rest scroll
+#### `the-order-column-pinned-while-the-rest-scroll`: The Order Column Pinned While the Rest Scroll
 
 ```wireframe
 page
@@ -2866,7 +2866,7 @@ page
 
 **Reference:** Shopify
 
-#### `first-and-last-pinned-actions-always-visible`: First and last pinned, actions always visible
+#### `first-and-last-pinned-actions-always-visible`: First and Last Pinned, Actions Always Visible
 
 ```wireframe
 page
@@ -2886,7 +2886,7 @@ page
 
 **Reference:** Airtable
 
-#### `draggable-widths-with-resize-handles`: Draggable widths with resize handles
+#### `draggable-widths-with-resize-handles`: Draggable Widths with Resize Handles
 
 ```wireframe
 page
@@ -2906,7 +2906,7 @@ page
 
 **Reference:** Airtable
 
-#### `pin-any-column-from-its-header-menu`: Pin any column from its header menu
+#### `pin-any-column-from-its-header-menu`: Pin Any Column from Its Header Menu
 
 ```wireframe
 page
@@ -2931,7 +2931,7 @@ page
 
 **Reference:** Notion
 
-#### `no-pinning-the-table-scrolls-as-one`: No pinning: the table scrolls as one
+#### `no-pinning-the-table-scrolls-as-one`: No Pinning: The Table Scrolls as One
 
 ```wireframe
 page
@@ -2951,7 +2951,7 @@ page
 
 **Reference:** Carbon
 
-#### `double-click-a-header-edge-to-fit-content`: Double-click a header edge to fit content
+#### `double-click-a-header-edge-to-fit-content`: Double-Click a Header Edge to Fit Content
 
 ```wireframe
 page
@@ -2971,7 +2971,7 @@ page
 
 **Reference:** Google Sheets
 
-### Deliveries as a grid
+### Deliveries as a Grid
 
 **Question:** Deliveries are few and dated: the company runs a handful a week and asks how each one is doing. A table answers with rows of numbers, while a card answers with the run itself: its date, its warehouse, and how full it is.
 
@@ -2981,7 +2981,7 @@ page
 
 **Rationale:** Keep delivery cards with a load bar. Four deliveries read better as four cards than as four rows. The bar answers the only question the list exists for. The runner-up is a date-led list. Prefer it once the year holds dozens of runs and cards stop fitting. Never ship the month calendar: it answers when, which the deliveries list is never asked.
 
-#### `delivery-cards-with-a-load-bar`: Delivery cards with a load bar
+#### `delivery-cards-with-a-load-bar`: Delivery Cards with a Load Bar
 
 ```wireframe
 page
@@ -3005,7 +3005,7 @@ page
 
 **Cost:** Cards stop scanning past a dozen deliveries: no column to sort, no state to scan down. The pattern fits a handful, not a hundred.
 
-#### `a-table-with-a-load-progress-column`: A table with a load progress column
+#### `a-table-with-a-load-progress-column`: A Table with a Load Progress Column
 
 ```wireframe
 page
@@ -3026,7 +3026,7 @@ page
 
 **Reference:** Shopify
 
-#### `a-date-led-list-with-month-dividers`: A date-led list with month dividers
+#### `a-date-led-list-with-month-dividers`: A Date-Led List with Month Dividers
 
 ```wireframe
 page
@@ -3051,7 +3051,7 @@ page
 
 **Reference:** Google Calendar
 
-#### `a-month-calendar-with-delivery-chips`: A month calendar with delivery chips
+#### `a-month-calendar-with-delivery-chips`: A Month Calendar with Delivery Chips
 
 ```wireframe
 page
@@ -3074,7 +3074,7 @@ page
 
 **Reference:** Google Calendar
 
-#### `compact-rows-with-a-status-word`: Compact rows with a status word
+#### `compact-rows-with-a-status-word`: Compact Rows with a Status Word
 
 ```wireframe
 page
@@ -3095,7 +3095,7 @@ page
 
 **Reference:** Linear
 
-#### `a-table-grid-toggle-the-reader-sets`: A table/grid toggle the reader sets
+#### `a-table-grid-toggle-the-reader-sets`: A Table/Grid Toggle the Reader Sets
 
 ```wireframe
 page
@@ -3122,7 +3122,7 @@ page
 
 **Reference:** Notion
 
-### List on a phone
+### List on a Phone
 
 **Question:** At 390 pixels the five-column table cannot survive: the columns either crush or scroll. Every option here answers the same question, what the orders list becomes on a phone. Each one keeps a different capability: reading, sorting, acting, or comparing.
 
@@ -3132,7 +3132,7 @@ page
 
 **Rationale:** Keep two-line rows with money right. The rows read well at 390 pixels and keep the order code, the customer, and the amount. They pair with a Sort control where sorting matters. The runner-up is a scroll container with a sticky first column. Prefer it for the rare phone task that needs every column. Never ship a phone list that hides behind search: a list that starts empty teaches the reader there is nothing to see.
 
-#### `two-line-rows-with-money-right`: Two-line rows with money right
+#### `two-line-rows-with-money-right`: Two-Line Rows with Money Right
 
 ```wireframe
 page
@@ -3153,7 +3153,7 @@ page
 
 **Reference:** Stripe
 
-#### `stacked-records-with-labeled-cells`: Stacked records with labeled cells
+#### `stacked-records-with-labeled-cells`: Stacked Records with Labeled Cells
 
 ```wireframe
 page
@@ -3180,7 +3180,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `a-scroll-container-with-a-sticky-first-column`: A scroll container with a sticky first column
+#### `a-scroll-container-with-a-sticky-first-column`: A Scroll Container with a Sticky First Column
 
 ```wireframe
 page
@@ -3200,7 +3200,7 @@ page
 
 **Reference:** Shopify
 
-#### `priority-columns-only`: Priority columns only
+#### `priority-columns-only`: Priority Columns Only
 
 ```wireframe
 page
@@ -3218,7 +3218,7 @@ page
 
 **Cost:** The order code, the placed time, and the delivery all leave. Support identifying a caller by code finds the one column they need is gone.
 
-#### `a-card-per-order-with-its-actions`: A card per order with its actions
+#### `a-card-per-order-with-its-actions`: A Card per Order with Its Actions
 
 ```wireframe
 page
@@ -3240,7 +3240,7 @@ page
 
 **Cost:** Cards are tall: three orders fill the screen where rows fit six. A queue worked top to bottom becomes twice the scrolling.
 
-#### `search-and-chips-above-one-line-rows`: Search and chips above one-line rows
+#### `search-and-chips-above-one-line-rows`: Search and Chips Above One-Line Rows
 
 ```wireframe
 page
@@ -3268,22 +3268,22 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/lists-and-tables#keep-a-lists-view-in-its-address | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/lists-and-tables#align-money-to-the-right-with-its-currency | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/lists-and-tables#choosing-the-columns | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#sorting | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#filters | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#row-density | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#bulk-action-bar | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#pagination | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#row-actions | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#tables-own-states | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#status-in-a-column | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#money-column | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#exporting-the-list | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#searching-with-highlighted-matches | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#grouped-rows | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#inline-row-expansion | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#pinned-and-resizing-columns | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#deliveries-as-a-grid | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/lists-and-tables#list-on-a-phone | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/lists-and-tables#keep-a-lists-view-in-its-address | guidance | Which built list loses its filters, sort, or page on refresh? Open built lists, change the view, and reload the address. |
+| litespec/frontend/patterns/lists-and-tables#align-money-to-the-right-with-its-currency | guidance | Which built money column centers its figures or hides a currency? Open the money columns on built tables. |
+| litespec/frontend/patterns/lists-and-tables#choosing-the-columns | guidance | Which built column set breaks from the wireframe its catalog entry chose? Open the built choosers and saved views beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#sorting | guidance | Which built sort control breaks from the wireframe its catalog entry chose? Open the built arrows, stacks, and phone sort controls beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#filters | guidance | Which built filter control breaks from the wireframe its catalog entry chose? Open the built chips, panels, and facet buttons beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#row-density | guidance | Which built row height breaks from the wireframe its catalog entry chose? Open the built 24, 32, 40, and 48 pixel rows beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#bulk-action-bar | guidance | Which built selection bar breaks from the wireframe its catalog entry chose? Open the built count bars, pills, and dropdowns beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#pagination | guidance | Which built page control breaks from the wireframe its catalog entry chose? Open the built chevrons, load-more buttons, and compact pagers beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#row-actions | guidance | Which built row command breaks from the wireframe its catalog entry chose? Open the built inline actions and row menus beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#tables-own-states | guidance | Which built table state breaks from the wireframe its catalog entry chose? Open the built no-data, failed-read, and slow-read states beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#status-in-a-column | guidance | Which built state badge breaks from the wireframe its catalog entry chose? Open the built tones, dots, and progress steps beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#money-column | guidance | Which built amount column breaks from the wireframe its catalog entry chose? Open the built aligned figures, shares, and totals footers beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#exporting-the-list | guidance | Which built download flow breaks from the wireframe its catalog entry chose? Open the built CSV buttons, dialogs, and histories beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#searching-with-highlighted-matches | guidance | Which built list search breaks from the wireframe its catalog entry chose? Open the built highlighted cells and match columns beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#grouped-rows | guidance | Which built group header breaks from the wireframe its catalog entry chose? Open the built day, delivery, and state groups beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#inline-row-expansion | guidance | Which built expandable row breaks from the wireframe its catalog entry chose? Open the built order lines, timelines, and expand-all controls beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#pinned-and-resizing-columns | guidance | Which built fixed column breaks from the wireframe its catalog entry chose? Open the built frozen first columns and resize handles beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#deliveries-as-a-grid | guidance | Which built delivery overview breaks from the wireframe its catalog entry chose? Open the built cards, calendars, and table-grid toggles beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/lists-and-tables#list-on-a-phone | guidance | Which built narrow list breaks from the wireframe its catalog entry chose? Open the built two-line rows, cards, and sticky columns at 390 pixels beside the catalog entry recording the chosen option and its reason. |

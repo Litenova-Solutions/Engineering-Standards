@@ -1,4 +1,4 @@
-# Document templates
+# Document Templates
 
 ## Intent
 
@@ -6,7 +6,7 @@ These files are starting points for consumer records. `litespec init` copies the
 
 A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a requirement page. Rules and events sit on an aggregate page, and results and scenarios on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the glossary at `docs/glossary.json` instead of on a page.
 
-## Project setup
+## Project Setup
 
 | Template | Target | Purpose |
 |:---|:---|:---|
@@ -15,7 +15,7 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 | `glossary.json` | `docs/glossary.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
 | `example-cast.md` | `docs/domain/example-cast.md` | Fixes the people, place, dates, and amounts every `Example` section draws from. |
 
-## Page records
+## Page Records
 
 | Template | Target | Purpose |
 |:---|:---|:---|
@@ -37,7 +37,7 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 | `deviation.md` | `docs/deviations/<name>.md` | Records one departure from a provision, with reason and review date. |
 | `known-gap.md` | `docs/known-gaps/<name>.md` | Records one accepted gap whose check stays red. |
 
-## Entry lists and page styles
+## Entry Lists and Page Styles
 
 | Template | Target | Purpose |
 |:---|:---|:---|

@@ -8,7 +8,7 @@
   "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# <Reference title>
+# <Reference Title>
 
 ## Intent
 

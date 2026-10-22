@@ -8,7 +8,7 @@
   "decideBy": "<YYYY-MM-DD>"
 }
 ---
-# <How-to title>
+# <How-to Title>
 
 ## Purpose
 

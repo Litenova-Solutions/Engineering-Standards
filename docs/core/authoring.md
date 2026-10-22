@@ -50,19 +50,36 @@ A consumer page is a record or one of these styles. Each one opens with the spec
 
 | Page style | Template | Sections, in order |
 |:---|:---|:---|
-| product-topic | `templates/consumer/product-topic.md` | Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, How sure we are, Rules, Position, Refusals, Open questions, Next, History, Evidence |
-| permission-list | `templates/consumer/permission-list.md` | Permissions |
-| entry-point-list | `templates/consumer/entry-point-list.md` | Entry points |
-| limit-set | `templates/consumer/limit-set.md` | Limits |
-| rule-set | `templates/consumer/rule-set.md` | Rules |
-| index | `templates/consumer/index.md` | Intent, then navigation groups |
-| tutorial | `templates/consumer/tutorial.md` | Purpose, Prerequisites, Lesson, What you built |
+| product-brief | `templates/consumer/product-brief.md` | Summary |
+| goal | `templates/consumer/goal.md` | Why It Matters |
+| problem | `templates/consumer/problem.md` | Situation, Evidence |
+| feature | `templates/consumer/feature.md` | Offering |
+| constraint | `templates/consumer/constraint.md` | Summary, What It Requires |
+| research | `templates/consumer/research.md` | Answer, optional Notes on Sources |
+| decision | `templates/consumer/decision.md` | Context, Decision, Consequences, optional Evidence with Confidence |
+| requirement-page | `templates/consumer/requirement-page.md` | Summary, The Situation, What We Do, Why It Is Better, Example, Costs and Risks, How Sure We Are, Position, Refusals |
+| journey | `templates/consumer/journey.md` | Example, optional Before It Starts, Between the Steps |
+| module | `templates/consumer/module.md` | optional Example, optional Known Limits, optional Notes |
+| aggregate | `templates/consumer/aggregate.md` | Transitions, Data, optional Example, optional Known Limits, optional Notes |
+| use-case | `templates/consumer/use-case.md` | Goal, What Happens except on queries, optional Risk, optional Example, optional Notes |
+| rule-set | `templates/consumer/rule-set.md` | Summary, optional Notes |
+| actor | `templates/consumer/actor.md` | Summary |
+| role | `templates/consumer/role.md` | Summary |
+| external-system | `templates/consumer/external-system.md` | Summary |
+| permission-list | `templates/consumer/permission-list.md` | Entries only |
+| entry-point-list | `templates/consumer/entry-point-list.md` | Entries only |
+| limit-set | `templates/consumer/limit-set.md` | Entries only |
+| runbook | `templates/consumer/runbook.md` | Impact, Prerequisites, Procedure, Verification, Rollback or Recovery, Escalation |
+| deviation | `templates/consumer/deviation.md` | Consequences |
+| known-gap | `templates/consumer/known-gap.md` | Exit |
+| glossary | `templates/consumer/glossary.md` | Generated region only |
+| example-cast | `templates/consumer/example-cast.md` | The Organization, The People, The Occasion, The Amounts, Recurring Situations, optional What This Page Does Not Do |
+| tutorial | `templates/consumer/tutorial.md` | Purpose, Prerequisites, Lesson, What You Built |
 | how-to | `templates/consumer/how-to.md` | Purpose, optional Prerequisites, Procedure, Check |
 | reference | `templates/consumer/reference.md` | Intent, Reference, optional Notes |
-| command | `templates/consumer/command.md` | Name, Synopsis, Description, Arguments, Options, Exit codes, Examples, Underneath |
+| command | `templates/consumer/command.md` | Name, Synopsis, Description, Arguments, Options, Exit Codes, Examples, Underneath |
 | configuration | `templates/consumer/configuration.md` | Intent, Settings, Precedence, optional Notes |
-| glossary | `templates/consumer/glossary.md` | One heading per term, in alphabetical order |
-| scenario-cast | `templates/consumer/scenario-cast.md` | The organization, The people, The occasion, The amounts, Recurring situations, optional What this page does not do |
+| index | `templates/consumer/index.md` | Intent, then navigation groups |
 
 These rules apply to every page style:
 
@@ -279,7 +296,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Rationale:** A reader without a map from question to page opens both and trusts neither. Naming each style in the reader's terms before the first navigation group sends each question to the page that answers it.
 
-**Example:** A `Which page do you want` section names each style in the reader's terms, one sentence each.
+**Example:** A `Which Page Do You Want` section names each style in the reader's terms, one sentence each.
 
 ### Name the Tool Rather Than the Mechanism
 
@@ -567,7 +584,7 @@ Every command declares an audit position. To count the declarations:
 | litespec/core/authoring#run-repeatable-authoring-checks | checkable | `litespec validate`, `dotnet test --solution LiteSpec.slnx` and `git diff --check` exit zero. |
 | litespec/core/authoring#validate-current-standards-material | guidance | Which validator inputs come from outside the working tree? Look at the paths the validator reads. |
 | litespec/core/authoring#exclude-historical-transition-material | guidance | Which active files carry history-specific paths, aliases, or migration material? Look at the files the change adds. |
-| litespec/core/authoring#publish-each-release-as-a-complete-contract | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/core/authoring#publish-each-release-as-a-complete-contract | checkable | `litespec validate` checks every page of the release in one run, and the manifest names one version for the whole contract. |
 | litespec/core/authoring#exclude-cross-release-compatibility-work | guidance | Which pages promise migration, mapping, or alias between releases? Look at the release material the change adds. |
 | litespec/core/authoring#keep-a-pinned-release-for-as-long-as-it-serves | guidance | Which provisions oblige a move to a later release? Look at the Statements the change adds. |
 | litespec/core/authoring#record-the-reviewed-litespec-release | checkable | `litespec consumer` fails when `reviewedLiteSpecVersion` differs from the pinned release. |

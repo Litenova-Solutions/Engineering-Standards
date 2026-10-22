@@ -2,27 +2,27 @@
 
 ## Intent
 
-One screen shows one business record: its state, facts, history, and the commands a reader may run. This page holds the patterns for that screen: header, tabs, summary, aside, timeline, relations, refusals, change history, notes, attachments, identifiers, phone header, neighbor movement, and the worked order example. A team building a record screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared record shape keeps every record readable in the same order, so support finds the state and the next step without hunting.
+One screen shows one record of the product, with its state, facts, history, and the commands a reader may run, and this page holds the patterns for that screen: header, tabs, summary, aside, timeline, relations, refusals, change history, notes, attachments, identifiers, phone header, neighbor movement, and the worked order example. A team building a record screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One shared record shape keeps every record readable in the same order, so support finds the state and the next step without hunting.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one recurring question about a record screen, such as what the header states. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use order SO-1042 for Maria Garcia: paid, EUR 125.00, part of the Garcia Interiors restock. The header states the order and its state, the sections state the customer, lines, and money, and the aside carries the history. The Standards section states the two rules every option keeps: a record header shows at most one primary action, and a destructive command never takes the primary place or style.
 
 ## Standards
 
-### Show one primary action in a record header
+### Show One Primary Action in a Record Header
 
 **Statement:** A record header MUST show at most one primary action.
 
 **Rationale:** One primary action names the step readers take most often next on the record, such as Message customer on order SO-1042. Without that single answer, two equal buttons force the reader to compare labels on every visit, and the hurried click lands on the wrong command.
 
-### Keep destructive commands out of the primary place
+### Keep Destructive Commands Out of the Primary Place
 
 **Statement:** A destructive command MUST NOT take the primary action's place or style in a record header.
 
@@ -30,7 +30,7 @@ The drawings on this page use order SO-1042 for Maria Garcia: paid, EUR 125.00, 
 
 ## Patterns
 
-### Record header
+### Record Header
 
 **Question:** One record, stated at the top. A record header always carries a title. It carries a breadcrumb when the record has a parent. It offers exactly one primary action, with everything else secondary beside it. A common failure puts a destructive action where the primary should be.
 
@@ -42,7 +42,7 @@ The drawings on this page use order SO-1042 for Maria Garcia: paid, EUR 125.00, 
 
 Prefer the state-driven primary on records with a clear next step, such as an unpaid order. Never ship the title-less option. It fails the check for exactly one `h1` per page.
 
-#### `title-state-breadcrumb-one-primary-action`: Title, state, breadcrumb, one primary action
+#### `title-state-breadcrumb-one-primary-action`: Title, State, Breadcrumb, One Primary Action
 
 ```wireframe
 page
@@ -66,7 +66,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `title-and-state-only-no-description`: Title and state only, no description
+#### `title-and-state-only-no-description`: Title and State Only, No Description
 
 ```wireframe
 page
@@ -86,7 +86,7 @@ page
 
 **Cost:** A record with a long name or a subtle state loses the one line. That line says which delivery this order belongs to, which is the most-asked question.
 
-#### `state-as-a-badge-under-the-title`: State as a badge under the title
+#### `state-as-a-badge-under-the-title`: State as a Badge Under the Title
 
 ```wireframe
 page
@@ -107,7 +107,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `destructive-action-in-its-own-place-separated`: Destructive action in its own place, separated
+#### `destructive-action-in-its-own-place-separated`: Destructive Action in Its Own Place, Separated
 
 ```wireframe
 page
@@ -132,7 +132,7 @@ page
 
 **Cost:** A destructive action behind a menu is three clicks from a misclick, which is the other failure. Tone plus position is the usual answer, and neither is complete alone.
 
-#### `facts-in-the-header-commands-beside-them`: Facts in the header, commands beside them
+#### `facts-in-the-header-commands-beside-them`: Facts in the Header, Commands Beside Them
 
 ```wireframe
 page
@@ -157,7 +157,7 @@ page
 
 **Cost:** A tall header pushes the content below the fold on a phone. A four-fact list competes with the trail for the same vertical space.
 
-#### `no-title-because-the-trail-is-the-title`: No title, because the trail is the title
+#### `no-title-because-the-trail-is-the-title`: No Title, Because the Trail Is the Title
 
 ```wireframe
 page
@@ -176,7 +176,7 @@ page
 
 **Cost:** Fails WCAG 2.4.8 Location in spirit and reads as a bare panel. Every page carries exactly one `h1`, which automated checks enforce, so this fails that check.
 
-#### `title-state-and-who-saved-it-last`: Title, state, and who saved it last
+#### `title-state-and-who-saved-it-last`: Title, State, and Who Saved It Last
 
 ```wireframe
 page
@@ -200,7 +200,7 @@ page
 
 **Cost:** One more line in the header on every record, and it is only honest if the data tracks the last writer. On records nobody shares it is noise.
 
-#### `one-primary-the-rest-in-an-overflow-menu`: One primary, the rest in an overflow menu
+#### `one-primary-the-rest-in-an-overflow-menu`: One Primary, the Rest in an Overflow Menu
 
 ```wireframe
 page
@@ -228,7 +228,7 @@ page
 
 **Reference:** Stripe
 
-#### `the-primary-follows-the-state`: The primary follows the state
+#### `the-primary-follows-the-state`: The Primary Follows the State
 
 ```wireframe
 page
@@ -253,7 +253,7 @@ page
 
 **Reference:** Shopify
 
-### Record tabs
+### Record Tabs
 
 **Question:** A record holds at most three sections, and further facets become tabs. A product record carries four facets. Tab sets stay small, at six at most, and the active tab stays in the URL.
 
@@ -265,7 +265,7 @@ page
 
 Prefer the counts option only where a facet can be empty and the count saves a wasted click. Never ship the icon tabs. Icons are forbidden in tab labels, and they add a second channel for one meaning.
 
-#### `four-tabs-with-the-active-one-in-the-url`: Four tabs with the active one in the URL
+#### `four-tabs-with-the-active-one-in-the-url`: Four Tabs with the Active One in the URL
 
 ```wireframe
 page
@@ -289,7 +289,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `three-tabs-the-fourth-becomes-a-page`: Three tabs, the fourth becomes a page
+#### `three-tabs-the-fourth-becomes-a-page`: Three Tabs, the Fourth Becomes a Page
 
 ```wireframe
 page
@@ -311,7 +311,7 @@ page
 
 **Cost:** One more navigation step for the reader who wants details. The fourth page joins a system that already counts its routes in the hundreds.
 
-#### `tabs-with-counts`: Tabs with counts
+#### `tabs-with-counts`: Tabs with Counts
 
 ```wireframe
 page
@@ -330,7 +330,7 @@ page
 
 **Cost:** Counts on tabs are a claim that has to stay true. A count of 0 invites a click that leads to an empty state.
 
-#### `tabs-with-icons-as-well-as-words`: Tabs with icons as well as words
+#### `tabs-with-icons-as-well-as-words`: Tabs with Icons as Well as Words
 
 ```wireframe
 page
@@ -348,7 +348,7 @@ page
 
 **Cost:** Carbon's tab guidance is explicit that icons are not permitted in tab labels. Two channels for one thing, and a second set of icons to design and maintain.
 
-#### `scrollable-tabs-with-a-fade-at-the-edge`: Scrollable tabs with a fade at the edge
+#### `scrollable-tabs-with-a-fade-at-the-edge`: Scrollable Tabs with a Fade at the Edge
 
 ```wireframe
 page
@@ -368,7 +368,7 @@ page
 
 **Cost:** A hidden seventh tab is a hidden feature, and a horizontal scroll on a page hides content from anyone who never swipes.
 
-#### `tabs-below-the-summary-not-below-the-header`: Tabs below the summary, not below the header
+#### `tabs-below-the-summary-not-below-the-header`: Tabs Below the Summary, Not Below the Header
 
 ```wireframe
 page
@@ -388,7 +388,7 @@ page
 
 **Cost:** The tab row moves down the page, so it is less prominent. The summary has to be short or the tabs fall below the fold.
 
-#### `facets-in-a-side-rail-instead-of-tabs`: Facets in a side rail instead of tabs
+#### `facets-in-a-side-rail-instead-of-tabs`: Facets in a Side Rail Instead of Tabs
 
 ```wireframe
 page
@@ -418,7 +418,7 @@ page
 
 **Reference:** GitHub
 
-#### `a-select-on-a-phone-tabs-on-a-wide-screen`: A select on a phone, tabs on a wide screen
+#### `a-select-on-a-phone-tabs-on-a-wide-screen`: A Select on a Phone, Tabs on a Wide Screen
 
 ```wireframe
 page
@@ -452,7 +452,7 @@ page
 
 **Reference:** Shopify Polaris
 
-### Record summary
+### Record Summary
 
 **Question:** The section at the top of a record answers what the reader is looking at without scrolling. It states the record's identity. A summary that states supporting information answers the wrong question.
 
@@ -464,7 +464,7 @@ page
 
 Prefer the progress bar summary only for the one figure the company watches daily. Never ship the heading-less value row. Values with no section break the rule that a section is the only box.
 
-#### `facts-about-the-record-itself`: Facts about the record itself
+#### `facts-about-the-record-itself`: Facts About the Record Itself
 
 ```wireframe
 page
@@ -487,7 +487,7 @@ page
 
 **Cost:** Repeats what the header already says, since the header carries the title and state. Saying a thing twice is what the design contract forbids.
 
-#### `one-line-of-key-values-no-heading`: One line of key values, no heading
+#### `one-line-of-key-values-no-heading`: One Line of Key Values, No Heading
 
 ```wireframe
 page
@@ -510,7 +510,7 @@ page
 
 **Cost:** Breaks the rule that a section is the only box, because the values would float on the canvas with nothing holding them together visually.
 
-#### `money-summary-as-a-statement`: Money summary as a statement
+#### `money-summary-as-a-statement`: Money Summary as a Statement
 
 ```wireframe
 page
@@ -532,7 +532,7 @@ page
 
 **Cost:** Wrong for a record with no money, and a statement is longer than a summary ought to be, so it pushes the sections down.
 
-#### `summary-with-a-figure-and-a-sub-line-each`: Summary with a figure and a sub-line each
+#### `summary-with-a-figure-and-a-sub-line-each`: Summary with a Figure and a Sub-Line Each
 
 ```wireframe
 page
@@ -556,7 +556,7 @@ page
 
 **Cost:** A figure and a sub-line per fact need three columns or a wide row. The sub-lines repeat the label meaning in more words.
 
-#### `summary-with-a-progress-bar-for-the-one-number-that-matters`: Summary with a progress bar for the one number that matters
+#### `summary-with-a-progress-bar-for-the-one-number-that-matters`: Summary with a Progress Bar for the One Number That Matters
 
 ```wireframe
 page
@@ -581,7 +581,7 @@ page
 
 **Cost:** Choosing which number matters is a judgment the data has to support. A bar on a capacity figure implies a ratio that stops mattering once loading is over.
 
-#### `no-summary-straight-to-sections`: No summary, straight to sections
+#### `no-summary-straight-to-sections`: No Summary, Straight to Sections
 
 ```wireframe
 page
@@ -607,7 +607,7 @@ page
 
 **Cost:** The reader scrolls to learn what the record is. For a long record that is a real cost, and the record-page shape reserves a summary slot for exactly this reason.
 
-#### `facts-plus-copyable-identifiers`: Facts plus copyable identifiers
+#### `facts-plus-copyable-identifiers`: Facts Plus Copyable Identifiers
 
 ```wireframe
 page
@@ -636,7 +636,7 @@ page
 
 **Reference:** Stripe
 
-#### `four-tiles-instead-of-a-section`: Four tiles instead of a section
+#### `four-tiles-instead-of-a-section`: Four Tiles Instead of a Section
 
 ```wireframe
 page
@@ -664,7 +664,7 @@ page
 
 **Reference:** Vercel
 
-### Record aside
+### Record Aside
 
 **Question:** A record page has an aside slot for what supports the record rather than describing it. An order record puts its history there, which is the right use. A record with no supporting content leaves the slot empty.
 
@@ -676,7 +676,7 @@ page
 
 Prefer the people and labels aside on records a team hands between shifts. Never ship the empty aside state by accident. An order with nothing pending and no history reads as a rendering fault.
 
-#### `history-in-the-aside-sections-in-the-main-column`: History in the aside, sections in the main column
+#### `history-in-the-aside-sections-in-the-main-column`: History in the Aside, Sections in the Main Column
 
 ```wireframe
 page
@@ -700,7 +700,7 @@ page
 
 **Cost:** Below about 1000 pixels the aside stacks under everything, so the history a reader most wants lands after the sections they came to use.
 
-#### `aside-for-what-needs-a-decision`: Aside for what needs a decision
+#### `aside-for-what-needs-a-decision`: Aside for What Needs a Decision
 
 ```wireframe
 page
@@ -729,7 +729,7 @@ page
 
 **Cost:** The aside becomes a work panel, which changes what the page is. An order with nothing pending has an empty aside, which is its own awkward state.
 
-#### `no-aside-sections-fill-the-width`: No aside, sections fill the width
+#### `no-aside-sections-fill-the-width`: No Aside, Sections Fill the Width
 
 ```wireframe
 page
@@ -757,7 +757,7 @@ page
 
 **Cost:** A two-line fact list stretched across 1200 pixels is a long measure for a name and an email. The history loses its link to the record.
 
-#### `aside-sticky-main-column-scrolls`: Aside sticky, main column scrolls
+#### `aside-sticky-main-column-scrolls`: Aside Sticky, Main Column Scrolls
 
 ```wireframe
 page
@@ -781,7 +781,7 @@ page
 
 **Cost:** A sticky aside on a phone is a stacked block that no longer sticks. The behavior has two shapes and one of them is untested in practice.
 
-#### `aside-for-related-records`: Aside for related records
+#### `aside-for-related-records`: Aside for Related Records
 
 ```wireframe
 page
@@ -807,7 +807,7 @@ page
 
 **Cost:** Related records are what a reader navigates to, so putting them in the narrowest column makes them the least likely to be found.
 
-#### `aside-collapses-to-a-section-on-narrow-screens`: Aside collapses to a section on narrow screens
+#### `aside-collapses-to-a-section-on-narrow-screens`: Aside Collapses to a Section on Narrow Screens
 
 ```wireframe
 page
@@ -834,7 +834,7 @@ page
 
 **Cost:** Two different orders for one record, so a screenshot test holds two arrangements. The DOM order and the visual order disagree, which is also an accessibility question.
 
-#### `people-and-labels-in-the-aside-history-below`: People and labels in the aside, history below
+#### `people-and-labels-in-the-aside-history-below`: People and Labels in the Aside, History Below
 
 ```wireframe
 page
@@ -865,7 +865,7 @@ page
 
 **Reference:** Linear
 
-#### `related-records-and-history-share-the-aside`: Related records and history share the aside
+#### `related-records-and-history-share-the-aside`: Related Records and History Share the Aside
 
 ```wireframe
 page
@@ -896,7 +896,7 @@ page
 
 **Reference:** HubSpot
 
-### Record timeline
+### Record Timeline
 
 **Question:** What happened to one record. Entries read newest first. Every entry carries a timestamp and a byline, because the reader asks who did this and when.
 
@@ -908,7 +908,7 @@ page
 
 Prefer the day-grouped option for dispatch records, where entries cluster on one morning. Never ship the actor-grouped timeline as the main history. It destroys the chronological order a timeline exists to give.
 
-#### `newest-first-with-actor-and-timestamp`: Newest first with actor and timestamp
+#### `newest-first-with-actor-and-timestamp`: Newest First with Actor and Timestamp
 
 ```wireframe
 page
@@ -928,7 +928,7 @@ page
 
 **Reference:** Maersk, Paste
 
-#### `a-table-instead-of-a-timeline`: A table instead of a timeline
+#### `a-table-instead-of-a-timeline`: A Table Instead of a Timeline
 
 ```wireframe
 page
@@ -946,7 +946,7 @@ page
 
 **Cost:** It gives up the shape of a sequence for a grid of facts. A reader asking 'what happened in order' has to read down a table, which is slower than a timeline.
 
-#### `grouped-by-day-with-a-date-label`: Grouped by day with a date label
+#### `grouped-by-day-with-a-date-label`: Grouped by Day with a Date Label
 
 ```wireframe
 page
@@ -966,7 +966,7 @@ page
 
 **Cost:** More markup for the same information, and a reader scanning for one entry has to look under the right date heading.
 
-#### `collapsed-descriptions-behind-a-toggle`: Collapsed descriptions behind a toggle
+#### `collapsed-descriptions-behind-a-toggle`: Collapsed Descriptions Behind a Toggle
 
 ```wireframe
 page
@@ -987,7 +987,7 @@ page
 
 **Reference:** Maersk
 
-#### `grouped-by-actor-for-an-audit-question`: Grouped by actor, for an audit question
+#### `grouped-by-actor-for-an-audit-question`: Grouped by Actor, for an Audit Question
 
 ```wireframe
 page
@@ -1010,7 +1010,7 @@ page
 
 **Cost:** Destroys chronological order, which is the order a timeline exists to give. A person touching a record five times over a month reads as one entry.
 
-#### `timeline-with-a-what-changed-diff-on-each-entry`: Timeline with a 'what changed' diff on each entry
+#### `timeline-with-a-what-changed-diff-on-each-entry`: Timeline with a 'What Changed' Diff on Each Entry
 
 ```wireframe
 page
@@ -1029,7 +1029,7 @@ page
 
 **Cost:** A diff needs the before and after. It has to be reconstructed at read time rather than read from the entry that recorded the change.
 
-#### `filtered-by-kind-and-actor`: Filtered by kind and actor
+#### `filtered-by-kind-and-actor`: Filtered by Kind and Actor
 
 ```wireframe
 page
@@ -1055,7 +1055,7 @@ page
 
 **Reference:** GitHub
 
-#### `entries-and-internal-notes-in-one-feed`: Entries and internal notes in one feed
+#### `entries-and-internal-notes-in-one-feed`: Entries and Internal Notes in One Feed
 
 ```wireframe
 page
@@ -1081,7 +1081,7 @@ page
 
 **Reference:** Zendesk
 
-### Related records
+### Related Records
 
 **Question:** An order belongs to a delivery, a customer, and a channel. A delivery belongs to a warehouse and a schedule. A common failure states the parent in prose in the description rather than linking to it.
 
@@ -1093,7 +1093,7 @@ page
 
 Prefer the filtered list counts on records whose children number in the hundreds. Never ship the bare cross-reference line. It cannot carry the parent state and it hides in the description.
 
-#### `each-relation-is-a-link-with-its-state`: Each relation is a link with its state
+#### `each-relation-is-a-link-with-its-state`: Each Relation Is a Link with Its State
 
 ```wireframe
 page
@@ -1112,7 +1112,7 @@ page
 
 **Cost:** Three links is a small nav of its own, and it competes with the record's own commands for the reader's attention.
 
-#### `a-breadcrumb-as-the-relation-chain`: A breadcrumb as the relation chain
+#### `a-breadcrumb-as-the-relation-chain`: A Breadcrumb as the Relation Chain
 
 ```wireframe
 page
@@ -1136,7 +1136,7 @@ page
 
 **Cost:** The trail cannot carry state, so a reader cannot tell a scheduled delivery from a finished one without opening it.
 
-#### `a-section-of-other-orders-on-the-same-delivery`: A section of other orders on the same delivery
+#### `a-section-of-other-orders-on-the-same-delivery`: A Section of Other Orders on the Same Delivery
 
 ```wireframe
 page
@@ -1160,7 +1160,7 @@ page
 
 **Cost:** Anywhere between one and two hundred rows, which is a table with a limit rather than a section; the money page already splits it by delivery for this reason.
 
-#### `a-cross-reference-line-not-a-section`: A cross-reference line, not a section
+#### `a-cross-reference-line-not-a-section`: A Cross-Reference Line, Not a Section
 
 ```wireframe
 page
@@ -1185,7 +1185,7 @@ page
 
 **Cost:** It stays invisible to anyone who does not read descriptions. It cannot carry the parent state, so the reader has to open it to learn whether it is still live.
 
-#### `a-count-that-links-to-the-filtered-list`: A count that links to the filtered list
+#### `a-count-that-links-to-the-filtered-list`: A Count That Links to the Filtered List
 
 ```wireframe
 page
@@ -1206,7 +1206,7 @@ page
 
 **Cost:** A link whose text is a number reads as a figure, not a destination, unless the hover and the visited color make it clear. WCAG 2.4.4 wants the purpose to be clear from the link text.
 
-#### `the-parent-as-a-card-above-the-record-s-own-sections`: The parent as a card above the record's own sections
+#### `the-parent-as-a-card-above-the-record-s-own-sections`: The Parent as a Card Above the Record's Own Sections
 
 ```wireframe
 page
@@ -1232,7 +1232,7 @@ page
 
 **Cost:** A box inside the page sits above the sections, which is the nesting the design contract forbids. It makes the child look secondary when it is the page.
 
-#### `links-with-a-preview-of-the-parent`: Links with a preview of the parent
+#### `links-with-a-preview-of-the-parent`: Links with a Preview of the Parent
 
 ```wireframe
 page
@@ -1262,7 +1262,7 @@ page
 
 **Reference:** Notion
 
-#### `children-as-an-editable-table`: Children as an editable table
+#### `children-as-an-editable-table`: Children as an Editable Table
 
 ```wireframe
 page
@@ -1284,7 +1284,7 @@ page
 
 **Reference:** Airtable
 
-### Record the reader may not change
+### Record the Reader May Not Change
 
 **Question:** Some records refuse some roles. A page a role cannot use shows the refusal with the reason and the grant that helps. The question is whether the refusal covers the whole page or a part of one.
 
@@ -1296,7 +1296,7 @@ page
 
 Prefer the field-withheld option only where the values themselves are restricted, such as customer personal data under a warehouse role. Never ship the role switcher on production. Acting as somebody is a development capability, and the button would be a security hole with a label on it.
 
-#### `the-commands-are-refused-the-record-is-not`: The commands are refused, the record is not
+#### `the-commands-are-refused-the-record-is-not`: The Commands Are Refused, the Record Is Not
 
 ```wireframe
 page
@@ -1320,7 +1320,7 @@ page
 
 **Cost:** A page full of refused commands is a page that looks broken to someone who does not know what their role is.
 
-#### `the-whole-page-is-refused`: The whole page is refused
+#### `the-whole-page-is-refused`: The Whole Page Is Refused
 
 ```wireframe
 page
@@ -1337,7 +1337,7 @@ page
 
 **Cost:** Nothing is shown, so a warehouse lead cannot read a customer's name to answer a question at the counter. That is a real cost on the surface where names matter most.
 
-#### `a-banner-above-the-page-the-record-still-readable`: A banner above the page, the record still readable
+#### `a-banner-above-the-page-the-record-still-readable`: A Banner Above the Page, the Record Still Readable
 
 ```wireframe
 page
@@ -1357,7 +1357,7 @@ page
 
 **Cost:** A full-width band on a page about other work breaks the rule that tone marks content, not chrome. This has to be a neutral notice, not a caution one.
 
-#### `the-command-is-absent-not-refused`: The command is absent, not refused
+#### `the-command-is-absent-not-refused`: The Command Is Absent, Not Refused
 
 ```wireframe
 page
@@ -1381,7 +1381,7 @@ page
 
 **Cost:** Nothing tells the reader the capability exists elsewhere, so they cannot find out who can do it. On a page of four commands, three of them missing looks like a broken deployment.
 
-#### `personal-data-withheld-field-by-field`: Personal data withheld field by field
+#### `personal-data-withheld-field-by-field`: Personal Data Withheld Field by Field
 
 ```wireframe
 page
@@ -1406,7 +1406,7 @@ page
 
 **Cost:** Every personal field needs a withheld form, and a reader sees that a value exists without seeing it. A caution alert on top of that repeats what the fields already say.
 
-#### `a-role-switcher-rather-than-a-refusal`: A role switcher rather than a refusal
+#### `a-role-switcher-rather-than-a-refusal`: A Role Switcher Rather Than a Refusal
 
 ```wireframe
 page
@@ -1429,7 +1429,7 @@ page
 
 **Cost:** Only honest where acting as somebody is a real capability. On a production deployment with one real account it is a security hole with a nice button on it.
 
-#### `ask-for-access-from-the-refused-command`: Ask for access from the refused command
+#### `ask-for-access-from-the-refused-command`: Ask for Access from the Refused Command
 
 ```wireframe
 page
@@ -1454,7 +1454,7 @@ page
 
 **Reference:** Google Drive
 
-#### `a-read-only-ribbon-naming-what-the-role-can-do`: A read-only ribbon naming what the role can do
+#### `a-read-only-ribbon-naming-what-the-role-can-do`: A Read-Only Ribbon Naming What the Role Can Do
 
 ```wireframe
 page
@@ -1482,7 +1482,7 @@ page
 
 **Reference:** Figma
 
-### Record change history
+### Record Change History
 
 **Question:** Several people touch one order before the week ends. The customer corrects an email. The manager answers. Finance adds a note.
 
@@ -1496,7 +1496,7 @@ When the customer disputes what happened, the company answers from the record it
 
 It fits disputes about one value such as the email that carried the confirmation. Prefer the full-page log only for long-lived records whose trail outgrows a tab. Never ship the money-only trail as the audit. The edits that explain the money are missing there.
 
-#### `history-as-a-tab-on-the-record`: History as a tab on the record
+#### `history-as-a-tab-on-the-record`: History as a Tab on the Record
 
 ```wireframe
 page
@@ -1518,7 +1518,7 @@ page
 
 **Cost:** The trail is hidden until its tab opens, and facts cannot be compared against the trail without switching back and forth.
 
-#### `history-in-a-side-panel-beside-the-summary`: History in a side panel beside the summary
+#### `history-in-a-side-panel-beside-the-summary`: History in a Side Panel Beside the Summary
 
 ```wireframe
 page
@@ -1543,7 +1543,7 @@ page
 
 **Cost:** Each column is half the width, so long entries wrap, and on a narrow screen the panel stacks below the facts it explains.
 
-#### `full-page-audit-log-with-filters`: Full-page audit log with filters
+#### `full-page-audit-log-with-filters`: Full-Page Audit Log with Filters
 
 ```wireframe
 page
@@ -1566,7 +1566,7 @@ page
 
 **Cost:** The trail leaves the record it explains, so the reader holds the facts in memory. The filters need data support for actor and kind.
 
-#### `last-change-line-with-an-expander`: Last change line with an expander
+#### `last-change-line-with-an-expander`: Last Change Line with an Expander
 
 ```wireframe
 page
@@ -1591,7 +1591,7 @@ page
 
 **Cost:** Older changes stay hidden behind a click, and the expander state is not shareable, so two people cannot point at the same open trail.
 
-#### `money-movements-only`: Money movements only
+#### `money-movements-only`: Money Movements Only
 
 ```wireframe
 page
@@ -1614,7 +1614,7 @@ page
 
 **Cost:** The edits that explain the money are missing. A corrected email before a resend reads as a gap, and there are two histories to keep true.
 
-#### `exportable-trail-for-disputes`: Exportable trail for disputes
+#### `exportable-trail-for-disputes`: Exportable Trail for Disputes
 
 ```wireframe
 page
@@ -1641,7 +1641,7 @@ page
 
 **Cost:** The download freezes wording that a later correction invalidates, and the file format becomes a contract the data has to keep stable.
 
-#### `per-field-history-beside-the-facts`: Per-field history beside the facts
+#### `per-field-history-beside-the-facts`: Per-Field History Beside the Facts
 
 ```wireframe
 page
@@ -1669,7 +1669,7 @@ page
 
 **Reference:** Google Sheets
 
-#### `two-versions-side-by-side`: Two versions side by side
+#### `two-versions-side-by-side`: Two Versions Side by Side
 
 ```wireframe
 page
@@ -1698,7 +1698,7 @@ page
 
 **Reference:** Wikipedia
 
-### Record notes
+### Record Notes
 
 **Question:** Support and finance think on the record, not beside it. They record why the confirmation was resent. They record what the customer was told. They record what still waits. A note is staff writing with a byline and a time. The reader must always know whether the customer can see it.
 
@@ -1710,7 +1710,7 @@ page
 
 It fits records where staff write to the customer from the same box. Prefer resolved notes only once open notes grow hard to scan. Never ship notes without a scope marker. A reader who cannot tell internal from customer-visible will write the wrong one.
 
-#### `a-notes-section-with-the-composer-on-top`: A notes section with the composer on top
+#### `a-notes-section-with-the-composer-on-top`: A Notes Section with the Composer on Top
 
 ```wireframe
 page
@@ -1734,7 +1734,7 @@ page
 
 **Reference:** Shopify
 
-#### `notes-mixed-into-the-timeline`: Notes mixed into the timeline
+#### `notes-mixed-into-the-timeline`: Notes Mixed into the Timeline
 
 ```wireframe
 page
@@ -1759,7 +1759,7 @@ page
 
 **Reference:** Zendesk
 
-#### `internal-or-customer-visible-chosen-per-note`: Internal or customer-visible, chosen per note
+#### `internal-or-customer-visible-chosen-per-note`: Internal or Customer-Visible, Chosen per Note
 
 ```wireframe
 page
@@ -1782,7 +1782,7 @@ page
 
 **Reference:** Zendesk
 
-#### `resolved-notes-collapse-away`: Resolved notes collapse away
+#### `resolved-notes-collapse-away`: Resolved Notes Collapse Away
 
 ```wireframe
 page
@@ -1806,7 +1806,7 @@ page
 
 **Reference:** Google Docs
 
-#### `notes-in-the-aside`: Notes in the aside
+#### `notes-in-the-aside`: Notes in the Aside
 
 ```wireframe
 page
@@ -1834,7 +1834,7 @@ page
 
 **Reference:** Linear
 
-#### `no-notes-yet`: No notes yet
+#### `no-notes-yet`: No Notes Yet
 
 ```wireframe
 page
@@ -1858,7 +1858,7 @@ page
 
 **Reference:** Notion
 
-### Record attachments
+### Record Attachments
 
 **Question:** A dispute needs its evidence, a delivery needs its packing list, and a product needs its photos. An attachment is a file the company put on the record, with who added it and when. The reader must know what each file is before opening it.
 
@@ -1870,7 +1870,7 @@ page
 
 It fits a dispute. The bank asks for kinds there rather than files. Prefer thumbnails only where images dominate, such as product photos. Never ship the drop-zone-only section. A record whose files hide behind an upload control reads as empty.
 
-#### `a-file-list-with-a-drop-zone`: A file list with a drop zone
+#### `a-file-list-with-a-drop-zone`: A File List with a Drop Zone
 
 ```wireframe
 page
@@ -1893,7 +1893,7 @@ page
 
 **Reference:** Linear
 
-#### `compact-rows-for-many-files`: Compact rows for many files
+#### `compact-rows-for-many-files`: Compact Rows for Many Files
 
 ```wireframe
 page
@@ -1915,7 +1915,7 @@ page
 
 **Reference:** GitHub
 
-#### `evidence-grouped-by-what-it-proves`: Evidence grouped by what it proves
+#### `evidence-grouped-by-what-it-proves`: Evidence Grouped by What It Proves
 
 ```wireframe
 page
@@ -1943,7 +1943,7 @@ page
 
 **Reference:** Stripe
 
-#### `the-drop-zone-is-the-section`: The drop zone is the section
+#### `the-drop-zone-is-the-section`: The Drop Zone Is the Section
 
 ```wireframe
 page
@@ -1964,7 +1964,7 @@ page
 
 **Reference:** Dropbox
 
-#### `images-as-thumbnails-documents-as-rows`: Images as thumbnails, documents as rows
+#### `images-as-thumbnails-documents-as-rows`: Images as Thumbnails, Documents as Rows
 
 ```wireframe
 page
@@ -1987,7 +1987,7 @@ page
 
 **Reference:** Zendesk
 
-#### `no-files-and-what-belongs-here`: No files, and what belongs here
+#### `no-files-and-what-belongs-here`: No Files, and What Belongs Here
 
 ```wireframe
 page
@@ -2008,7 +2008,7 @@ page
 
 **Reference:** Figma
 
-### Property list with copy
+### Property List with Copy
 
 **Question:** Support reads a reference out on the phone and pastes an identifier into a dispute. A property list is a set of labeled values where the identifiers copy with one click. The reader must know the copy landed.
 
@@ -2020,7 +2020,7 @@ page
 
 Prefer hover-only copy nowhere. Touch screens have no hover and the button would never appear. Never ship a property list whose long values clip without a way to expand them.
 
-#### `every-identifier-copies`: Every identifier copies
+#### `every-identifier-copies`: Every Identifier Copies
 
 ```wireframe
 page
@@ -2042,7 +2042,7 @@ page
 
 **Reference:** Stripe
 
-#### `copy-appears-on-hover-only`: Copy appears on hover only
+#### `copy-appears-on-hover-only`: Copy Appears on Hover Only
 
 ```wireframe
 page
@@ -2064,7 +2064,7 @@ page
 
 **Reference:** GitHub
 
-#### `identifiers-grouped-in-one-card`: Identifiers grouped in one card
+#### `identifiers-grouped-in-one-card`: Identifiers Grouped in One Card
 
 ```wireframe
 page
@@ -2091,7 +2091,7 @@ page
 
 **Reference:** Vercel
 
-#### `copied-confirmation-in-place`: Copied confirmation in place
+#### `copied-confirmation-in-place`: Copied Confirmation in Place
 
 ```wireframe
 page
@@ -2112,7 +2112,7 @@ page
 
 **Reference:** Railway
 
-#### `long-values-truncate-with-expand`: Long values truncate with expand
+#### `long-values-truncate-with-expand`: Long Values Truncate with Expand
 
 ```wireframe
 page
@@ -2133,7 +2133,7 @@ page
 
 **Reference:** Sentry
 
-#### `stacked-on-a-phone`: Stacked on a phone
+#### `stacked-on-a-phone`: Stacked on a Phone
 
 ```wireframe
 page
@@ -2162,7 +2162,7 @@ page
 
 **Reference:** Shopify Polaris
 
-### Record header on a phone
+### Record Header on a Phone
 
 **Question:** Warehouse staff read records on a phone at the dock, 390 px wide, one hand free. The header must state which record, what state, and the one step that matters without scrolling sideways or hiding the title.
 
@@ -2174,7 +2174,7 @@ page
 
 It fits records where the step is taken mid-scroll, such as scanning at the dock. Prefer the scrolling action row only where every action is equally likely. Never ship actions that need sideways scrolling to be found. A hidden Refund at the dock stops the queue.
 
-#### `stacked-title-full-width-primary-the-rest-in-a-menu`: Stacked title, full-width primary, the rest in a menu
+#### `stacked-title-full-width-primary-the-rest-in-a-menu`: Stacked Title, Full-Width Primary, the Rest in a Menu
 
 ```wireframe
 page
@@ -2197,7 +2197,7 @@ page
 
 **Reference:** shadcn
 
-#### `a-sticky-action-bar-at-the-foot`: A sticky action bar at the foot
+#### `a-sticky-action-bar-at-the-foot`: A Sticky Action Bar at the Foot
 
 ```wireframe
 page
@@ -2224,7 +2224,7 @@ page
 
 **Reference:** Shopify
 
-#### `back-chevron-and-state-in-the-bar`: Back chevron and state in the bar
+#### `back-chevron-and-state-in-the-bar`: Back Chevron and State in the Bar
 
 ```wireframe
 page
@@ -2247,7 +2247,7 @@ page
 
 **Reference:** iOS
 
-#### `the-description-folds-behind-the-title`: The description folds behind the title
+#### `the-description-folds-behind-the-title`: The Description Folds Behind the Title
 
 ```wireframe
 page
@@ -2268,7 +2268,7 @@ page
 
 **Reference:** GitHub
 
-#### `one-scrolling-row-of-actions`: One scrolling row of actions
+#### `one-scrolling-row-of-actions`: One Scrolling Row of Actions
 
 ```wireframe
 page
@@ -2293,7 +2293,7 @@ page
 
 **Reference:** Material Design
 
-#### `no-actions-in-the-header-at-all`: No actions in the header at all
+#### `no-actions-in-the-header-at-all`: No Actions in the Header at All
 
 ```wireframe
 page
@@ -2318,7 +2318,7 @@ page
 
 **Reference:** GOV.UK
 
-### Previous and next record
+### Previous and Next Record
 
 **Question:** Support works a queue, not a record. The next order in the list waits. The next dispute waits for an answer. Moving on must be one step that keeps the list order. The reader never returns to the list merely to open its neighbor.
 
@@ -2330,7 +2330,7 @@ page
 
 It fits readers who know the next record number rather than its neighbor. Prefer the list drawer on triage queues where the reader skims many records. Never ship movement without a position. Chevrons that never say 4 of 268 leave the reader lost in the queue.
 
-#### `chevrons-beside-the-breadcrumb`: Chevrons beside the breadcrumb
+#### `chevrons-beside-the-breadcrumb`: Chevrons Beside the Breadcrumb
 
 ```wireframe
 page
@@ -2358,7 +2358,7 @@ page
 
 **Reference:** Gmail
 
-#### `chevrons-in-the-header-with-keyboard-hints`: Chevrons in the header with keyboard hints
+#### `chevrons-in-the-header-with-keyboard-hints`: Chevrons in the Header with Keyboard Hints
 
 ```wireframe
 page
@@ -2384,7 +2384,7 @@ page
 
 **Reference:** Gmail
 
-#### `back-to-the-list-then-in-again`: Back to the list, then in again
+#### `back-to-the-list-then-in-again`: Back to the List, Then in Again
 
 ```wireframe
 page
@@ -2410,7 +2410,7 @@ page
 
 **Reference:** Shopify Polaris
 
-#### `a-list-drawer-beside-the-record`: A list drawer beside the record
+#### `a-list-drawer-beside-the-record`: A List Drawer Beside the Record
 
 ```wireframe
 page
@@ -2437,7 +2437,7 @@ page
 
 **Reference:** Intercom
 
-#### `jump-to-a-record-by-searching`: Jump to a record by searching
+#### `jump-to-a-record-by-searching`: Jump to a Record by Searching
 
 ```wireframe
 page
@@ -2462,7 +2462,7 @@ page
 
 **Reference:** Linear
 
-#### `no-movement-each-record-opens-from-the-list`: No movement: each record opens from the list
+#### `no-movement-each-record-opens-from-the-list`: No Movement: Each Record Opens from the List
 
 ```wireframe
 page
@@ -2485,7 +2485,7 @@ page
 
 **Cost:** Every record costs a full round trip through the list, which is slow triage and loses the reader's scroll each time. It is honest but it is the slowest honest option.
 
-### Order record
+### Order Record
 
 **Question:** The order is the record support opens most. Maria Garcia ordered SO-1042. It totals EUR 125.00 for two lamps, a delivery fee, and a cable tray. It must state its lines, its payments, and its refunds in one reading. The money adds up. Every refund reads against the payment it reverses.
 
@@ -2497,7 +2497,7 @@ page
 
 Prefer the tabbed layout only once an order outgrows three sections. Never ship the phone layout as the desktop page. Stacked sections waste most of the width there.
 
-#### `summary-three-sections-history-in-the-aside`: Summary, three sections, history in the aside
+#### `summary-three-sections-history-in-the-aside`: Summary, Three Sections, History in the Aside
 
 ```wireframe
 page
@@ -2527,7 +2527,7 @@ page
 
 **Cost:** Three sections is a ceiling, so the fourth facet waits for a tab or a second page. The aside also stacks below everything under 900 px, which buries the history on a phone.
 
-#### `one-facet-per-tab`: One facet per tab
+#### `one-facet-per-tab`: One Facet per Tab
 
 ```wireframe
 page
@@ -2549,7 +2549,7 @@ page
 
 **Reference:** Shopify
 
-#### `one-long-page-everything-in-order`: One long page, everything in order
+#### `one-long-page-everything-in-order`: One Long Page, Everything in Order
 
 ```wireframe
 page
@@ -2584,7 +2584,7 @@ page
 
 **Reference:** Stripe
 
-#### `money-first`: Money first
+#### `money-first`: Money First
 
 ```wireframe
 page
@@ -2613,7 +2613,7 @@ page
 
 **Reference:** Xero
 
-#### `customer-first`: Customer first
+#### `customer-first`: Customer First
 
 ```wireframe
 page
@@ -2645,7 +2645,7 @@ page
 
 **Reference:** Zendesk
 
-#### `the-order-on-a-phone`: The order on a phone
+#### `the-order-on-a-phone`: The Order on a Phone
 
 ```wireframe
 page
@@ -2675,18 +2675,18 @@ page
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/frontend/patterns/record-detail#show-one-primary-action-in-a-record-header | checkable | `litespec patterns check` refuses a wireframe header holding two primary actions; a reviewer confirms each built record header holds at most one. |
-| litespec/frontend/patterns/record-detail#keep-destructive-commands-out-of-the-primary-place | guidance | Does every destructive command on a record page sit outside the primary place, in its own tone? |
-| litespec/frontend/patterns/record-detail#record-header | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-tabs | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-summary | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-aside | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-timeline | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#related-records | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-the-reader-may-not-change | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-change-history | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-notes | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-attachments | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#property-list-with-copy | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#record-header-on-a-phone | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#previous-and-next-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/record-detail#order-record | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/record-detail#keep-destructive-commands-out-of-the-primary-place | guidance | Which built record header hands a destructive command the primary style? Open the headers on built record screens and read each command's tone. |
+| litespec/frontend/patterns/record-detail#record-header | guidance | Which built title row differs from the wireframe its catalog entry chose? Open the built states, facts, and overflow menus beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-tabs | guidance | Which built facet row differs from the wireframe its catalog entry chose? Open the built counts, icons, and phone selects beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-summary | guidance | Which built fact block differs from the wireframe its catalog entry chose? Open the built key values, figures, and tiles beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-aside | guidance | Which built side column differs from the wireframe its catalog entry chose? Open the built history, decisions, and related asides beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-timeline | guidance | Which built event feed differs from the wireframe its catalog entry chose? Open the built day groups, diffs, and note mixes beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#related-records | guidance | Which built relation link differs from the wireframe its catalog entry chose? Open the built chains, cards, and counts beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-the-reader-may-not-change | guidance | Which built locked record differs from the wireframe its catalog entry chose? Open the built refused commands, banners, and withheld fields beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-change-history | guidance | Which built audit trail differs from the wireframe its catalog entry chose? Open the built tabs, panels, and per-field histories beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-notes | guidance | Which built annotation feed differs from the wireframe its catalog entry chose? Open the built composers, mixes, and resolved piles beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-attachments | guidance | Which built file section differs from the wireframe its catalog entry chose? Open the built lists, thumbnails, and drop zones beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#property-list-with-copy | guidance | Which built copyable fact differs from the wireframe its catalog entry chose? Open the built identifiers, hovers, and truncations beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#record-header-on-a-phone | guidance | Which built narrow title row differs from the wireframe its catalog entry chose? Open the built stacked headers and foot action bars at 390 pixels beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#previous-and-next-record | guidance | Which built neighbor step differs from the wireframe its catalog entry chose? Open the built chevrons, drawers, and jump searches beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/record-detail#order-record | guidance | Which built worked order differs from the wireframe its catalog entry chose? Open the built summary, tabs, and phone order screens beside the catalog entry recording the chosen option and its reason. |

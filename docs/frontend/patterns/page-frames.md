@@ -2,27 +2,27 @@
 
 ## Intent
 
-Every screen in the product is one kind of page, from home and list to form, report, and outcome. This page holds the layout pattern for each kind: home, list, queue, record, form, report, settings, editor, outcome, operations, schedule, setup, error, and drawer. A team building a new screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One layout per kind keeps every screen predictable, so a reader knows where the heading, actions, and content sit before reading.
+This page holds the layout pattern for each kind of page, from home and list to form, report, and outcome: home, list, queue, record, form, report, settings, editor, outcome, operations, schedule, setup, error, and drawer. A team building a new screen starts from these patterns, an owner picks an option from the drawings, and the team records the choice in its pattern catalog, the file holding the project's interface decisions. One layout per kind keeps every screen predictable, so a reader knows where the heading, actions, and content sit before reading.
 
 ## Concepts
 
-### How to read a pattern
+### How to Read a Pattern
 
 Each pattern answers one layout question, such as how a list page orders its search, filters, table, and paging. It states the question, the default option a project builds, how the default behaves on a narrow screen, and why the default won. Each option then shows one wireframe drawing with its own rationale, cost, and optional reference. A project records its choice in its pattern catalog and builds the chosen option with its own components. The [UI patterns](../patterns.md) page states the catalog contract and the wireframe language.
 
-### The running example
+### The Running Example
 
 The drawings on this page use the Acme Supply back office: order SO-1042 for Maria Garcia, the Garcia Interiors restock delivery, and the Amsterdam warehouse. Each kind of page repeats the same frame, so a reader meets one heading and at most one primary action on every screen. The Standards section states the two rules every option keeps: each page shows one top-level heading, and each frame shows at most one primary action outside its rows and overlays.
 
 ## Standards
 
-### Name the page in one heading
+### Name the Page in One Heading
 
 **Statement:** Each page MUST show one top-level heading that names the record, list, or task it holds.
 
 **Rationale:** One heading names the open record, list, or task, so a reader who arrived from a link or a search knows where they landed. Without it, two headings compete for that job, and the reader guesses which line to trust while assistive tech announces the wrong one.
 
-### Show one primary action in a page frame
+### Show One Primary Action in a Page Frame
 
 **Statement:** A page frame MUST show at most one primary action outside its rows and overlays.
 
@@ -30,7 +30,7 @@ The drawings on this page use the Acme Supply back office: order SO-1042 for Mar
 
 ## Patterns
 
-### Home page
+### Home Page
 
 **Question:** The first page after sign-in tells the reader what needs doing now, most urgent first, before any figure. A home page typically holds a greeting, stat tiles, a setup section, a needs-attention list, and a coming-up list. The disagreement is how much of that sits above the fold, and whether the tiles lead or the work leads.
 
@@ -42,7 +42,7 @@ The drawings on this page use the Acme Supply back office: order SO-1042 for Mar
 
 Never ship the tiles-first order as the default. Three stat tiles push the queue below the fold and the page reads as a report instead of a task list.
 
-#### `work-first-tiles-second`: Work first, tiles second
+#### `work-first-tiles-second`: Work First, Tiles Second
 
 ```wireframe
 page
@@ -67,7 +67,7 @@ page
 
 **Cost:** The tiles lose prominence, and a reader who came to check a number has to scroll. It costs one screen of vertical space.
 
-#### `tiles-first-work-second`: Tiles first, work second
+#### `tiles-first-work-second`: Tiles First, Work Second
 
 ```wireframe
 page
@@ -95,7 +95,7 @@ page
 
 **Cost:** Three large tiles push the needs-attention list below the fold, so the page reads as a report rather than a task list.
 
-#### `one-queue-no-tiles`: One queue, no tiles
+#### `one-queue-no-tiles`: One Queue, No Tiles
 
 ```wireframe
 page
@@ -113,7 +113,7 @@ page
 
 **Cost:** The reader loses orientation entirely. Nothing says how big the day is, how much is coming, or whether anything is broken. The work-page shape calls for two to four tiles below the queue.
 
-#### `grouped-by-area`: Grouped by area
+#### `grouped-by-area`: Grouped by Area
 
 ```wireframe
 page
@@ -130,7 +130,7 @@ page
 
 **Cost:** A returning manager has to open an area before they can work, and nothing surfaces the one thing that is late. It fits a settings home better than a landing page.
 
-#### `queue-with-an-owner-and-an-age`: Queue with an owner and an age
+#### `queue-with-an-owner-and-an-age`: Queue with an Owner and an Age
 
 ```wireframe
 page
@@ -147,7 +147,7 @@ page
 
 **Cost:** An owner and a clock are only honest if assignment is a real command. With no assignment, every row reads Alex and the columns are noise.
 
-#### `guided-first-run`: Guided first run
+#### `guided-first-run`: Guided First Run
 
 ```wireframe
 page
@@ -167,7 +167,7 @@ page
 
 **Cost:** Two different pages hide behind one route. The usual answer is a separate setup route plus a setup section, which holds the same idea in two places rather than one.
 
-#### `my-work-first-shared-queue-second`: My work first, shared queue second
+#### `my-work-first-shared-queue-second`: My Work First, Shared Queue Second
 
 ```wireframe
 page
@@ -195,7 +195,7 @@ page
 
 **Reference:** Linear
 
-#### `one-next-action-then-the-queue`: One next action, then the queue
+#### `one-next-action-then-the-queue`: One Next Action, Then the Queue
 
 ```wireframe
 page
@@ -220,7 +220,7 @@ page
 
 **Cost:** Choosing the one next action is a judgment the application has to make and keep true. When it picks wrong, the urgency sits one section down. It costs one section of vertical space above the queue.
 
-### List page
+### List Page
 
 **Question:** Find one record among many. The frame is fixed: header, views, search, filters, one table, pagination. The decision is which controls earn their place, because a search box on its own is not enough across 268 rows.
 
@@ -232,7 +232,7 @@ page
 
 Never ship two tables on one page. A list page holds one table, and a second table is a second route wearing a disguise.
 
-#### `search-and-a-state-filter-only`: Search and a state filter only
+#### `search-and-a-state-filter-only`: Search and a State Filter Only
 
 ```wireframe
 page
@@ -254,7 +254,7 @@ page
 
 **Cost:** A reader with 268 orders from 40 customers still cannot narrow to one customer. It stays acceptable while the search box already searches the customer name.
 
-#### `views-instead-of-filters`: Views instead of filters
+#### `views-instead-of-filters`: Views Instead of Filters
 
 ```wireframe
 page
@@ -275,7 +275,7 @@ page
 
 **Cost:** Five segments plus a search box crowd one toolbar, and segments have no room for a count per state. The reader cannot see where the work is before choosing.
 
-#### `full-filter-row-with-chips`: Full filter row with chips
+#### `full-filter-row-with-chips`: Full Filter Row with Chips
 
 ```wireframe
 page
@@ -303,7 +303,7 @@ page
 
 **Cost:** Four controls and a chip row is a lot of chrome above a table, and the chips duplicate the controls. It pays off once the list holds mixed records.
 
-#### `saved-views-opened-from-a-menu`: Saved views, opened from a menu
+#### `saved-views-opened-from-a-menu`: Saved Views, Opened from a Menu
 
 ```wireframe
 page
@@ -329,7 +329,7 @@ page
 
 **Cost:** Nothing is discoverable on arrival, and every view needs its own storage. It suits power users and reads poorly as a first-run surface.
 
-#### `two-lists-on-one-page`: Two lists on one page
+#### `two-lists-on-one-page`: Two Lists on One Page
 
 ```wireframe
 page
@@ -351,7 +351,7 @@ page
 
 **Cost:** A list page holds one table, and a second table means a second page or a tab. Following it means two routes and two search states.
 
-#### `dense-filter-bar-with-a-result-count`: Dense filter bar with a result count
+#### `dense-filter-bar-with-a-result-count`: Dense Filter Bar with a Result Count
 
 ```wireframe
 page
@@ -376,7 +376,7 @@ page
 
 **Reference:** GitHub
 
-#### `master-and-detail-on-one-screen`: Master and detail on one screen
+#### `master-and-detail-on-one-screen`: Master and Detail on One Screen
 
 ```wireframe
 page
@@ -420,7 +420,7 @@ page
 
 Never ship the toolbar-replacing bulk bar. The layout jumps mid-decision and the search box vanishes when the reader wants to refine it.
 
-#### `select-all-on-the-page-banner-for-the-rest`: Select all on the page, banner for the rest
+#### `select-all-on-the-page-banner-for-the-rest`: Select All on the Page, Banner for the Rest
 
 ```wireframe
 page
@@ -451,7 +451,7 @@ page
 
 **Reference:** Gmail
 
-#### `a-checkbox-on-every-row-no-header-checkbox`: A checkbox on every row, no header checkbox
+#### `a-checkbox-on-every-row-no-header-checkbox`: A Checkbox on Every Row, No Header Checkbox
 
 ```wireframe
 page
@@ -470,7 +470,7 @@ page
 
 **Cost:** The most common bulk job, refunding everything inside the window, becomes 31 clicks. A cap that protects money also removes the batch work the queue exists for.
 
-#### `bulk-bar-that-replaces-the-toolbar`: Bulk bar that replaces the toolbar
+#### `bulk-bar-that-replaces-the-toolbar`: Bulk Bar That Replaces the Toolbar
 
 ```wireframe
 page
@@ -492,7 +492,7 @@ page
 
 **Cost:** The layout shifts under the reader, and a search box they wanted to refine with disappears mid-decision. It is widely used, and widely disliked for the jump.
 
-#### `every-row-carries-its-own-command`: Every row carries its own command
+#### `every-row-carries-its-own-command`: Every Row Carries Its Own Command
 
 ```wireframe
 page
@@ -509,7 +509,7 @@ page
 
 **Cost:** No batch work at all, which is the whole point of a queue. It fits when the batch is rare and each decision needs different information.
 
-#### `grouped-by-what-the-row-is`: Grouped by what the row is
+#### `grouped-by-what-the-row-is`: Grouped by What the Row Is
 
 ```wireframe
 page
@@ -534,7 +534,7 @@ page
 
 **Reference:** Atlassian
 
-#### `play-mode-one-decision-per-screen`: Play mode, one decision per screen
+#### `play-mode-one-decision-per-screen`: Play Mode, One Decision per Screen
 
 ```wireframe
 page
@@ -564,7 +564,7 @@ page
 
 **Reference:** Zendesk
 
-#### `a-table-with-a-clock-column`: A table with a clock column
+#### `a-table-with-a-clock-column`: A Table with a Clock Column
 
 ```wireframe
 page
@@ -585,7 +585,7 @@ page
 
 **Reference:** Jira Service Management
 
-### Record page
+### Record Page
 
 **Question:** One record, and everything done to it. The frame carries a summary, at most three sections, and an aside. The decision is how to divide the page: tabs against stacked sections, and what earns the aside.
 
@@ -597,7 +597,7 @@ page
 
 Never ship the facts-in-header variant. A dense header pushes every command below the fold on a phone and fights the trail for space.
 
-#### `summary-sections-aside-for-history`: Summary, sections, aside for history
+#### `summary-sections-aside-for-history`: Summary, Sections, Aside for History
 
 ```wireframe
 page
@@ -627,7 +627,7 @@ page
 
 **Reference:** Shopify
 
-#### `four-tabs-over-the-same-sections`: Four tabs over the same sections
+#### `four-tabs-over-the-same-sections`: Four Tabs over the Same Sections
 
 ```wireframe
 page
@@ -654,7 +654,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `one-page-headed-sections-no-tabs`: One page, headed sections, no tabs
+#### `one-page-headed-sections-no-tabs`: One Page, Headed Sections, No Tabs
 
 ```wireframe
 page
@@ -683,7 +683,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `header-carries-the-facts-sections-carry-the-commands`: Header carries the facts, sections carry the commands
+#### `header-carries-the-facts-sections-carry-the-commands`: Header Carries the Facts, Sections Carry the Commands
 
 ```wireframe
 page
@@ -708,7 +708,7 @@ page
 
 **Cost:** A dense header pushes the commands below the fold on a phone, and it competes with the trail for vertical space.
 
-#### `timeline-as-the-page-record-as-the-aside`: Timeline as the page, record as the aside
+#### `timeline-as-the-page-record-as-the-aside`: Timeline as the Page, Record as the Aside
 
 ```wireframe
 page
@@ -733,7 +733,7 @@ page
 
 **Cost:** This option is wrong for most records. An order is mostly its facts. An audit trail or a collection record is mostly its history, and the shape has to follow the record.
 
-#### `editable-properties-in-the-rail`: Editable properties in the rail
+#### `editable-properties-in-the-rail`: Editable Properties in the Rail
 
 ```wireframe
 page
@@ -763,7 +763,7 @@ page
 
 **Reference:** Linear
 
-#### `record-with-its-own-sub-navigation`: Record with its own sub-navigation
+#### `record-with-its-own-sub-navigation`: Record with Its Own Sub-Navigation
 
 ```wireframe
 page
@@ -794,7 +794,7 @@ page
 
 **Cost:** It takes horizontal space that a table would rather have, and a reader cannot see what is on the other pages at all.
 
-### Form page
+### Form Page
 
 **Question:** Take one command's input. New-record pages are often inconsistent. One wraps its fields in a section with a left label column, while another draws bare fields with no box and no Cancel. Both are this frame.
 
@@ -806,7 +806,7 @@ page
 
 Never ship the stepper for creating a product. Three steps for work that fits one page is one step too many.
 
-#### `one-section-one-column-of-fields-cancel-beside-save`: One section, one column of fields, Cancel beside Save
+#### `one-section-one-column-of-fields-cancel-beside-save`: One Section, One Column of Fields, Cancel Beside Save
 
 ```wireframe
 page
@@ -828,7 +828,7 @@ page
 
 **Cost:** A long form makes a long page. Grouping into several labeled blocks keeps it scannable, at the cost of a taller page.
 
-#### `form-section-with-the-label-in-the-left-column`: Form section with the label in the left column
+#### `form-section-with-the-label-in-the-left-column`: Form Section with the Label in the Left Column
 
 ```wireframe
 page
@@ -857,7 +857,7 @@ page
 
 **Cost:** The left column is about 150 pixels, which wraps the explanatory line to four words per line. The same content stacked would read better.
 
-#### `stacked-blocks-with-the-title-above`: Stacked blocks with the title above
+#### `stacked-blocks-with-the-title-above`: Stacked Blocks with the Title Above
 
 ```wireframe
 page
@@ -884,7 +884,7 @@ page
 
 **Cost:** The page grows longer, and the reader loses the vertical alignment that helped readers scan between fields.
 
-#### `two-columns-on-a-wide-screen`: Two columns on a wide screen
+#### `two-columns-on-a-wide-screen`: Two Columns on a Wide Screen
 
 ```wireframe
 page
@@ -907,7 +907,7 @@ page
 
 **Cost:** A long amount or a long name does not fit half a column, so the layout forces some fields to be narrower than others. Two columns suit short fields on wide screens.
 
-#### `a-stepper-above-one-step-s-fields`: A stepper above one step's fields
+#### `a-stepper-above-one-step-s-fields`: A Stepper Above One Step's Fields
 
 ```wireframe
 page
@@ -932,7 +932,7 @@ page
 
 **Reference:** Carbon
 
-#### `one-question-per-screen`: One question per screen
+#### `one-question-per-screen`: One Question per Screen
 
 ```wireframe
 page
@@ -953,7 +953,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `section-per-action-one-save-at-the-foot`: Section per action, one Save at the foot
+#### `section-per-action-one-save-at-the-foot`: Section per Action, One Save at the Foot
 
 ```wireframe
 page
@@ -979,7 +979,7 @@ page
 
 **Cost:** One Save means a partial failure loses the lot, and a reader who wants to save the name and leave the price cannot. Two Saves on one screen is the worse version of this problem.
 
-### Report page
+### Report Page
 
 **Question:** Read figures over one period. An Acme Supply statement puts the period in the heading with August 2026 and October 2026 buttons beside it. Nothing says which is previous and which is next.
 
@@ -991,7 +991,7 @@ page
 
 Never ship the two unlabeled month buttons. Nothing says which is previous and which is next.
 
-#### `chevron-pair-with-the-period-as-the-heading`: Chevron pair with the period as the heading
+#### `chevron-pair-with-the-period-as-the-heading`: Chevron Pair with the Period as the Heading
 
 ```wireframe
 page
@@ -1018,7 +1018,7 @@ page
 
 **Cost:** Walking months one at a time is slow when comparing a quarter, which is why the list stays.
 
-#### `period-tabs-across-the-top`: Period tabs across the top
+#### `period-tabs-across-the-top`: Period Tabs Across the Top
 
 ```wireframe
 page
@@ -1041,7 +1041,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `dropdown-with-presets-beside-a-typeable-range`: Dropdown with presets beside a typeable range
+#### `dropdown-with-presets-beside-a-typeable-range`: Dropdown with Presets Beside a Typeable Range
 
 ```wireframe
 page
@@ -1064,7 +1064,7 @@ page
 
 **Cost:** Presets plus a range are two mechanisms on one control. The used preset must stay visible afterwards, or the reader loses track of the period.
 
-#### `the-two-buttons-labeled`: The two buttons, labeled
+#### `the-two-buttons-labeled`: The Two Buttons, Labeled
 
 ```wireframe
 page
@@ -1088,7 +1088,7 @@ page
 
 **Cost:** Still a month at a time, and the labels still compete with the heading for attention. It treats the symptom rather than the shape.
 
-#### `report-with-the-breakdown-as-tabs`: Report with the breakdown as tabs
+#### `report-with-the-breakdown-as-tabs`: Report with the Breakdown as Tabs
 
 ```wireframe
 page
@@ -1110,7 +1110,7 @@ page
 
 **Cost:** The reader loses the statement when they want a breakdown, and the tabs have to deep-link.
 
-#### `cards-with-sparklines-above-the-statement`: Cards with sparklines above the statement
+#### `cards-with-sparklines-above-the-statement`: Cards with Sparklines Above the Statement
 
 ```wireframe
 page
@@ -1135,7 +1135,7 @@ page
 
 **Reference:** Shopify
 
-#### `report-as-a-statement-with-no-separate-breakdown`: Report as a statement with no separate breakdown
+#### `report-as-a-statement-with-no-separate-breakdown`: Report as a Statement with No Separate Breakdown
 
 ```wireframe
 page
@@ -1162,7 +1162,7 @@ page
 
 **Cost:** It suits a monthly settlement and fails a revenue question during the month.
 
-### Settings home
+### Settings Home
 
 **Question:** Find one setting among many areas. A settings home can carry a whole tree: thirty routes under `/settings`, and the home page has to hold all of them.
 
@@ -1174,7 +1174,7 @@ page
 
 Never ship the frequency grouping. Readers look for a thing, not for how often they change it.
 
-#### `grouped-links-one-line-each`: Grouped links, one line each
+#### `grouped-links-one-line-each`: Grouped Links, One Line Each
 
 ```wireframe
 page
@@ -1197,7 +1197,7 @@ page
 
 **Cost:** Nothing states which areas are incomplete, so a new starter has to open each one. The Acme Supply home page already covers this with its setup section.
 
-#### `cards-with-an-icon-and-a-state`: Cards with an icon and a state
+#### `cards-with-an-icon-and-a-state`: Cards with an Icon and a State
 
 ```wireframe
 page
@@ -1216,7 +1216,7 @@ page
 
 **Cost:** Cards are boxes, and the design contract says a section is the only box and never nests. A grid of bordered cards on the settings home is that rule broken by twenty boxes.
 
-#### `a-list-with-a-search-box`: A list with a search box
+#### `a-list-with-a-search-box`: A List with a Search Box
 
 ```wireframe
 page
@@ -1236,7 +1236,7 @@ page
 
 **Cost:** The grouping is lost, so a reader who knows the area must hunt for it. The search has to know every setting name a reader might use.
 
-#### `grouped-by-how-often-it-is-changed`: Grouped by how often it is changed
+#### `grouped-by-how-often-it-is-changed`: Grouped by How Often It Is Changed
 
 ```wireframe
 page
@@ -1259,7 +1259,7 @@ page
 
 **Cost:** The grouping is about frequency rather than about the thing. A reader hunting the dock plan must recall which bucket holds it.
 
-#### `incomplete-areas-first-everything-else-beneath`: Incomplete areas first, everything else beneath
+#### `incomplete-areas-first-everything-else-beneath`: Incomplete Areas First, Everything Else Beneath
 
 ```wireframe
 page
@@ -1279,7 +1279,7 @@ page
 
 **Cost:** The order changes as setup completes. That makes the page feel unstable and makes a link unreliable by position.
 
-#### `left-navigation-with-the-area-on-the-right`: Left navigation with the area on the right
+#### `left-navigation-with-the-area-on-the-right`: Left Navigation with the Area on the Right
 
 ```wireframe
 page
@@ -1306,7 +1306,7 @@ page
 
 **Reference:** Stripe
 
-#### `a-checklist-of-what-is-left-then-a-plain-index`: A checklist of what is left, then a plain index
+#### `a-checklist-of-what-is-left-then-a-plain-index`: A Checklist of What Is Left, Then a Plain Index
 
 ```wireframe
 page
@@ -1326,7 +1326,7 @@ page
 
 **Cost:** Two structures on one page, and a reader who only wants the index scrolls past a checklist they have finished.
 
-### Editor page
+### Editor Page
 
 **Question:** Edit what a customer sees, with a live preview beside the form. A storefront editor holds the look in a form. It shows the result in a preview card beside the form. It must carry a Cancel and a dirty state. Without them, leaving silently discards work.
 
@@ -1338,7 +1338,7 @@ page
 
 Never ship the preview-above-the-form stack. Every edit pushes the preview off screen, which defeats a live preview.
 
-#### `form-left-live-preview-right-one-save`: Form left, live preview right, one Save
+#### `form-left-live-preview-right-one-save`: Form Left, Live Preview Right, One Save
 
 ```wireframe
 page
@@ -1368,7 +1368,7 @@ page
 
 **Cost:** The preview needs a phone toggle to be trusted for a storefront. Two thirds of a 1440 screen is a lot of preview for a few fields.
 
-#### `preview-as-a-device-frame-with-a-width-toggle`: Preview as a device frame with a width toggle
+#### `preview-as-a-device-frame-with-a-width-toggle`: Preview as a Device Frame with a Width Toggle
 
 ```wireframe
 page
@@ -1399,7 +1399,7 @@ page
 
 **Cost:** The device frame costs horizontal room, so the form column narrows. A toggle means one width is never visible while the other is edited.
 
-#### `preview-above-the-form-full-width`: Preview above the form, full width
+#### `preview-above-the-form-full-width`: Preview Above the Form, Full Width
 
 ```wireframe
 page
@@ -1426,7 +1426,7 @@ page
 
 **Cost:** Every field edit pushes the preview off the screen, which defeats a live preview. Only works if the preview is sticky or the field count is tiny.
 
-#### `preview-as-a-drawer-pulled-over-the-form`: Preview as a drawer pulled over the form
+#### `preview-as-a-drawer-pulled-over-the-form`: Preview as a Drawer Pulled over the Form
 
 ```wireframe
 page
@@ -1454,7 +1454,7 @@ page
 
 **Cost:** The preview is out of sight by default. A drawer over a form is a layered context for something meant to reassure.
 
-#### `tabs-per-facet-with-the-preview-always-on-the-right`: Tabs per facet with the preview always on the right
+#### `tabs-per-facet-with-the-preview-always-on-the-right`: Tabs per Facet with the Preview Always on the Right
 
 ```wireframe
 page
@@ -1483,7 +1483,7 @@ page
 
 **Cost:** The preview shows a whole that the reader has only partly set. A tabbed editor grows a third tab here, so this is the next step rather than a change of kind.
 
-#### `floating-settings-panel-over-a-full-bleed-preview`: Floating settings panel over a full-bleed preview
+#### `floating-settings-panel-over-a-full-bleed-preview`: Floating Settings Panel over a Full-Bleed Preview
 
 ```wireframe
 page
@@ -1511,7 +1511,7 @@ page
 
 **Reference:** Webflow
 
-#### `unsaved-changes-bar-pinned-to-the-foot`: Unsaved-changes bar pinned to the foot
+#### `unsaved-changes-bar-pinned-to-the-foot`: Unsaved-Changes Bar Pinned to the Foot
 
 ```wireframe
 page
@@ -1541,7 +1541,7 @@ page
 
 **Cost:** A bar across the bottom of the page is a full-width band, which the tone rules reserve for deployment identity. It has to be neutral to stay inside the contract.
 
-### Outcome page
+### Outcome Page
 
 **Question:** Where a flow ends: an order confirmed, a payment that failed, a link that expired. One state, one statement of what happened, one next step. Flows often end in a toast instead, so this frame states what an ending page holds.
 
@@ -1553,7 +1553,7 @@ page
 
 Never ship the toast-only outcome for anything the reader may need to return to. A moment is not a place.
 
-#### `one-statement-one-next-step`: One statement, one next step
+#### `one-statement-one-next-step`: One Statement, One Next Step
 
 ```wireframe
 page
@@ -1576,7 +1576,7 @@ page
 
 **Cost:** Saying nothing about what comes next makes the page a dead end unless the one action is right. Nothing else is offered, so a wrong guess is expensive.
 
-#### `outcome-with-the-record-it-changed`: Outcome with the record it changed
+#### `outcome-with-the-record-it-changed`: Outcome with the Record It Changed
 
 ```wireframe
 page
@@ -1600,7 +1600,7 @@ page
 
 **Cost:** The page stops being an outcome and becomes a record page with an unusual header. The flow's end then reads like its middle.
 
-#### `refusal-outcome-that-names-the-fix`: Refusal outcome that names the fix
+#### `refusal-outcome-that-names-the-fix`: Refusal Outcome That Names the Fix
 
 ```wireframe
 page
@@ -1619,7 +1619,7 @@ page
 
 **Cost:** Every refusal needs a differently-worded fix, and one that does not have one has to fall back to explaining itself.
 
-#### `outcome-as-a-confirmation-with-a-reference`: Outcome as a confirmation with a reference
+#### `outcome-as-a-confirmation-with-a-reference`: Outcome as a Confirmation with a Reference
 
 ```wireframe
 page
@@ -1643,7 +1643,7 @@ page
 
 **Cost:** A reference is an identifier, and the design contract says an identifier on screen must be labeled and copyable rather than bare.
 
-#### `outcome-with-a-checklist-of-what-is-left`: Outcome with a checklist of what is left
+#### `outcome-with-a-checklist-of-what-is-left`: Outcome with a Checklist of What Is Left
 
 ```wireframe
 page
@@ -1662,7 +1662,7 @@ page
 
 **Cost:** This stops being an outcome page and becomes a work page. The floor plan boundary blurs, and the one-glance property that makes an outcome page good is lost.
 
-#### `confirmation-band-with-the-reference-inside`: Confirmation band with the reference inside
+#### `confirmation-band-with-the-reference-inside`: Confirmation Band with the Reference Inside
 
 ```wireframe
 page
@@ -1685,7 +1685,7 @@ page
 
 **Reference:** GOV.UK
 
-#### `outcome-as-a-toast-with-the-record-in-place`: Outcome as a toast with the record in place
+#### `outcome-as-a-toast-with-the-record-in-place`: Outcome as a Toast with the Record in Place
 
 ```wireframe
 page
@@ -1708,7 +1708,7 @@ page
 
 **Reference:** Carbon
 
-### Live operations page
+### Live Operations Page
 
 **Question:** Dispatch day is happening: the docks are open, scanners are reading, and the warehouse lead needs the count at a glance. The decision is what earns the glance: the total, the per-dock split, or only the exceptions.
 
@@ -1720,7 +1720,7 @@ page
 
 Never ship the timeline as the main view. A list of six hundred dispatches is a log, not a page.
 
-#### `the-count-the-docks-the-exceptions`: The count, the docks, the exceptions
+#### `the-count-the-docks-the-exceptions`: The Count, the Docks, the Exceptions
 
 ```wireframe
 page
@@ -1746,7 +1746,7 @@ page
 
 **Cost:** Three structures on one page, and the exceptions sit below the docks on a phone. That order still reads correctly.
 
-#### `per-dock-cards-with-a-rate`: Per-dock cards with a rate
+#### `per-dock-cards-with-a-rate`: Per-Dock Cards with a Rate
 
 ```wireframe
 page
@@ -1772,7 +1772,7 @@ page
 
 **Reference:** Datadog
 
-#### `dispatches-as-a-timeline`: Dispatches as a timeline
+#### `dispatches-as-a-timeline`: Dispatches as a Timeline
 
 ```wireframe
 page
@@ -1794,7 +1794,7 @@ page
 
 **Reference:** PagerDuty
 
-#### `exceptions-only-quiet-otherwise`: Exceptions only, quiet otherwise
+#### `exceptions-only-quiet-otherwise`: Exceptions Only, Quiet Otherwise
 
 ```wireframe
 page
@@ -1814,7 +1814,7 @@ page
 
 **Cost:** When nothing needs anybody the page is nearly empty, and an empty page on a wall display reads as broken. It needs the count to prove it is alive.
 
-#### `full-screen-count-for-the-wall-display`: Full-screen count for the wall display
+#### `full-screen-count-for-the-wall-display`: Full-Screen Count for the Wall Display
 
 ```wireframe
 page
@@ -1831,7 +1831,7 @@ page
 
 **Cost:** A display is not a workplace: nothing can be opened, decided or closed from it. It answers how many, and every other question needs a phone.
 
-#### `split-dispatches-left-incidents-right`: Split: dispatches left, incidents right
+#### `split-dispatches-left-incidents-right`: Split: Dispatches Left, Incidents Right
 
 ```wireframe
 page
@@ -1858,7 +1858,7 @@ page
 
 **Reference:** GitHub
 
-### Calendar or schedule page
+### Calendar or Schedule Page
 
 **Question:** Ninety-three deliveries ahead need a shape that answers when, not what. The decision is density: a grid that shows the month against a list that shows the next delivery.
 
@@ -1868,7 +1868,7 @@ page
 
 **Rationale:** The month grid stays the pick: ninety-three deliveries ahead need density, and the grid shows the month the list cannot. The agenda list is the runner-up. Prefer it on a phone, where seven columns become unreadable whichever way they are drawn. Never ship the week lanes as the default. Two warehouses fit, and the third warehouse breaks the shape.
 
-#### `month-grid-with-deliveries-marked`: Month grid with deliveries marked
+#### `month-grid-with-deliveries-marked`: Month Grid with Deliveries Marked
 
 ```wireframe
 page
@@ -1890,7 +1890,7 @@ page
 
 **Reference:** Google Calendar
 
-#### `agenda-grouped-by-day`: Agenda grouped by day
+#### `agenda-grouped-by-day`: Agenda Grouped by Day
 
 ```wireframe
 page
@@ -1916,7 +1916,7 @@ page
 
 **Reference:** Apple Calendar
 
-#### `week-lanes-per-warehouse`: Week lanes per warehouse
+#### `week-lanes-per-warehouse`: Week Lanes per Warehouse
 
 ```wireframe
 page
@@ -1940,7 +1940,7 @@ page
 
 **Reference:** Float
 
-#### `upcoming-list-with-a-state-filter`: Upcoming list with a state filter
+#### `upcoming-list-with-a-state-filter`: Upcoming List with a State Filter
 
 ```wireframe
 page
@@ -1965,7 +1965,7 @@ page
 
 **Cost:** A list answers what, not when: dates read as text and the shape of the month is invisible. It is fine for ten deliveries and wrong for ninety-three.
 
-#### `mini-month-beside-the-day`: Mini month beside the day
+#### `mini-month-beside-the-day`: Mini Month Beside the Day
 
 ```wireframe
 page
@@ -1993,7 +1993,7 @@ page
 
 **Reference:** Outlook
 
-#### `next-30-days-as-a-week-strip`: Next 30 days as a week strip
+#### `next-30-days-as-a-week-strip`: Next 30 Days as a Week Strip
 
 ```wireframe
 page
@@ -2013,7 +2013,7 @@ page
 
 **Reference:** Airbnb
 
-### Onboarding or setup page
+### Onboarding or Setup Page
 
 **Question:** A new company has an account and nothing else. The decision is how much the page does. A checklist waits, a wizard leads, and a single page states the three steps and gets out of the way.
 
@@ -2023,7 +2023,7 @@ page
 
 **Rationale:** The checklist with a progress bar stays the pick: it states the three steps, shows which is done, and waits without leading. The stepper wizard is the runner-up. Prefer it when a step cannot be skipped and the next depends on the last. Never ship the single page with a Save per section: three saves for a first run is three chances to leave half set up.
 
-#### `checklist-with-a-progress-bar`: Checklist with a progress bar
+#### `checklist-with-a-progress-bar`: Checklist with a Progress Bar
 
 ```wireframe
 page
@@ -2052,7 +2052,7 @@ page
 
 **Reference:** Shopify
 
-#### `stepper-wizard-one-step-open`: Stepper wizard, one step open
+#### `stepper-wizard-one-step-open`: Stepper Wizard, One Step Open
 
 ```wireframe
 page
@@ -2075,7 +2075,7 @@ page
 
 **Reference:** Stripe
 
-#### `setup-beside-the-guide`: Setup beside the guide
+#### `setup-beside-the-guide`: Setup Beside the Guide
 
 ```wireframe
 page
@@ -2098,7 +2098,7 @@ page
 
 **Reference:** Notion
 
-#### `start-from-a-template`: Start from a template
+#### `start-from-a-template`: Start from a Template
 
 ```wireframe
 page
@@ -2118,7 +2118,7 @@ page
 
 **Cost:** A template is a guess about the shipment, and a wrong guess sets lines nobody reads. Templates must stay visibly editable, never silently applied.
 
-#### `one-page-one-section-per-step`: One page, one section per step
+#### `one-page-one-section-per-step`: One Page, One Section per Step
 
 ```wireframe
 page
@@ -2145,7 +2145,7 @@ page
 
 **Reference:** WordPress
 
-#### `book-help-instead-of-reading`: Book help instead of reading
+#### `book-help-instead-of-reading`: Book Help Instead of Reading
 
 ```wireframe
 page
@@ -2168,7 +2168,7 @@ page
 
 **Reference:** Shopify
 
-### Error or not-found page
+### Error or Not-Found Page
 
 **Question:** Something is missing, broken or refused. The decision is how much the page owns: a dead end with links back, or a working page that names the fix and offers it.
 
@@ -2178,7 +2178,7 @@ page
 
 **Rationale:** The centered not-found with links back stays the pick: it says what happened, says where to go, and does both in one glance. The permission refusal with the fix is the runner-up. Prefer it whenever the page knows who can resolve it, because Back is not a fix. Never ship the inline error alone for a missing page. A retry button on a page that will never exist is a promise that cannot be kept.
 
-#### `centered-not-found-with-links-back`: Centered not-found with links back
+#### `centered-not-found-with-links-back`: Centered Not-Found with Links Back
 
 ```wireframe
 page
@@ -2198,7 +2198,7 @@ page
 
 **Reference:** GitHub
 
-#### `inline-error-with-a-retry`: Inline error with a retry
+#### `inline-error-with-a-retry`: Inline Error with a Retry
 
 ```wireframe
 page
@@ -2219,7 +2219,7 @@ page
 
 **Reference:** Vercel
 
-#### `full-page-outage-with-the-state-named`: Full-page outage with the state named
+#### `full-page-outage-with-the-state-named`: Full-Page Outage with the State Named
 
 ```wireframe
 page
@@ -2239,7 +2239,7 @@ page
 
 **Reference:** Stripe
 
-#### `permission-refusal-with-the-fix`: Permission refusal with the fix
+#### `permission-refusal-with-the-fix`: Permission Refusal with the Fix
 
 ```wireframe
 page
@@ -2260,7 +2260,7 @@ page
 
 **Cost:** Every refusal needs its own fix, and one without a fix falls back to explaining itself. The fix must be a command, never a longer paragraph.
 
-#### `expired-invitation-with-the-next-step`: Expired invitation with the next step
+#### `expired-invitation-with-the-next-step`: Expired Invitation with the Next Step
 
 ```wireframe
 page
@@ -2284,7 +2284,7 @@ page
 
 **Reference:** Slack
 
-#### `warehouse-scanner-is-offline`: Warehouse scanner is offline
+#### `warehouse-scanner-is-offline`: Warehouse Scanner Is Offline
 
 ```wireframe
 page
@@ -2305,7 +2305,7 @@ page
 
 **Cost:** Offline confidence must be earned: the queued count has to be exact, or the first discrepancy teaches the warehouse to distrust the page.
 
-### Record drawer
+### Record Drawer
 
 **Question:** Read a record without leaving the list. It exists so a reader can compare a row against what the row actually holds. The constraint is width: a 420-pixel drawer inside a 1440 screen holds facts and nothing else.
 
@@ -2315,7 +2315,7 @@ page
 
 **Rationale:** The read-only drawer beside the list stays the pick: the list context is the whole reason to use a drawer, so nothing covers it. The inline detail band is the runner-up. Prefer it when the record is four facts and the comparison must sit inside the table. Never ship the drawer holding an edit. Repeatable work in a narrow overlay gives two nested control sets in one thin column.
 
-#### `drawer-beside-the-list-read-only`: Drawer beside the list, read-only
+#### `drawer-beside-the-list-read-only`: Drawer Beside the List, Read-Only
 
 ```wireframe
 page
@@ -2362,7 +2362,7 @@ page
 
 **Cost:** A phone has no room for two columns, so the drawer becomes a full-screen page. The same route then has two layouts to verify.
 
-#### `drawer-over-the-list-as-an-overlay`: Drawer over the list as an overlay
+#### `drawer-over-the-list-as-an-overlay`: Drawer over the List as an Overlay
 
 ```wireframe
 page
@@ -2391,7 +2391,7 @@ page
 
 **Reference:** Atlassian
 
-#### `row-expands-inline-into-a-detail-band`: Row expands inline into a detail band
+#### `row-expands-inline-into-a-detail-band`: Row Expands Inline into a Detail Band
 
 ```wireframe
 page
@@ -2419,7 +2419,7 @@ page
 
 **Reference:** NN/g
 
-#### `drawer-holding-a-small-edit-list-behind-it`: Drawer holding a small edit, list behind it
+#### `drawer-holding-a-small-edit-list-behind-it`: Drawer Holding a Small Edit, List Behind It
 
 ```wireframe
 page
@@ -2444,7 +2444,7 @@ page
 
 **Reference:** Carbon
 
-#### `drawer-as-a-preview-closing-back-to-the-same-row`: Drawer as a preview, closing back to the same row
+#### `drawer-as-a-preview-closing-back-to-the-same-row`: Drawer as a Preview, Closing Back to the Same Row
 
 ```wireframe
 page
@@ -2468,7 +2468,7 @@ page
 
 **Cost:** The reader has to know when the drawer is enough. One more place to judge, and the difference between it and the record page has to show at a glance.
 
-#### `drawer-with-timeline-and-reply-box`: Drawer with timeline and reply box
+#### `drawer-with-timeline-and-reply-box`: Drawer with Timeline and Reply Box
 
 ```wireframe
 page
@@ -2493,7 +2493,7 @@ page
 
 **Reference:** Intercom
 
-#### `phone-width-drawer-becomes-a-full-page`: Phone width, drawer becomes a full page
+#### `phone-width-drawer-becomes-a-full-page`: Phone Width, Drawer Becomes a Full Page
 
 ```wireframe
 page
@@ -2524,19 +2524,19 @@ page
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns/page-frames#name-the-page-in-one-heading | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/page-frames#show-one-primary-action-in-a-page-frame | guidance | Does every built screen of this kind keep this rule, including in its compact layout? |
-| litespec/frontend/patterns/page-frames#home-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#list-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#queue | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#record-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#form-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#report-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#settings-home | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#editor-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#outcome-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#live-operations-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#calendar-or-schedule-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#onboarding-or-setup-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#error-or-not-found-page | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
-| litespec/frontend/patterns/page-frames#record-drawer | guidance | Does the built page follow the default option, or the option the project catalog records with its reason? |
+| litespec/frontend/patterns/page-frames#name-the-page-in-one-heading | guidance | Which built screen splits its title across headings or omits it? Open every built page and read its top-level heading. |
+| litespec/frontend/patterns/page-frames#show-one-primary-action-in-a-page-frame | guidance | Which built frame carries two primary actions outside rows and overlays? Open every built page frame and count the primary actions. |
+| litespec/frontend/patterns/page-frames#home-page | guidance | Which built start screen breaks from the wireframe its catalog entry chose? Open the built queues, tiles, and next actions beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#list-page | guidance | Which built collection screen breaks from the wireframe its catalog entry chose? Open the built searches, views, and play modes beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#queue | guidance | Which built batch-selection screen breaks from the wireframe its catalog entry chose? Open the built select-all banners and play modes beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#record-page | guidance | Which built single-record screen breaks from the wireframe its catalog entry chose? Open the built summaries, tabs, and asides beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#form-page | guidance | Which built input screen breaks from the wireframe its catalog entry chose? Open the built sections, steppers, and save bars beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#report-page | guidance | Which built figures screen breaks from the wireframe its catalog entry chose? Open the built period pickers and breakdown tabs beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#settings-home | guidance | Which built setup index breaks from the wireframe its catalog entry chose? Open the built grouped links, cards, and checklists beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#editor-page | guidance | Which built preview screen breaks from the wireframe its catalog entry chose? Open the built form-plus-preview splits and device frames beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#outcome-page | guidance | Which built result screen breaks from the wireframe its catalog entry chose? Open the built statements, references, and refusal outcomes beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#live-operations-page | guidance | Which built wall display breaks from the wireframe its catalog entry chose? Open the built counts, docks, and exception views beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#calendar-or-schedule-page | guidance | Which built date view breaks from the wireframe its catalog entry chose? Open the built month grids, agendas, and week lanes beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#onboarding-or-setup-page | guidance | Which built first-run guide breaks from the wireframe its catalog entry chose? Open the built checklists, wizards, and templates beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#error-or-not-found-page | guidance | Which built dead end breaks from the wireframe its catalog entry chose? Open the built not-found, outage, and refused views beside the catalog entry recording the chosen option and its reason. |
+| litespec/frontend/patterns/page-frames#record-drawer | guidance | Which built side record breaks from the wireframe its catalog entry chose? Open the built read-only, edit, and timeline drawers beside the catalog entry recording the chosen option and its reason. |

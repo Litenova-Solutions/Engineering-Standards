@@ -19,7 +19,7 @@
   ]
 }
 ---
-# <Module display title>
+# <Module Display Title>
 
 ## Example
 

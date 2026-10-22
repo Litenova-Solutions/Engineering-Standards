@@ -102,17 +102,14 @@ static partial class StandardsValidator
         return "topic";
     }
 
-    static PageContract? ExpectedSections(string? kind, string relative = "")
+    static PageContract? ExpectedSections(string? kind)
     {
         if (kind == "topic")
         {
-            // Each shared web page is stack-neutral with short per-stack sections for
-            // what differs between React and Svelte. No other topic page carries
-            // stack sections. (litespec/core/authoring#use-the-declared-page-contract)
-            var optional = relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal)
-                ? new List<string> { "Concepts", "React", "Svelte", "Reference example" }
-                : new List<string> { "Concepts", "Reference example" };
-            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], optional);
+            // A topic page carries no per-stack sections. Shared pages stay neutral
+            // across stacks, and each stack page carries its own bindings.
+            // (litespec/core/authoring#place-each-stack-binding-on-its-stack-page)
+            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], ["Concepts", "Reference Example"]);
         }
 
         // A pattern page offers drawn options for recurring interface questions; its
@@ -124,24 +121,24 @@ static partial class StandardsValidator
 
         if (kind == "stack")
         {
-            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], []);
+            return new PageContract(["Intent", "Standards", "Conventions", "Verification"], ["Concepts"]);
         }
 
         if (kind == "extension")
         {
-            return new PageContract(["Intent", "Activation", "Baseline relationship", "Standards", "Conventions", "Dependencies", "Verification"], []);
+            return new PageContract(["Intent", "Activation", "Baseline Relationship", "Standards", "Conventions", "Dependencies", "Verification"], []);
         }
 
         if (kind == "how-to")
         {
-            return new PageContract(["Purpose", "Procedure", "Verification"], ["Prerequisites"]);
+            return new PageContract(["Purpose", "Procedure", "Check"], ["Prerequisites"]);
         }
 
-        // A tutorial closes on what the reader now has. Verification asks whether a
+        // A tutorial closes on what the reader now has. Check asks whether a
         // procedure worked, which is a different question asked by a different reader.
         if (kind == "tutorial")
         {
-            return new PageContract(["Purpose", "Prerequisites", "Lesson", "What you built"], []);
+            return new PageContract(["Purpose", "Prerequisites", "Lesson", "What You Built"], []);
         }
 
         if (kind == "reference")
@@ -154,7 +151,7 @@ static partial class StandardsValidator
         // separately runnable writes 'None.' (litespec/core/authoring#name-the-escape-from-every-abstraction)
         if (kind == "command")
         {
-            return new PageContract(["Name", "Synopsis", "Description", "Arguments", "Options", "Exit codes", "Examples", "Underneath"], []);
+            return new PageContract(["Name", "Synopsis", "Description", "Arguments", "Options", "Exit Codes", "Examples", "Underneath"], []);
         }
 
         return null;
@@ -162,7 +159,7 @@ static partial class StandardsValidator
 
     static void CheckSectionOrder(string relative, string? kind, List<PageSection> sections, Action<string, int, string, string> add)
     {
-        var contract = ExpectedSections(kind, relative);
+        var contract = ExpectedSections(kind);
         if (contract is null)
         {
             return;
@@ -189,21 +186,19 @@ static partial class StandardsValidator
         List<string> canonical;
         if (kind == "topic")
         {
-            canonical = ["Intent", "Concepts"];
-            if (relative.StartsWith("docs/frontend/web/", StringComparison.Ordinal))
-            {
-                canonical.AddRange(["React", "Svelte"]);
-            }
-
-            canonical.AddRange(["Standards", "Conventions", "Reference example", "Verification"]);
+            canonical = ["Intent", "Concepts", "Standards", "Conventions", "Reference Example", "Verification"];
         }
         else if (kind == "pattern")
         {
             canonical = ["Intent", "Concepts", "Standards", "Conventions", "Patterns", "Verification"];
         }
+        else if (kind == "stack")
+        {
+            canonical = ["Intent", "Concepts", "Standards", "Conventions", "Verification"];
+        }
         else if (kind == "how-to")
         {
-            canonical = ["Purpose", "Prerequisites", "Procedure", "Verification"];
+            canonical = ["Purpose", "Prerequisites", "Procedure", "Check"];
         }
         else if (kind == "reference")
         {
@@ -251,15 +246,18 @@ static partial class StandardsValidator
         // the words around them.
         value = PageAnchorSuffixPattern().Replace(value, "");
         value = InlineCodePattern().Replace(value, " ");
-        var tokens = TitleTokenPattern().Matches(value).Cast<Match>().Select(match => match.Value).ToList();
-        return tokens.Select((token, index) => (token, index)).All(item =>
+        var matches = TitleTokenPattern().Matches(value).Cast<Match>().ToList();
+        return matches.Select((match, index) => (token: match.Value, index, start: match.Index)).All(item =>
         {
             if (TitleAtypicalPattern().IsMatch(item.token) || TitleCamelPattern().IsMatch(item.token) || item.token.Contains('.'))
             {
                 return true;
             }
 
-            if (item.index > 0 && item.index < tokens.Count - 1 && TitleSmallWords.Contains(item.token.ToLowerInvariant()))
+            // The word after a colon starts a new phrase and is capitalized like a first word.
+            var afterColon = value[..item.start].TrimEnd().EndsWith(':');
+
+            if (item.index > 0 && item.index < matches.Count - 1 && !afterColon && TitleSmallWords.Contains(item.token.ToLowerInvariant()))
             {
                 return item.token == item.token.ToLowerInvariant();
             }
@@ -279,7 +277,7 @@ static partial class StandardsValidator
             return;
         }
 
-        var contract = ExpectedSections(kind, relative);
+        var contract = ExpectedSections(kind);
         var contractNames = contract is null
             ? new HashSet<string>(StringComparer.Ordinal)
             : new HashSet<string>(contract.Required.Concat(contract.Optional), StringComparer.Ordinal);
@@ -544,7 +542,7 @@ static partial class StandardsValidator
         CheckSectionOrder(relative, kind, sections, add);
         CheckIndexAndGlossary(relative, kind, raw, sections, add);
         CheckHeadingCase(relative, kind, clean, add);
-        var contract = ExpectedSections(kind, relative);
+        var contract = ExpectedSections(kind);
         if (contract is not null)
         {
             var allowed = new HashSet<string>(contract.Required.Concat(contract.Optional), StringComparer.Ordinal);
@@ -567,15 +565,15 @@ static partial class StandardsValidator
             }
         }
 
-        if (kind == "topic" && sections.Any(section => section.Name == "Reference example"))
+        if (kind == "topic" && sections.Any(section => section.Name == "Reference Example"))
         {
-            var example = SectionBody(lines, "Reference example");
+            var example = SectionBody(lines, "Reference Example");
             var firstLine = StripFences(SplitLines(example)).FirstOrDefault(item => item.Line.Trim().Length > 0)?.Line.Trim() ?? "";
             var ids = CitationPattern.Matches(example);
             if (!firstLine.StartsWith("This informative example demonstrates ", StringComparison.Ordinal) || ids.Count == 0)
             {
-                var section = sections.FirstOrDefault(item => item.Name == "Reference example");
-                add(relative, section?.Line ?? 1, "REFERENCE_EXAMPLE_DECLARATION", "Reference example must begin with an informative declaration and provision IDs");
+                var section = sections.FirstOrDefault(item => item.Name == "Reference Example");
+                add(relative, section?.Line ?? 1, "REFERENCE_EXAMPLE_DECLARATION", "Reference Example must begin with an informative declaration and provision IDs");
             }
         }
 
@@ -639,7 +637,8 @@ static partial class StandardsValidator
     [GeneratedRegex(@"[A-Za-z0-9][A-Za-z0-9'./+-]*")]
     private static partial Regex TitleTokenPattern();
 
-    [GeneratedRegex(@"^(?:v?\d|[A-Z0-9.]+$)")]
+    // A token holding a digit is a proper name such as arc42 or C4 and keeps its own case.
+    [GeneratedRegex(@"^(?:v?\d|[A-Z0-9.]+$|[A-Za-z]+\d)")]
     private static partial Regex TitleAtypicalPattern();
 
     [GeneratedRegex(@"[a-z][A-Z]|[A-Z][a-z]+[A-Z]")]

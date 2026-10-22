@@ -48,7 +48,7 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 **Example:** Renaming a provision changes its heading, its ID, its Verification row, and every citation together.
 
-### Publish a LiteSpec Release From a Tag
+### Publish a LiteSpec Release from a Tag
 
 **Statement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
 
@@ -58,7 +58,7 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 None.
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/maintaining#state-the-provision-lifecycle`, `litespec/core/maintaining#replace-every-citation-on-a-rename`, and `litespec/core/maintaining#publish-a-litespec-release-from-a-tag`.
 

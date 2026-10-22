@@ -18,4 +18,4 @@
   ]
 }
 ---
-# <Limits display title>
+# <Limits Display Title>

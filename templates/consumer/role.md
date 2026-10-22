@@ -19,7 +19,7 @@
   ]
 }
 ---
-# <Role display title>
+# <Role Display Title>
 
 ## Summary
 

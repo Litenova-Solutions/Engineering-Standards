@@ -402,7 +402,7 @@ static partial class StandardsValidator
             var raw = ReadText(file);
             var lines = SplitLines(raw);
             var activation = SectionBody(lines, "Activation");
-            var baseline = SectionBody(lines, "Baseline relationship");
+            var baseline = SectionBody(lines, "Baseline Relationship");
             var dependencies = SectionBody(lines, "Dependencies");
             var scope = JsonString(ext?["activationScope"]) ?? "undefined";
             if (!activation.Contains($"Activation scope: `{scope}`.", StringComparison.Ordinal))
@@ -426,7 +426,7 @@ static partial class StandardsValidator
 
             if (baseline.Length == 0)
             {
-                add(extensionPath, 1, "EXTENSION_BASELINE", $"extension '{id}' has an empty Baseline relationship");
+                add(extensionPath, 1, "EXTENSION_BASELINE", $"extension '{id}' has an empty Baseline Relationship");
             }
 
             if (dependencies.Length == 0)

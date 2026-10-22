@@ -6,7 +6,7 @@ One pattern catalog decides each recurring interface question once, such as how 
 
 ## Concepts
 
-### Pattern kinds
+### Pattern Kinds
 
 A pattern answers one recurring question. Its kind states what the question is about.
 
@@ -16,7 +16,7 @@ A pattern answers one recurring question. Its kind states what the question is a
 | `element` | How does one control behave? | Sorting on an invoice table |
 | `scenario` | What shows in this situation? | An order list with no orders |
 
-### The catalog entry
+### The Catalog Entry
 
 The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. Each pattern entry carries these fields.
 
@@ -27,7 +27,7 @@ The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. 
 | `title` | The pattern name |
 | `question` | The recurring question the pattern answers |
 | `options` | At least two options, each with rationale and cost |
-| `decision` | The chosen option, its source, and an optional record |
+| `decision` | The chosen option, its source, an optional note, and an optional record |
 | `compact` | The breakpoint and the behavior below it |
 | `extensions` | Further options a reader may switch to |
 | `implementations` | The status and source paths per platform |
@@ -35,7 +35,7 @@ The catalog is one file valid against `schemas/ui-pattern-catalog.schema.json`. 
 
 The `breakpoints` map names viewport widths, and `groups` collect related patterns. The optional `registry` field names the command or path rendering every product-added option for review.
 
-### Pattern pages
+### Pattern Pages
 
 A pattern page holds one group of patterns, such as the record-detail group in `docs/frontend/patterns/record-detail.md`. The patterns folder names no stack, so its pages apply to every frontend under `docs/frontend/`. Each `###` heading under `## Patterns` names one pattern, and its ID is `litespec/frontend/patterns/<group>#<pattern-slug>`. The heading is a name rather than an action, so the ID survives a change of default.
 
@@ -46,11 +46,11 @@ A pattern carries four labeled fields, then its options.
 | `**Question:**` | The recurring question and its situation |
 | `**Default:**` | The option ID a project builds unless its catalog records another |
 | `**Compact:**` | How the default behaves on a narrow screen |
-| `**Rationale:**` | Why the default, the runner-up and when to prefer it, and what never to ship |
+| `**Rationale:**` | Why the default, the runner-up and when to prefer it, and what to leave out |
 
 Each option is a `####` heading of the form ``#### `option-id`: Option name``. It carries one `wireframe` block, an optional `wireframe compact` block for a different phone layout, then `**Rationale:**`, `**Cost:**` and an optional `**Reference:**`. An option ID is stable once published. The page's Standards hold the rules every option keeps.
 
-### The wireframe language
+### The Wireframe Language
 
 A wireframe states the structure of one option: which parts sit where, in what order, which action is primary, and the copy they show. It states no color, font, spacing, or component library. An agent builds the option from the text in its own stack and design system. `litespec patterns preview` draws the text for a person to choose from.
 
@@ -103,7 +103,7 @@ The validator holds each block to these rules.
 
 | Rule | Example |
 |:---|:---|
-| One `page`, at the top | A block never starts with `header` |
+| One `page`, at the top | A block starting with `header` fails validation |
 | A `split` holds one child per ratio part | `split 2:1` holds two children |
 | A `row` holds at least two children | |
 | A `list`, `grid`, or `timeline` holds one template child and a count | `list 3` with one `item` |
@@ -115,7 +115,7 @@ The validator holds each block to these rules.
 
 On a phone the drawing reflows unless a `wireframe compact` block says otherwise. A `row` or `split` stacks, an `aside` follows the main content, a table keeps its first two columns, and a drawer rises from the bottom.
 
-### Starting a catalog entry from a LiteSpec pattern
+### Starting a Catalog Entry from a LiteSpec Pattern
 
 A catalog entry may set `library` to one pattern ID, such as `litespec/frontend/patterns/record-detail#record-header`, to start from that pattern. The entry keeps the pattern's option IDs and names, so a choice stays comparable across products, and it may add options of its own.
 
@@ -125,7 +125,7 @@ The diagram shows the flow from a LiteSpec pattern through the catalog entry tha
 
 ![A LiteSpec pattern with three options and a named default, a catalog entry citing the pattern by ID with the chosen option and source owner, and the built expense detail screen, with arrows from the pattern to the entry to the screen.](../assets/diagrams/frontend-pattern-flow.svg)
 
-### The decision lifecycle
+### The Decision Lifecycle
 
 A choice starts as a recommendation and settles when an owner chooses. A later change names the record that made it.
 
@@ -135,7 +135,7 @@ A choice starts as a recommendation and settles when an owner chooses. A later c
 | `owner` | The owner choice, with an optional note |
 | `owner` or `recommended`, plus `record` | A later choice, naming the decision record that made it |
 
-### The compact variant
+### The Compact Variant
 
 Each pattern states what happens below one named breakpoint. The chosen option reflows, or a named option replaces it.
 
@@ -146,7 +146,7 @@ Each pattern states what happens below one named breakpoint. The chosen option r
 
 The breakpoint names one key of the catalog `breakpoints` map.
 
-### Implementation status
+### Implementation Status
 
 Each platform entry states how far the chosen option is built there.
 
@@ -159,7 +159,7 @@ Each platform entry states how far the chosen option is built there.
 
 A partial or pending entry states its gap in `gap`.
 
-### Patterns and floorplans
+### Patterns and Floorplans
 
 A floorplan implements the chosen option of one page-frame pattern. The pattern decides the behavior, and the floorplan is the shared component carrying it ([Controlled UI Governance](ui.md)).
 
@@ -171,7 +171,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ## Standards
 
-### Keep one pattern catalog
+### Keep One Pattern Catalog
 
 **Statement:** A workspace with a controlled frontend MUST keep one pattern catalog at `paths.uiPatterns` in `litespec.project.json`, valid against the schema.
 
@@ -183,7 +183,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 { "paths": { "uiPatterns": "docs/ui/patterns.json" } }
 ```
 
-### Record every option considered
+### Record Every Option Considered
 
 **Statement:** Each pattern MUST record at least two options with rationale and cost, and name the chosen option.
 
@@ -191,11 +191,11 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Example:** An invoice list considers two sort options: clickable headers and a menu listing sort fields. The entry records the rationale and cost of each, then names the chosen one.
 
-### Record who chose
+### Record Who Chose
 
 **Statement:** Each pattern decision MUST record its source as `owner` or `recommended`.
 
-**Rationale:** The source tells the reader whether the choice is settled. A recommended choice stands until an owner confirms or changes it; an agent never marks its own choice as the owner's, so no automated choice poses as a human decision. The catalog then shows at a glance which choices are settled and which still await review.
+**Rationale:** The source tells the reader whether the choice is settled. A recommended choice stands until an owner confirms or changes it; an agent leaves its own choice marked as recommended, so no automated choice poses as a human decision. The catalog then shows at a glance which choices are settled and which still await review.
 
 **Example:** For example, the Expenses catalog starts its expense header entry from `litespec/frontend/patterns/record-detail#record-header`, keeps the pattern option IDs, and records the owner choice.
 
@@ -212,7 +212,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 The entry names the pattern's default option and records `owner` as the source, so the choice stands as settled and the platform team builds it in its own components.
 
-### Declare the compact behavior
+### Declare the Compact Behavior
 
 **Statement:** Each pattern MUST name one breakpoint and state whether the chosen option reflows below it or a named option replaces it.
 
@@ -220,23 +220,23 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 **Example:** The entry names breakpoint `compact`; below it invoice rows render as cards.
 
-### Implement a chosen pattern once
+### Implement a Chosen Pattern Once
 
 **Statement:** The shared UI package MUST implement each chosen pattern once at the source paths the catalog names per platform.
 
-**Rationale:** The shared UI package implements each chosen pattern once, at the source paths the catalog names per platform, so every route composes the same behavior. A route that redraws the pattern instead makes a second decision the catalog cannot track: it looks like the pattern, drifts from it, and no entry records the difference.
+**Rationale:** The shared UI package implements each chosen pattern once, at the source paths the catalog names per platform, so every route composes the same behavior. A route that redraws the pattern instead makes a second decision the catalog does not track: it looks like the pattern, drifts from it, and no entry records the difference.
 
 **Example:** The catalog names one shared source path per platform, so every invoice route composes its platform path.
 
-### Update the catalog with the code
+### Update the Catalog with the Code
 
 **Statement:** A change that switches option, adds an option, or extends a pattern MUST update the catalog entry in the same change as its implementation.
 
-**Rationale:** A catalog updated in a later change is a catalog updated never: the code ships, the follow-up slips, and the entry describes behavior no route renders. Updating the entry in the same change as its implementation keeps the two in agreement by construction. A deliberate departure in one route names a decision record instead, so the exception stays reviewable.
+**Rationale:** When the catalog waits for a later change, the code ships, the follow-up slips, and the entry describes behavior no route renders. Updating the entry in the same change as its implementation keeps the two in agreement by construction. A deliberate departure in one route names a decision record instead, so the departure stays reviewable.
 
 **Example:** A route departing from the chosen option names `decision.record`, such as `docs/product/decisions/0014-invoice-sort-menu.md`.
 
-### State the implementation status
+### State the Implementation Status
 
 **Statement:** Each platform entry MUST state one status and the gap when that status is `partial` or `pending`.
 
@@ -244,7 +244,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 **Example:** A `pending` entry for one platform states in `gap` what is missing there.
 
-### Keep the catalog platform neutral
+### Keep the Catalog Platform Neutral
 
 **Statement:** A pattern MUST name behavior and structure, never a component library.
 
@@ -254,7 +254,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ## Conventions
 
-### Keep a visual registry
+### Keep a Visual Registry
 
 **Default:** Review LiteSpec options with `litespec patterns preview`, and draw only product-specific options in a product registry at compact and full widths.
 
@@ -262,15 +262,15 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 **Rationale:** An option seen beside its rivals is judged on appearance rather than on its description, which is how owners actually choose. The `litespec patterns preview` command already draws every LiteSpec option, so a product registry only needs to draw the patterns and options the product added, at compact and full widths. The catalog `registry` field names the command or path that renders them.
 
-### Report pattern feedback after the work
+### Report Pattern Feedback After the Work
 
 **Default:** Finish the task on the chosen pattern, then report a proposal in the completion report with pattern id, change, reason, and affected option.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
-**Rationale:** An agent that spots a better option finishes the task on the chosen pattern first: it never changes a decision on its own and never stops mid-task to ask. The proposal goes in the completion report with pattern id, change, reason, and affected option, where the owner accepts, refuses, or defers it. An accepted proposal updates the catalog with its implementation under `litespec/frontend/patterns#update-the-catalog-with-the-code`.
+**Rationale:** An agent that spots a better option finishes the task on the chosen pattern first: it changes no decision on its own and stops for no mid-task question. The proposal goes in the completion report with pattern id, change, reason, and affected option, where the owner accepts, refuses, or defers it. An accepted proposal updates the catalog with its implementation under `litespec/frontend/patterns#update-the-catalog-with-the-code`.
 
-### Start from a LiteSpec pattern
+### Start from a LiteSpec Pattern
 
 **Default:** Start each catalog entry from its LiteSpec pattern, through `library`, and keep the pattern's option IDs, option names, and default.
 
@@ -278,7 +278,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 **Rationale:** Starting from the LiteSpec pattern keeps choices comparable across products and keeps the default visible beside the product's own options. Keeping the pattern's option IDs and names lets one product read another's catalog without translation. A product that chooses a different option records its reason in the entry, so the departure stays reviewable.
 
-### Promote pattern improvements
+### Promote Pattern Improvements
 
 **Default:** Send an accepted proposal that is not specific to one product to the LiteSpec pattern page, as a new option or a refined one.
 
@@ -290,15 +290,15 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/frontend/patterns#keep-one-pattern-catalog | checkable | `litespec ui` reports a missing catalog or a schema failure. |
-| litespec/frontend/patterns#record-every-option-considered | checkable | `litespec ui` reports fewer than two options or a choice naming no option. |
-| litespec/frontend/patterns#record-who-chose | guidance | Does each decision record owner or recommended, with no agent-marked owner choice? |
-| litespec/frontend/patterns#declare-the-compact-behavior | checkable | `litespec ui` reports a compact option naming no recorded option. |
-| litespec/frontend/patterns#implement-a-chosen-pattern-once | checkable | `litespec ui` reports a named component path that does not exist. |
-| litespec/frontend/patterns#update-the-catalog-with-the-code | guidance | Did the catalog entry change with its implementation or name a record? |
-| litespec/frontend/patterns#state-the-implementation-status | checkable | `litespec ui` reports a partial or pending entry without a gap. |
-| litespec/frontend/patterns#keep-the-catalog-platform-neutral | guidance | Does any pattern name a component library outside implementations? |
-| litespec/frontend/patterns#keep-a-visual-registry | guidance | Does the registry render every product-added option in each theme at compact and full widths? |
-| litespec/frontend/patterns#report-pattern-feedback-after-the-work | guidance | Does each completion report carry proposals with pattern id, change, reason, and option? |
-| litespec/frontend/patterns#start-from-a-litespec-pattern | guidance | Does each entry set library or record its own reason, keeping the pattern's option IDs? |
-| litespec/frontend/patterns#promote-pattern-improvements | guidance | Did each accepted generic proposal reach the LiteSpec pattern page as a new or refined option? |
+| litespec/frontend/patterns#keep-one-pattern-catalog | checkable | `litespec ui` reports `[litespec/frontend/patterns#keep-one-pattern-catalog]` for a missing catalog, a duplicate id, an unknown group, an unknown library pattern, or a renamed option. Run it at the consumer root. |
+| litespec/frontend/patterns#record-every-option-considered | checkable | `litespec ui` reports `[litespec/frontend/patterns#record-every-option-considered]` for a choice or extension naming no recorded option, and the catalog schema requires at least two options with rationale and cost. Run it at the consumer root. |
+| litespec/frontend/patterns#record-who-chose | guidance | Each decision carries `owner` or `recommended`, with agent proposals left as recommendations and later changes naming their record. Look in the catalog decisions. |
+| litespec/frontend/patterns#declare-the-compact-behavior | checkable | `litespec ui` reports `[litespec/frontend/patterns#declare-the-compact-behavior]` for a breakpoint outside the breakpoints map or a compact option naming no recorded option. Run it at the consumer root. |
+| litespec/frontend/patterns#implement-a-chosen-pattern-once | checkable | `litespec ui` reports `[litespec/frontend/web/patterns#implement-a-chosen-pattern-once]` for a named component path that does not exist or an adopted status with no components. Run it at the consumer root. |
+| litespec/frontend/patterns#update-the-catalog-with-the-code | guidance | Option switches, added options, and extensions land with their implementation; single-route departures name a decision record. Look in the change diffs and the catalog entries. |
+| litespec/frontend/patterns#state-the-implementation-status | checkable | `litespec ui` reports `[litespec/frontend/patterns#state-the-implementation-status]` for a partial or pending entry with no gap. Run it at the consumer root. |
+| litespec/frontend/patterns#keep-the-catalog-platform-neutral | guidance | Patterns name behavior and structure, with platform bindings only under implementations. Look in the catalog entries outside implementations. |
+| litespec/frontend/patterns#keep-a-visual-registry | guidance | Product-added options render in the registry at compact and full widths, and LiteSpec options render through `litespec patterns preview`. Look at the registry command or path the catalog names. |
+| litespec/frontend/patterns#report-pattern-feedback-after-the-work | guidance | Completion reports carry proposals with pattern id, change, reason, and affected option. Look in the completion reports. |
+| litespec/frontend/patterns#start-from-a-litespec-pattern | guidance | Entries set `library` and keep the pattern option ids and names, or record why no pattern fits. Look in the catalog entries. |
+| litespec/frontend/patterns#promote-pattern-improvements | guidance | Accepted product-neutral proposals reach the LiteSpec pattern page as new or refined options. Look in the LiteSpec pattern pages and the accepted proposals. |

@@ -210,7 +210,7 @@ A release record binds evidence to one artifact, so a product with no artifact y
 
 **Rationale:** Warnings that nobody reviews accumulate until a real defect hides among them. Failing on warnings forces each one to be fixed or narrowly suppressed with its reason, so a changed compiler, linter, or dependency boundary surfaces immediately.
 
-## Reference example
+## Reference Example
 
 This informative example demonstrates `litespec/core/release#verify-connected-journeys`, `litespec/core/release#identify-immutable-release-artifacts`, and `litespec/core/release#record-release-evidence`.
 

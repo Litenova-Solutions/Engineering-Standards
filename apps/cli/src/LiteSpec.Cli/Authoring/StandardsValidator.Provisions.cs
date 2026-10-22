@@ -309,7 +309,10 @@ static partial class StandardsValidator
             // tells a reviewer to confirm that a rule says what it says.
             var owner = provisions.FirstOrDefault(provision => provision.Id == rowId);
             var ownerClaim = owner is not null ? Claim(owner.Title) : "";
-            if (ownerClaim.Length > 0 && Claim(evidence).Contains(ownerClaim, StringComparison.Ordinal))
+            // A tool's finding tag such as `[litespec/page#slug]` names the
+            // provision on purpose, so it does not count as a restatement.
+            var withoutTags = ProvisionTagPattern().Replace(evidence, " ");
+            if (ownerClaim.Length > 0 && Claim(withoutTags).Contains(ownerClaim, StringComparison.Ordinal))
             {
                 add(relative, index + 1, "VERIFY_TEMPLATED_EVIDENCE", $"Verification for '{rowId}' repeats its provision heading instead of naming evidence");
             }
@@ -463,4 +466,7 @@ static partial class StandardsValidator
 
     [GeneratedRegex(@"^(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+$")]
     private static partial Regex PathShapedPattern();
+
+    [GeneratedRegex(@"\[litespec/[^\]\s]+\]")]
+    private static partial Regex ProvisionTagPattern();
 }

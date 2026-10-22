@@ -14,7 +14,7 @@ Add the package to each of the five application projects, or once in `Directory.
 
 The package needs the .NET 9.0.300 SDK, Visual Studio 17.14, or later.
 
-## How a project gets its layer
+## How a Project Gets Its Layer
 
 A rule runs only in the layers its provision covers. The analyzers read the layer from the assembly name suffix: `Shop.Domain`, `Shop.Application.Abstractions`, `Shop.Application`, `Shop.Infrastructure`, and `Shop.WebApi` for production code, and `Shop.Domain.Tests` for test projects. Any other assembly is not analyzed.
 
@@ -56,9 +56,9 @@ The values are `Domain`, `Application.Abstractions`, `Application`, `Infrastruct
 | LS3002 | All five | A `CancellationToken` that is not the last parameter, or not named `cancellationToken` | [Name asynchronous methods completely](https://litespec.dev/2.0.0/backend/dotnet/naming/#name-asynchronous-methods-completely) |
 | LS3003 | All five | A file whose primary type does not match its name, or that holds more than one top-level type | [Match C# files and primary types](https://litespec.dev/2.0.0/backend/dotnet/naming/#match-c-files-and-primary-types) |
 | LS3004 | All five | A concrete class with no derived type that is not sealed | [Keep implementation style consistent](https://litespec.dev/2.0.0/backend/dotnet/naming/#keep-implementation-style-consistent) |
-| LS4001 | Test | A test method that contains no assertion | [Prove each Case with a test that calls its use case](https://litespec.dev/2.0.0/backend/dotnet/testing/#prove-each-case-with-a-test-that-calls-its-use-case) |
+| LS4001 | Test | A test method that contains no assertion | [Prove each Case with a test that calls its use case](https://litespec.dev/2.0.0/backend/dotnet/testing/#prove-each-scenario-with-a-test-that-calls-its-use-case) |
 
-## Change a rule's severity
+## Change a Rule's Severity
 
 Every rule is an error by default, so a finding fails the build. Lower a rule's severity in `.editorconfig`:
 

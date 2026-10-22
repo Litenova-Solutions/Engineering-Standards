@@ -1,10 +1,10 @@
-# litespec CLI
+# Litespec CLI
 
 ## Audience
 
 You maintain the `litespec` command line in `apps/cli/src/LiteSpec.Cli/`. You add a command, add an authoring check, add a model finding, or change a validator message. After reading this page you know which file owns the behavior, how to change it, and how to cover the change with a fixture.
 
-## What it is
+## What It Is
 
 The CLI is a .NET 10 console tool named `litespec`. It checks the LiteSpec repository against its own authoring contract, writes the generated provision index, scaffolds and validates consumer repositories, builds and checks the consumer project model, generates the project book, and draws the UI pattern wireframes. The project file is `apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj`. It sets `OutputType` to `Exe`, `AssemblyName` to `litespec`, `PackAsTool` to `true`, and `ToolCommandName` to `litespec`. The package id is `LiteSpec.Cli`. The tool references `Microsoft.CodeAnalysis.CSharp` for the code readers and embeds `Book/Assets/**` as `LiteSpec.Book.Assets.*` for the generated book site.
 
@@ -15,7 +15,7 @@ The user-facing contract of each command lives in `docs/tools/`. Read those page
 - [Draw Patterns](../../docs/tools/patterns.md) for the wireframe command.
 - [CLI overview](../../docs/tools/README.md) for how to run the CLI from this repository and from a consumer, and for the `LITESPEC_HOME` and `LITESPEC_TIMING` environment variables.
 
-## Quick start
+## Quick Start
 
 Run every command in this section from the repository root, `D:/Personal-Projects/LiteSpec`.
 
@@ -70,7 +70,7 @@ The entry files sit at the top of `apps/cli/src/LiteSpec.Cli/`. Each command liv
 
 The solution file `LiteSpec.slnx` lists the CLI, the CLI tests, the analyzers, and the analyzer tests. `Directory.Build.props` pins the target framework to `net10.0` with nullable reference types and implicit usings, and shields this checkout from a consumer root when pinned as a submodule. `Directory.Packages.props` pins `Microsoft.CodeAnalysis.CSharp` and `xunit.v3`. `global.json` selects `Microsoft.Testing.Platform` as the test runner and pins no SDK.
 
-## Dispatch and option parsing
+## Dispatch and Option Parsing
 
 `Program.cs` matches `args[0]` in a switch expression. `--help`, `-h`, and `help` print the top-level usage and exit 0. `--version` prints `LiteSpecHome.Version`, which is the `version` field of `litespec.manifest.json`, and exits 0. Each command name calls that command's static `Run` with the remaining arguments. Anything else prints `Unknown command '<name>'.` plus the usage to standard error and exits 2.
 
@@ -80,7 +80,7 @@ Two helpers apply across commands. `Json` is true when `--format json` or `--for
 
 The `--help` text of each command is the contract quoted in `docs/tools/`. Quote it when you document behavior, and change the `Usage` constant and the docs page together when you change options. Exit codes are stable: 0 for success, 1 for a finding or a failed check, and 2 for a usage error or an unreadable input. `init` exits 1 when the checkout template or preset is unreadable, and 2 when the project file exists or an option is invalid. `book` exits 1 for unreadable input or unwritable output. `model query` exits 1 when no record holds the id.
 
-## Findings and diagnostic codes
+## Findings and Diagnostic Codes
 
 Authoring diagnostics and model findings share one reporting shape: a stable code, a one-sentence message, a file path, and a 1-based line. Human output prints one line per finding to standard error. JSON output prints one object to standard output so a caller never parses the human lines back apart.
 
@@ -90,7 +90,7 @@ Authoring diagnostics and model findings share one reporting shape: a stable cod
 
 `consumer` and `ui` report problems as plain strings rather than coded findings: `Consumer: <root>`, `Files scanned: N under <docs>, frontmatter pages: M`, the language summary, an `ADVISORY` section, and a `FAIL (N problem(s)):` section, or `PASS: project configuration, page frontmatter and language are valid.` JSON output writes `tool`, `consumer`, `ok`, a `scanned` object, a `problems` array, and an `advisories` array.
 
-## Checkout and consumer roots
+## Checkout and Consumer Roots
 
 Two roots meet in most commands: the LiteSpec checkout that holds the standard, and the repository under check.
 
@@ -100,7 +100,7 @@ Two roots meet in most commands: the LiteSpec checkout that holds the standard, 
 
 `consumer`, `ui`, and `model` read the consumer repository at `--root`, which defaults to the working directory. Each one refuses a root without `litespec.project.json`: `consumer` writes `No litespec.project.json at <root>` and exits 2, `model` writes `Root '<root>' holds no litespec.project.json.` and exits 2, and `ui` writes `No litespec.project.json at <root>` and exits 2. `model` then loads `ConsumerConfig` from that file: record roots, language path, application, domain, web API, and infrastructure roots, test roots, frontends, API client sources, test results directory, size, shape, and stacks. The builder reads shared provisions from the pinned docs under the checkout and the test run from TRX or JUnit XML files under `paths.testResults`. `book` reads neither root: it takes `--model <model.json>` and `--out <folder>`, with an optional `--findings <file>` for the review page, and falls back to findings embedded in the model when the flag is absent. `patterns` resolves its targets through `LiteSpecHome`: a group name such as `record-detail`, a pattern id such as `litespec/frontend/patterns/record-detail#record-header`, or a page path. Set `LITESPEC_TIMING` to any value to print `model` phase timings such as `[time] check-schema 0.1s` on standard error; normal runs print nothing besides their findings.
 
-## Test harness and fixtures
+## Test Harness and Fixtures
 
 The tests live in `apps/cli/tests/LiteSpec.Cli.Tests/`. The test project targets the CLI binary as a project reference, uses `xunit.v3`, and excludes `Fixtures/**` from compilation so fixture files stay data. One folder covers each command: `Authoring/`, `Consumer/`, `Ui/`, `Model/`, `Book/`, `Init/`, and `Patterns/`. `Support/Cli.cs` runs the built `litespec.dll` with `dotnet` as its own process, the way a consumer runs the tool, and asserts the exit code with both streams. It sets `LITESPEC_HOME` to the repository root, finds the root by walking up for `litespec.manifest.json`, and offers `Fixture` for a path under `Fixtures/` and `Temp` for a fresh folder that is deleted on dispose unless `KEEP_FIXTURE` is set. `Support/InputErrorTests.cs` proves that ordinary user error reaches a message and a documented exit code, never an unhandled exception: a malformed percent escape in a link, a `provisions` root without docs, a malformed project file, a missing project file, and an equals-form book option.
 
@@ -112,9 +112,9 @@ Book tests read the frozen `Fixtures/Book/model.json` with `Fixtures/Book/findin
 
 To add a fixture repository for a new case, follow the harness the area already uses. For a new model finding, copy `large/` by hand into a new `broken/<code>/` overlay that holds only the differing files, add `DELETES.txt` with one relative path per line when the case deletes files, and add the code to the theory list in `ModelCheckTests.cs`. For a new authoring rule, extend `StandardsFixture.Base` only when the rule needs a new page shape; otherwise mutate one page from `Base` inside the test. For a new book shape, extend the frozen model only when the shape needs a new record type, and keep the existing file byte-identical otherwise.
 
-## Common changes
+## Common Changes
 
-### Add a command
+### Add a Command
 
 1. Add the usage text as a `Usage` constant on the new command class, with synopsis, options, and exit codes in the shape of the neighboring commands.
 2. Add the dispatch arm in `Program.cs` and route unknown subcommands to exit 2 with the usage text.
@@ -123,7 +123,7 @@ To add a fixture repository for a new case, follow the harness the area already 
 5. Write human lines to standard output or error and one JSON object to standard output under `--format json`, using `CliJson`.
 6. Document the command on a new page under `docs/tools/` with the command page sections, and link it from `docs/tools/README.md`.
 
-### Add an authoring diagnostic code end to end
+### Add an Authoring Diagnostic Code End to End
 
 1. Add the code to `StableDiagnosticCodes` in `Authoring/StandardsValidator.cs`, in declaration order.
 2. Emit it through the `Add` callback inside `Validate` with the repository-relative file, the 1-based line, the code, and a message that names the file and the fix. Never construct a `StandardsDiagnostic` with a code the list does not hold.
@@ -131,7 +131,7 @@ To add a fixture repository for a new case, follow the harness the area already 
 4. Add a test under `Authoring/` that starts from `StandardsFixture.Base`, mutates one file, and asserts the `file:line [CODE] message` line and the exit code. Add the mirror test that the clean tree passes.
 5. Quote the code on the affected `docs/tools/validate.md` behavior or the relevant standard page when the rule restates visible behavior.
 
-### Add a model finding
+### Add a Model Finding
 
 1. Add the code to `Checker.Codes` in `Model/Checker.cs`.
 2. Append the finding with its absolute path, 1-based line, message, and subject record id to the `findings` list in the matching `Check*` method. Keep the message to one sentence that names the record and the fix.
@@ -139,13 +139,13 @@ To add a fixture repository for a new case, follow the harness the area already 
 4. Add a `broken/<code>/` overlay under `Fixtures/Model/` with only the differing files, and add the code to `FindingCodeList` in `Model/ModelCheckTests.cs`. Add the open-gap and expired-gap rows when the finding is suppressible.
 5. Document the code and its meaning in the finding table on the [Model Builder](../../docs/tools/model.md) page.
 
-### Change a message
+### Change a Message
 
 1. Edit the message at its emission site, not in the test. Keep it to one sentence, name the file or record and the action the reader takes next.
 2. Update every test that asserts the old text, including `Support/InputErrorTests.cs` when the message covers user error.
 3. Check that JSON output needs no change: messages stay inside `message` fields, and codes, paths, and field names stay stable. Rename a code only as a new code with a new overlay, never by editing the old string in place.
 
-## Wireframe renderer and the TypeScript port
+## Wireframe Renderer and the TypeScript Port
 
 `Patterns/WireframeRenderer.cs` draws one parsed wireframe page as an SVG sketch at `DesktopWidth` 1200 or `PhoneWidth` 390 pixels. The sketch shows structure and copy in one neutral style with tone fills for `neutral`, `positive`, `caution`, `critical`, and `info` meanings. Text width comes from the character count, so rendering needs no font. The `phone` flag applies the compact reflow rules and prefers the option `Compact` block when present. `PatternsCommand.Preview` draws every option at both widths into one offline HTML file with the default option outlined, and `Svg` prints one option to standard output.
 

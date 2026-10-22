@@ -18,7 +18,7 @@ Run it after adding, renaming, or removing a provision. The next run overwrites 
 
 ## Arguments
 
-None. Everything passes through options.
+None.
 
 ## Options
 
@@ -28,7 +28,7 @@ None. Everything passes through options.
 | `--check` | off | Compares the page with the active standards and writes nothing. |
 | `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|

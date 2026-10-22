@@ -38,7 +38,7 @@ A pattern page under `docs/frontend/patterns/` answers one recurring interface q
 | `--phone` | off | Draws the phone width in `svg`. |
 | `--help` | off | Prints the synopsis, the options, and the exit codes, then exits zero. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|

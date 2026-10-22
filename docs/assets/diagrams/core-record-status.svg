@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="176" viewBox="0 0 720 176" role="img" aria-labelledby="core-record-status-title core-record-status-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
-  <title id="core-record-status-title">Record statuses and what each allows</title>
-  <desc id="core-record-status-desc">Three statuses in order: draft, approved, retired. A draft awaits its decider and names its decider and decide-by date. Approved holds; a decision is replaced, never edited. Retired means a replacement holds and the old record stands beside the new one. An arrow points from each status to the status that follows it.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="292" viewBox="0 0 720 292" role="img" aria-labelledby="core-record-status-title core-record-status-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
+  <title id="core-record-status-title">Record statuses and the computed states</title>
+  <desc id="core-record-status-desc">Three written statuses in order: draft, approved, retired. A draft awaits its decider and names its decider and decide-by date. Approved holds; a decision is replaced, never edited. Retired means a replacement holds and the old record stands beside the new one. The builder computes four states: implemented when code exists for the use case, rule, event, or state; verified when every scenario is proven and every requirement is fulfilled and checked; reachable when a transition leads into the state; and effective status, draft when the record, a deciding decision, or a fulfilled requirement is draft.</desc>
   <defs>
     <marker id="core-record-status-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
@@ -8,31 +8,51 @@
   </defs>
 
   <g style="stroke: var(--muted-fg, #77706a); fill: none" stroke-width="1.25" marker-end="url(#core-record-status-arrow)">
-    <path d="M222 72 H 252" />
-    <path d="M462 72 H 492" />
+    <path d="M222 62 H 252" />
+    <path d="M462 62 H 492" />
   </g>
 
   <g style="fill: var(--bg, #ffffff); stroke: var(--border, #e5e0d9)" stroke-width="1">
-    <rect x="20" y="20" width="200" height="104" rx="8" />
-    <rect x="260" y="20" width="200" height="104" rx="8" />
-    <rect x="500" y="20" width="200" height="104" rx="8" />
+    <rect x="20" y="16" width="200" height="96" rx="8" />
+    <rect x="260" y="16" width="200" height="96" rx="8" />
+    <rect x="500" y="16" width="200" height="96" rx="8" />
+    <rect x="20" y="142" width="161" height="100" rx="8" />
+    <rect x="193" y="142" width="161" height="100" rx="8" />
+    <rect x="366" y="142" width="161" height="100" rx="8" />
+    <rect x="539" y="142" width="161" height="100" rx="8" />
   </g>
 
   <g style="fill: var(--fg, #19151c)" font-size="14" font-weight="600" text-anchor="middle">
-    <text x="120" y="48">Draft</text>
-    <text x="360" y="48">Approved</text>
-    <text x="600" y="48">Retired</text>
+    <text x="120" y="40">Draft</text>
+    <text x="360" y="40">Approved</text>
+    <text x="600" y="40">Retired</text>
+    <text x="100" y="164">implemented</text>
+    <text x="273" y="164">verified</text>
+    <text x="446" y="164">reachable</text>
+    <text x="619" y="164">effective status</text>
   </g>
   <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
-    <text x="120" y="70">awaits its decider;</text>
-    <text x="120" y="88">names decider and</text>
-    <text x="120" y="106">decide-by date</text>
-    <text x="360" y="70">holds;</text>
-    <text x="360" y="88">a decision is replaced,</text>
-    <text x="360" y="106">never edited</text>
-    <text x="600" y="70">a replacement holds;</text>
-    <text x="600" y="88">kept beside the</text>
-    <text x="600" y="106">new record</text>
+    <text x="120" y="62">awaits its decider;</text>
+    <text x="120" y="80">names decider and</text>
+    <text x="120" y="98">decide-by date</text>
+    <text x="360" y="62">holds;</text>
+    <text x="360" y="80">a decision is replaced,</text>
+    <text x="360" y="98">never edited</text>
+    <text x="600" y="62">a replacement holds;</text>
+    <text x="600" y="80">kept beside the</text>
+    <text x="600" y="98">new record</text>
+    <text x="100" y="184">code exists for</text>
+    <text x="100" y="202">use case, rule,</text>
+    <text x="100" y="220">event, or state</text>
+    <text x="273" y="184">every scenario proven;</text>
+    <text x="273" y="202">fulfillments proven;</text>
+    <text x="273" y="220">measures checked</text>
+    <text x="446" y="184">a transition leads</text>
+    <text x="446" y="202">into the state</text>
+    <text x="619" y="184">draft when it, a deciding</text>
+    <text x="619" y="202">decision, or a fulfilled</text>
+    <text x="619" y="220">requirement is draft</text>
   </g>
-  <text x="360" y="154" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">An arrow points from a status to the status that follows it.</text>
+  <text x="20" y="134" font-size="12" style="fill: var(--muted-fg, #77706a)">Computed by the builder:</text>
+  <text x="360" y="270" text-anchor="middle" font-size="12" style="fill: var(--muted-fg, #77706a)">Arrows run between the written statuses; the builder computes the states below on every run.</text>
 </svg>
