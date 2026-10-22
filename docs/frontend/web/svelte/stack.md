@@ -8,7 +8,7 @@ A Svelte frontend takes one of 3 rendering modes, chosen by who reads it: a stat
 
 ### Select a rendering mode by audience
 
-**Requirement:** A Svelte frontend MUST render as a static application when it is a console, and on the server when a public page is indexed.
+**Statement:** A Svelte frontend MUST render as a static application when it is a console, and on the server when a public page is indexed.
 
 **Rationale:** A console opens inside the application a signed-in user already has, so its first response has nothing to index and ships as static files. A public page arrives by message or search result, so its title and links belong in the first response and it renders on the server. A page counts as indexed when its readers reach it from a message or a search result. A device client asks one question over and over and takes a static page with no router.
 
@@ -16,7 +16,7 @@ A Svelte frontend takes one of 3 rendering modes, chosen by who reads it: a stat
 
 ### Build a device client as one static page
 
-**Requirement:** A device client MUST ship as one static page with no router.
+**Statement:** A device client MUST ship as one static page with no router.
 
 **Rationale:** A device client shows one answer on repeat: one question, one screen, no navigation. A router would add downloads for destinations the client never visits. One static page carries exactly what the device needs.
 

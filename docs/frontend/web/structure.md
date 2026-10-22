@@ -18,7 +18,7 @@ A device client serves one page with no router. Route groups keep their parenthe
 
 ### Use the frontend application tree
 
-**Requirement:** A frontend MUST use the frame, routes, and modules layout its stack section states.
+**Statement:** A frontend MUST use the frame, routes, and modules layout its stack section states.
 
 **Rationale:** The frame, routes, and modules layout gives every file one predictable home: cross-route values in the frame, one address per route file or folder, and use-case code under the module that owns it. A reader moves from a use case to its code by path alone, on either stack. This realizes litespec/frontend/structure#organize-a-frontend-into-frame-routes-and-modules.
 
@@ -62,13 +62,13 @@ The generated route artifacts, build output, and dependency folders stay untrack
 
 ### Refuse stack-specific folder names
 
-**Requirement:** A React folder MUST NOT be named `lib`, nor a Svelte folder under `src/lib` be named `stores`.
+**Statement:** A React folder MUST NOT be named `lib`, nor a Svelte folder under `src/lib` be named `stores`.
 
 **Rationale:** A `lib` folder on React would sit beside `src/app` as a second frame, and `src/app` already holds the frame. A `stores` folder on Svelte would gather shared state in one place, while the rules put shared state in the frame or beside its readers. Refusing both names stops the second home before anything moves into it.
 
 ### Keep a route file thin
 
-**Requirement:** A route file MUST hold its input, its load, and its component, with no reusable logic and no import of another route file.
+**Statement:** A route file MUST hold its input, its load, and its component, with no reusable logic and no import of another route file.
 
 **Rationale:** A route file holds its input, its load, and its component: the wiring for one address. Reusable logic filed there is unreachable from the second route that needs it, and an import between route files makes one address depend on another. Both push shared code into modules where it belongs. This realizes litespec/frontend/structure#keep-a-route-entry-thin.
 
@@ -96,7 +96,7 @@ export async function load({ parent, url }) {
 
 ### Keep imports directional
 
-**Requirement:** An import MUST point from a route to a module to the frame to a shared package, and never in the reverse direction.
+**Statement:** An import MUST point from a route to a module to the frame to a shared package, and never in the reverse direction.
 
 **Rationale:** The direction runs from addresses to use-case code to cross-route values to shared code: route to module to frame to shared package. Each layer then builds on the ones inside it without cycles. A module importing a route, a package importing an application, or a frame module reaching into one use-case folder for another module's data each reverses the flow and tangles two layers. This realizes litespec/frontend/structure#order-imports-from-routes-to-shared-packages.
 
@@ -118,7 +118,7 @@ A module cannot import a route. A shared package cannot import an application. A
 
 ### Locate the frame in the app folder
 
-**Requirement:** A frontend MUST place cross-route values in the frame folder its stack section states: client configuration, session read, language choice, permissions, formatting, and shell data.
+**Statement:** A frontend MUST place cross-route values in the frame folder its stack section states: client configuration, session read, language choice, permissions, formatting, and shell data.
 
 **Rationale:** Client configuration, session read, language choice, permissions, formatting, and shell data cross every route. Filed in the frame folder, each has one home; filed in a route, each exists once per route with copies to keep equal. A browser API reached from a use-case module belongs here too, because a module renders and reads data rather than touching the device. This realizes litespec/frontend/structure#locate-cross-route-values-in-the-frame.
 

@@ -26,7 +26,7 @@ Some architectures fall outside what LiteSpec supports: microservices, multiple 
 
 ### Select a size, a shape and stacks
 
-**Requirement:** A consumer MUST select a size, a shape, one stack per frontend, and one backend stack unless the shape is client-only.
+**Statement:** A consumer MUST select a size, a shape, one stack per frontend, and one backend stack unless the shape is client-only.
 
 **Rationale:** One size and explicit stacks tell every check which records and pages apply. The size decides which record types the project carries and which test projects prove them; each stack decides which technology pages and checks apply. Without the declaration, each agent infers the architecture from the directory tree, and two agents infer two architectures.
 
@@ -51,7 +51,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Keep one bounded context
 
-**Requirement:** A consumer MUST keep one business language and deployment boundary.
+**Statement:** A consumer MUST keep one business language and deployment boundary.
 
 **Rationale:** One business language and one deployment boundary keep every module, record, and use case in a single consistent model. Modules organize related language, models, use cases, and code without becoming independent services or bounded contexts. A second language or boundary splits the project into systems that the records, links, and checks can no longer hold together.
 
@@ -59,7 +59,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Select conditional extensions explicitly
 
-**Requirement:** A consumer MUST select every extension whose activation criteria apply, and no extension whose criteria do not.
+**Statement:** A consumer MUST select every extension whose activation criteria apply, and no extension whose criteria do not.
 
 **Rationale:** Conditional capabilities stay inactive until a documented product or engineering condition applies, so no project carries caching, messaging, or tenancy machinery it never justified. Selecting exactly the extensions whose criteria hold keeps the active rule set minimal and reviewable. The manifest's extension list is the closed set a project selects from, so there is no informal extension.
 
@@ -67,7 +67,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Record selected extensions
 
-**Requirement:** A consumer MUST list every selected extension in `selectedExtensions` in `litespec.project.json`, each with its criterion and review date.
+**Statement:** A consumer MUST list every selected extension in `selectedExtensions` in `litespec.project.json`, each with its criterion and review date.
 
 **Rationale:** The project record determines which extension boundaries apply to the project's work. Writing each selection with its criterion and review date lets a later reader check whether the condition still holds. Without the record, extensions drift in through dependencies and prose while the checks apply a different set.
 
@@ -79,7 +79,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Answer the constraints question
 
-**Requirement:** A consumer MUST state in `litespec.project.json` whether any outside constraint applies to the project.
+**Statement:** A consumer MUST state in `litespec.project.json` whether any outside constraint applies to the project.
 
 **Rationale:** An outside rule the project never names is a law the product can break unknowingly. Recording the answer, even when it is empty, proves the team asked the question: an empty answer states that no outside rule binds the project. A later reader can then tell a project with no constraints from one that never looked.
 
@@ -87,7 +87,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Declare a consumer that has no backend
 
-**Requirement:** A consumer with no server of its own MUST declare the `client-only` shape and record a decision naming the surfaces left without coverage.
+**Statement:** A consumer with no server of its own MUST declare the `client-only` shape and record a decision naming the surfaces left without coverage.
 
 **Rationale:** The shape decides which backend pages still apply. A `client-only` product keeps a domain model, so it applies the backend architecture, domain, application, and identifier pages that the manifest lists under `shapes`. Persistence, the HTTP API, and API testing have no target without a server, and the decision names those uncovered surfaces. Adding a server only to obtain conformance contradicts `litespec/core/principles#require-current-complexity-activation`, which permits new machinery only for a current documented requirement.
 
@@ -95,7 +95,7 @@ The diagram shows the three project choices and what each decides.
 
 ### Record unsupported scope decisions
 
-**Requirement:** A consumer MUST record a separate project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
+**Statement:** A consumer MUST record a separate project decision for microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, or large pipelines.
 
 **Rationale:** Microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, and large pipelines each change the assumptions this page rests on: one language, one deployment, one API and database. A separate project decision records that the team saw the boundary and chose deliberately. Without it, the project drifts outside the supported scope while claiming its checks still apply.
 

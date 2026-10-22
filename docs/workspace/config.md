@@ -18,37 +18,37 @@ A repeatable build resolves the same versions on every machine. The manifest, `l
 
 ### Validate backend configuration at startup
 
-**Requirement:** A backend configuration section MUST bind to a named settings type validated for required fields, ranges, and formats at startup.
+**Statement:** A backend configuration section MUST bind to a named settings type validated for required fields, ranges, and formats at startup.
 
 **Rationale:** A missing or malformed setting fails somewhere: at startup with a named field, or at the first request that needs it with a downstream error. Binding each section to a validated settings type fails at startup, while the deployment can still stop. Reading a required setting through a raw configuration lookup defers the failure to the first request that needs it.
 
 ### Validate frontend environment access
 
-**Requirement:** A frontend MUST read environment variables through one validated module separating server-only from browser-visible values, at `src/lib/env.ts` through the framework alias.
+**Statement:** A frontend MUST read environment variables through one validated module separating server-only from browser-visible values, at `src/lib/env.ts` through the framework alias.
 
 **Rationale:** A frontend bundle ships to the browser, so every value it reads is public. One validated module at `src/lib/env.ts` separates server-only values from browser-visible ones in a single place a reviewer can read. Browser-visible names use the framework prefix, so an unprefixed value cannot reach the bundle by accident.
 
 ### Keep secrets outside source control
 
-**Requirement:** A tracked configuration file MUST contain only safe defaults and placeholders.
+**Statement:** A tracked configuration file MUST contain only safe defaults and placeholders.
 
 **Rationale:** A tracked file reaches every clone and stays in history after deletion. Local development uses user secrets and hosted environments use the deployment platform, so no real value needs to be tracked. Safe defaults and placeholders keep the tracked file runnable as documentation.
 
 ### Use one frontend dependency graph
 
-**Requirement:** A TypeScript workspace MUST use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`.
+**Statement:** A TypeScript workspace MUST use one root `package.json`, `pnpm-workspace.yaml`, and `pnpm-lock.yaml`.
 
 **Rationale:** One root manifest and one lockfile resolve one version of each package for the whole workspace. A nested lockfile lets one application resolve a different version than the workspace CI installs, so local builds and CI builds disagree about the same code. One graph keeps every install identical.
 
 ### Pin the JavaScript toolchain
 
-**Requirement:** Root `package.json` MUST declare the manifest pnpm stack release in `packageManager` and a Node.js engine matching the manifest node stack release.
+**Statement:** Root `package.json` MUST declare the manifest pnpm stack release in `packageManager` and a Node.js engine matching the manifest node stack release.
 
 **Rationale:** Different Node.js or pnpm releases resolve, build, and lint differently. Declaring the manifest pnpm release in `packageManager` and a matching Node.js engine keeps every developer and CI on the same toolchain. CI provisions that Node.js release and invokes the declared pnpm release, so local and CI resolve identically.
 
 ### Pin the React version in the ESLint flat config
 
-**Requirement:** When the workspace holds a React frontend, its ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
+**Statement:** When the workspace holds a React frontend, its ESLint flat config MUST set a concrete `settings.react.version` rather than leave it at `detect`.
 
 **Rationale:** Version detection calls context APIs that the pinned ESLint release removed, so `detect` fails under the pinned toolchain. A concrete `settings.react.version` skips detection entirely and lints against the version the workspace ships.
 

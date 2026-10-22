@@ -22,7 +22,7 @@ Imports point one way: routes import modules, modules import the frame, and the 
 
 ### Organize a frontend into frame, routes, and modules
 
-**Requirement:** A frontend MUST organize its code into a frame, routes, and use-case modules.
+**Statement:** A frontend MUST organize its code into a frame, routes, and use-case modules.
 
 **Rationale:** Three parts give every file one home by answering one question: is it cross-cutting, is it an address, or does it serve one use case. Without the split, shared values hide inside routes, use-case code hides inside shared folders, and no author can tell where a new file belongs. The three parts make the answer mechanical.
 
@@ -37,7 +37,7 @@ Imports point one way: routes import modules, modules import the frame, and the 
 
 ### Mirror the backend use case path in kebab case
 
-**Requirement:** A use-case folder MUST sit under the modules root at `{module}/{aggregate}/{use-case}/` in kebab case, resolving to the backend folder of the same three names.
+**Statement:** A use-case folder MUST sit under the modules root at `{module}/{aggregate}/{use-case}/` in kebab case, resolving to the backend folder of the same three names.
 
 **Rationale:** A reader holding a specification page finds the frontend code by translating three names to lowercase folders. No second map, index, or naming register stands between the specification and the code, so an agent given a use case id resolves its frontend folder by rule. The frontend structure test holds the mirror on every build under `litespec/frontend/testing#prove-the-module-mirror-in-a-structure-test`.
 
@@ -63,13 +63,13 @@ The diagram shows the backend path beside its frontend mirror, with one arrow pe
 
 ### Keep a use case folder flat
 
-**Requirement:** A folder named for one use case MUST hold files and no subfolder.
+**Statement:** A folder named for one use case MUST hold files and no subfolder.
 
 **Rationale:** A subfolder inside a use case folder names a grouping the backend does not have, so the one-to-one mirror between the two trees stops at that point. Past the subfolder, the reader can no longer translate names by rule, and nothing reports where the translation broke. Files directly in the use case folder keep the mirror checkable to the bottom.
 
 ### Place a shared file in the folder that owns it
 
-**Requirement:** A file read by several use cases of one aggregate MUST sit flat in that aggregate's folder.
+**Statement:** A file read by several use cases of one aggregate MUST sit flat in that aggregate's folder.
 
 **Rationale:** A file read by several use cases of one aggregate belongs flat in that aggregate's folder: the lowest folder holding every reader. There it sits beside its consumers, found by browsing rather than through an index, and moving it changes nothing outside the aggregate. A file read by several aggregates rises one more level, to the module folder, by the same rule.
 
@@ -77,7 +77,7 @@ The diagram shows the backend path beside its frontend mirror, with one arrow pe
 
 ### Reject a folder name that owns nothing
 
-**Requirement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `types`, or `services`.
+**Statement:** A folder under `src` MUST NOT be named `shared`, `common`, `utils`, `util`, `helpers`, `misc`, `components`, `hooks`, `types`, or `services`.
 
 **Rationale:** A folder named `shared`, `utils`, or `components` can refuse nothing: every author with a file of unclear ownership drops it there. The folder collects unrelated code that is never reviewed against the use cases it serves, and finding a file means searching a pile instead of translating a use case path. The refused names force each file into the folder that owns it.
 
@@ -85,7 +85,7 @@ The diagram shows the backend path beside its frontend mirror, with one arrow pe
 
 ### Keep a route entry thin
 
-**Requirement:** A route entry MUST hold its input, its load, and its component, with no reusable logic and no reference to another route entry.
+**Statement:** A route entry MUST hold its input, its load, and its component, with no reusable logic and no reference to another route entry.
 
 **Rationale:** A route entry serves one address: its input, its load, and its component. A column definition or validation rule written there is unreachable from the second route that needs it, so the second route writes its own copy. A reference from one route entry to another makes one address depend on another, so changing the first breaks the second. Reusable logic belongs in modules, where both routes import it.
 
@@ -93,7 +93,7 @@ The diagram shows the backend path beside its frontend mirror, with one arrow pe
 
 ### Order imports from routes to shared packages
 
-**Requirement:** An import MUST point from a route to a module to the frame to a shared package, and never in the reverse direction.
+**Statement:** An import MUST point from a route to a module to the frame to a shared package, and never in the reverse direction.
 
 **Rationale:** Imports pointing from routes to modules to the frame to shared packages keep addresses, use-case code, cross-route values, and shared code in separate layers. A reverse import collapses two layers: a module importing a route ties use-case code to one address, and a shared package importing an application ties every application to one application's choices. One direction keeps each layer usable without the layers above it.
 
@@ -107,25 +107,25 @@ A module cannot import a route. A shared package cannot import an application. A
 
 ### Keep applications independent
 
-**Requirement:** A frontend MUST NOT import source from another frontend.
+**Statement:** A frontend MUST NOT import source from another frontend.
 
 **Rationale:** Each application owns its routes, its environment, its session handling, its words, its tests, and its deployment, so it can change, test, and ship on its own. An import from another application's source ties the two together: a change to one breaks or redeploys the other. Code two applications genuinely share moves down into a shared package, which names neither application.
 
 ### Keep shared packages non application specific
 
-**Requirement:** A shared package MUST NOT contain page composition, feature state, authentication policy, or application components.
+**Statement:** A shared package MUST NOT contain page composition, feature state, authentication policy, or application components.
 
 **Rationale:** Shared packages hold what serves every frontend and names none of them: the generated client, the shared UI package, the language machinery, and the frontend tooling. Page composition, feature state, authentication policy, or application components kept there would bind every application to one application's choices. Application-specific code stays in the application, where it can change without touching the rest.
 
 ### Locate cross-route values in the frame
 
-**Requirement:** A frontend MUST place cross-route values in its frame: client configuration, session read, language choice, permissions, formatting, and shell data.
+**Statement:** A frontend MUST place cross-route values in its frame: client configuration, session read, language choice, permissions, formatting, and shell data.
 
 **Rationale:** Client configuration, session read, language choice, permissions, formatting, and shell data cross every route. A route holding one of them holds a copy beside every other route's copy, and the copies must be kept equal by hand. The frame holds each once, where every route reaches it. A browser API a use-case module needs belongs in the frame too, because a module renders and reads data rather than touching the device.
 
 ### Cover public use cases in journeys
 
-**Requirement:** Every public use case MUST appear in a journey or name its background caller.
+**Statement:** Every public use case MUST appear in a journey or name its background caller.
 
 **Rationale:** A public use case in no journey and with no named background caller is unreachable from every actor: it ships, it is tested, and nobody can reach it. Appearing in a journey, or naming its background caller, states who reaches the use case and why, so an unreached use case shows up as the one with neither.
 

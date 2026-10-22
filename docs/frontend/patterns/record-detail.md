@@ -18,13 +18,13 @@ The drawings on this page use order SO-1042 for Maria Garcia: paid, EUR 125.00, 
 
 ### Show one primary action in a record header
 
-**Requirement:** A record header MUST show at most one primary action.
+**Statement:** A record header MUST show at most one primary action.
 
 **Rationale:** One primary action names the step readers take most often next on the record, such as Message customer on order SO-1042. Without that single answer, two equal buttons force the reader to compare labels on every visit, and the hurried click lands on the wrong command.
 
 ### Keep destructive commands out of the primary place
 
-**Requirement:** A destructive command MUST NOT take the primary action's place or style in a record header.
+**Statement:** A destructive command MUST NOT take the primary action's place or style in a record header.
 
 **Rationale:** The primary place draws the hurried click, so it holds only the safe next step. A destructive command styled or placed as primary turns a routine visit into a discontinued product or a voided order, with no step between intent and loss.
 

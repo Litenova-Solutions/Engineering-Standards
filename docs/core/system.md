@@ -260,37 +260,37 @@ Both stay informative. A scenario illustrates its page and never governs it. Whe
 
 ### Keep decision authority with accountable people
 
-**Requirement:** An agent MUST stop affected work and record the question in a draft decision when an unknown fact changes behavior, money, data, access, or recovery.
+**Statement:** An agent MUST stop affected work and record the question in a draft decision when an unknown fact changes behavior, money, data, access, or recovery.
 
 **Rationale:** Agents meet open questions in the middle of a task: an unknown refund policy, an unclear access rule, a missing recovery target. When the answer changes behavior, money, data, access, or recovery, only an accountable person can give it. Stopping and recording the question in a draft decision keeps the choice visible and owned, instead of buried in code nobody approved. Decision owners approve outcomes, terms, policies, criteria, commitments, and risk, and an agent contribution stays a proposal until one of them accepts it.
 
 ### Drive work from approved records
 
-**Requirement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
+**Statement:** An agent MUST start behavior work from the approved use-case and module records, plus the product and journey records when they exist for the behavior.
 
 **Rationale:** A prompt, ticket, chat message, or code comment can start work, but none of them holds the approved behavior. Starting from the owning records keeps the agent building what reviewers approved, and keeps the records as the lasting statement of what the code should do. Without this rule, each task reinterprets intent from its starting message, and the records drift from the code until nobody trusts either.
 
 ### Resolve authority by ladder
 
-**Requirement:** Authority MUST follow constraint, then product, requirement, rule, and use case in that order, with every record carrying an owner.
+**Statement:** Authority MUST follow constraint, then product, requirement, rule, and use case in that order, with every record carrying an owner.
 
 **Rationale:** Two records can each look right while saying different things. The ladder settles the tie without a meeting: the higher record wins, and its owner answers for the outcome. Without it, every conflict becomes a negotiation, and agents resolve ties by guessing.
 
 ### Write each record in its catalog shape
 
-**Requirement:** Every written record MUST use its catalog type, identifier form, home, owner, and status.
+**Statement:** Every written record MUST use its catalog type, identifier form, home, owner, and status.
 
 **Rationale:** One shape per type lets the model builder read every record the same way and lets a reader know where each fact lives. A record in the wrong home or with a free-form identifier drops out of computed links and checks. The failure is silent: the record looks written while the tools no longer see it.
 
 ### Declare each link on its source
 
-**Requirement:** Every written link MUST live on the record the link table names first, with every citation resolving to a written record.
+**Statement:** Every written link MUST live on the record the link table names first, with every citation resolving to a written record.
 
 **Rationale:** Links on the source keep each record readable alone: one page shows what it decides, fulfills, raises, and needs. Resolving citations keep the graph whole, so impact analysis and coverage stay trustworthy. A link kept on both ends drifts into two stories, and a citation to nothing breaks every query that follows it.
 
 ### Connect one product outcome through a journey
 
-**Requirement:** A journey MUST link its use-case records without repeating their content, and every public use case sits in a journey or names its background caller.
+**Statement:** A journey MUST link its use-case records without repeating their content, and every public use case sits in a journey or names its background caller.
 
 **Rationale:** A journey proves that connected use cases produce one observable outcome through public boundaries. It can cross modules and pass through branches, waiting, failure, and recovery. Linking instead of repeating keeps inputs, rules, refusals, and results in one home each: a repeated copy goes stale with the next edit. Naming a background caller for use cases no journey reaches separates scheduled and reactive work from operations nobody wired up.
 
@@ -317,19 +317,19 @@ The page shows three of the eight steps; each step names its use case and actor 
 
 ### Group language and use cases by module
 
-**Requirement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and record identifiers.
+**Statement:** A module name MUST be identical across documentation, Domain and Application folders, endpoint groups, frontend features, tests, and record identifiers.
 
 **Rationale:** One name across every surface lets a reader and an agent move from a record to its code, endpoints, screens, and tests without a translation table. A module renamed in code but not in records splits the project into two vocabularies. The module stays a navigation and ownership boundary: it defines no transaction boundary and needs no runtime `Module` or `IModule` type.
 
 ### Make business-record ownership explicit
 
-**Requirement:** A module page MUST map each business record to its state, rules, and commands, with one record per command unless an approved record demands more.
+**Statement:** A module page MUST map each business record to its state, rules, and commands, with one record per command unless an approved record demands more.
 
 **Rationale:** The mapping shows every transaction boundary in the module on one page: which commands change which record under which rules. One record per command keeps each commit small and each failure attributable. A command that quietly writes two records couples their lifecycles and hides the second write from reviewers.
 
 ### Deliver one complete use case
 
-**Requirement:** A use case MUST map to one Command or Query, complete only with Domain behavior, Application coordination, persistence, entry points, evidence, and operating impact.
+**Statement:** A use case MUST map to one Command or Query, complete only with Domain behavior, Application coordination, persistence, entry points, evidence, and operating impact.
 
 **Rationale:** A use case is done only when a caller can run it and operations can support it: behavior, coordination, storage, entry points, automated evidence, and operating impact together, with a top-level Command or Query. Accepting a thinner slice leaves the missing layers for later, and later rarely itemizes what shipped half-built. Placeholder work, such as a handler that throws `NotImplementedException`, leaves the use case unimplemented. Multi-step product outcomes belong to a journey rather than stretching one use case across several goals.
 
@@ -337,7 +337,7 @@ The page shows three of the eight steps; each step names its use case and actor 
 
 ### Compute use-case status from evidence
 
-**Requirement:** Use-case status MUST come from code, screens, and test runs: implemented when code implements it, verified when every Case passes its proof.
+**Statement:** Use-case status MUST come from code, screens, and test runs: implemented when code implements it, verified when every Case passes its proof.
 
 **Rationale:** A status a person writes by hand goes stale with the next commit and then misleads every plan built on it. Computed status cannot drift: the repository proves implemented through code and verified through passing proofs. Reviewers read the same status the tools computed, so the conversation starts from facts.
 
@@ -354,7 +354,7 @@ Endpoint: CancelOrderEndpoint
 
 ### Keep use cases and handlers in one-to-one correspondence
 
-**Requirement:** Every handler MUST resolve to one use case by the folder rule or one `implements` anchor, with every use case resolving back to its handler.
+**Statement:** Every handler MUST resolve to one use case by the folder rule or one `implements` anchor, with every use case resolving back to its handler.
 
 **Rationale:** The check exposes both failure directions. Code with no use case reads as a reviewed feature while no record approved it. A use case with no code states a plan in the present tense while nothing runs. Checking only one direction hides the other failure, so the rule requires both.
 
@@ -362,7 +362,7 @@ Endpoint: CancelOrderEndpoint
 
 ### Name what calls a use case
 
-**Requirement:** A use case MUST declare the entry points it is reached through, or name its background caller with the reason no entry point reaches it.
+**Statement:** A use case MUST declare the entry points it is reached through, or name its background caller with the reason no entry point reaches it.
 
 **Rationale:** Routes point from code to use cases, which answers what a screen calls but not who breaks when an operation moves. The declared callers answer the question asked before every change: which entry points, schedules, or reactions depend on this operation. Writing down a real background caller separates wired-up reactive work from operations nobody reaches.
 
@@ -374,13 +374,13 @@ Endpoint: CancelOrderEndpoint
 
 ### Declare event reaction delivery
 
-**Requirement:** An event reaction MUST declare exactly one delivery classification and deliver with it, never `best-effort-optional` when a record needs its effect.
+**Statement:** An event reaction MUST declare exactly one delivery classification and deliver with it, never `best-effort-optional` when a record needs its effect.
 
 **Rationale:** The classification states what a failure costs before it happens: rollback, retry, rebuild, or loss. Declaring exactly one forces the author to choose, and the implementation must honor the choice. A `best-effort-optional` label on an effect a record needs silently drops required behavior the first time delivery fails.
 
 ### State each rule with its kind
 
-**Requirement:** Each rule MUST state its kind, governed target, and enforcement point, keeping a negation word in its name when its statement says one.
+**Statement:** Each rule MUST state its kind, governed target, and enforcement point, keeping a negation word in its name when its statement says one.
 
 **Rationale:** The kind decides how the rule is proved, the governed target names what it constrains, and the enforcement point names where it runs. Together they let a reviewer check the rule without opening every layer. Keeping a negation word in the name lets the name read as a true sentence: a rule whose statement says never but whose name drops the word reads as its own opposite.
 
@@ -388,19 +388,19 @@ Endpoint: CancelOrderEndpoint
 
 ### Grant access through roles and permissions
 
-**Requirement:** Access MUST flow from actor through role and permission to use case, with each link declared: holds, allows, needs, and offers.
+**Statement:** Access MUST flow from actor through role and permission to use case, with each link declared: holds, allows, needs, and offers.
 
 **Rationale:** The chain gives every access decision one auditable path: which actor held which role at which scope, which permission the role allowed, and which use case needed it. A missing link breaks the audit: access granted outside the chain cannot be traced back to an owner. The hold names its scope so the same role grants different reach in different places.
 
 ### Model every business-record lifecycle with state records
 
-**Requirement:** A business-record page MUST map every business state to a sealed state record under one abstract state base.
+**Statement:** A business-record page MUST map every business state to a sealed state record under one abstract state base.
 
 **Rationale:** State-specific facts need a type that carries them: a rejected expense holds a reason that a reimbursed expense never needs. An enum, status string, boolean flag, or computed discriminator cannot carry those facts, so they pile onto the record as nullable fields valid in some states and meaningless in others. The rule holds from the first implementation, including a record with one current state, so the second state extends the hierarchy instead of replacing a flag.
 
 ### State one occasion for every behavior record
 
-**Requirement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
+**Statement:** A module, business-record, use-case, or journey page MUST carry a `Scenario` section stating one concrete occasion for its subject.
 
 **Rationale:** Every other section states a rule, a state, or a mapping; none says when the behavior happens or who is under pressure while it does. A reader who cannot place an operation in the world reads its rules as arbitrary constraints. An agent writing against it cannot tell an ordinary case from an exceptional one, and guesses where the pressure lies.
 
@@ -408,7 +408,7 @@ Endpoint: CancelOrderEndpoint
 
 ### Keep a scenario informative
 
-**Requirement:** A `Scenario` section MUST NOT contain a record identifier.
+**Statement:** A `Scenario` section MUST NOT contain a record identifier.
 
 **Rationale:** An identifier inside a scenario reads as a second definition of the record it names, and two definitions drift with the next edit. The section illustrates the page while the tables govern it. When the two disagree, the scenario is the part that is wrong, so nothing under it can carry authority.
 
@@ -416,7 +416,7 @@ Endpoint: CancelOrderEndpoint
 
 ### Derive every scenario from one reference cast
 
-**Requirement:** A consumer MUST record one `scenario-cast` page and draw the people, place, dates, and amounts of every `Scenario` section from it.
+**Statement:** A consumer MUST record one `scenario-cast` page and draw the people, place, dates, and amounts of every `Scenario` section from it.
 
 **Rationale:** One cast makes a sequence of pages describe one occasion rather than many unrelated illustrations. The reader carries context from each page to the next instead of meeting a new cast on every page. The cast costs nothing to maintain because it names no code, and its figures come from the records.
 
@@ -424,7 +424,7 @@ Endpoint: CancelOrderEndpoint
 
 ### Update records with behavior
 
-**Requirement:** An observable behavior change MUST update its use-case page, implementation, tests, generated contracts, product citation, decision, journey, and operating records together.
+**Statement:** An observable behavior change MUST update its use-case page, implementation, tests, generated contracts, product citation, decision, journey, and operating records together.
 
 **Rationale:** Approved records map to current names and paths only when each behavior change carries them along. A change that moves code but leaves the use-case page, contracts, or journey behind splits the project into approved fiction and unreviewed fact. Updating the records in the same change keeps the review of behavior and the review of its description in one place.
 

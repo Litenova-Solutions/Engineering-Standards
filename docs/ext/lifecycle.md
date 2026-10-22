@@ -22,13 +22,13 @@ Selecting it switches on the Limit record type: the retention bounds the lifecyc
 
 ### Record lifecycle scope
 
-**Requirement:** A lifecycle record MUST name classification, retention, deletion trigger, purge owner, hold, export, restore, backup, owner, and status.
+**Statement:** A lifecycle record MUST name classification, retention, deletion trigger, purge owner, hold, export, restore, backup, owner, and status.
 
 **Rationale:** A lifecycle record names every choice the team makes about a record's lifetime in one place: what kind of data it is, how long it stays, what triggers deletion, who purges it, and how holds, exports, restores, and backups behave. Without that record, the choices scatter across tickets and memory, and a deletion runs before anyone checks the retention bound. Retention bounds live in Limit records, and a draft record names its decider and decide-by date so the choice cannot wait forever.
 
 ### Default to hard delete
 
-**Requirement:** A lifecycle implementation MUST use hard delete when no accepted retention or restore requirement applies.
+**Statement:** A lifecycle implementation MUST use hard delete when no accepted retention or restore requirement applies.
 
 **Rationale:** When no use case needs the data back, removing the row deletes the least and keeps the least: no hidden state, no filtered queries, no purge job to write and watch. A team that keeps deleted rows just in case pays for retention without a requirement and answers subject-access exports with data it promised to delete.
 
@@ -36,7 +36,7 @@ Selecting it switches on the Limit record type: the retention bounds the lifecyc
 
 ### Model retained lifecycle states
 
-**Requirement:** A soft-deleted or archived record MUST have a business reason and explicit state transition.
+**Statement:** A soft-deleted or archived record MUST have a business reason and explicit state transition.
 
 **Rationale:** A record that stays after deletion or moves to an archive still affects the product: it appears in some reads, skips others, and can return. A named state with a named transition shows that behavior in the business record itself, so a reader sees which transitions exist and which checks each one runs. Without the transition, the retained data is a row the code treats specially in scattered places.
 
@@ -44,79 +44,79 @@ Selecting it switches on the Limit record type: the retention bounds the lifecyc
 
 ### Reject hidden lifecycle flags
 
-**Requirement:** A lifecycle implementation MUST NOT use a hidden boolean as its sole lifecycle behavior.
+**Statement:** A lifecycle implementation MUST NOT use a hidden boolean as its sole lifecycle behavior.
 
 **Rationale:** A boolean column that only the storage layer reads can flip without running the business checks: no authorization, no audit entry, no named transition a reviewer can find. The record then looks deleted in one query and active in another, depending on which filter the query remembered. An explicit lifecycle operation keeps the flag, where one exists, as an effect of the transition rather than the transition itself.
 
 ### Model lifecycle operations in Domain
 
-**Requirement:** A Domain aggregate MUST expose delete, archive, and restore as explicit behavior when those operations apply.
+**Statement:** A Domain aggregate MUST expose delete, archive, and restore as explicit behavior when those operations apply.
 
 **Rationale:** Delete, archive, and restore change what the business promises about a record, so the business record owns them the way it owns any rule: one method per operation, with the checks beside the change. When the operation lives anywhere else, two callers implement it two ways and the checks drift apart.
 
 ### Authorize and audit lifecycle changes
 
-**Requirement:** A lifecycle operation MUST apply its documented authorization, recording its audit as an audit record when audit is selected and a standalone record otherwise.
+**Statement:** A lifecycle operation MUST apply its documented authorization, recording its audit as an audit record when audit is selected and a standalone record otherwise.
 
 **Rationale:** Deleting or restoring the wrong record harms a customer or breaks a legal duty, so each lifecycle operation checks that the actor may perform it and writes down that the operation happened. The audit entry lets a reviewer answer who deleted what and when, which a subject-access or legal-hold dispute asks for first.
 
 ### Exclude persistence-only lifecycle behavior
 
-**Requirement:** A lifecycle rule MUST NOT rely only on persistence filters or property setters.
+**Statement:** A lifecycle rule MUST NOT rely only on persistence filters or property setters.
 
 **Rationale:** A query filter or a property setter runs without the business checks: it filters rows in storage while the business record never learns the transition happened. The product then enforces lifecycle in two places that disagree, and a new query that skips the filter exposes data the lifecycle retired.
 
 ### Exclude inactive records from normal reads
 
-**Requirement:** A normal query MUST exclude deleted or archived records.
+**Statement:** A normal query MUST exclude deleted or archived records.
 
 **Rationale:** An employee browsing expenses expects live data: deleted and archived records in that list confuse the employee and leak data the lifecycle retired. Normal queries therefore read only the active state, while the named privileged paths serve the records outside it.
 
 ### Authorize lifecycle access paths
 
-**Requirement:** An administrative or restore query MUST use a named path with explicit authorization.
+**Statement:** An administrative or restore query MUST use a named path with explicit authorization.
 
 **Rationale:** Restore and administration queries reach records normal queries cannot see, so they need a path of their own with checks of their own. Without the named path, a privileged read hides inside normal query code and inherits normal authorization, which grants too much to too many callers.
 
 ### Define post-deletion references
 
-**Requirement:** A lifecycle specification MUST define post-deletion behavior for cross-aggregate references, exports, and unique constraints.
+**Statement:** A lifecycle specification MUST define post-deletion behavior for cross-aggregate references, exports, and unique constraints.
 
 **Rationale:** Other records can point at the deleted one, exports can carry its values, and a unique value such as an expense reference number can become available again. When the specification stays silent, each developer guesses: one nulls the reference, another keeps it, and a duplicate value slips through or a report breaks. Writing the behavior down gives every reference, export, and constraint one answer.
 
 ### Define storage lifecycle behavior
 
-**Requirement:** A Marten lifecycle implementation MUST define document state, filtered queries, indexes, purge transformations, and contract evolution.
+**Statement:** A Marten lifecycle implementation MUST define document state, filtered queries, indexes, purge transformations, and contract evolution.
 
 **Rationale:** A document store keeps whatever the business record writes, so the team states how each lifecycle state lands in the document: which state the document carries, which queries filter it, which indexes serve those queries, how a purge rewrites the document, and how the contract changes when the shape does. Without those choices, the business transition lands in storage by accident and each query invents its own filter.
 
 ### Define relational lifecycle behavior
 
-**Requirement:** An EF Core lifecycle implementation MUST define columns, query filters, partial indexes, migrations, and named filter behavior.
+**Statement:** An EF Core lifecycle implementation MUST define columns, query filters, partial indexes, migrations, and named filter behavior.
 
 **Rationale:** A relational table keeps retained rows beside active ones, so the team states which columns mark the state, which query filters hide retained rows, which partial indexes keep active values unique, which migrations add all of it, and what each named filter means. Without those choices, a unique constraint blocks a legitimate reuse or a query returns rows the lifecycle retired.
 
 ### Test provider lifecycle paths
 
-**Requirement:** A selected persistence provider MUST test normal and lifecycle query paths.
+**Statement:** A selected persistence provider MUST test normal and lifecycle query paths.
 
 **Rationale:** Filters, indexes, and migrations behave differently per provider, and a filter that works on documents can fail on tables. Tests that read through both the normal path and the lifecycle path on the selected provider catch the difference before a customer does.
 
 ### Bound purge and archive work
 
-**Requirement:** A purge or archive operation MUST be resumable, bounded, cancellation-aware, and observable.
+**Statement:** A purge or archive operation MUST be resumable, bounded, cancellation-aware, and observable.
 
 **Rationale:** A purge or archive job can run for hours across millions of rows, and a deployment, a failure, or an operator stops it midway. Resumable, bounded, cancellation-aware work restarts where it stopped instead of from the beginning, and observable progress tells the operator whether it moves or stalls.
 
 ### Preserve legal-hold data
 
-**Requirement:** A retention job MUST record progress and preserve data under legal hold.
+**Statement:** A retention job MUST record progress and preserve data under legal hold.
 
 **Rationale:** A legal hold suspends the duty to delete: the named data stays until the hold releases, even when its retention date passes. A retention job that ignores the hold destroys evidence the organization had a duty to keep.
 
 ### Record the release of a legal hold
 
-**Requirement:** A legal-hold release MUST record actor, data covered, reason, and resumed retention: an audit record when audit is selected, a standalone record otherwise.
+**Statement:** A legal-hold release MUST record actor, data covered, reason, and resumed retention: an audit record when audit is selected, a standalone record otherwise.
 
 **Rationale:** A hold suspends the duty to erase, and releasing it resumes that duty from a date the team can name. Without a release record, nobody can state when the suspension ended, so a subject's [erasure request](https://gdpr-info.eu/art-17-gdpr/) has no answer date and the next retention run cannot tell which data is deletable again. The record also tells the retention job exactly which data resumed which retention date.
 
@@ -124,7 +124,7 @@ Selecting it switches on the Limit record type: the retention bounds the lifecyc
 
 ### Align backup deletion behavior
 
-**Requirement:** Backup and replica operations MUST follow the documented deletion guarantee.
+**Statement:** Backup and replica operations MUST follow the documented deletion guarantee.
 
 **Rationale:** A deletion promise covers every copy the product keeps, including backups and replicas that restore for months after the live row disappears. When backup behavior stays undocumented, the team promises erasure it cannot deliver and learns the gap during an audit or a restore.
 

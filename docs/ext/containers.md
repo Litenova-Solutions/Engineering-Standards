@@ -22,139 +22,139 @@ This extension switches on `limit` and `runbook`: resource bounds are Limit reco
 
 ### Build release images in stages
 
-**Requirement:** A release image MUST use multi-stage builds and pinned base-image digests.
+**Statement:** A release image MUST use multi-stage builds and pinned base-image digests.
 
 **Rationale:** Build tooling has no place in a runtime image: each compiler and package cache widens the attack surface of every deployment. Multi-stage builds leave that tooling in the build stage. A pinned base-image digest fixes the exact reviewed base, so a rebuild months later starts from the same bytes.
 
 ### Run images as non-root
 
-**Requirement:** A release image MUST run its application with a non-root runtime user.
+**Statement:** A release image MUST run its application with a non-root runtime user.
 
 **Rationale:** A compromised application process inherits the rights of its runtime user. A non-root user confines the attacker to what that user may touch. Root would hand over the whole container.
 
 ### Copy only runtime files
 
-**Requirement:** A runtime image MUST contain only files required to run the deployed application.
+**Statement:** A runtime image MUST contain only files required to run the deployed application.
 
 **Rationale:** Every file in the runtime image ships to every replica and waits for an attacker to read it. Copying only the files the application needs keeps the image small to transfer and to inspect. Each extra file is cost with no runtime purpose.
 
 ### Exclude build material from runtime images
 
-**Requirement:** A runtime image MUST NOT contain source, tests, package caches, or local configuration.
+**Statement:** A runtime image MUST NOT contain source, tests, package caches, or local configuration.
 
 **Rationale:** Source, tests, package caches, and local configuration serve the build and never the running application. Carrying them into production leaks internals to anyone who pulls the image. Secrets stay out under `litespec/quality/security#keep-secrets-out-of-tracked-and-observable-data`.
 
 ### Supply runtime configuration externally
 
-**Requirement:** A deployment platform MUST supply connection strings, OIDC settings, exporter endpoints, and secrets outside the image.
+**Statement:** A deployment platform MUST supply connection strings, OIDC settings, exporter endpoints, and secrets outside the image.
 
 **Rationale:** Connection strings, OIDC settings, exporter endpoints, and secrets differ by environment. Supplying them outside the image lets one image serve every environment. Baking them in would rebuild and re-test the image for each environment it enters.
 
 ### Exclude environment configuration from images
 
-**Requirement:** A release image MUST NOT contain environment-specific configuration.
+**Statement:** A release image MUST NOT contain environment-specific configuration.
 
 **Rationale:** One immutable image must deploy unchanged into staging and production. Environment values baked into the image break that promise: the tested bytes and the deployed bytes differ. External values keep the image identical everywhere it runs.
 
 ### Apply schema work before traffic
 
-**Requirement:** A release job MUST apply reviewed schema changes before traffic shifts to new application replicas, under `litespec/backend/persistence#control-production-schema-changes`.
+**Statement:** A release job MUST apply reviewed schema changes before traffic shifts to new application replicas, under `litespec/backend/persistence#control-production-schema-changes`.
 
 **Rationale:** New application replicas expect the schema their release reviewed. The release job applies those schema changes before traffic shifts, under `litespec/backend/persistence#control-production-schema-changes`. Traffic first would send new code against an old schema.
 
 ### Keep schema work out of startup
 
-**Requirement:** An application replica MUST NOT alter the production schema during startup, under `litespec/backend/persistence#control-production-schema-changes`.
+**Statement:** An application replica MUST NOT alter the production schema during startup, under `litespec/backend/persistence#control-production-schema-changes`.
 
 **Rationale:** Several replicas can start at once, each running its own startup. Schema work in startup then runs concurrently, without the release job's review and ordering. Startup reads the schema the release job prepared and changes nothing.
 
 ### Wait for replica readiness
 
-**Requirement:** A deployment controller MUST start new replicas and wait for readiness before shifting traffic.
+**Statement:** A deployment controller MUST start new replicas and wait for readiness before shifting traffic.
 
 **Rationale:** New replicas need time to load before they serve: a replica that receives traffic mid-startup fails its first requests. The controller starts them, waits for readiness, and only then shifts traffic. Readiness proves the new version serves before it becomes the version.
 
 ### Test released traffic
 
-**Requirement:** A release deployment MUST run the release's recorded end-to-end suite after traffic reaches the new version.
+**Statement:** A release deployment MUST run the release's recorded end-to-end suite after traffic reaches the new version.
 
 **Rationale:** An image that builds can still fail where it runs: routing, configuration, and data differ from the build machine. Running the release's recorded end-to-end suite after traffic shifts tests the deployed path itself. The release record names the suite, so the check runs the same tests every release.
 
 ### Retain rollback material
 
-**Requirement:** A release owner MUST record the rollback procedure as a Runbook record identifying the previous image digest, under `litespec/quality/operations#keep-rollback-executable`.
+**Statement:** A release owner MUST record the rollback procedure as a Runbook record identifying the previous image digest, under `litespec/quality/operations#keep-rollback-executable`.
 
 **Rationale:** A rollback under pressure must not depend on memory. The Runbook record carries the tested rollback command with the previous image digest, which names one immutable image, under `litespec/quality/operations#keep-rollback-executable`. A tag alone could have moved since the release went out.
 
 ### Limit container privileges
 
-**Requirement:** A deployment MUST use a read-only filesystem when the application permits it and drop unnecessary capabilities.
+**Statement:** A deployment MUST use a read-only filesystem when the application permits it and drop unnecessary capabilities.
 
 **Rationale:** A read-only filesystem and dropped capabilities shrink what a compromised process can do next: no writes outside declared paths, no privileged calls it never needed. The limits apply where the application permits them. Each kept capability is an action an attacker inherits.
 
 ### Declare writable paths and limits
 
-**Requirement:** A deployment MUST declare writable paths and record CPU and memory bounds as Limit records.
+**Statement:** A deployment MUST declare writable paths and record CPU and memory bounds as Limit records.
 
 **Rationale:** Declared writable paths name the mutable storage the application needs, and CPU and memory bounds as Limit records cap what one deployment may consume. The bounds protect the node's capacity from one hungry replica. The declarations also tell the next reader what the application was sized for.
 
 ### Run the application as PID 1
 
-**Requirement:** A container MUST run the application as its entry process.
+**Statement:** A container MUST run the application as its entry process.
 
 **Rationale:** The platform stops a container by signaling its entry process. An application running as PID 1 receives that signal and shuts down on purpose. A wrapper that swallows the signal leaves the platform waiting until it kills the container mid-work.
 
 ### Set sufficient shutdown time
 
-**Requirement:** A deployment MUST set a shutdown grace period longer than measured request or Worker stop time.
+**Statement:** A deployment MUST set a shutdown grace period longer than measured request or Worker stop time.
 
 **Rationale:** Stopping a replica interrupts its in-flight requests and Worker jobs. A grace period longer than the measured stop time lets that work finish or record a safe interruption. A shorter period kills work the system then has to reconcile.
 
 ### Write runtime logs to streams
 
-**Requirement:** A containerized application MUST write logs to standard output or standard error.
+**Statement:** A containerized application MUST write logs to standard output or standard error.
 
 **Rationale:** Container filesystems vanish with their replicas, so a log file inside the container dies with the evidence it holds. Standard output and standard error hand each line to the platform's log collection. The platform then keeps logs past the life of any one replica.
 
 ### Keep mutable data external
 
-**Requirement:** A containerized application MUST keep mutable data outside its container filesystem.
+**Statement:** A containerized application MUST keep mutable data outside its container filesystem.
 
 **Rationale:** The platform recreates replicas at will: deploys, scaling, and node failures each replace containers with fresh ones. Mutable data kept inside the container filesystem dies with its replica. External storage keeps the data alive across every recreation.
 
 ### Apply OCI release labels
 
-**Requirement:** A release image MUST include OCI source, revision, version, and created-time labels.
+**Statement:** A release image MUST include OCI source, revision, version, and created-time labels.
 
 **Rationale:** Source, revision, version, and created-time labels in the OCI standard form connect each image to the commit and release that produced it. An incident responder reads the running image's labels and opens the exact source. Images without labels force that join through guesswork.
 
 ### Record image digests
 
-**Requirement:** A release record MUST store the deployed image digest rather than only an image tag.
+**Statement:** A release record MUST store the deployed image digest rather than only an image tag.
 
 **Rationale:** The release record stores the deployed digest, not just the tag. A tag can move to a newer image after release, while the digest names the exact bytes that went out. The digest makes the deployed artifact reproducible and the rollback target exact.
 
 ### Exclude build timestamps from contracts
 
-**Requirement:** A published OpenAPI document or generated client MUST NOT contain a build timestamp.
+**Statement:** A published OpenAPI document or generated client MUST NOT contain a build timestamp.
 
 **Rationale:** A generated-at field or a build-time comment changes the OpenAPI document and generated clients on every build. The diff then reports change where no contract changed, which buries real breaks. Contracts carry version identity instead of build time.
 
 ### Separate frontend configuration classes
 
-**Requirement:** A frontend image build MUST distinguish public build-time configuration from server-only runtime secrets.
+**Statement:** A frontend image build MUST distinguish public build-time configuration from server-only runtime secrets.
 
 **Rationale:** A frontend build produces a browser bundle that anyone may download. Public build-time configuration belongs there, and server-only runtime secrets must never join it. The build distinguishes the two classes so each value lands in its own delivery.
 
 ### Use protected frontend secret delivery
 
-**Requirement:** A frontend image build MUST use secret mounts or runtime injection for secrets.
+**Statement:** A frontend image build MUST use secret mounts or runtime injection for secrets.
 
 **Rationale:** Secret mounts and runtime injection hand secrets to the build without writing them into a layer. Nothing secret then persists in the image history. A pulled image reveals its layers to anyone, so a layer must never hold a secret.
 
 ### Exclude insecure frontend secret carriers
 
-**Requirement:** A frontend image build MUST NOT use `ARG`, copied environment files, or image layers for secrets.
+**Statement:** A frontend image build MUST NOT use `ARG`, copied environment files, or image layers for secrets.
 
 **Rationale:** `ARG` values, copied environment files, and image layers all persist into the image history. A secret delivered through any of them stays readable to anyone who pulls the image. Secrets stay out of layers under `litespec/quality/security#keep-secrets-out-of-tracked-and-observable-data`.
 

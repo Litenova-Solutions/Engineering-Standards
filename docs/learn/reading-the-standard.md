@@ -70,7 +70,7 @@ Each rule is a heading, and the heading is also its ID. Here is one from the [do
 ```markdown
 ### Keep Domain independent of outer layers
 
-**Requirement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
+**Statement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
 
 **Rationale:** No persistence, web, mediator, logging, configuration, injection, serialization, or provider package enters Domain. Infrastructure registers a persisted discriminator rather than Domain carrying a serialization attribute.
 ```

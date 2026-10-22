@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply back office: deliveries such as Ga
 
 ### Confirm or undo every removal
 
-**Requirement:** Every removal MUST either offer undo or ask for confirmation before it runs.
+**Statement:** Every removal MUST either offer undo or ask for confirmation before it runs.
 
 **Rationale:** Staff remove the wrong record by misreading a row or misclicking, and without a way back the record is gone. An undo toast restores a reversible removal in one click, while a confirmation dialog makes an irreversible removal a deliberate choice. Either way the reader gets a moment to catch the mistake before it becomes permanent.
 
 ### Show the created record
 
-**Requirement:** A successful create MUST take the reader to the created record or show it in place.
+**Statement:** A successful create MUST take the reader to the created record or show it in place.
 
 **Rationale:** After creating, the reader needs proof that the record exists with the values entered, and the created record itself is that proof. A create that ends on an empty form or a bare toast leaves the reader unsure whether it worked, so they create it again and produce a duplicate.
 

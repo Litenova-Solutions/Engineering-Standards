@@ -14,31 +14,31 @@ A route is one address in the product, declared on a page with an `@page` templa
 
 ### Render on the client only
 
-**Requirement:** A page MUST render without server-side execution at first paint.
+**Statement:** A page MUST render without server-side execution at first paint.
 
 **Rationale:** The stack promises a product with no server of its own. Interactive server rendering, automatic render mode, and prerendering each need a live server connection at first paint, which breaks that promise and removes offline operation. Rendering on the client only keeps the published output static files that any host can serve.
 
 ### Declare routes on pages
 
-**Requirement:** A routable component MUST live under `Pages/`, declare one `@page` template, and type every route parameter.
+**Statement:** A routable component MUST live under `Pages/`, declare one `@page` template, and type every route parameter.
 
 **Rationale:** One `@page` template on a page under `Pages/` makes each address findable and each route's input typed. Feature components stay unroutable, so no address reaches an interior piece of a page. An unparsable parameter renders the not-found state rather than throwing, so a mistyped link shows a page instead of a crash.
 
 ### Give every route explicit states
 
-**Requirement:** A route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
+**Statement:** A route MUST define its loading, empty, error, forbidden, not-found, and ready behavior.
 
 **Rationale:** A route without declared states shows whatever its components default to while loading, empty, or failing: usually a blank page or a crash. Six named states leave no gap: loading until persisted reads complete, empty, error, forbidden for an address the actor may not read, not-found for an unparsable parameter, and ready. Each state name is a term in the project's language record, so every route describes the same states in the same words. This realizes litespec/frontend/rendering#represent-route-states.
 
 ### Keep the acquisition surface static
 
-**Requirement:** A marketing, search-landing, or informational page MUST be served as a static document outside the WebAssembly application.
+**Statement:** A marketing, search-landing, or informational page MUST be served as a static document outside the WebAssembly application.
 
 **Rationale:** A first-time visitor reads a landing page, and downloading the WebAssembly runtime first makes that read slow for no reason. Static documents outside the application load immediately. The application boundary begins where a visitor starts using the product, so only users pay the runtime cost.
 
 ### Operate offline after first load
 
-**Requirement:** A client MUST register a service worker that caches the application shell and framework payload.
+**Statement:** A client MUST register a service worker that caches the application shell and framework payload.
 
 **Rationale:** The service worker caches the shell and framework payload, so the application starts and navigates with no network. Without it the product is a blank page whenever the connection drops. A feature that cannot work offline states that in its use-case specification and degrades to an explicit offline state.
 

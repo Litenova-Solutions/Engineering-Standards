@@ -20,7 +20,7 @@ The model builder writes the generated project model under `.model/` from record
 
 ### Use the canonical root tree
 
-**Requirement:** A consumer workspace MUST use the canonical root tree declared in this section.
+**Statement:** A consumer workspace MUST use the canonical root tree declared in this section.
 
 **Example:** Consumer workspaces use this shape:
 
@@ -86,19 +86,19 @@ A record page lives at the home the tree names for its type. An entry lives on i
 
 ### Declare size and application stacks in project config
 
-**Requirement:** `litespec.project.json` MUST declare `size` as `small` or `large` and one stack for the backend and for each frontend.
+**Statement:** `litespec.project.json` MUST declare `size` as `small` or `large` and one stack for the backend and for each frontend.
 
 **Rationale:** Size decides which record types and test projects apply: small or large selects the project's required-record set. Each stack decides which technology pages and checks apply to its application. Declaring both in `litespec.project.json` lets tools and reviewers read the selection from one file.
 
 ### Keep the generated model out of source control
 
-**Requirement:** The generated `.model/` folder MUST stay out of source control.
+**Statement:** The generated `.model/` folder MUST stay out of source control.
 
 **Rationale:** The model builder writes `model.json` there from records, code, routes, tests, and test runs. Tracking it would commit a derived copy beside its sources, and every commit would carry a stale model until somebody regenerates it. The folder is rebuilt rather than reviewed.
 
 ### Keep production and test code separate
 
-**Requirement:** Production code MUST live under `apps/api/src/` and test code under `apps/api/tests/`.
+**Statement:** Production code MUST live under `apps/api/src/` and test code under `apps/api/tests/`.
 
 **Rationale:** Production code under `apps/api/src/` and test code under `apps/api/tests/` keep the two graphs apart by path. The split makes a test dependency reaching production code visible in the path itself, and keeps test helpers from shipping with the product.
 
@@ -113,25 +113,25 @@ apps/api/
 
 ### Keep runnable applications under apps
 
-**Requirement:** An independently runnable frontend, API, or deployed host MUST live under `apps/{name}/`.
+**Statement:** An independently runnable frontend, API, or deployed host MUST live under `apps/{name}/`.
 
 **Rationale:** Each root makes one promise: `apps/` runs, `packages/` is reused. A reusable package under `apps/` or deployable code under `packages/` inverts that promise, so neither location tells the reader what it holds. One home per kind keeps the promise readable.
 
 ### Limit shared TypeScript packages
 
-**Requirement:** A shared TypeScript package MUST have at least two consumers or carry generated output shared by design.
+**Statement:** A shared TypeScript package MUST have at least two consumers or carry generated output shared by design.
 
 **Rationale:** A shared package with one consumer pays versioning, publishing, and cross-package edits for an audience of one. Requiring two consumers or generated output shared by design keeps sharing deliberate. The baseline permits shared configuration, generated API types, a thin client, and CSS theme tokens.
 
 ### Keep consumer documentation at the root
 
-**Requirement:** Project records MUST live under the root `docs/` directory.
+**Statement:** Project records MUST live under the root `docs/` directory.
 
 **Rationale:** Project records describe the product, not the standard and not the code. Placing them inside the LiteSpec submodule or the application tree makes them disappear when either is replaced. The root `docs/` directory keeps records where a replaced standard or a rewritten application cannot take them.
 
 ### Keep orientation documents separate from canonical records
 
-**Requirement:** A README under `docs/` MUST link to the approved record rather than restate its content.
+**Statement:** A README under `docs/` MUST link to the approved record rather than restate its content.
 
 **Rationale:** A README orients; a record decides. A README that restates a decision becomes a second authored source that drifts from the record it summarizes, until the two disagree and neither is trusted. Linking to the approved record keeps one source with many pointers.
 

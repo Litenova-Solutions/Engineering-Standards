@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply catalog: the Oak desk lamp at EUR 
 
 ### Name every field with a visible label
 
-**Requirement:** Every field MUST carry a visible label that names its value.
+**Statement:** Every field MUST carry a visible label that names its value.
 
 **Rationale:** A placeholder disappears on the first keystroke, so a filled field with no label no longer says what it holds. Screen readers announce the label, and sighted staff returning to a filled form read it to check each value before saving. Without a visible label, both groups guess what each value means.
 
 ### Keep entered values after a refused submit
 
-**Requirement:** A form MUST keep every entered value when the API refuses a submit.
+**Statement:** A form MUST keep every entered value when the API refuses a submit.
 
 **Rationale:** Clearing the form after a refusal forces staff to retype every value to fix one field, which wastes time and adds new typos. Keeping all values lets the reader repair only the field the message names and submit again.
 

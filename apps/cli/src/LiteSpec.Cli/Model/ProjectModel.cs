@@ -15,6 +15,22 @@ sealed record ProvesLink(string Scenario, string Claim, bool Confirmed, bool? Pa
 sealed record UseCaseStatus(bool Implemented, bool Verified);
 
 /// <summary>
+///     One requirement's computed status: verified when everything fulfilling it is verified,
+///     and, for a measured requirement, when its measure has a passing check.
+///     <see cref="MeasurePassed"/> is null for a requirement with no measure or no result yet.
+/// </summary>
+sealed record RequirementStatus(bool Verified, bool? MeasurePassed);
+
+/// <summary>One code location no scenario test reaches, read from scenario-only coverage.</summary>
+sealed record CoverageGap(string File, int Line, string Member);
+
+/// <summary>One result of a measured check, read from a k6, Lighthouse CI or ZAP result file.</summary>
+sealed record MeasureResult(string Tool, string Check, bool Passed, string? Value, string Source);
+
+/// <summary>One screen operation that resolves to no backend endpoint.</summary>
+sealed record UnmatchedCall(string Screen, string Operation, string File);
+
+/// <summary>
 ///     The project model: written records, read code, screens, tests, the test run,
 ///     computed links and per use case status.
 /// </summary>
@@ -43,6 +59,24 @@ sealed class ProjectModel
 
     /// <summary>Refusal codes by the class whose literal carries them.</summary>
     public Dictionary<string, HashSet<string>> RefusalCodes { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Per requirement, by id: verified from what fulfills it and from its measure.</summary>
+    public Dictionary<string, RequirementStatus> RequirementStatus { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Per aggregate, by id: the states some transition leads into, or that start its lifecycle.</summary>
+    public Dictionary<string, IReadOnlySet<string>> ReachableStates { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Code no scenario test reaches; empty when no scenario-only coverage file was read.</summary>
+    public List<CoverageGap> UnreachedCode { get; } = [];
+
+    /// <summary>Whether a scenario-only coverage file was read, so an empty <see cref="UnreachedCode"/> means something.</summary>
+    public bool CoverageRead { get; set; }
+
+    /// <summary>Results of measured checks read from tool result files.</summary>
+    public List<MeasureResult> Measures { get; } = [];
+
+    /// <summary>Screen operations that resolve to no endpoint.</summary>
+    public List<UnmatchedCall> UnmatchedCalls { get; } = [];
 
     /// <summary>Records by id.</summary>
     public IReadOnlyDictionary<string, Record> ById =>
@@ -335,6 +369,91 @@ sealed class ProjectModel
             }
 
             writer.WriteEndObject();
+
+            writer.WriteStartObject("requirementStatus");
+
+            foreach (var entry in RequirementStatus.OrderBy(left => left.Key, StringComparer.Ordinal))
+            {
+                writer.WriteStartObject(entry.Key);
+                writer.WriteBoolean("verified", entry.Value.Verified);
+
+                if (entry.Value.MeasurePassed is null)
+                {
+                    writer.WriteNull("measurePassed");
+                }
+                else
+                {
+                    writer.WriteBoolean("measurePassed", entry.Value.MeasurePassed.Value);
+                }
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndObject();
+
+            writer.WriteStartObject("reachableStates");
+
+            foreach (var entry in ReachableStates.OrderBy(left => left.Key, StringComparer.Ordinal))
+            {
+                writer.WriteStartArray(entry.Key);
+
+                foreach (var state in entry.Value.OrderBy(left => left, StringComparer.Ordinal))
+                {
+                    writer.WriteStringValue(state);
+                }
+
+                writer.WriteEndArray();
+            }
+
+            writer.WriteEndObject();
+
+            if (CoverageRead)
+            {
+                writer.WriteStartArray("unreachedCode");
+
+                foreach (var gap in UnreachedCode)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("path", Config.Relative(gap.File));
+                    writer.WriteNumber("line", gap.Line);
+                    writer.WriteString("member", gap.Member);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+            else
+            {
+                writer.WriteNull("unreachedCode");
+            }
+
+            writer.WriteStartArray("measures");
+
+            foreach (var measure in Measures)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("tool", measure.Tool);
+                writer.WriteString("check", measure.Check);
+                writer.WriteBoolean("passed", measure.Passed);
+                WriteNullable(writer, "value", measure.Value);
+                writer.WriteString("source", Config.Relative(measure.Source));
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+
+            writer.WriteStartArray("unmatchedCalls");
+
+            foreach (var call in UnmatchedCalls)
+            {
+                writer.WriteStartObject();
+                writer.WriteString("screen", call.Screen);
+                writer.WriteString("operation", call.Operation);
+                writer.WriteString("file", call.File);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
             writer.WriteEndObject();
         }
 

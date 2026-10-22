@@ -48,7 +48,7 @@ The Svelte stack uses these values:
 
 ### Generate the client from the published contract
 
-**Requirement:** A workspace MUST generate its client, types, schemas, query options, and mutation options from the API's published OpenAPI document.
+**Statement:** A workspace MUST generate its client, types, schemas, query options, and mutation options from the API's published OpenAPI document.
 
 **Rationale:** A handwritten copy of a request, a response, or a schema drifts from the contract silently: the API changes and the copy still compiles. A generated client turns a contract change into a compile error in every application at once, so every affected call is fixed before anything ships. This realizes litespec/frontend/data#generate-the-client-from-the-published-contract.
 
@@ -64,13 +64,13 @@ Each stack adds the TanStack Query plugin its section names.
 
 ### Map every failure to one problem type
 
-**Requirement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing the `traceId` in copyable form in each error's detail.
+**Statement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing the `traceId` in copyable form in each error's detail.
 
 **Rationale:** A raw response body shown to the user leaks whatever the API included and offers no consistent recovery path. Deciding from the code keeps each page's behavior stable across reworded messages, because a code is a published identifier. Showing the `traceId` in copyable form in the detail lets support find the exact request the user saw fail, without making an identifier the headline. This realizes litespec/frontend/data#map-every-failure-to-one-problem-type.
 
 ### Place a refusal beside what was refused
 
-**Requirement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
+**Statement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
 
 **Rationale:** A refusal at the top of a page says that something failed but not what. Rendered beside the record or control that was refused, in the application's own sentence for that code, it tells the user what was asked and denied. The code in the markup lets a browser test provoke that exact refusal by name. This realizes litespec/frontend/data#place-a-refusal-beside-what-was-refused.
 
@@ -86,7 +86,7 @@ Each stack adds the TanStack Query plugin its section names.
 
 ### Validate a form with the generated schema
 
-**Requirement:** A form MUST validate against the generated schema for its request body, extended with the application's own rules rather than replaced by them.
+**Statement:** A form MUST validate against the generated schema for its request body, extended with the application's own rules rather than replaced by them.
 
 **Rationale:** The generated schema is the contract, so validating against it holds the form to what the API accepts even where the browser accepts more. The application extends the schema with its required messages and any rule the contract cannot express, rather than replacing it with a restatement that drifts. A form validated only by hand restates the contract and breaks silently when the contract changes. This realizes litespec/frontend/data#validate-a-form-with-the-generated-schema.
 
@@ -98,7 +98,7 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 ### Update the cache a command changed
 
-**Requirement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
+**Statement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
 
 **Rationale:** The query cache owns freshness, so a command that changes a record must invalidate that record's queries: otherwise the page shows the old record until something else refetches. Invalidating no further matters too, because each unrelated invalidation costs a request on every affected page. Invalidating exactly the changed queries keeps reads fresh without wasted traffic. This realizes litespec/frontend/data#update-the-cache-a-command-changed.
 
@@ -106,13 +106,13 @@ zRedeliverOrderRequestModel.extend({ reason: zRedeliverOrderRequestModel.shape.r
 
 ### Assign state to the narrowest owner
 
-**Requirement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
+**Statement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
 
 **Rationale:** Each value has a narrowest owner that can hold it: server data in the cache, shared address state in the address, form input in form state, and anything else in the component's own state. A store above that order re-renders unrelated components on every change and hides where the value changes. The component's own state is local component state in React and a rune in Svelte. This realizes litespec/frontend/data#assign-state-to-the-narrowest-owner.
 
 ### Localize copy through locale dictionaries
 
-**Requirement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
+**Statement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
 
 **Rationale:** One sentence copied into two components drifts at the first rewording. Locale dictionaries with fill and plural support keep one sentence in one place, one chunk per language keeps a reader's download to the language they read, and typed keys with a declared fallback fail a missing key where the fallback says instead of rendering nothing. This realizes litespec/frontend/data#localize-copy-through-locale-dictionaries.
 

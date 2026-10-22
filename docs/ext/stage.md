@@ -22,7 +22,7 @@ It switches on no record type: the promotion Decision is a core record every pro
 
 ### Declare the release stage
 
-**Requirement:** A consumer MUST declare `pre-production` or `production` as its release stage in `litespec.project.json`.
+**Statement:** A consumer MUST declare `pre-production` or `production` as its release stage in `litespec.project.json`.
 
 **Rationale:** The release stage is a project fact, not a departure from any rule, so it lives as data in the `stage` selection: `releaseStage` holds `pre-production` or `production`, beside the deferrals the early stage allows. Without the declared stage, tools and reviewers cannot tell which provisions the project owes today.
 
@@ -34,7 +34,7 @@ It switches on no record type: the promotion Decision is a core record every pro
 
 ### Defer named provisions until promotion
 
-**Requirement:** A `pre-production` consumer MUST name each deferred provision with its end date in the stage extension selection, with a `production` consumer carrying no deferred provisions.
+**Statement:** A `pre-production` consumer MUST name each deferred provision with its end date in the stage extension selection, with a `production` consumer carrying no deferred provisions.
 
 **Rationale:** An early-stage deferral without a named end becomes permanent by neglect. Each entry names the deferred provision with the date its deferral ends, and the promotion Decision names the same provisions, so promotion closes every deferral at once.
 
@@ -46,7 +46,7 @@ It switches on no record type: the promotion Decision is a core record every pro
 
 ### Promote through a recorded decision
 
-**Requirement:** A consumer MUST approve its promotion to `production` as a Decision before its first deployment holds customer data, ending every deferred provision.
+**Statement:** A consumer MUST approve its promotion to `production` as a Decision before its first deployment holds customer data, ending every deferred provision.
 
 **Rationale:** Promotion is the moment relaxed rules end, and an unrecorded moment never arrives: the relaxed rules last until somebody notices they never ended. The Decision carries its owner, status, decider, and decide-by date like any Decision, and approving it before the first deployment holds customer data keeps the data under full rules from day one.
 

@@ -22,13 +22,13 @@ Durable state is what the user made: it is persisted, versioned, and exported. D
 
 ### Own storage in Infrastructure
 
-**Requirement:** Browser storage MUST be reached only through an Infrastructure adapter implementing an Application-declared interface.
+**Statement:** Browser storage MUST be reached only through an Infrastructure adapter implementing an Application-declared interface.
 
 **Rationale:** When storage sits behind an Application interface, a test replaces the browser with an in-memory implementation and every component keeps working. If a component or page called the browser API directly, its tests would need a browser host, and swapping the storage mechanism would touch every caller.
 
 ### Version and scope every storage key
 
-**Requirement:** A storage key MUST use the form `{product}.{area}.v{n}` and be declared once as a constant beside its adapter.
+**Statement:** A storage key MUST use the form `{product}.{area}.v{n}` and be declared once as a constant beside its adapter.
 
 **Rationale:** The version segment marks which shape a stored value holds, so a migration knows what it is reading. A literal key written anywhere else is a second declaration that no version bump reaches, so one part of the product reads the old shape while another writes the new one.
 
@@ -36,25 +36,25 @@ Durable state is what the user made: it is persisted, versioned, and exported. D
 
 ### Provide a migration for every changed shape
 
-**Requirement:** A change to a persisted shape MUST ship a migration that reads every previously released version and produces the current one.
+**Statement:** A change to a persisted shape MUST ship a migration that reads every previously released version and produces the current one.
 
 **Rationale:** Users keep data written by installs older than the current build, and the product starts against whatever those installs left behind. Without a migration the new build either crashes on the old shape or discards it. The migration runs at startup before the store finishes loading. Data it cannot interpret waits under a quarantine key, reported but never silently deleted, because deleting unreadable user data destroys work the user cannot recreate.
 
 ### Treat reads as fallible
 
-**Requirement:** A storage adapter MUST return a typed result covering unavailable, absent, corrupt, and present.
+**Statement:** A storage adapter MUST return a typed result covering unavailable, absent, corrupt, and present.
 
 **Rationale:** The browser can deny, partition, or fill storage at any time, and each of those differs from nothing stored yet. A typed result forces the caller to handle each case: the application starts and stays usable when storage is unavailable, with durable writes disabled and the user told once, instead of crashing or mistaking a failure for empty state.
 
 ### Bound what is stored
 
-**Requirement:** A specification persisting a growing collection MUST state its bound and its eviction rule.
+**Statement:** A specification persisting a growing collection MUST state its bound and its eviction rule.
 
 **Rationale:** Browser quotas are small and shared across the origin, so a collection that grows without a bound eventually fails a write the user cannot diagnose. A stated bound with an eviction rule keeps the collection inside the quota, so a write never fails for lack of room. Large generated assets are cached by the service worker rather than written to key storage.
 
 ### Provide export and import
 
-**Requirement:** Durable state MUST export to one versioned file that imports the same version, transforms an older version, and refuses a newer version.
+**Statement:** Durable state MUST export to one versioned file that imports the same version, transforms an older version, and refuses a newer version.
 
 **Rationale:** With no server, the exported file is the only copy of the user's work outside the browser that holds it. A versioned file that imports its own version, transforms older ones, and refuses newer ones keeps that copy trustworthy across installs. Device-local state is excluded from the export. The file carries its own schema version. A refusal names the application version that wrote the file. A partial import of an unknown shape would drop fields silently, so the rule refuses instead.
 

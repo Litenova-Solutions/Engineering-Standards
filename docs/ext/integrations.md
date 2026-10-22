@@ -22,7 +22,7 @@ This extension switches on no optional record type.
 
 ### Define business-action ports
 
-**Requirement:** Application MUST own a public external-service interface named for its business action.
+**Statement:** Application MUST own a public external-service interface named for its business action.
 
 **Rationale:** The use case needs a behavior, such as authorizing a payment, not a provider. A public interface named for that business action states the need with no provider in sight. Application then depends on the behavior while providers come and go behind it.
 
@@ -30,7 +30,7 @@ This extension switches on no optional record type.
 
 ### Isolate provider implementations
 
-**Requirement:** Infrastructure MUST own provider clients, SDKs, authentication, and transport models.
+**Statement:** Infrastructure MUST own provider clients, SDKs, authentication, and transport models.
 
 **Rationale:** Provider clients, SDKs, authentication, and transport models name provider things in provider terms. Infrastructure owns all of them, outside Application's business boundary. A provider SDK upgrade then touches Infrastructure instead of the use case.
 
@@ -38,37 +38,37 @@ This extension switches on no optional record type.
 
 ### Bind client configuration
 
-**Requirement:** An external client MUST bind its base address, credentials, timeout, and policy through validated options.
+**Statement:** An external client MUST bind its base address, credentials, timeout, and policy through validated options.
 
 **Rationale:** Base address, credentials, timeout, and policy decide where the client calls and how it behaves. Binding them through validated options checks each value at startup. A missing or invalid value fails fast instead of misdirecting the first live call.
 
 ### Use managed HTTP clients
 
-**Requirement:** An HTTP integration MUST use `HttpClientFactory` and applicable service discovery.
+**Statement:** An HTTP integration MUST use `HttpClientFactory` and applicable service discovery.
 
 **Rationale:** `HttpClientFactory` centralizes handler lifetime, and service discovery resolves provider addresses in one place. Both keep HTTP construction out of the use case. A hand-built client in each call site would scatter both concerns.
 
 ### Reject per-request HTTP clients
 
-**Requirement:** An HTTP integration MUST NOT construct a new HTTP client for each request.
+**Statement:** An HTTP integration MUST NOT construct a new HTTP client for each request.
 
 **Rationale:** A new HTTP client per request skips the central handler configuration and opens sockets the process never reuses. Under load, the exhausted sockets fail calls that the provider would have served. Managed clients reuse what per-request construction throws away.
 
 ### Bound transient retries
 
-**Requirement:** An external client MUST retry transient failures with bounded attempts and jitter.
+**Statement:** An external client MUST retry transient failures with bounded attempts and jitter.
 
 **Rationale:** A provider outage tempts every caller to retry at once, and the synchronized wave hits the provider the moment it recovers. Bounded attempts cap the load and jitter spreads it over time. An unbounded retry turns each caller into a second outage.
 
 ### Protect non-idempotent calls
 
-**Requirement:** An external client MUST NOT retry a non-idempotent provider call without provider idempotency and documented replay behavior.
+**Statement:** An external client MUST NOT retry a non-idempotent provider call without provider idempotency and documented replay behavior.
 
 **Rationale:** Retrying a charge, a shipment, or any irreversible provider call can perform it twice. The retry is safe only with provider idempotency behind it and documented replay behavior stating what a repeat does. Without both, the project trades one failed call for two completed effects.
 
 ### Translate provider failure outcomes
 
-**Requirement:** An integration MUST map provider errors to project-owned outcomes and stable diagnostics.
+**Statement:** An integration MUST map provider errors to project-owned outcomes and stable diagnostics.
 
 **Rationale:** Each provider reports failure in its own codes and shapes. Mapping them to project-owned outcomes with stable diagnostics keeps the project's failure contract steady while providers change theirs.
 
@@ -78,13 +78,13 @@ The project's own error catalog holds the stable codes. `litespec/backend/api#re
 
 ### Exclude provider internals
 
-**Requirement:** An API MUST NOT expose provider bodies, credentials, headers, exception types, or internal account identifiers.
+**Statement:** An API MUST NOT expose provider bodies, credentials, headers, exception types, or internal account identifiers.
 
 **Rationale:** Provider bodies, headers, exception types, and account identifiers carry secrets, implementation details, and sometimes another account's data. An API that returns them leaks all three to its callers. The mapped project-owned outcome carries the meaning without the internals.
 
 ### Verify inbound provider messages
 
-**Requirement:** An inbound provider handler MUST verify signature, timestamp tolerance, replay protection, content type, size, schema, and event identity before processing.
+**Statement:** An inbound provider handler MUST verify signature, timestamp tolerance, replay protection, content type, size, schema, and event identity before processing.
 
 **Rationale:** An inbound message arrives from the network, where anyone can send bytes. Signature, timestamp tolerance, replay protection, content type, size, schema, and event identity each guard a different part of that trust boundary. Skipping any one leaves its attack open.
 
@@ -94,13 +94,13 @@ Order matters here. Verify the signature first, over the raw body, before parsin
 
 ### Process duplicate messages safely
 
-**Requirement:** An inbound provider handler MUST store or process duplicate events idempotently.
+**Statement:** An inbound provider handler MUST store or process duplicate events idempotently.
 
 **Rationale:** A provider repeats delivery after a timeout or an acknowledgement failure, so the same event arrives twice. Storing or processing duplicates idempotently leaves one accepted effect. A handler without that protection charges, ships, or notifies twice.
 
 ### Reject formula-leading import values
 
-**Requirement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
+**Statement:** A CSV or spreadsheet import MUST reject or neutralize a value that begins with a formula-leading character.
 
 **Rationale:** The formula-leading characters are the equals sign, the plus sign, the minus sign, the at sign, the tab, and the carriage return. Escaping when you export protects the reader of that export. It does not protect the reader of the next export. A different report can re-export an unchanged imported value without escaping it. [CSV injection](https://owasp.org/www-community/attacks/CSV_Injection) travels through the store, so the boundary that admits the value is where it stops.
 
@@ -108,13 +108,13 @@ Order matters here. Verify the signature first, over the raw body, before parsin
 
 ### Simulate integration boundaries
 
-**Requirement:** An integration test MUST use WireMock.Net or a protocol-specific local endpoint.
+**Statement:** An integration test MUST use WireMock.Net or a protocol-specific local endpoint.
 
 **Rationale:** A live provider account makes tests slow, flaky, and expensive, and some failure modes never occur on demand. WireMock.Net or a protocol-specific local endpoint simulates the network contract under test control. The suite then covers provider behavior without calling the provider.
 
 ### Cover provider failure modes
 
-**Requirement:** An integration test MUST cover timeout, connection failure, transient response, permanent response, malformed payload, rate limit, duplicate delivery, and unexpected response shape.
+**Statement:** An integration test MUST cover timeout, connection failure, transient response, permanent response, malformed payload, rate limit, duplicate delivery, and unexpected response shape.
 
 **Rationale:** Timeout, connection failure, transient and permanent responses, malformed payloads, rate limits, duplicate delivery, and unexpected shapes each exercise a different path through retry, mapping, and idempotency. A mode without a test leaves its path unverified. The suite covers all eight so each path proves itself.
 

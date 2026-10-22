@@ -22,19 +22,19 @@ When an extension or a consumer override replaces baseline behavior, it names ev
 
 ### Apply the complete stack
 
-**Requirement:** A consumer selecting a stack MUST apply the pages in its folder, every folder above it, and their subfolders that hold no stack.
+**Statement:** A consumer selecting a stack MUST apply the pages in its folder, every folder above it, and their subfolders that hold no stack.
 
 **Rationale:** The stack is the unit of conformance: a consumer cannot claim a stack while silently omitting an applicable page. Applying the folder, every folder above it, and their stackless subfolders keeps inherited principles in force without restating them. A deeper page replaces only the provisions it names, so everything it leaves unnamed keeps applying.
 
 ### Use manifest version pins
 
-**Requirement:** A consumer MUST resolve every SDK, framework, and package version from `litespec.manifest.json`.
+**Statement:** A consumer MUST resolve every SDK, framework, and package version from `litespec.manifest.json`.
 
 **Rationale:** The manifest owns every pin, so resolving versions anywhere else produces builds the standard never described. A version copied from prose, an example, a package search, or agent memory drifts from the pin with the next edit. One resolution source keeps every consumer on the same tested combination.
 
 ### Declare replacements
 
-**Requirement:** An extension or consumer override MUST name every baseline provision ID it replaces.
+**Statement:** An extension or consumer override MUST name every baseline provision ID it replaces.
 
 **Rationale:** Naming every replaced provision ID draws the exact boundary of the change: everything unnamed stays active. Without the list, a replacement silently widens its scope with each reading, and reviewers cannot tell which baseline rules still bind the project.
 

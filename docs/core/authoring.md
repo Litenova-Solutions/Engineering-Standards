@@ -88,7 +88,7 @@ A Standard states one testable obligation:
 ```markdown
 ### Keep shared UI in one package
 
-**Requirement:** A workspace MUST hold its shared primitives and composites in one shared UI package.
+**Statement:** A workspace MUST hold its shared primitives and composites in one shared UI package.
 
 **Deviation:** Only with SHOULD or SHOULD NOT: the bounded reason that permits a departure.
 
@@ -160,7 +160,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Keep authored prose ASCII-safe
 
-**Requirement:** Authored prose MUST contain only ASCII unless code, data, or mathematical content requires another character.
+**Statement:** Authored prose MUST contain only ASCII unless code, data, or mathematical content requires another character.
 
 **Rationale:** Non-ASCII characters break in terminals, diffs, generated context, and plain-text tools: a curly quote becomes unreadable in one reader and a silent mismatch in another. ASCII prose renders the same everywhere the standard is read or checked.
 
@@ -168,25 +168,25 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Exclude declared content paths from the ASCII check
 
-**Requirement:** An ASCII check MUST exclude only the natural-language content paths that the project record declares.
+**Statement:** An ASCII check MUST exclude only the natural-language content paths that the project record declares.
 
 **Rationale:** A product whose subject is another language carries that language in its content files, where a diacritic is part of a word rather than a styling choice. Excluding only the declared content paths keeps the check strict everywhere else: documents about that content stay in scope, so authors cannot file styled prose beside content to slip it past the check.
 
 ### Use one normative vocabulary
 
-**Requirement:** A Standards provision MUST use exactly one approved capitalized modal and no other capitalized normative term.
+**Statement:** A Standards provision MUST use exactly one approved capitalized modal and no other capitalized normative term.
 
 **Rationale:** Strength words work only when each one means exactly one thing. The provision contract defines the approved modals with their RFC meaning, so a reader never guesses whether a word obliges or suggests, and no second capitalized term sneaks in a different shade of obligation.
 
 ### Use one term for one concept
 
-**Requirement:** Authored prose MUST name each concept with its one glossary term.
+**Statement:** Authored prose MUST name each concept with its one glossary term.
 
 **Rationale:** A second name for one concept reads as a second concept: the reader hunts for a distinction the writer never meant. One term per concept means each term is defined once and checked once.
 
 ### Record the project vocabulary as data
 
-**Requirement:** A consumer MUST record each term, its rejected synonyms, the scope of each rejection, and its mannered terms in a language record satisfying `schemas/language.schema.json`.
+**Statement:** A consumer MUST record each term, its rejected synonyms, the scope of each rejection, and its mannered terms in a language record satisfying `schemas/language.schema.json`.
 
 **Rationale:** A glossary column headed "Avoid" speaks to a reader and to nothing else: no tool can check it. A rule held as data reaches the reader and the validator alike, so the same rejection appears in prose guidance and in diagnostics.
 
@@ -199,13 +199,13 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Reject a recorded synonym inside its scope
 
-**Requirement:** Authored prose MUST NOT use a synonym that the project language record rejects for the scope the page sits in.
+**Statement:** Authored prose MUST NOT use a synonym that the project language record rejects for the scope the page sits in.
 
 **Rationale:** Term drift is invisible one page at a time and plain across a module: each page looks fine while the project slowly speaks two languages. The expensive case is a synonym that is a defined term elsewhere, because one word then names two things and every reader guesses which one.
 
 ### Check the vocabulary on every surface a reader meets
 
-**Requirement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
+**Statement:** A consumer MUST name every non-Markdown surface its vocabulary reaches in `paths.languageScan`, including source, interface copy, the API contract, and acceptance tests.
 
 **Rationale:** Documentation is often the smallest surface a reader meets; names in code, interface copy, contracts, and tests carry the vocabulary further. A rejection that stops at prose lets `ClientOrderId` breach a rejection of `client` where readers meet it most. A pattern that matches no file fails, so a surface cannot go unread unnoticed.
 
@@ -217,7 +217,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Exclude the compound that names another concept
 
-**Requirement:** A language record MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
+**Statement:** A language record MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
 
 **Rationale:** A rejection matches a word, and a word can belong to more than one term: Expenses rejects `docket` in favor of `receipt` for payment proof while a docket still names the shipping list. Without the `except` list, the check would force the project to rename an unrelated concept or drop a sound rejection.
 
@@ -230,25 +230,25 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Exclude generated regions from prose checks
 
-**Requirement:** An authoring check MUST skip every generated region.
+**Statement:** An authoring check MUST skip every generated region.
 
 **Rationale:** A generated region holds tool output that no author wrote and no author can fix by editing the page. Checking it would fail pages for words outside author control and train writers to ignore diagnostics.
 
 ### Use controlled capitalization
 
-**Requirement:** A page MUST use Title Case for its title and sentence case for every other heading.
+**Statement:** A page MUST use Title Case for its title and sentence case for every other heading.
 
 **Rationale:** Titles read as names in indexes, tabs, and search results, while sentence-case headings read as statements within the page. One rule for each keeps every page scannable the same way. Code names, product names, and layer names keep their own capitalization, since renaming them would break references.
 
 ### Use the declared page contract
 
-**Requirement:** An authored page MUST use the sections, in order, of its page style.
+**Statement:** An authored page MUST use the sections, in order, of its page style.
 
 **Rationale:** A fixed shape puts the authority, the context, the defaults, and the evidence in the same place on every page. Readers learn the shape once, and tools find each section without guessing. A page that invents its own order sends both searching.
 
 ### Route the reader before listing pages
 
-**Requirement:** A documentation root index MUST state which page style answers which reader question before its first navigation group.
+**Statement:** A documentation root index MUST state which page style answers which reader question before its first navigation group.
 
 **Rationale:** A reader who cannot tell a tutorial from a reference opens both and trusts neither. Naming each style in the reader's terms before the first navigation group sends each question to the page that answers it.
 
@@ -256,7 +256,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Name the tool rather than the mechanism
 
-**Requirement:** A tutorial step or how-to step MUST name the repository command that performs it, where one exists.
+**Statement:** A tutorial step or how-to step MUST name the repository command that performs it, where one exists.
 
 **Rationale:** A procedure that lists what a command already does becomes a second copy of that command's behavior. The copy drifts from the tool, and readers follow stale steps. Naming the repository command delegates the steps to the thing that performs them.
 
@@ -264,13 +264,13 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### State one layer per page
 
-**Requirement:** A page MUST NOT describe both a command and the mechanism that command runs, outside an `Underneath` section.
+**Statement:** A page MUST NOT describe both a command and the mechanism that command runs, outside an `Underneath` section.
 
 **Rationale:** A reader who wanted the command reads mechanism detail as noise, and a reader who wanted the mechanism reads the command wrapper as an obstacle. One layer per page serves each reader, and the `Underneath` section holds the mechanism for the reader who asks for it.
 
 ### Name the escape from every abstraction
 
-**Requirement:** A command page MUST state under `Underneath` what the command runs, or that nothing beneath it is separately runnable.
+**Statement:** A command page MUST state under `Underneath` what the command runs, or that nothing beneath it is separately runnable.
 
 **Rationale:** A wrapper nobody can see through cannot be debugged when it fails: the reader has no command to run by hand and no layer to inspect. Stating what the command runs, or that nothing beneath it is separately runnable, gives every failure a next step.
 
@@ -278,13 +278,13 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Record a setting as reference
 
-**Requirement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
+**Statement:** A configuration setting a reader can change MUST appear on a configuration page with its default, its scope, and what overrides it.
 
 **Rationale:** A setting introduced inside a procedure is found only by the reader who already knows which procedure mentioned it. A configuration page with the default, scope, and overrides puts every setting where a reader looks it up.
 
 ### Write atomic Standards provisions
 
-**Requirement:** A Standards provision MUST follow the Standard contract this page defines.
+**Statement:** A Standards provision MUST follow the Standard contract this page defines.
 
 **Rationale:** One provision with one obligation has one authority, one identifier, and one verification row. A provision that bundles two obligations leaves a project half-compliant with no identifier for the half it missed.
 
@@ -292,19 +292,19 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Identify actionable conventions
 
-**Requirement:** A Convention provision MUST follow the Convention contract this page defines.
+**Statement:** A Convention provision MUST follow the Convention contract this page defines.
 
 **Rationale:** A Convention heading under `## Conventions` makes each replaceable default traceable: a project cites exactly the default it replaces. Without the contract, defaults hide in prose and replacements cite paragraphs instead of identifiers.
 
 ### Attach examples to their provisions
 
-**Requirement:** An informative example MUST belong to its provision or to a Reference example that names every provision it demonstrates.
+**Statement:** An informative example MUST belong to its provision or to a Reference example that names every provision it demonstrates.
 
 **Rationale:** An example floating free of its provision reads as a second rule: readers obey the illustration instead of the obligation. Belonging to its provision, or to a Reference example that names every provision it demonstrates, marks it as illustration.
 
 ### Use the declared identifier grammar
 
-**Requirement:** A provision ID MUST be `litespec/<page>#<slug>`, computed from its page path and its heading.
+**Statement:** A provision ID MUST be `litespec/<page>#<slug>`, computed from its page path and its heading.
 
 **Rationale:** The page names the file and the slug names the heading, so a citation resolves with no lookup table. One grammar for every identifier keeps citations writable by hand and checkable by tool.
 
@@ -312,7 +312,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Name the owning page in the identifier
 
-**Requirement:** A provision ID's page segment MUST be its page's path under `docs/` without the `.md` extension.
+**Statement:** A provision ID's page segment MUST be its page's path under `docs/` without the `.md` extension.
 
 **Rationale:** The page segment is the file a reader opens and the address the provision carries on the published site. Deriving it from the path keeps the identifier and the file from disagreeing.
 
@@ -320,37 +320,37 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Keep identifiers out of provision headings
 
-**Requirement:** A provision heading MUST carry no identifier text.
+**Statement:** A provision heading MUST carry no identifier text.
 
 **Rationale:** The page path and the heading already state the identifier. An identifier written into the heading repeats it at best and contradicts it at worst, after a rename touches one and misses the other.
 
 ### Exclude a sequence number from the identifier
 
-**Requirement:** A provision ID MUST NOT contain a sequence number.
+**Statement:** A provision ID MUST NOT contain a sequence number.
 
 **Rationale:** A counter orders a provision among its siblings and says nothing about what it requires. Words name the obligation; numbers would renumber every sibling on each insertion and break citations for no gain.
 
 ### Map provisions to evidence
 
-**Requirement:** A page that owns provisions MUST give every provision one row in its Verification table.
+**Statement:** A page that owns provisions MUST give every provision one row in its Verification table.
 
 **Rationale:** A provision with no verification row is a rule nobody checks: people assume a tool covers it while no tool was told. One row per provision makes each rule reviewable by a person or a tool.
 
 ### Mark every provision checkable or guidance
 
-**Requirement:** A Verification row MUST mark its provision `checkable` or `guidance`.
+**Statement:** A Verification row MUST mark its provision `checkable` or `guidance`.
 
 **Rationale:** The mark tells a reader who judges the provision: a tool or a person. Without it, a team automates a judgment call or hand-reviews what a command already proves.
 
 ### Regenerate the provision index
 
-**Requirement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `litespec provisions`.
+**Statement:** A standards change MUST leave `docs/reference/provisions.md` equal to the output of `litespec provisions`.
 
 **Rationale:** One generated page resolves every identifier to its heading and page, so a reader follows a citation in one step. Regenerating it with `litespec provisions` on every standards change keeps the index and the pages from disagreeing.
 
 ### Declare structured specification metadata
 
-**Requirement:** A consumer page MUST open with a specification metadata block satisfying the record schema for its declared type.
+**Statement:** A consumer page MUST open with a specification metadata block satisfying the record schema for its declared type.
 
 **Rationale:** The record schema owns the field list of every record type and page style. The block is one JSON object between two lines that hold only `---`, which people read as a header and tools parse as data. The [model page](model.md) states the record types and their homes.
 
@@ -370,19 +370,19 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Use one metadata carrier
 
-**Requirement:** A consumer page MUST use its opening specification metadata block as its only metadata carrier.
+**Statement:** A consumer page MUST use its opening specification metadata block as its only metadata carrier.
 
 **Rationale:** Two metadata carriers on one page disagree sooner or later: source links, paths, and evidence drift between the header and the body. One opening block keeps metadata in one place, while the body sections carry the links, paths, and evidence beside what they describe.
 
 ### Classify every specification file
 
-**Requirement:** Every Markdown file under the consumer documentation root MUST declare a record type or page style, or sit under a declared unstructured path.
+**Statement:** Every Markdown file under the consumer documentation root MUST declare a record type or page style, or sit under a declared unstructured path.
 
 **Rationale:** A file the validator cannot classify is skipped, and a skipped file looks sound: its errors never surface. Requiring every file to declare a type or sit under a declared unstructured path leaves no page unchecked. A directory index that owns no record uses the index style.
 
 ### Derive a computed fact instead of restating it
 
-**Requirement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
+**Statement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
 
 **Rationale:** A restated number is right until the next unrelated commit changes the code it counts, and nothing reports when it goes stale. Naming the source or the command gives every reader the current figure instead of the figure from commit day.
 
@@ -396,43 +396,43 @@ Every command declares an audit position. To count the declarations:
 
 ### Run repeatable authoring checks
 
-**Requirement:** A standards change MUST pass the repository validator, the test suite, and `git diff --check`.
+**Statement:** A standards change MUST pass the repository validator, the test suite, and `git diff --check`.
 
 **Rationale:** The repository validator, the test suite, and `git diff --check` each catch what the others miss: structure, behavior, and whitespace. Passing all three on every standards change keeps the standard checkable by anyone who runs the same commands. The change report lists every skipped check with its reason. The [command index](../tools/README.md) names each check and its command.
 
 ### Validate current standards material
 
-**Requirement:** The standards validator MUST evaluate only current standards material.
+**Statement:** The standards validator MUST evaluate only current standards material.
 
 **Rationale:** Each pinned release is a complete snapshot, so the validator judges the working tree alone. Reading history would let a provision pass on the strength of a release nobody pinned. Git history and the changelog give release context to readers outside validation.
 
 ### Exclude historical transition material
 
-**Requirement:** Current standards material MUST NOT contain history-specific paths, IDs, terms, aliases, replacement maps, release migration material, compatibility rules, or transition checks.
+**Statement:** Current standards material MUST NOT contain history-specific paths, IDs, terms, aliases, replacement maps, release migration material, compatibility rules, or transition checks.
 
 **Rationale:** A snapshot that carries aliases, maps, migration notes, or transition checks for other releases forces every reader to learn releases they did not pin. The published snapshot states its own contract and nothing else. An extension's `Baseline relationship` section names a provision it replaces inside this release, which is a current replacement rather than history.
 
 ### Publish each release as a complete contract
 
-**Requirement:** A LiteSpec release MUST state every active provision without depending on an earlier release.
+**Statement:** A LiteSpec release MUST state every active provision without depending on an earlier release.
 
 **Rationale:** A consumer pins one snapshot and reads it as the whole obligation. Depending on another release would force the consumer to pin and read two contracts to know either. Stating every active provision in each release keeps one snapshot sufficient.
 
 ### Exclude cross-release compatibility work
 
-**Requirement:** The LiteSpec repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
+**Statement:** The LiteSpec repository MUST NOT publish a compatibility guarantee, migration path, deprecation period, or identifier alias between its own releases.
 
 **Rationale:** LiteSpec is a pinned contract, not a running service: consumers adopt a release whole, on their own schedule. Compatibility guarantees, migration paths, deprecation periods, and identifier aliases between LiteSpec releases would promise a continuity the model does not offer. A consumer product keeps its own API compatibility, migration, deprecation, and rollback provisions for its own users.
 
 ### Keep a pinned release for as long as it serves
 
-**Requirement:** A consumer MAY keep any published LiteSpec release for as long as it chooses.
+**Statement:** A consumer MAY keep any published LiteSpec release for as long as it chooses.
 
 **Rationale:** Adoption is the consumer's decision. If a repository change could oblige a move, every LiteSpec edit would become a deadline for every consumer. Keeping any published release for as long as it serves decouples the consumer's schedule from the standard's.
 
 ### Record the reviewed LiteSpec release
 
-**Requirement:** A consumer MUST record the LiteSpec release it adopts in `reviewedLiteSpecVersion` within `litespec.project.json`.
+**Statement:** A consumer MUST record the LiteSpec release it adopts in `reviewedLiteSpecVersion` within `litespec.project.json`.
 
 **Rationale:** A provision can gain force while keeping its ID, so an Exception written against one release could otherwise apply to a rule nobody reread. Recording the adopted release in `reviewedLiteSpecVersion` makes adoption an explicit act and tells every reader which contract the project reviewed.
 

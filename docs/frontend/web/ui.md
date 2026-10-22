@@ -31,19 +31,19 @@ The browser suite discovers its routes from the generated route tree rather than
 
 ### Pin the baseline in the shared package
 
-**Requirement:** A workspace MUST install the pinned baseline from `litespec.manifest.json` once, into its shared UI package, using the `uiBaseline` or `uiBaselineSvelte` entry.
+**Statement:** A workspace MUST install the pinned baseline from `litespec.manifest.json` once, into its shared UI package, using the `uiBaseline` or `uiBaselineSvelte` entry.
 
 **Rationale:** Installing the pinned baseline once into the shared UI package keeps every application on the same source: the CLI's configuration, the registry source, the token stylesheet, and the source lock beside them. Installing per application made one copy each, and drift in any copy was invisible because every copy compiled. An additional registry is permitted only under an exception recorded against this provision, so the departure stays visible. This realizes litespec/frontend/ui#pin-the-baseline-in-the-shared-package.
 
 ### Publish one registry item per floorplan
 
-**Requirement:** The shared package MUST publish a registry whose build exits zero and which lists one item per floorplan the design contract declares.
+**Statement:** The shared package MUST publish a registry whose build exits zero and which lists one item per floorplan the design contract declares.
 
 **Rationale:** Without an installable page for each floorplan, an author invents a page from primitives and the next author invents another. One registry item per floorplan the design contract declares gives every page type a reference the author installs before writing. A registry build that exits zero proves every item still builds.
 
 ### Compose each route from one floorplan
 
-**Requirement:** A route MUST render exactly one floorplan from the declared set, unless it is a recorded freestyle route.
+**Statement:** A route MUST render exactly one floorplan from the declared set, unless it is a recorded freestyle route.
 
 **Rationale:** The floorplan fixes the layout, the heading position, and the slots, so a reviewer reads which floorplan a route composes and knows the page's shape. The slots take domain values: the business record state, the use cases that state permits, and the refusal results of the called use case. Exactly one floorplan per route keeps layout decisions out of route code; a recorded freestyle route is the visible exception. This realizes litespec/frontend/ui#compose-each-route-from-one-floorplan.
 
@@ -82,43 +82,43 @@ Svelte:
 
 ### Keep layout inside floorplans
 
-**Requirement:** Route code MUST NOT carry a layout utility such as `grid`, `flex`, `gap-*`, `space-*`, or `col-span-*`.
+**Statement:** Route code MUST NOT carry a layout utility such as `grid`, `flex`, `gap-*`, `space-*`, or `col-span-*`.
 
 **Rationale:** A layout utility in a route file is a second layout beside the floorplan's, and the next route copies it instead of the floorplan. With layout owned by floorplan and display composites, one change reaches every route composing them. Route code carries no `grid`, `flex`, `gap-*`, `space-*`, or `col-span-*`. This realizes litespec/frontend/ui#keep-layout-inside-floorplans.
 
 ### Derive each page type from a named reference
 
-**Requirement:** Every route MUST carry a `data-registry-item` attribute naming its page type's registry item, with a freestyle route carrying no attribute and naming its decision record.
+**Statement:** Every route MUST carry a `data-registry-item` attribute naming its page type's registry item, with a freestyle route carrying no attribute and naming its decision record.
 
 **Rationale:** An author with no named reference invents a page from primitives, and the next author invents another. The `data-registry-item` attribute naming the page type's registry item keeps every page of one type on one reference, and a test resolves it. A freestyle route carries no attribute and names its decision record instead, so the exception is explicit. This realizes litespec/frontend/ui#derive-each-page-type-from-a-named-reference.
 
 ### Select a tone from the closed set
 
-**Requirement:** A state indicator MUST take one tone from the closed set, each application declaring its state-to-tone mapping once as an exhaustive table of language terms.
+**Statement:** A state indicator MUST take one tone from the closed set, each application declaring its state-to-tone mapping once as an exhaustive table of language terms.
 
 **Rationale:** A page that picks its own color picks a meaning nobody agreed to, and the same state reads differently on every screen. One state-to-tone mapping per application, declared once as an exhaustive table of language terms, keeps every screen consistent and makes a new state fail to compile until its tone and its word exist. The table lives in `src/app/states.tsx` on React and `src/lib/app/states.ts` on Svelte. This realizes litespec/frontend/ui#select-a-tone-from-the-closed-set.
 
 ### Keep tokens in one stylesheet
 
-**Requirement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal color in any stylesheet the shared package ships.
+**Statement:** An application stylesheet MUST import the shared package's token stylesheet and declare no rule, with no literal color in any stylesheet the shared package ships.
 
 **Rationale:** One token stylesheet makes two applications look like one product. Each application stylesheet imports it and declares no rule, so no application invents a value the tokens have no opinion about. A stylesheet the shared package ships beside the token sheet declares no literal color, so every color resolves through the tokens. This realizes litespec/frontend/ui#keep-tokens-in-one-definition.
 
 ### Hold the declared base color
 
-**Requirement:** A token stylesheet MUST carry the values the manifest baseline `baseColor` ramp publishes, and no value outside them except under a recorded exception.
+**Statement:** A token stylesheet MUST carry the values the manifest baseline `baseColor` ramp publishes, and no value outside them except under a recorded exception.
 
 **Rationale:** A token value outside the published `baseColor` ramp is a second palette beside the declared one, and the next author copies it. Holding the ramp keeps the whole product on one palette. A recorded exception keeps a deliberate departure visible in the design contract instead of hidden in the stylesheet. This realizes litespec/frontend/ui#hold-the-declared-base-color.
 
 ### Check every route in a browser
 
-**Requirement:** Every route MUST pass each route suite check in a browser.
+**Statement:** Every route MUST pass each route suite check in a browser.
 
 **Rationale:** The Concepts section names the checks: floorplan, registry reference, axe WCAG 2.2 AA, heading, landmark, reflow, text spacing, keyboard use, target size, and status announcements. One suite visits every route the tree discovers, so a new route is checked without anyone writing a specification for it. A route outside the suite can ship any defect on the list with no error. This realizes litespec/frontend/ui#check-every-route.
 
 ### Prove every result a route calls
 
-**Requirement:** Every result a called use case returns MUST be proved by a passing test or a known-gap record with owner and end date.
+**Statement:** Every result a called use case returns MUST be proved by a passing test or a known-gap record with owner and end date.
 
 **Rationale:** A refusal the reader can reach and no test provokes is a refusal nobody has seen render. The calls come from the route code, so the obligation follows the code: every result a called use case returns is proved by a passing test or named by a known-gap record with owner and end date. This realizes litespec/frontend/ui#prove-every-result-a-route-calls.
 
@@ -132,19 +132,19 @@ test('shows the changed total before payment', async ({ page }) => {
 
 ### Restrict CSS decisions
 
-**Requirement:** A Tailwind class MUST use a semantic token rather than an arbitrary value, a raw palette value, or an important modifier.
+**Statement:** A Tailwind class MUST use a semantic token rather than an arbitrary value, a raw palette value, or an important modifier.
 
 **Rationale:** Semantic tokens keep every class inside the governed palette, spacing, and type scales. An arbitrary value, a raw palette value, or an important modifier steps outside them: the value answers to no token and survives every restyle. The approved CSS surface is the shared package's stylesheet, holding the Tailwind import, the tokens, the fonts, and the documented resets. The source scan skips build output and reports authored feature CSS. This realizes litespec/frontend/ui#restrict-styling-to-semantic-tokens.
 
 ### Track source changes
 
-**Requirement:** The shared package's source lock MUST record the pinned CLI, the registry address, the paths, the normalized digest, and the dependencies for each primitive.
+**Statement:** The shared package's source lock MUST record the pinned CLI, the registry address, the paths, the normalized digest, and the dependencies for each primitive.
 
 **Rationale:** The source lock records the pinned CLI, the registry address, the paths, the normalized digest, and the dependencies for each primitive. Normalizing source before hashing lets two workspaces compute the same digest for identical source. One lock beside one copy is what makes a changed primitive report a fork instead of passing unreported.
 
 ### Prove UI behavior and appearance
 
-**Requirement:** A primitive, composite, token, source, floorplan, or route change MUST name the evidence in the matrix in this section.
+**Statement:** A primitive, composite, token, source, floorplan, or route change MUST name the evidence in the matrix in this section.
 
 **Rationale:** Each change class carries different risk, and the matrix names the narrowest evidence that covers it: no more than needed, no less. A change that names no evidence is reviewed by gut feeling, which misses exactly the regressions the matrix lists. This realizes litespec/frontend/ui#prove-ui-behavior-and-appearance.
 

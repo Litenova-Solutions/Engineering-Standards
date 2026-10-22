@@ -22,79 +22,79 @@ It switches on no record type: tenant scope applies to records every project req
 
 ### Record the tenant adoption decision
 
-**Requirement:** A consumer selecting `tenancy` MUST record a Decision naming tenant source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound.
+**Statement:** A consumer selecting `tenancy` MUST record a Decision naming tenant source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound.
 
 **Rationale:** Tenant source, storage model, isolation guarantee, administrative access, and evolution path interact across every boundary, so one Decision records them together before code assumes any of them. Approval waits while that Decision stays a draft, and the enumeration bound caps how many tenant identifiers an all-tenant record lists.
 
 ### Define tenant isolation
 
-**Requirement:** A multi-tenant decision MUST define shared-table, schema, or database isolation and state its guarantee and operating trade-off.
+**Statement:** A multi-tenant decision MUST define shared-table, schema, or database isolation and state its guarantee and operating trade-off.
 
 **Rationale:** Shared tables, separate schemas, and separate databases isolate differently and operate differently: each choice moves work between queries, migrations, backups, and scaling. Naming the model with its guarantee and its operating trade-off tells every later choice which isolation it can rely on.
 
 ### Avoid unplanned isolation models
 
-**Requirement:** A multi-tenant system MUST NOT mix isolation models without a decision and data evolution plan.
+**Statement:** A multi-tenant system MUST NOT mix isolation models without a decision and data evolution plan.
 
 **Rationale:** One part of the product on shared tables and another on separate databases answers which rows each tenant sees two ways. Each mixed model needs its own decision with a data evolution plan, or backup, restore, and incident response each guess which guarantee covers which data.
 
 ### Resolve tenant identity from trusted context
 
-**Requirement:** A trusted host boundary MUST resolve tenant identity from verified claims, host mapping, or another authenticated source.
+**Statement:** A trusted host boundary MUST resolve tenant identity from verified claims, host mapping, or another authenticated source.
 
 **Rationale:** The tenant decides which data the request may touch, so only a trusted host boundary resolves it: verified claims, host mapping, or another authenticated source. An identity the caller supplies itself is a choice, not a fact.
 
 ### Reject unrestricted tenant input
 
-**Requirement:** A tenant resolver MUST NOT accept an unrestricted tenant ID from request data.
+**Statement:** A tenant resolver MUST NOT accept an unrestricted tenant ID from request data.
 
 **Rationale:** A tenant ID taken straight from request data lets any caller name any tenant. Rejecting unrestricted input keeps the request from choosing a data boundary outside its authenticated context.
 
 ### Verify actor and target tenancy
 
-**Requirement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
+**Statement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed Permission held at the resolved scope and the target belonging to it.
 
 **Rationale:** Checking the caller alone leaves the target unchecked: an authorized caller can still name a resource from another tenant. The operation confirms both sides through one chain: the actor holds a role at the resolved scope, the role allows the permission, the use case needs that permission, and the target belongs to the same scope.
 
 ### Isolate administrative cross-tenant access
 
-**Requirement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, writing an audit record.
+**Statement:** An administrative cross-tenant operation MUST require a Permission the actor holds through a Role at platform scope, writing an audit record.
 
 **Rationale:** Support and operations sometimes reach across tenants, and that exceptional reach needs exceptional control: a permission held through a role at platform scope, with an audit record for every use. Without both, one support login becomes an unscoped key to every customer's data.
 
 ### Use selected tenant storage support
 
-**Requirement:** A multi-tenant persistence implementation MUST resolve its tenant at session creation through the selected provider's own tenancy support.
+**Statement:** A multi-tenant persistence implementation MUST resolve its tenant at session creation through the selected provider's own tenancy support.
 
 **Rationale:** Session creation is the point that matters: a session opened without a tenant serves an unscoped next query. Resolving the tenant then, through the selected provider's own tenancy support, scopes every query the session runs, so no query carries the concern alone. Adding the filter per query instead leaves every new query one omission away from reading across tenants. The baseline provider resolves the tenant from the registered tenancy at session creation; an Entity Framework Core implementation resolves it when the context is created and applies it through a query filter convention.
 
 ### Scope tenant-owned records
 
-**Requirement:** Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path MUST include tenant scope.
+**Statement:** Every tenant-owned document, query, unique constraint, cache key, outbox record, job, export, and object-storage path MUST include tenant scope.
 
 **Rationale:** Documents, queries, unique constraints, cache keys, outbox records, jobs, exports, and object-storage paths each form a boundary where tenants meet. Leaving tenant scope out of any one of them discloses or mixes customer data through exactly that gap.
 
 ### Apply cross-tenant disclosure policy
 
-**Requirement:** A cross-tenant resource response MUST use the documented not-found or forbidden policy.
+**Statement:** A cross-tenant resource response MUST use the documented not-found or forbidden policy.
 
 **Rationale:** A caller that names another tenant's resource forces an answer: pretend it does not exist, or admit it exists and refuse. The product documents one policy and applies it to every cross-tenant response, so callers cannot probe for resources through inconsistent answers.
 
 ### Protect tenant diagnostics
 
-**Requirement:** Errors, logs, metrics, and traces MUST NOT reveal another tenant's business identifiers or data.
+**Statement:** Errors, logs, metrics, and traces MUST NOT reveal another tenant's business identifiers or data.
 
 **Rationale:** Errors, logs, metrics, and traces travel to readers the API never authorized: support screens, dashboards, and log stores shared across tenants. Scrubbing other tenants' identifiers and data from diagnostics keeps the disclosure policy whole past the API boundary.
 
 ### Scope tenant operations
 
-**Requirement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
+**Statement:** Backup, restore, replay, deletion, export, support access, and incident investigation MUST document one-tenant or all-tenant scope.
 
 **Rationale:** Backup, restore, replay, deletion, export, support access, and incident investigation each touch more data than one normal request. Documenting each as one-tenant or all-tenant tells the operator how much data the run touches before it starts.
 
 ### Record an all-tenant operation
 
-**Requirement:** An all-tenant operation MUST record actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound.
+**Statement:** An all-tenant operation MUST record actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound.
 
 **Rationale:** A documented scope states what an operation may touch, not what one run touched, and the run is what a tenant asks about after an incident. An all-tenant run is also the one case where no single tenant's audit trail holds the whole event. [The OWASP logging guidance](https://owasp.org/www-project-cheat-sheets/cheatsheets/Logging_Cheat_Sheet) treats an administrative action over many subjects as one event to record: actor, operation, reason, tenant count, and reached tenant identifiers up to the adoption Decision bound. When the audit extension is selected, the record is an audit record; otherwise it stays a standalone record.
 

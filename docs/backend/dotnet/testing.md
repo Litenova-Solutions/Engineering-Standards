@@ -18,7 +18,7 @@ Each Case is proved by a test that carries a `proves` tag naming the Case and ca
 
 ### Keep the test projects the size requires
 
-**Requirement:** A backend solution MUST hold exactly the test projects its size requires: Architecture and Integration for small, adding Acceptance for large.
+**Statement:** A backend solution MUST hold exactly the test projects its size requires: Architecture and Integration for small, adding Acceptance for large.
 
 **Rationale:** The required suites match the size: Architecture and Integration for small, adding Acceptance for large. Unit test projects stay optional in both sizes, and Acceptance stays optional for small. An Acceptance project without the executable BDD extension is an unnamed baseline project: select the extension, or name the project for what it actually is. This provision states the .NET form of `litespec/backend/testing#keep-the-test-suites-the-size-requires`.
 
@@ -34,19 +34,19 @@ A small solution holds the first two; Acceptance appears when the executable BDD
 
 ### Test HTTP integration through the real host
 
-**Requirement:** An HTTP integration test MUST run through `WebApplicationFactory` with the real configuration, covering Problem Details, authentication, and resource authorization.
+**Statement:** An HTTP integration test MUST run through `WebApplicationFactory` with the real configuration, covering Problem Details, authentication, and resource authorization.
 
 **Rationale:** A test host with substituted configuration proves the substitutes, not the product. Running through `WebApplicationFactory` with the real configuration, and covering Problem Details, authentication, and resource authorization, exercises the boundary clients actually call. Persistence behavior against PostgreSQL is covered by `litespec/backend/persistence#test-persistence-against-postgresql`; both run on the harness that `litespec/backend/dotnet/testing#use-one-production-faithful-integration-harness` owns. This provision states the .NET form of `litespec/backend/testing#test-http-integration-through-the-real-application-host`.
 
 ### Enforce architecture rules
 
-**Requirement:** An architecture test MUST assert the structural boundaries that `litespec/backend/architecture#test-structural-boundaries` names, running in the Release test pass.
+**Statement:** An architecture test MUST assert the structural boundaries that `litespec/backend/architecture#test-structural-boundaries` names, running in the Release test pass.
 
 **Rationale:** Layer references, visibility, and folder placement are boundaries the compiler does not enforce, so a review miss lands in the main branch and every later change copies it. Architecture tests assert the boundaries that `litespec/backend/architecture#test-structural-boundaries` names, and run in the Release test pass. This provision states the .NET form of `litespec/backend/testing#assert-architecture-boundaries-with-tests`.
 
 ### Prove each Case with a test that calls its use case
 
-**Requirement:** Each Case MUST be proved by a test carrying one `/// <proves>case/<use-case>.<name></proves>` tag and calling its use case.
+**Statement:** Each Case MUST be proved by a test carrying one `/// <proves>case/<use-case>.<name></proves>` tag and calling its use case.
 
 **Rationale:** The `proves` tag is the claim that ties a test to its Case, and the model builder confirms it: an acceptance scenario is confirmed when its When step belongs to the use case steps class, and an integration test when its body names the use case message type. The test calls the use case and asserts its result, and for a refusal the Result code. A Case no test proves is recorded as a Known gap with owner and end date.
 
@@ -60,7 +60,7 @@ A test carries no coverage tag; the `proves` tag is its only record citation. Th
 
 ### Use one production-faithful integration harness
 
-**Requirement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one database isolation helper, either a `DatabaseReset` or a template database clone.
+**Statement:** The integration project MUST own one PostgreSQL container fixture, one `ApiFactory`, and one database isolation helper, either a `DatabaseReset` or a template database clone.
 
 **Rationale:** The fixture starts the pinned PostgreSQL once per test run as an xUnit v3 assembly fixture, and supplies each class its connection string before the host builds, so every test sees the same configuration. A container per test class multiplies run time by the class count while adding no isolation a cloned database lacks. "One harness" binds the integration project: an activated BDD extension brings its own host for the acceptance project, because the two projects run different lifetimes, and that host reuses this fixture's container and reset helper rather than starting another database. This provision states the .NET form of `litespec/backend/testing#share-one-production-faithful-integration-harness`.
 

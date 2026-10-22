@@ -18,13 +18,13 @@ A validator checks structural input, such as an empty title or a malformed ident
 
 ### Report input problems as Validity
 
-**Requirement:** A validator MUST report its findings as Validity, with each ValidationFailure carrying a member, a code, and a message, and no HTTP status.
+**Statement:** A validator MUST report its findings as Validity, with each ValidationFailure carrying a member, a code, and a message, and no HTTP status.
 
 **Rationale:** Every validator for a message runs, and the pipeline merges the findings before it refuses the request, so the caller fixes the whole form at once. The member tells the caller which input failed, the stable code lets a client branch on the reason, and the message explains the problem in words safe to show. Validity values come from the pinned mediator's abstractions, named in `litespec/backend/dotnet/application#use-the-pinned-mediator-entry-points`, so every project reports the same shape. This provision states the .NET form of `litespec/backend/application#report-input-problems-as-validity-findings`.
 
 ### Keep one state-changing Use case in one Command pipeline
 
-**Requirement:** A command handler MUST NOT dispatch another command through `ICommandMediator`.
+**Statement:** A command handler MUST NOT dispatch another command through `ICommandMediator`.
 
 **Rationale:** When a handler dispatches a second command through `ICommandMediator`, the inner pipeline can commit before the outer use case finishes, and a later failure in the outer use case then leaves committed work behind. A top-level handler coordinates several aggregates directly instead, when an approved record names the invariant that requires one transaction.
 

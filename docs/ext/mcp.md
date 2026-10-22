@@ -22,7 +22,7 @@ This extension switches on no record type. Authentication, authorization, and pe
 
 ### Pass server instructions at initialize
 
-**Requirement:** An MCP server MUST pass an `instructions` value at initialize stating its transport, its audience, its write surface, and its refusal behavior.
+**Statement:** An MCP server MUST pass an `instructions` value at initialize stating its transport, its audience, its write surface, and its refusal behavior.
 
 **Rationale:** The MCP initialize response carries server instructions that the client loads once per session, while each tool description loads per call. Scope and policy therefore belong at the server level, where they hold for every call: the transport, the audience, the write surface, and the refusal behavior. Tool mechanics stay in the tool descriptions, which the model reads when it chooses a tool. Without server-level instructions, each tool repeats the policy differently or omits it, and the model plans calls the server refuses.
 
@@ -30,7 +30,7 @@ This extension switches on no record type. Authentication, authorization, and pe
 
 ### Write one tool description for one decision
 
-**Requirement:** An MCP tool MUST title its action imperatively, describe its behavior declaratively, use positive parameter polarity, and state its side effects.
+**Statement:** An MCP tool MUST title its action imperatively, describe its behavior declaratively, use positive parameter polarity, and state its side effects.
 
 **Rationale:** The [MCP specification](https://modelcontextprotocol.io/specification/2025-06-18) carries the title and description to the model, and the model plans its calls from those words. An imperative title names the action, while a declarative description states what happens instead of commanding the caller, so the server's guidance and the model's own plan do not compete. A positive boolean such as `paused` avoids the inverse polarity that a model answers wrongly, and a stated side effect answers the reviewer who asks what the call changed.
 
@@ -51,25 +51,25 @@ This extension switches on no record type. Authentication, authorization, and pe
 
 ### Scope each tool to named use cases
 
-**Requirement:** Each tool MUST name the use cases and permissions it reaches.
+**Statement:** Each tool MUST name the use cases and permissions it reaches.
 
 **Rationale:** Each tool opens product behavior to a model acting for the user, so the team names exactly which use cases and permissions each tool reaches. Without the named scope, a reviewer cannot tell whether a tool reads one account or writes across many, and a broad tool ships without the scrutiny its reach needs.
 
 ### Confirm every writing tool
 
-**Requirement:** Every tool that writes MUST refuse until the person confirms the write.
+**Statement:** Every tool that writes MUST refuse until the person confirms the write.
 
 **Rationale:** A model misreads intent the way any agent does: it can pause the wrong subscription or delete the record the user asked about. Refusing each write until the person confirms keeps the person behind every change while leaving reads fast. Without confirmation, one misunderstood sentence becomes a changed record nobody approved.
 
 ### Exclude secrets and personal data
 
-**Requirement:** Tool descriptions and logs MUST exclude secrets and personal data from every field they carry.
+**Statement:** Tool descriptions and logs MUST exclude secrets and personal data from every field they carry.
 
 **Rationale:** Tool descriptions travel to the model on every call, and logs persist for operators long after the call ends. A secret copied into either grants access to whoever reads it next, and personal data in either spreads beyond the consent that collected it. Descriptions and logs name the fields without carrying the values.
 
 ### State the distribution and update path
 
-**Requirement:** The server documentation MUST state how a user installs and updates the server.
+**Statement:** The server documentation MUST state how a user installs and updates the server.
 
 **Rationale:** The server runs on the user's machine, not on the product's servers, so no deployment pipeline updates it. Without documented install and update steps, users run stale servers with stale tool descriptions, and a security fix waits on users who never learn it exists.
 

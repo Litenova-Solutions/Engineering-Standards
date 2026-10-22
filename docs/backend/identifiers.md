@@ -65,7 +65,7 @@ Shared provisions keep their published `litespec/<page>#<slug>` form, as stated 
 
 ### Follow the identifier form of each record type
 
-**Requirement:** A record identifier MUST follow the form its type row names.
+**Statement:** A record identifier MUST follow the form its type row names.
 
 **Rationale:** A reader who meets `use-case/spending.submit-expense` knows it is a use case in the spending module without opening it. If two types shared one form, a citation would need its surrounding page to make sense, and search would return the wrong records.
 
@@ -73,7 +73,7 @@ Shared provisions keep their published `litespec/<page>#<slug>` form, as stated 
 
 ### Name records with one to six words
 
-**Requirement:** A name MUST carry one to six lowercase hyphenated words.
+**Statement:** A name MUST carry one to six lowercase hyphenated words.
 
 **Rationale:** A short hyphenated name reads aloud in review and stays stable when the record's wording changes. A long name gets shortened differently at each citation, and the shortcuts drift into competing names for one record.
 
@@ -81,19 +81,19 @@ Shared provisions keep their published `litespec/<page>#<slug>` form, as stated 
 
 ### Keep use case names unique across the project
 
-**Requirement:** A use case name MUST be unique across the project.
+**Statement:** A use case name MUST be unique across the project.
 
 **Rationale:** A result cites only its use case name, as in `result/submit-expense.receipt-missing`. If two use cases shared the name `submit-expense`, that result would point at two homes and the model check could not tell which one it proves.
 
 ### Keep business record names unique across the project
 
-**Requirement:** A business record name MUST be unique across the project.
+**Statement:** A business record name MUST be unique across the project.
 
 **Rationale:** A rule cites only its business record name, as in `rule/expense.approver-is-not-submitter`. If two records shared the name `expense`, that rule would point at two homes and a reader could not tell which record it constrains.
 
 ### Keep negation in rule names
 
-**Requirement:** A rule name MUST keep the negation its statement makes.
+**Statement:** A rule name MUST keep the negation its statement makes.
 
 **Rationale:** A rule name reads as a true sentence on its own: `rule/order.only-paid-orders-ship` states the rule. If the name dropped the negation, a reader scanning identifiers would learn the opposite of the rule.
 
@@ -101,19 +101,19 @@ Shared provisions keep their published `litespec/<page>#<slug>` form, as stated 
 
 ### Keep wire codes stable
 
-**Requirement:** A wire code MUST stay unchanged once clients read it.
+**Statement:** A wire code MUST stay unchanged once clients read it.
 
 **Rationale:** Wire codes travel to deployed clients, which branch on their exact values. Renaming a code that clients already read breaks every deployed reader that compares the old value, with no record the reader can open to learn the new one.
 
 ### Resolve every identifier citation
 
-**Requirement:** Every identifier citation MUST resolve to a written record.
+**Statement:** Every identifier citation MUST resolve to a written record.
 
 **Rationale:** A citation is a promise that a record exists at the other end. A citation that names nothing sends the reader searching for a record nobody wrote, so the model check fails it.
 
 ### Cite shared provisions in their published form
 
-**Requirement:** A shared provision citation MUST use its published identifier.
+**Statement:** A shared provision citation MUST use its published identifier.
 
 **Rationale:** A shared provision is cited across projects, so its identifier must look the same everywhere. The published `litespec/<page>#<slug>` form stays fixed, while project records use the type forms above.
 

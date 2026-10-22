@@ -8,13 +8,13 @@ The Blazor stack is the technology binding for a product that has no server of i
 
 ### Keep Blazor outside the UI contract
 
-**Requirement:** A consumer selecting this stack MUST NOT apply the controlled UI contract.
+**Statement:** A consumer selecting this stack MUST NOT apply the controlled UI contract.
 
 **Rationale:** The controlled UI contract's route checks read TypeScript sources, so they cannot read a `.razor` component. Applying them to this stack would fail every check for lack of readable input. The Blazor pages state the styling, accessibility, and state rules that apply instead, so nothing is left ungoverned.
 
 ### Publish static WebAssembly output
 
-**Requirement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
+**Statement:** A consumer MUST publish a standalone Blazor WebAssembly application to static files.
 
 **Rationale:** Standalone WebAssembly compiles to static files, which is what lets the product run with no server and offline. Blazor Server, interactive server rendering, and prerendering each reintroduce a server dependency, which removes offline operation and contradicts the `client-only` shape.
 

@@ -147,7 +147,7 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### Write every record in its home
 
-**Requirement:** A project MUST keep every record in the home its type names.
+**Statement:** A project MUST keep every record in the home its type names.
 
 **Rationale:** One home per type tells a reader where to open a record and tells the builder where to read it. A record kept anywhere else is invisible to the checks that scan its home, so it looks sound while nothing validates it.
 
@@ -155,37 +155,37 @@ Generated regions sit inside fences that only the builder writes and prose check
 
 ### State the common fields on every record
 
-**Requirement:** Every written record MUST carry its type, identifier, title, owner, and status.
+**Statement:** Every written record MUST carry its type, identifier, title, owner, and status.
 
 **Rationale:** Type, identifier, title, owner, and status are the fields every join needs. Without them on every record, the builder cannot connect decisions to requirements, cases to results, or records to owners, and the model falls apart into loose pages.
 
 ### Write links on the record that points
 
-**Requirement:** A link MUST live as fields on the record it starts from.
+**Statement:** A link MUST live as fields on the record it starts from.
 
 **Rationale:** One writing site keeps a link and its source in one edit: changing the source updates the link in the same change. Links written on the target instead would scatter each relationship across every page it touches.
 
 ### Follow the authority order
 
-**Requirement:** A conflict MUST resolve toward the higher authority.
+**Statement:** A conflict MUST resolve toward the higher authority.
 
 **Rationale:** Intent records disagree in real projects: a use case asks for behavior its rule forbids. The order settles the conflict without a meeting, with constraint over product, product over requirement, requirement over rule, and rule over use case. Decisions explain choices and research informs them, but neither outranks the ladder, so prose never silently overrides an approved record.
 
 ### Resolve ties by the later decision
 
-**Requirement:** A tie MUST resolve toward the later approved decision.
+**Statement:** A tie MUST resolve toward the later approved decision.
 
 **Rationale:** Two records at one level can disagree with no higher record to settle them. The later approved decision wins because it decided with knowledge of the earlier one. When no later decision separates them, their shared owner decides, so every tie still has exactly one judge.
 
 ### Hold approval behind draft decisions
 
-**Requirement:** A record MUST NOT stand approved behind a draft decision.
+**Statement:** A record MUST NOT stand approved behind a draft decision.
 
 **Rationale:** Approval means the reasoning behind the record already holds. A record approved behind a draft decision claims settled intent while its foundation can still move. The builder also writes each record's `effectiveStatus`: draft when the record, a decision deciding it, or a requirement it fulfills is a draft. A result or a case takes its use case's effective status.
 
 ### Record accepted gaps as known gaps
 
-**Requirement:** An accepted gap MUST live as a known gap with owner and end date.
+**Statement:** An accepted gap MUST live as a known gap with owner and end date.
 
 **Rationale:** Missing work with no owner and no date is invisible: nobody answers for it and nothing reports it. A known gap with an owner and an end date turns the same missing work into a visible promise that the checks report until the date and fail after it.
 
@@ -209,7 +209,7 @@ The `use-case-unimplemented` check reports without failing until 2027-06-01, and
 
 ### Apply guidance precedence
 
-**Requirement:** A conflict MUST resolve toward the project exception, the extension, the deeper page, or the shallower page, in that order.
+**Statement:** A conflict MUST resolve toward the project exception, the extension, the deeper page, or the shallower page, in that order.
 
 **Rationale:** A project requirement can never quietly override a shared standard; without this order it would, one page at a time. The conflict becomes an exception record instead: dated, reasoned, and reviewable. The order puts the project exception first, then the extension, then the deeper page, then the shallower page, so the most local approved decision wins.
 
@@ -233,7 +233,7 @@ The record names the standard it departs from, the reason, and the review date, 
 
 ### Authorize access through the permission chain
 
-**Requirement:** A use case MUST name the permissions it needs.
+**Statement:** A use case MUST name the permissions it needs.
 
 **Rationale:** Access decisions need one auditable path from actor to role to permission to use case. A use case that names no permission breaks the end of that chain, and nobody can answer who may run it. Entry points may then offer fewer permissions, never more.
 
@@ -241,13 +241,13 @@ The record names the standard it departs from, the reason, and the review date, 
 
 ### Express module order as depends on
 
-**Requirement:** Module order MUST live as `dependsOn` links between modules.
+**Statement:** Module order MUST live as `dependsOn` links between modules.
 
 **Rationale:** Modules depend on each other, and each dependency needs writing down. A ranked list would imply that one module outranks another, which no authority order supports. `dependsOn` links state each dependency without ranking.
 
 ### Keep one owner and status on every record
 
-**Requirement:** Every page MUST name one owner and one status.
+**Statement:** Every page MUST name one owner and one status.
 
 **Rationale:** One owner means one person answers for the page. One status means the page either awaits decision, holds, or stands replaced. Entries inherit both from their page, so a page of entries stays consistent without repeating the fields on every object.
 
@@ -259,25 +259,25 @@ The three statuses and what each allows: a draft awaits its decider, approved ho
 
 ### Retire records with replaces
 
-**Requirement:** A replacing decision MUST name the decision it replaces, and no other record type carries `replaces`.
+**Statement:** A replacing decision MUST name the decision it replaces, and no other record type carries `replaces`.
 
 **Rationale:** Only decisions keep the past: the retired decision stands beside its replacement so the reasoning stays readable. Every other record changes in place, because retired copies of rules or use cases would fork the intent readers must follow. A rename rewrites every citation in the same change, so no dangling reference survives.
 
 ### Name what every decision decides
 
-**Requirement:** Every decision that is not retired MUST name at least one record it settles in `decides`.
+**Statement:** Every decision that is not retired MUST name at least one record it settles in `decides`.
 
 **Rationale:** The draft gate and the computed effective status both follow `decides`. A decision that names nothing holds back nothing, so its approval state constrains no record and its draft gate checks nothing. Naming at least one settled record gives the decision something to govern.
 
 ### Resolve every page link
 
-**Requirement:** Every Markdown link outside code on a page under the record roots MUST point at an existing file, by its relative path.
+**Statement:** Every Markdown link outside code on a page under the record roots MUST point at an existing file, by its relative path.
 
 **Rationale:** A link that points at a moved file or a bare identifier reads as navigation and leads nowhere. Requiring every link to name an existing file by its relative path keeps the documentation clickable at every commit. Identifiers are cited in backticks instead, so the two never confuse.
 
 ### Declare size stacks and optional types
 
-**Requirement:** A project MUST declare its size, stacks, and optional types.
+**Statement:** A project MUST declare its size, stacks, and optional types.
 
 **Rationale:** Size decides which record types and test projects the checks require, while stacks decide which technology pages and checks apply. Without the declaration, the builder cannot tell a missing record from one the project never needed. Optional types switch on per project, so the declaration also names which ones this project carries.
 
@@ -285,7 +285,7 @@ The three statuses and what each allows: a draft awaits its decider, approved ho
 
 ### Give every use case its results
 
-**Requirement:** A use case MUST end in a success result and name its refusals.
+**Statement:** A use case MUST end in a success result and name its refusals.
 
 **Rationale:** Callers branch on named endings: success or a specific refusal with its code. A use case with no named success leaves callers guessing what good looks like, and cases prove one ending each, so unnamed endings stay unproven.
 
@@ -332,13 +332,13 @@ Success ends with 201, the refusal carries the failure code `failure/spending.re
 
 ### Cover every public use case from a journey
 
-**Requirement:** A public use case MUST sit in a journey or name its background caller.
+**Statement:** A public use case MUST sit in a journey or name its background caller.
 
 **Rationale:** A public operation that no journey reaches and no background caller names is either unreachable or wired up by accident. Reachability shows readers how each operation is found and gives every public use case a path from a user goal or a named caller.
 
 ### Read truth from code screens and test runs
 
-**Requirement:** Implemented and verified MUST come from the builder, never from handwriting.
+**Statement:** Implemented and verified MUST come from the builder, never from handwriting.
 
 **Rationale:** Handwritten status drifts: a record marked implemented stays marked after its handler is deleted. Computed status cannot drift, because the builder re-derives it from handlers, routes, scenarios, and test runs on every run. A use case reads implemented when its handler exists and verified when every case passes its proof.
 

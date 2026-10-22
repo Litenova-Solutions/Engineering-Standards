@@ -22,31 +22,31 @@ A closed set is a fixed menu of values where the compiler knows every case, such
 
 ### Keep Domain independent of outer layers
 
-**Requirement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
+**Statement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
 
 **Rationale:** Domain that references only the language standard library and its own types compiles and tests with no infrastructure at all. Each banned package would drag one outer concern into the business model: a serialization attribute couples a rule to a store format, a mediator couples it to dispatch. Infrastructure registers a persisted discriminator instead, so Domain carries no serialization metadata.
 
 ### Use one ubiquitous language
 
-**Requirement:** A Domain type, property, method, exception, or event name MUST match a Term record in the project language record.
+**Statement:** A Domain type, property, method, exception, or event name MUST match a Term record in the project language record.
 
 **Rationale:** When code and specification share names, a reader moves between them without translation. A business action named `Publish` in the language record is not `SetStatus` in code, because the second name hides which business action ran. The language record holds each Term meaning, labels per language, rejected words, and broader and narrower links; records cite the Terms they use, and the glossary is generated from the language record.
 
 ### Treat aggregates as consistency boundaries
 
-**Requirement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
+**Statement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
 **Rationale:** If outside code could set properties or call child mutations, it could change data without passing the root's checks. The root stands as the only public mutation entry point, so every change passes the invariant the transaction protects. A command normally changes one aggregate, and the use-case record names any immediate invariant before one command changes several.
 
 ### Take identity and events from the project root contract
 
-**Requirement:** An aggregate root MUST take its identity and event mechanics from the project-owned root contract.
+**Statement:** An aggregate root MUST take its identity and event mechanics from the project-owned root contract.
 
 **Rationale:** One root contract gives every aggregate the same identity and event mechanics, so Infrastructure collects events from any aggregate the same way. The contract owns typed identity, pending events, recording, and clearing, and nothing else: no timestamp, audit, tenant, lifecycle, or persistence behavior, because any of those would couple every aggregate to a concern only some need.
 
 ### Model every aggregate lifecycle with state types
 
-**Requirement:** An aggregate MUST expose its lifecycle only through one state property backed by one closed hierarchy of per-state types.
+**Statement:** An aggregate MUST expose its lifecycle only through one state property backed by one closed hierarchy of per-state types.
 
 **Rationale:** Each lifecycle state can carry different facts: a published post carries its publication time, a draft does not. An enumeration, string discriminator, boolean flag, parallel nullable field, or computed state cannot carry state-specific data, and the compiler cannot prove a switch over them exhaustive. State types hold that data, and aggregate methods own the transitions between them.
 
@@ -58,7 +58,7 @@ In the Expenses product, `business-record/spending.expense` declares the `Submit
 
 ### Model every closed set of domain values as a closed type hierarchy
 
-**Requirement:** Domain code MUST model a closed set as one type hierarchy whose cases the type system can enumerate.
+**Statement:** Domain code MUST model a closed set as one type hierarchy whose cases the type system can enumerate.
 
 **Rationale:** A closed set with case data needs a type per case: an enumeration carries no case data, admits undefined values, and forces parallel nullable fields when one case gains data. A closed hierarchy lets the type system check exhaustiveness, so adding a case breaks every switch that must handle it. A boundary converts a label to its case through a named lookup, never through a string conversion, and an unrecognized label is a validation failure rather than a default case.
 
@@ -81,7 +81,7 @@ Round-trip tests cover every data-less case, which catches a renamed code and a 
 
 ### Create valid aggregates through named factories
 
-**Requirement:** An aggregate root MUST create instances only through a static factory named for its business action.
+**Statement:** An aggregate root MUST create instances only through a static factory named for its business action.
 
 **Rationale:** A constructor cannot carry a business name and cannot refuse cleanly, so construction through constructors spreads creation rules across call sites. The factory is named for its business action, accepts typed identifiers, rejects empty identity and violated creation rules, selects the initial state, records required events, and returns a complete aggregate.
 
@@ -106,7 +106,7 @@ public sealed class Order : AggregateRoot<OrderId>
 
 ### Express transitions through business methods
 
-**Requirement:** A public aggregate mutation method MUST check current state and protect its invariants, replacing state and recording its transition event when it moves the lifecycle.
+**Statement:** A public aggregate mutation method MUST check current state and protect its invariants, replacing state and recording its transition event when it moves the lifecycle.
 
 **Rationale:** A business-named method lets the handler call `post.Publish(utcNow)` without testing the state first: the method checks the current state and protects its invariants, then replaces state and records the transition event when it moves the lifecycle. A generic `Set`, `Update`, `Process`, or `Handle` name hides which business action ran. A mutation that changes no lifecycle state, such as `ChangeTitle` on a draft, checks state and assigns without recording a transition.
 
@@ -131,13 +131,13 @@ Checks run before replacement, and replacement runs before recording. An unappro
 
 ### Keep child entities inside the aggregate boundary
 
-**Requirement:** A child entity MUST expose no mutable state outside its aggregate root, surfacing its collection as a read-only view.
+**Statement:** A child entity MUST expose no mutable state outside its aggregate root, surfacing its collection as a read-only view.
 
 **Rationale:** A child that exposed mutable state would let outside code change aggregate data without passing the root's checks. The root creates, finds, and changes children through business methods, and collections surface as read-only views. A child with lifecycle states uses the same state types and no enumeration.
 
 ### Identify aggregates with strongly typed version 7 values
 
-**Requirement:** An aggregate identity MUST be a dedicated type wrapping one version 7 UUID, with no implicit conversion, primitive alias, or public parameterless creation path.
+**Statement:** An aggregate identity MUST be a dedicated type wrapping one version 7 UUID, with no implicit conversion, primitive alias, or public parameterless creation path.
 
 **Rationale:** A dedicated identity type stops one aggregate's identifier from passing where another's is expected, and with no implicit conversion, primitive alias, or parameterless creation path, there is no quiet route back to a bare value. The type rejects the empty value, and each factory also rejects its default. New values arrive from the caller: a factory takes its identifier as an argument, and a method that needs several identifiers takes a generator. Domain reads no clock and calls no static source of time or randomness.
 
@@ -147,7 +147,7 @@ Version 7 values come from the caller-supplied generator, so Domain observes no 
 
 ### Use immutable value objects for domain concepts
 
-**Requirement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
+**Statement:** A value object MUST be immutable, compare by its complete value, and expose creation through a static method rather than a constructor.
 
 **Rationale:** Immutability with comparison by complete value lets two instances with the same data stand in for each other. The type exposes no setter and no implicit conversion, because a primitive conversion hides validation and a value conversion erases the domain type. Reading uses `Value` or a string conversion, and creation through a named static method keeps every construction path under the validation the type declares.
 
@@ -184,7 +184,7 @@ public sealed record PostTitle
 
 ### Define collection value semantics explicitly
 
-**Requirement:** A value object containing a collection MUST implement content equality and a matching hash for its declared ordering rule.
+**Statement:** A value object containing a collection MUST implement content equality and a matching hash for its declared ordering rule.
 
 **Rationale:** Default structural equality compares collection references rather than contents, so two value objects holding equal lists compare as different. Content equality with a matching hash compares what the value means. Constructors copy incoming mutable collections and members return read-only views, so later mutation by the caller cannot change the value. The module terms state whether order is part of the value.
 
@@ -225,7 +225,7 @@ The example treats tag order as meaningful. If order is not part of the value, c
 
 ### Model money with exact decimal values
 
-**Requirement:** A monetary amount MUST use an exact decimal type inside one shared `Money` value object carrying an ISO 4217 currency code and serializing as `{ "amount": "12.50", "currency": "EUR" }`.
+**Statement:** A monetary amount MUST use an exact decimal type inside one shared `Money` value object carrying an ISO 4217 currency code and serializing as `{ "amount": "12.50", "currency": "EUR" }`.
 
 **Rationale:** Money needs exact arithmetic and an explicit currency on every value, and one shared `Money` object gives both. The owning module record defines supported currencies, scale, rounding, sign rules, and cross-currency arithmetic, and Infrastructure maps that precision explicitly. A use case fixed to one currency accepts an amount alone and states that currency in its record.
 
@@ -239,7 +239,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 ### Keep binary floating point out of exact quantities
 
-**Requirement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
+**Statement:** A Domain type MUST NOT use `double` or `float` for a monetary amount, a rate applied to one, or a quantity compared for exact equality.
 
 **Rationale:** Binary floating point cannot represent most decimal fractions, so two amounts a person reads as equal compare as different, and totals drift by fractions of a cent. Exact decimal types keep equality and arithmetic exact.
 
@@ -247,7 +247,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 ### Use stateless domain services for ownerless rules
 
-**Requirement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, logging, clock, authorization, or provider call.
+**Statement:** A domain service MUST be stateless, accept and return Domain values, and perform no persistence, messaging, logging, clock, authorization, or provider call.
 
 **Rationale:** Some calculations span concepts with no natural aggregate owner; forcing them into one aggregate couples it to another's data. A stateless service holds that calculation, accepting and returning Domain values with no persistence, messaging, logging, clock, authorization, or provider call. Application loads the aggregates, calls the service, and passes its result into aggregate behavior.
 
@@ -273,7 +273,7 @@ Application supplies the lines and passes the returned `Money` to `Order.Confirm
 
 ### Expose repositories for one aggregate only
 
-**Requirement:** A repository interface MUST expose only aggregate and Domain types for exactly one aggregate root, without a queryable, a session, or a generic CRUD surface.
+**Statement:** A repository interface MUST expose only aggregate and Domain types for exactly one aggregate root, without a queryable, a session, or a generic CRUD surface.
 
 **Rationale:** One repository per aggregate keeps the write side shaped by the aggregates it loads: a required load uses a get-by-identity operation that fails with `{Aggregate}NotFound`, so a handler repeats no null check, while a nullable find is reserved for lookups where absence is normal. A queryable, session, or generic CRUD surface would expose store mechanics to every handler.
 
@@ -285,13 +285,13 @@ The load returns a post and fails with its not-found error when the identity has
 
 ### Raise immutable facts as domain events
 
-**Requirement:** A domain event MUST be an immutable event named `{Aggregate}{PastFact}Event` and carrying business data only.
+**Statement:** A domain event MUST be an immutable event named `{Aggregate}{PastFact}Event` and carrying business data only.
 
 **Rationale:** A domain event records a completed fact for reactions to consume. The `{Aggregate}{PastFact}Event` name states which aggregate raised the fact without opening the file. The event carries business data only: typed identifiers and the values its reactions need, with no aggregate, session, service, mutable collection, or exception, because any of those would couple reactions to the raising process. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process.
 
 ### Reject business violations with dedicated errors
 
-**Requirement:** A rejected business rule MUST fail with a dedicated error type named `{DomainType}{Reason}` carrying a stable code.
+**Statement:** A rejected business rule MUST fail with a dedicated error type named `{DomainType}{Reason}` carrying a stable code.
 
 **Rationale:** One error type per rejected rule lets each boundary map failures without parsing messages: the type names the failed rule and the stable code travels to the caller. The name always leads with the aggregate root. Domain raises no standard library, validation, HTTP, or provider error for a business rejection, and carries no transport status. Error names follow `litespec/workspace/naming#name-exceptions-by-failed-rule`; this provision owns the one-type-per-rule shape and the code each type carries.
 
@@ -303,19 +303,19 @@ Application validators handle malformed caller input through validation errors. 
 
 ### Reference other aggregates by ID
 
-**Requirement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
+**Statement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
 **Rationale:** An object reference between aggregates loads one aggregate's data through another, which couples their consistency boundaries and their storage. A typed identifier keeps each aggregate loadable on its own: Application loads each aggregate through its repository when a command coordinates several, and the use-case record names any immediate cross-aggregate invariant.
 
 ### Pass nondeterministic values into Domain
 
-**Requirement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them, and read no clock.
+**Statement:** Domain behavior MUST receive time, randomness, and new identifiers as arguments rather than read them, and read no clock.
 
 **Rationale:** Domain behavior that read a clock or generated identifiers would return different results for the same call, which makes tests nondeterministic. Receiving time, randomness, and new identifiers as arguments keeps every Domain call a pure function of its inputs: a test supplies explicit values and stays deterministic. Application obtains each value through an owned port and passes it in. A method that needs more than one value receives a clock or a generator through its arguments, and version 7 identifiers come from the caller-supplied generator.
 
 ### Describe every public Domain contract in documentation
 
-**Requirement:** Every public Domain type and member MUST carry documentation stating the business constraint, result, or failure it represents.
+**Statement:** Every public Domain type and member MUST carry documentation stating the business constraint, result, or failure it represents.
 
 **Rationale:** A reader meeting a public Domain member needs to know the business rule behind it, not just its signature. Documentation states the business constraint, result, or failure the member represents: a mutation method names its source states, resulting state, protected invariant, and recorded event. A summary that restates the member name adds nothing.
 

@@ -22,97 +22,97 @@ This extension switches on `limit` and `runbook`: schedules bound their retentio
 
 ### Record schedule behavior
 
-**Requirement:** A scheduled-job record MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status, with a draft naming decider and decide-by date.
+**Statement:** A scheduled-job record MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status, with a draft naming decider and decide-by date.
 
 **Rationale:** The schedule record states when work may run and how it recovers from normal scheduling faults: schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status. The owners are the operating owner and the record owner, and a draft names its decider and decide-by date. A schedule without that record leaves each fault for the on-call operator to invent around.
 
 ### Run jobs in Worker
 
-**Requirement:** A scheduled job MUST run in Worker outside WebApi request handling.
+**Statement:** A scheduled job MUST run in Worker outside WebApi request handling.
 
 **Rationale:** Scheduled work runs in a Worker, outside WebApi request handling. The Worker owns the schedule's lifetime and shuts its replicas down in a controlled order. Request handling has neither a scheduler nor a shutdown order for background work.
 
 ### Bound job execution
 
-**Requirement:** A scheduled job MUST observe cancellation, have bounded duration, and stop accepting new work during graceful shutdown.
+**Statement:** A scheduled job MUST observe cancellation, have bounded duration, and stop accepting new work during graceful shutdown.
 
 **Rationale:** Each job observes cancellation, bounds its duration, and stops accepting new work during graceful shutdown. Bounded execution lets a Worker stop without stranding work it can no longer watch. An unbounded job turns every deploy into a wait for work that never ends.
 
 ### Store execution leases
 
-**Requirement:** A scheduled-job store MUST record lease owner, expiry, and fencing value in PostgreSQL.
+**Statement:** A scheduled-job store MUST record lease owner, expiry, and fencing value in PostgreSQL.
 
 **Rationale:** Each planned occurrence carries a lease with its owner, expiry, and fencing value in PostgreSQL. The lease names the one replica that may complete that occurrence. The outbox extension cites this definition for its own claims.
 
 ### Renew only owned leases
 
-**Requirement:** A Worker replica MUST renew only its active lease and stop when renewal fails.
+**Statement:** A Worker replica MUST renew only its active lease and stop when renewal fails.
 
 **Rationale:** A replica renews only the lease it holds and only while it stays active. A failed renewal means another replica owns the occurrence now. The loser stops instead of completing work it no longer owns.
 
 ### Prevent duplicate completion
 
-**Requirement:** A scheduled-job lease MUST prevent two replicas from completing the same occurrence.
+**Statement:** A scheduled-job lease MUST prevent two replicas from completing the same occurrence.
 
 **Rationale:** Overlapping replicas must not complete the same occurrence twice. The lease admits one completion per occurrence. Two completions would bill, notify, or reconcile the same planned work twice.
 
 ### Generate monotonic fencing values
 
-**Requirement:** A scheduled-job store MUST generate each fencing value monotonically per occurrence and check it on every completion write.
+**Statement:** A scheduled-job store MUST generate each fencing value monotonically per occurrence and check it on every completion write.
 
 **Rationale:** Each fencing value rises monotonically per occurrence, and the store checks it on every completion write. A Worker that lost its lease presents a stale value the store rejects. The check closes the gap between losing the lease and learning about it.
 
 ### Scope occurrences and leases by tenant
 
-**Requirement:** A scheduled-job occurrence and its lease MUST carry tenant scope when the product isolates tenants.
+**Statement:** A scheduled-job occurrence and its lease MUST carry tenant scope when the product isolates tenants.
 
 **Rationale:** Products that isolate tenants scope each occurrence and its lease to one tenant. One tenant's schedules then never trigger, block, or expose another tenant's work. Unscoped leases would let a replica mix tenants inside one occurrence.
 
 ### Dispatch Application behavior
 
-**Requirement:** A scheduled job MUST dispatch an Application Command or approved Application port.
+**Statement:** A scheduled job MUST dispatch an Application Command or approved Application port.
 
 **Rationale:** The schedule triggers a use case, and the use case boundary lives in Application. Each job therefore dispatches an Application Command or an approved Application port. The schedule stays a trigger while the behavior stays owned.
 
 ### Exclude direct storage and HTTP execution
 
-**Requirement:** A scheduled job MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
+**Statement:** A scheduled job MUST NOT mutate a Marten session or DbContext directly, bypass Domain behavior, or call WebApi endpoints.
 
 **Rationale:** A job that mutates a Marten session or DbContext directly, bypasses Domain behavior, or calls WebApi endpoints skips the command boundary. That boundary carries authorization, transaction, and validation the job would then lack. Jobs enter through Commands like every other caller.
 
 ### Bound job retries
 
-**Requirement:** A scheduled job MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure.
+**Statement:** A scheduled job MUST use bounded attempts, cancellation-aware backoff, and a poison state for permanent failure.
 
 **Rationale:** Bounded attempts with cancellation-aware backoff cap what one failed occurrence consumes. A poison state parks the permanently failing occurrence instead of retrying it forever. Without the bound, one poison occurrence eats the Worker's whole capacity.
 
 ### Tolerate duplicate execution
 
-**Requirement:** A scheduled job Command and side effect MUST tolerate duplicate execution after lease or process failure.
+**Statement:** A scheduled job Command and side effect MUST tolerate duplicate execution after lease or process failure.
 
 **Rationale:** A lease or process failure can replay a job whose completion stayed uncertain. The job Command and its side effects tolerate that duplicate execution. Work that assumes exactly-once breaks on the first uncertain failure.
 
 ### Treat unavailable schedule stores as outages
 
-**Requirement:** A Worker MUST treat an unavailable scheduler store as the store outage `litespec/ext/outbox#distinguish-dependency-outage` defines, with backed-off, rate-limited logging.
+**Statement:** A Worker MUST treat an unavailable scheduler store as the store outage `litespec/ext/outbox#distinguish-dependency-outage` defines, with backed-off, rate-limited logging.
 
 **Rationale:** An unavailable scheduler store is an outage of the dependency, not a failed occurrence. The Worker treats it as the store outage `litespec/ext/outbox#distinguish-dependency-outage` defines, with backed-off, rate-limited logging. Retry and poison outcomes belong to claimed occurrences, not to a store nobody can reach.
 
 ### Persist occurrence recovery points
 
-**Requirement:** A scheduled-job store MUST persist each occurrence's last scheduled, started, and completed time.
+**Statement:** A scheduled-job store MUST persist each occurrence's last scheduled, started, and completed time.
 
 **Rationale:** Last scheduled, started, and completed times persist per occurrence. After a restart, those points separate missed work from completed work. Memory alone cannot make that split, because the restart wipes it.
 
 ### Define misfire recovery
 
-**Requirement:** A scheduled-job specification MUST define skipped, once-replayed, or interval-replayed behavior for missed occurrences.
+**Statement:** A scheduled-job specification MUST define skipped, once-replayed, or interval-replayed behavior for missed occurrences.
 
 **Rationale:** Downtime and delay leave occurrences past their time. The specification states whether each missed occurrence is skipped, replayed once, or replayed per interval. The choice controls the business effect: a skipped reminder stays silent while a replayed one arrives late.
 
 ### Provide operational recovery procedures
 
-**Requirement:** A scheduled-job owner MUST provide Runbook records for inspection, manual replay, and disable.
+**Statement:** A scheduled-job owner MUST provide Runbook records for inspection, manual replay, and disable.
 
 **Rationale:** Stalled, failed, or unsafe schedules need controlled operator actions: inspection, manual replay, and disable. Runbook records carry those procedures. An operator without them improvises against the store during the incident.
 
@@ -122,7 +122,7 @@ Each procedure names the interface that performs it. A procedure that says "disa
 
 ### Derive stable occurrence identity
 
-**Requirement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant, removing occurrences older than the schedule's retention Limit record.
+**Statement:** A scheduled-job store MUST derive each occurrence identity from its schedule ID and scheduled instant, removing occurrences older than the schedule's retention Limit record.
 
 **Rationale:** Schedule ID plus scheduled instant gives each planned time one stable identity across retries and replicas. Retries of one occurrence then share their idempotency scope, and two replicas recognize the same occurrence. Occurrences older than the retention Limit record leave the store so the key space stays bounded.
 
@@ -132,49 +132,49 @@ The key space grows with the schedule's frequency and its retention. A per-secon
 
 ### Persist occurrence state
 
-**Requirement:** A scheduled-job store MUST persist scheduled, processing, completed, and dead-letter state with safe execution details.
+**Statement:** A scheduled-job store MUST persist scheduled, processing, completed, and dead-letter state with safe execution details.
 
 **Rationale:** Scheduled, processing, completed, and dead-letter states persist with attempt, lease, start, completion, and safe error data. The persisted state tells operators and recovery code where each occurrence stands. A store without states cannot separate work in flight from work never started.
 
 ### Scope command idempotency by occurrence
 
-**Requirement:** A scheduled job MUST use its occurrence identity as the command idempotency scope.
+**Statement:** A scheduled job MUST use its occurrence identity as the command idempotency scope.
 
 **Rationale:** The occurrence identity scopes the command idempotency key. Every retry of one occurrence then replays the same scheduled business action. A key scoped any wider would merge separate occurrences into one.
 
 ### Restrict completion by fencing value
 
-**Requirement:** A Worker MUST mark completion only while its fencing value remains current.
+**Statement:** A Worker MUST mark completion only while its fencing value remains current.
 
 **Rationale:** The Worker marks completion only while its fencing value stays current. A stale value means another replica owns the occurrence now. Completing past that point would write one replica's result over another's ownership.
 
 ### Audit manual replay
 
-**Requirement:** A manual replay MUST create a new attempt for the same occurrence identity: an audit record when audit is selected, a standalone record otherwise.
+**Statement:** A manual replay MUST create a new attempt for the same occurrence identity: an audit record when audit is selected, a standalone record otherwise.
 
 **Rationale:** A manual replay creates a new attempt under the same occurrence identity: an audit record where audit is selected, a standalone record otherwise. The replay keeps the original scheduled instant and its history. A replay recorded as a new occurrence would rewrite when the work was due.
 
 ### Prefer UTC schedules
 
-**Requirement:** A scheduled job MUST use a UTC schedule unless its specification names a business-local time requirement and its IANA time zone.
+**Statement:** A scheduled job MUST use a UTC schedule unless its specification names a business-local time requirement and its IANA time zone.
 
 **Rationale:** A local schedule runs twice on one date each year and skips an hour on another. A daylight-saving transition does that to a wall clock. That behavior is correct for a job whose meaning is local, such as a nightly statement at 9 AM for a reader. It is a defect for every other job. Naming the time zone in the specification makes the transition behavior reviewable.
 
 ### Define business-local clock behavior
 
-**Requirement:** A business-local schedule MUST record an IANA time-zone identifier and define skipped and repeated local-time behavior.
+**Statement:** A business-local schedule MUST record an IANA time-zone identifier and define skipped and repeated local-time behavior.
 
 **Rationale:** Daylight-saving transitions omit one local hour and repeat another. A business-local schedule records its IANA time-zone identifier and defines what happens to occurrences in the skipped and repeated hours. Without that definition, each transition silently drops or doubles the local work.
 
 ### Test time transitions
 
-**Requirement:** A scheduled-job test MUST use an injected clock and representative time-zone transitions.
+**Statement:** A scheduled-job test MUST use an injected clock and representative time-zone transitions.
 
 **Rationale:** An injected clock lets tests move time to any transition on demand. Representative time-zone transitions then run deterministically instead of once a year in production. Tests on the real clock can only wait for the transition to arrive.
 
 ### Exclude machine-local time
 
-**Requirement:** Scheduled-job production code MUST NOT depend on machine-local time.
+**Statement:** Scheduled-job production code MUST NOT depend on machine-local time.
 
 **Rationale:** Machine-local time follows each host's configuration. Production code that reads it schedules differently on a developer machine, in staging, and in production. Schedules read their time from the injected clock and the declared zone instead.
 

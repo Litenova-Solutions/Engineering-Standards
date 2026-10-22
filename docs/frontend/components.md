@@ -24,7 +24,7 @@ Some drawings have no composite: a stock-location map, a packing-slip preview, o
 
 ### Keep shared UI in one package
 
-**Requirement:** A workspace MUST hold its shared primitives and its composites in one shared UI package, with no copy in an application.
+**Statement:** A workspace MUST hold its shared primitives and its composites in one shared UI package, with no copy in an application.
 
 **Rationale:** When two applications each hold a copy of one primitive, the first upstream update changes one copy and misses the other. Both copies still compile, so nothing reports the split, and the two applications drift into two visual languages. One package gives every application the same component, so one update reaches every screen.
 
@@ -32,7 +32,7 @@ Some drawings have no composite: a stock-location map, a packing-slip preview, o
 
 ### Compose composites in page code
 
-**Requirement:** A component under a route or module folder MUST import only the shared package's documented entry points.
+**Statement:** A component under a route or module folder MUST import only the shared package's documented entry points.
 
 **Rationale:** A composite fixes its layout and exposes only the inputs its job needs, so every page that uses it draws the same shape. If page code could reach past the composite to the primitives, one page would tune spacing or order for itself, and the next page would copy that tuning instead of the composite. The product would then hold as many layouts as pages.
 
@@ -55,7 +55,7 @@ The section imports only the shared package entry point, so the layout it draws 
 
 ### Write no class name in page code
 
-**Requirement:** A component under a route or module folder MUST NOT declare a class or style binding.
+**Statement:** A component under a route or module folder MUST NOT declare a class or style binding.
 
 **Rationale:** The floorplan and the display composites own every spacing, size, and placement choice on a page. A class or style binding in route code is a second layout that answers to no composite, and the next route copies it because it looks like the local way to draw. Two sources of layout then disagree on the first redesign, so keeping classes out of page code leaves the floorplan as the one place a visual change lands.
 
@@ -63,13 +63,13 @@ Each stack page names the class and style bindings this rule covers for its stac
 
 ### Use composites for layout and interaction in page code
 
-**Requirement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
+**Statement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
 
 **Rationale:** A raw element is only markup: it carries no focus handling, no state behavior, and no accessibility wiring, so each page that declares one rebuilds behavior the composite already carries, usually worse. The lint refusal names the composite to use instead, so the author gets the replacement in the same message as the refusal and does not have to search the shared package.
 
 ### Prefer a composite over a primitive
 
-**Requirement:** Page code MUST import a composite wherever the shared package provides one, and the lint refuses the primitive that composite replaces.
+**Statement:** Page code MUST import a composite wherever the shared package provides one, and the lint refuses the primitive that composite replaces.
 
 **Rationale:** The composite holds the product's decision for one job: which layout, which behavior, which tone. The bare primitive holds none of those, so a page that imports it makes each decision again for itself, and two pages answer the same question two ways. Refusing the replaced primitive in page code sends every page to the decision already made.
 
@@ -77,19 +77,19 @@ Each stack page names the class and style bindings this rule covers for its stac
 
 ### Place a drawing no composite makes in an exception file
 
-**Requirement:** An exception file MAY declare custom styling, and uses semantic theme tokens only.
+**Statement:** An exception file MAY declare custom styling, and uses semantic theme tokens only.
 
 **Rationale:** Some drawings have no composite: a stock-location map, a packing-slip preview, or a public marketing frame. Refusing them entirely would push the drawing into arbitrary values that no token governs, which is harder to find and restyle than a declared exception. The exception file keeps the drawing visible: its name says this page draws outside the composites, and semantic tokens keep it inside the product palette. Each stack page names the file pattern that marks an exception for its stack.
 
 ### Add a missing composite to the shared package
 
-**Requirement:** A layout, a control, or a surface a second page needs MUST be added to the shared UI package, not written inside an application.
+**Statement:** A layout, a control, or a surface a second page needs MUST be added to the shared UI package, not written inside an application.
 
 **Rationale:** The second page that needs a layout, control, or surface proves the piece is shared, not page-specific. Written inside one application, it is reviewed against one use, styled for one context, and invisible to the floorplans that should carry it, so the third page writes it a third time or copies the first copy. Adding it to the shared package puts it where every page finds it and where its design is judged against every use.
 
 ### Support keyboard, focus, labels, and announcements
 
-**Requirement:** Interactive UI MUST support keyboard operation, visible focus, semantic elements, programmatic labels, and asynchronous status announcements.
+**Statement:** Interactive UI MUST support keyboard operation, visible focus, semantic elements, programmatic labels, and asynchronous status announcements.
 
 **Rationale:** Keyboard operation, visible focus, semantic elements, programmatic labels, and status announcements come free with platform controls and all break at once in a custom control. A mouse-only control locks out keyboard readers, a missing label leaves screen-reader users guessing, and a silent update never reaches anyone who cannot see the screen change. Starting from a platform control keeps all five properties, and the composite keeps them for every page that uses it.
 
@@ -111,7 +111,7 @@ The AA criteria bind every project. The AAA rows bind only a project that target
 
 ### Render complete states
 
-**Requirement:** A data component MUST render loading, empty, error, forbidden, and ready; a control renders disabled and pending, prevents duplicate submission, and keeps recovery usable.
+**Statement:** A data component MUST render loading, empty, error, forbidden, and ready; a control renders disabled and pending, prevents duplicate submission, and keeps recovery usable.
 
 **Rationale:** A component that renders only its ready state leaves the reader with a blank region while data loads, after it fails, or when there is nothing to show. Each missing state is a screen the team never designed and no test visits. Naming every state up front forces each one to have a designed drawing: what arrives (loading, empty, error, forbidden, ready) and what the reader may do (disabled, pending, with duplicate submission blocked and recovery kept usable).
 
@@ -119,25 +119,25 @@ A route adds `not-found` under `litespec/frontend/rendering#represent-route-stat
 
 ### Keep component inputs narrow
 
-**Requirement:** A composite MUST receive the values and callbacks it needs, not a client, a store, or a business record.
+**Statement:** A composite MUST receive the values and callbacks it needs, not a client, a store, or a business record.
 
 **Rationale:** The shared package serves applications it was never written against. A composite that takes a client, a store, or a business record takes one application's data model as its input, so it cannot be reused by an application with a different model, and a change to that model breaks the shared package. Values and callbacks keep the composite free of any application's shape: the page translates its model into plain inputs, and the composite renders what it is given.
 
 ### Use declared visual variants
 
-**Requirement:** A repeated component variant MUST use theme tokens through the shared package's variant helper rather than repeated literal values.
+**Statement:** A repeated component variant MUST use theme tokens through the shared package's variant helper rather than repeated literal values.
 
 **Rationale:** When each composite writes its own pixel values, colors, or conditional branches for one variant, the copies start equal and drift with every later edit, because nothing points the author at the other copies. The variant helper holds each variant once, in theme tokens, so a change to the variant reaches every composite that uses it and no composite carries a literal the theme cannot restyle.
 
 ### Sanitize untrusted rich content
 
-**Requirement:** A component MUST NOT render untrusted rich content without its recorded sanitization decision.
+**Statement:** A component MUST NOT render untrusted rich content without its recorded sanitization decision.
 
 **Rationale:** Rich content written by one user renders in another user's browser, so unsanitized markup is a script injection path: whoever writes the content runs code as every reader. The recorded decision names the sanitizer, the allowed elements and attributes, the link policy, and the test cases, so the boundary is explicit and reviewable instead of a different ad-hoc escape on every page.
 
 ### Use a composite for a content image
 
-**Requirement:** An informative or decorative image MUST render through the shared image component, which owns its shape, its sizing, and its fallback.
+**Statement:** An informative or decorative image MUST render through the shared image component, which owns its shape, its sizing, and its fallback.
 
 **Rationale:** An informative image needs meaningful alternative text, and a decorative image needs empty alternative text so assistive tools skip it. A source and label written directly in a page bypass both rules: the author must remember which kind each image is and write the matching text, on every page. The shared image component owns the shape, the sizing, the fallback, and the text policy, so each image gets the handling its kind needs. The raw-element rule refuses unwrapped images in page code under litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
 

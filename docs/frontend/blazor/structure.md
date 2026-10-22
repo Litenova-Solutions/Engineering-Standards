@@ -14,7 +14,7 @@ Four production projects hold the client: Domain for rules and state, Applicatio
 
 ### Use the client solution tree
 
-**Requirement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
+**Statement:** A client solution MUST contain Domain, Application, Infrastructure, and Web production projects and no server project.
 
 **Rationale:** Four production projects give each layer one home, and the absence of a server project means the tree cannot silently gain a server dependency. A reader finds behavior by layer and a build compiles each layer separately. This replaces the API solution path in `litespec/workspace/structure#use-the-canonical-root-tree`, because a client-only consumer has no API directory.
 
@@ -44,19 +44,19 @@ Framework-generated `bin`, `obj`, and `publish` folders remain untracked.
 
 ### Organize features by module and use case
 
-**Requirement:** A feature MUST live under `Features/{Module}/{UseCase}/` using the module and use-case names its specification declares.
+**Statement:** A feature MUST live under `Features/{Module}/{UseCase}/` using the module and use-case names its specification declares.
 
 **Rationale:** The specification tree names each module and use case, and the client tree repeats those names, so a reader moves from a specification to its code by path alone. A feature filed anywhere else is findable only by search, and a renamed use case leaves its code behind. This realizes litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case.
 
 ### Isolate module internals
 
-**Requirement:** A module MUST NOT reference another module's internal feature types.
+**Statement:** A module MUST NOT reference another module's internal feature types.
 
 **Rationale:** A module's internal types are its own to change. When another module references them, a change in one module breaks code in another. Page composition may still render public components from several modules, because a page is the one place that combines modules. Truly shared code moves to `Components/` only after two real consumers prove the need, so the shared folder never fills with guesses.
 
 ### Keep imports directional
 
-**Requirement:** A reference MUST point from pages to features to components and Application, and from Infrastructure inward.
+**Statement:** A reference MUST point from pages to features to components and Application, and from Infrastructure inward.
 
 **Rationale:** The direction keeps each layer testable with only the layers inside it: Domain references nothing, Application references only Domain, and a feature reaches Infrastructure through an interface that Application owns. A reference in the other direction drags the outer layer's dependencies into the inner layer's tests. This realizes litespec/frontend/structure#order-imports-from-routes-to-shared-packages.
 
@@ -69,7 +69,7 @@ Infrastructure -> Application and Domain
 
 ### Keep Domain free of browser concerns
 
-**Requirement:** Domain and Application MUST contain no interop, component, HTTP, browser storage, render-loop timer, or document object model type.
+**Statement:** Domain and Application MUST contain no interop, component, HTTP, browser storage, render-loop timer, or document object model type.
 
 **Rationale:** Interop, component, HTTP, storage, timer, and document types each need a browser to run. If Domain or Application named them, every core test would need a browser host. Keeping them out mirrors the baseline rule that Domain carries no persistence or web package, so the core stays testable as plain .NET.
 

@@ -18,7 +18,7 @@ Each architectural role carries a fixed suffix: a command handler ends in `Comma
 
 ### Anchor aggregate-owned types on the aggregate root
 
-**Requirement:** An aggregate-owned type's qualified name MUST start with its aggregate root's full name.
+**Statement:** An aggregate-owned type's qualified name MUST start with its aggregate root's full name.
 
 **Rationale:** Leading with the root name reveals the owner without folder context. The rule covers events, states, child business records, values, and discriminated unions. A type nested inside a declaring type inherits that type's prefix through its qualified name, so `PostState.Published` satisfies the rule while a flat `PostStatePublishedState` repeats the anchor twice.
 
@@ -26,7 +26,7 @@ Each architectural role carries a fixed suffix: a command handler ends in `Comma
 
 ### Use architectural suffixes
 
-**Requirement:** An architectural type MUST carry the suffix its role assigns in the table in this section.
+**Statement:** An architectural type MUST carry the suffix its role assigns in the table in this section.
 
 **Example:**
 
@@ -75,31 +75,31 @@ The transport name drops the Domain union's aggregate prefix, such as `OrderFulf
 
 ### Name asynchronous operations completely
 
-**Requirement:** An asynchronous operation MUST reveal its asynchrony in its name and accept cancellation explicitly when the operation is cancelable.
+**Statement:** An asynchronous operation MUST reveal its asynchrony in its name and accept cancellation explicitly when the operation is cancelable.
 
 **Rationale:** A caller decides from the signature whether to await and what to cancel. Naming the asynchrony and accepting cancellation explicitly put both answers in the signature. An operation is cancelable when it performs I/O or awaits; anything else has nothing to cancel.
 
 ### Name exceptions by failed rule
 
-**Requirement:** An exception name MUST state the rule that failed, using `{DomainType}{Reason}Exception` for a Domain rejection.
+**Statement:** An exception name MUST state the rule that failed, using `{DomainType}{Reason}Exception` for a Domain rejection.
 
 **Rationale:** An exception name is the first diagnosis: it states which rule failed on which type. `{DomainType}{Reason}Exception` puts both in the name. `DomainType` is the aggregate root or an anchored owned type, so the name always starts with the aggregate root.
 
 ### Use intent-revealing boolean names
 
-**Requirement:** A boolean property or method MUST use `Is`, `Has`, `Can`, or a precise verb.
+**Statement:** A boolean property or method MUST use `Is`, `Has`, `Can`, or a precise verb.
 
 **Rationale:** A boolean answers a yes-or-no question, so its name asks one. `Is`, `Has`, `Can`, or a precise verb make the question explicit: `HasLines` and `CanPublish` state a condition. `LinesPresent` and `CheckPublish` state neither a question nor an answer, so the caller reads the body to learn the polarity.
 
 ### Use current language features
 
-**Requirement:** Production code MUST target the pinned language version and use its current construct over an older equivalent.
+**Statement:** Production code MUST target the pinned language version and use its current construct over an older equivalent.
 
 **Rationale:** A pinned language version gives every writer the same constructs. Using the current construct over its older equivalent keeps one idiom across the codebase instead of one per author. In the dotnet stack, collection expressions, pattern matching, and primary constructors express the same intent with less incidental code.
 
 ### Use predictable frontend names
 
-**Requirement:** A frontend folder MUST use kebab-case, a component file and its export PascalCase, and a React hook file `use-{name}`.
+**Statement:** A frontend folder MUST use kebab-case, a component file and its export PascalCase, and a React hook file `use-{name}`.
 
 **Rationale:** Kebab-case folders, PascalCase components with matching exports, and `use-{name}` hooks give every file one predictable name. One mapping lets a reader move between the documentation tree and the source tree without translation, and lets an agent derive the file from the feature name.
 

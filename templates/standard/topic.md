@@ -8,7 +8,7 @@ State the page scope and the boundary it owns.
 
 ### State one action
 
-**Requirement:** The named actor MUST perform one testable action.
+**Statement:** The named actor MUST perform one testable action.
 
 **Rationale:** Explain a specific constraint or decision when it helps implementation.
 

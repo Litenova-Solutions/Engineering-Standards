@@ -22,13 +22,13 @@ A port is a narrow interface Application declares for work it cannot do itself, 
 
 ### Organize Application by operation
 
-**Requirement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, mapping, and definition of pipeline-read values.
+**Statement:** Each command or query MUST own one operation folder under its module holding its message, result, validator, handler, mapping, and definition of pipeline-read values.
 
 **Rationale:** One operation folder holds everything a reviewer needs to judge a use case: its message, result, validator, handler, mapping, and pipeline-read values. Grouping by technical type scatters one operation across the project, so a change touches six folders and review misses one. Type names share the use-case prefix and follow the suffix table under `litespec/workspace/naming#use-architectural-suffixes`. Pipeline-read values are declared beside the message under `litespec/backend/application#declare-every-pipeline-position-beside-the-message`.
 
 ### Dispatch commands and queries through separate entry points
 
-**Requirement:** An application MUST dispatch a command and a query through two separate Application-facing entry points rather than one message bus abstraction.
+**Statement:** An application MUST dispatch a command and a query through two separate Application-facing entry points rather than one message bus abstraction.
 
 **Rationale:** Two entry points keep the write and read paths distinguishable at every call site and let the pipeline compose different stages for each. A unified bus hides that difference behind one method, so a reader cannot tell whether a dispatch changes state. This backend's whole command and query split depends on that difference.
 
@@ -36,7 +36,7 @@ The rule states the property rather than the package. Each stack binding pins on
 
 ### Separate input validation from invariants
 
-**Requirement:** A validator MUST limit its checks to structural input, leaving aggregate state decisions to Domain.
+**Statement:** A validator MUST limit its checks to structural input, leaving aggregate state decisions to Domain.
 
 **Rationale:** Structural input and aggregate state fail for different reasons and at different times: malformed input is rejected before Domain runs, while a state refusal needs the loaded aggregate. A validator that checked state would need the aggregate, which pulls persistence into validation. A validator rejects an empty title, a malformed identifier, or an invalid page size, and Domain decides whether the expense above the threshold carries a receipt. Every validator for a message reports validity findings under `litespec/backend/application#report-input-problems-as-validity-findings`, so the caller learns the whole form in one answer.
 
@@ -50,7 +50,7 @@ Whether the expense above the threshold carries a receipt is an aggregate state 
 
 ### Report input problems as validity findings
 
-**Requirement:** A validator MUST report its findings as validity findings, with each failure carrying a member, a code, and a message, and no HTTP status.
+**Statement:** A validator MUST report its findings as validity findings, with each failure carrying a member, a code, and a message, and no HTTP status.
 
 **Rationale:** Running every validator and merging findings tells the caller everything wrong with the form in one answer; stopping at the first failure turns one form into repeated round trips. Each failure carries a member naming the input member, a code naming the stable reason, and a message explaining the problem in caller-safe language, with no HTTP status because Application answers no transport.
 
@@ -67,7 +67,7 @@ The caller learns the whole form in one answer, and the pipeline refuses the req
 
 ### Model expected use-case failures explicitly
 
-**Requirement:** An expected use-case failure MUST throw a transport-neutral Application exception carrying the refusal Result's stable code and a safe message.
+**Statement:** An expected use-case failure MUST throw a transport-neutral Application exception carrying the refusal Result's stable code and a safe message.
 
 **Rationale:** An expected failure is part of the use case's contract: one base `UseCaseException` with `ResourceNotFoundException`, `UseCaseForbiddenException`, and `UseCaseConflictException` subtypes, carrying the refusal Result's stable code and a safe message. The exceptions carry no HTTP result, provider exception, or stack detail, so the same failure maps correctly at any transport, and handlers do not catch them.
 
@@ -75,7 +75,7 @@ The use case lists every Result it returns, and each refusal Result carries its 
 
 ### Enforce target authorization in the pipeline
 
-**Requirement:** The authorization guard, not the handler, MUST authorize every message from the permissions its use case needs and the resource the message names.
+**Statement:** The authorization guard, not the handler, MUST authorize every message from the permissions its use case needs and the resource the message names.
 
 **Rationale:** Authorization decided in each handler is decided differently in each handler. The guard decides once from what the message declares: permission codes with the resource subject, resolved against the actor's roles at the subject's scope, with ownership, tenant, role, state, or delegated access resolved against the target data through a scope owner lookup for the record the message names.
 
@@ -87,7 +87,7 @@ WebApi enforces coarse authenticated, role, or scope policies first under `lites
 
 ### Keep command handlers narrow
 
-**Requirement:** A command handler MUST load aggregates, call domain behavior, stage changes, and return a result, leaving commit, transport mapping, audit, and authorization to their owners.
+**Statement:** A command handler MUST load aggregates, call domain behavior, stage changes, and return a result, leaving commit, transport mapping, audit, and authorization to their owners.
 
 **Rationale:** A handler that commits, maps errors, audits, or authorizes duplicates a boundary that already owns that work, and the duplicates drift: one handler's commit order differs from another's, or one audit entry misses a field. The commit post-handler owns the transaction under `litespec/backend/persistence#commit-each-command-pipeline-once`, WebApi owns error mapping, the audit completion handler owns the trail, and the guard owns authorization. The handler loads aggregates, calls domain behavior, stages changes, and returns a result.
 
@@ -124,13 +124,13 @@ The handler loads, calls, stages, and returns. Commit, error mapping, and author
 
 ### Project queries directly
 
-**Requirement:** A query handler MUST project directly to its result record without loading an aggregate.
+**Statement:** A query handler MUST project directly to its result record without loading an aggregate.
 
 **Rationale:** A read path cannot act on an invariant, so loading an aggregate for presentation pays for enforcement it cannot use and couples the read shape to the write model. Projecting directly to the result record keeps reads on the read boundary the persistence standards state. The command and query split lives in `litespec/backend/architecture#separate-command-and-query-behavior`.
 
 ### Mirror a Domain closed set in the result
 
-**Requirement:** An Application result carrying a Domain closed set MUST model that set with the same shape as its own union or code value.
+**Statement:** An Application result carrying a Domain closed set MUST model that set with the same shape as its own union or code value.
 
 **Rationale:** Each case of a closed set can carry different data, and that data must survive to the caller. Mirroring the Domain shape in the result keeps the layers aligned; flattening case data into an enum with nullable fields loses which fields belong to which case. Application exposes no Domain union type. Narrowing follows `litespec/backend/application#record-a-decision-for-closed-set-narrowing`, and the set itself follows `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy`.
 
@@ -145,19 +145,19 @@ The handler loads, calls, stages, and returns. Commit, error mapping, and author
 
 ### Record a decision for closed-set narrowing
 
-**Requirement:** A layer MUST NOT narrow a Domain closed set without a recorded decision and an updated specification.
+**Statement:** A layer MUST NOT narrow a Domain closed set without a recorded decision and an updated specification.
 
 **Rationale:** Narrowing silently drops cases the Domain can produce, so a caller meeting a dropped case gets a shape the contract never described. A recorded decision with an updated specification makes the dropped cases visible and owned. The decision and the specification follow `litespec/core/model#keep-one-owner-and-status-on-every-record`.
 
 ### Define narrow external ports
 
-**Requirement:** Application MUST declare each external port as a public interface with a noun or verb name, one method or one purpose, and project-owned types.
+**Statement:** Application MUST declare each external port as a public interface with a noun or verb name, one method or one purpose, and project-owned types.
 
 **Rationale:** A port is the seam where a provider change stops: one method or one purpose, named as a noun for the capability (`PostArchive`) or a verb for the act (`ArchivePosts`), typed with project-owned types. If provider names or transport models entered the interface, replacing the provider would rewrite Application. Keeping them in Infrastructure confines the change to the adapter.
 
 ### Declare a port where its consumers meet
 
-**Requirement:** A port MUST be declared at the lowest folder holding every consumer that names it, following `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
+**Statement:** A port MUST be declared at the lowest folder holding every consumer that names it, following `litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`.
 
 **Rationale:** A port reviewed beside the aggregate it serves is reviewed with that aggregate's specification; a port in a project-wide folder is reviewed by nobody. A port whose consumers sit in one module is declared in that module beside the aggregate it serves, and only a port that more than one module names belongs in the shared application contracts. Collecting every port in one folder because they share the word "port" is grouping by technical type. `litespec/backend/application#organize-application-by-operation` rejects that grouping one level down for the same reason.
 
@@ -165,13 +165,13 @@ You review a port declared beside its aggregate with that aggregate's specificat
 
 ### Declare every pipeline position beside the message
 
-**Requirement:** A message MUST declare a value or an exemption for every pipeline position the baseline and the selected extensions require.
+**Statement:** A message MUST declare a value or an exemption for every pipeline position the baseline and the selected extensions require.
 
 **Rationale:** A pipeline stage that must guess a message's position guesses differently per message. Declaring a value or an exemption beside the message makes each position explicit, and composition refuses to start when a message states neither. The baseline holds one position: authorization, declared as required authorization or a constant exemption, with the exemption on the message itself. The audit extension adds the audit selection position under `litespec/ext/audit#declare-audit-selection-on-every-command`.
 
 ### Keep event reaction implementations explicit
 
-**Requirement:** An event reaction implementation MUST declare exactly one delivery classification: atomic, durable, rebuildable, or best-effort-optional.
+**Statement:** An event reaction implementation MUST declare exactly one delivery classification: atomic, durable, rebuildable, or best-effort-optional.
 
 **Rationale:** A reaction without a declared classification leaves its delivery to whoever reads the code: a retry that should have been durable is lost, or a rebuildable projection blocks the command's transaction. Exactly one classification states the contract. Atomic reactions commit with the triggering command's transaction, and a failure rolls both back. Durable reactions run after commit through durable delivery, and a failure retries until it succeeds. Rebuildable reactions build derived state that a rebuild reproduces, and a failure waits for the next rebuild. Best-effort-optional reactions may skip or drop their effect, and no record needs it.
 
@@ -179,7 +179,7 @@ The use-case record declares the classification under `litespec/core/system#decl
 
 ### Keep one state-changing use case in one pipeline
 
-**Requirement:** A command handler MUST NOT dispatch another command through the command pipeline.
+**Statement:** A command handler MUST NOT dispatch another command through the command pipeline.
 
 **Rationale:** A nested dispatch runs the full pipeline inside the pipeline, so the commit post-handler can commit before the top-level use case finishes. One pipeline per state-changing use case keeps one transaction per command. A top-level handler may still coordinate several aggregates when an approved record names the invariant requiring one transaction.
 

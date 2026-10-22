@@ -14,25 +14,25 @@ Each component belongs to one feature folder under `Features/{Module}/{UseCase}/
 
 ### Keep components presentational
 
-**Requirement:** A component MUST NOT call a browser API, read persisted state directly, or contain a business rule.
+**Statement:** A component MUST NOT call a browser API, read persisted state directly, or contain a business rule.
 
 **Rationale:** A business rule inside a component runs only inside a rendered page, so no unit test reaches it and no second caller reuses it. A browser call inside a component ties every test of that component to a browser host. When components only show values and report interaction, rendering stays cheap and testable.
 
 ### Declare every parameter type
 
-**Requirement:** A component parameter MUST declare a concrete type owned by its feature.
+**Statement:** A component parameter MUST declare a concrete type owned by its feature.
 
 **Rationale:** A typed parameter states the component's contract at its boundary, so a wrong call fails at compile time. A loosely typed bag of values hides that contract until the component runs. A Domain aggregate as a parameter couples rendering to the core model, so a domain change ripples into every view that names it. This realizes litespec/frontend/components#keep-component-inputs-narrow.
 
 ### Raise events rather than mutating
 
-**Requirement:** A child component MUST report upward through `EventCallback` rather than mutate a parent-owned object.
+**Statement:** A child component MUST report upward through `EventCallback` rather than mutate a parent-owned object.
 
 **Rationale:** A callback names the relationship between child and parent in the markup: the child reports, the parent decides. Mutating a parent-owned object or writing to a shared store hides that relationship, so a reader cannot tell which component changed the value or when.
 
 ### Own the layer contract
 
-**Requirement:** A feature view model MUST expose no Domain aggregate, Domain closed set, or Application result record.
+**Statement:** A feature view model MUST expose no Domain aggregate, Domain closed set, or Application result record.
 
 **Rationale:** Each layer mirrors the shape it needs so a change in one layer does not ripple into the others, as `litespec/backend/architecture#own-each-layers-contract-types` requires. A view model that names a Domain aggregate or an Application result breaks that isolation: the view then compiles against the core model and breaks with it. Shared-kernel typed identifiers and value objects are the one sanctioned crossing.
 
@@ -40,19 +40,19 @@ This rule pairs with `litespec/frontend/blazor/structure#keep-domain-free-of-bro
 
 ### Resolve browser behavior through an interface
 
-**Requirement:** A component MUST resolve browser behavior through an Application-owned interface rather than inject the interop runtime.
+**Statement:** A component MUST resolve browser behavior through an Application-owned interface rather than inject the interop runtime.
 
 **Rationale:** A component that injects the interop runtime directly runs only where a JavaScript host exists, so its tests need a browser. Resolving browser behavior through an Application-owned interface lets a test substitute a double and assert what the component renders for each answer the browser could give.
 
 ### Place one component per file
 
-**Requirement:** A `.razor` file MUST declare one routable or reusable component named for what it renders.
+**Statement:** A `.razor` file MUST declare one routable or reusable component named for what it renders.
 
 **Rationale:** One component per file named for what it renders makes each component findable by name. A file holding several components hides all but the first from search and review. Logic beyond trivial rendering moves to a code-behind partial class, so the markup stays readable.
 
 ### Keep accessibility in the component
 
-**Requirement:** A component MUST own focus management, keyboard interaction, labeling, and live-region announcements for its interaction.
+**Statement:** A component MUST own focus management, keyboard interaction, labeling, and live-region announcements for its interaction.
 
 **Rationale:** Only the component knows which element should receive focus, which keys it answers, and what a screen reader should announce. A page composing the component cannot supply any of that. When the component owns focus, keyboard interaction, labeling, and announcements, every page that composes it is accessible without extra work. This realizes litespec/frontend/components#support-keyboard-focus-labels-and-announcements.
 

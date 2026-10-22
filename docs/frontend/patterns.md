@@ -173,7 +173,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Keep one pattern catalog
 
-**Requirement:** A workspace with a controlled frontend MUST keep one pattern catalog at `paths.uiPatterns` in `litespec.project.json`, valid against the schema.
+**Statement:** A workspace with a controlled frontend MUST keep one pattern catalog at `paths.uiPatterns` in `litespec.project.json`, valid against the schema.
 
 **Rationale:** An interface decision kept in one catalog is found before it is remade: the next author reads the entry and builds the chosen option. A decision kept in chat, in a review thread, or in one author's memory is decided again on the next page, and the two answers differ. One catalog at the configured path, valid against the schema, keeps every decision searchable and every choice comparable.
 
@@ -185,7 +185,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Record every option considered
 
-**Requirement:** Each pattern MUST record at least two options with rationale and cost, and name the chosen option.
+**Statement:** Each pattern MUST record at least two options with rationale and cost, and name the chosen option.
 
 **Rationale:** Recording at least two options with their rationale and cost turns a preference into a decision the next team can revisit. When the chosen option stops fitting, the team reads the recorded cost of the alternative instead of repeating the research from nothing. An option recorded without its cost gives them no basis to compare.
 
@@ -193,7 +193,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 ### Record who chose
 
-**Requirement:** Each pattern decision MUST record its source as `owner` or `recommended`.
+**Statement:** Each pattern decision MUST record its source as `owner` or `recommended`.
 
 **Rationale:** The source tells the reader whether the choice is settled. A recommended choice stands until an owner confirms or changes it; an agent never marks its own choice as the owner's, so no automated choice poses as a human decision. The catalog then shows at a glance which choices are settled and which still await review.
 
@@ -214,7 +214,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ### Declare the compact behavior
 
-**Requirement:** Each pattern MUST name one breakpoint and state whether the chosen option reflows below it or a named option replaces it.
+**Statement:** Each pattern MUST name one breakpoint and state whether the chosen option reflows below it or a named option replaces it.
 
 **Rationale:** A pattern with no compact statement breaks on a narrow screen, or each route redraws it for the phone in its own way and the product ships as many compact layouts as routes. Naming one breakpoint and stating whether the chosen option reflows below it or a named option replaces it settles the phone layout once. The breakpoint is a key in the catalog's breakpoints map, so every pattern measures against one width scale.
 
@@ -222,7 +222,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ### Implement a chosen pattern once
 
-**Requirement:** The shared UI package MUST implement each chosen pattern once at the source paths the catalog names per platform.
+**Statement:** The shared UI package MUST implement each chosen pattern once at the source paths the catalog names per platform.
 
 **Rationale:** The shared UI package implements each chosen pattern once, at the source paths the catalog names per platform, so every route composes the same behavior. A route that redraws the pattern instead makes a second decision the catalog cannot track: it looks like the pattern, drifts from it, and no entry records the difference.
 
@@ -230,7 +230,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ### Update the catalog with the code
 
-**Requirement:** A change that switches option, adds an option, or extends a pattern MUST update the catalog entry in the same change as its implementation.
+**Statement:** A change that switches option, adds an option, or extends a pattern MUST update the catalog entry in the same change as its implementation.
 
 **Rationale:** A catalog updated in a later change is a catalog updated never: the code ships, the follow-up slips, and the entry describes behavior no route renders. Updating the entry in the same change as its implementation keeps the two in agreement by construction. A deliberate departure in one route names a decision record instead, so the exception stays reviewable.
 
@@ -238,7 +238,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ### State the implementation status
 
-**Requirement:** Each platform entry MUST state one status and the gap when that status is `partial` or `pending`.
+**Statement:** Each platform entry MUST state one status and the gap when that status is `partial` or `pending`.
 
 **Rationale:** The status tells a reader what is built and what is missing on each platform, so a team adopting the catalog knows which options exist in code and which are still drawings. A partial or pending entry states its gap, so the missing work is named rather than discovered. The Concepts section defines the four values.
 
@@ -246,7 +246,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 ### Keep the catalog platform neutral
 
-**Requirement:** A pattern MUST name behavior and structure, never a component library.
+**Statement:** A pattern MUST name behavior and structure, never a component library.
 
 **Rationale:** A pattern names behavior and structure: which parts sit where, in what order, with which actions. Each platform then binds that behavior to its own components through `implementations`, so one catalog serves every selected stack. A component library named in the pattern itself would force a second catalog per platform, and the two would diverge.
 

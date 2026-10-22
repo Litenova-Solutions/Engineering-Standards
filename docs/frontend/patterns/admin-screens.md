@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply settings: the team with Sam Rivera
 
 ### Show a new secret once
 
-**Requirement:** A screen MUST show a newly created API key or secret in full only once, at creation.
+**Statement:** A screen MUST show a newly created API key or secret in full only once, at creation.
 
 **Rationale:** A secret that stays readable on screen can be copied by anyone who later opens the page, including from a shared screen or a screenshot. Showing it once forces the person creating it to store it in a vault or environment file at once, so no later visit can leak it.
 
 ### Show what a role allows before granting it
 
-**Requirement:** An invitation or role change MUST show what the chosen role allows before it is sent.
+**Statement:** An invitation or role change MUST show what the chosen role allows before it is sent.
 
 **Rationale:** Role names such as Picker or Manager hide what they grant. A sender who sees only the name can grant access to refunds or data by mistake. Showing the granted capabilities beside the name lets the sender confirm the access itself before the invitation goes out.
 

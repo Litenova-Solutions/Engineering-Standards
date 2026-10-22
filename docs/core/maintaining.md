@@ -34,7 +34,7 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 ### State the provision lifecycle
 
-**Requirement:** A maintainer MUST keep each provision in exactly one of three states: draft, active, or retired.
+**Statement:** A maintainer MUST keep each provision in exactly one of three states: draft, active, or retired.
 
 **Rationale:** The three states tell a maintainer what an identifier promises. An active identifier names a rule that holds and that a Verification row or validator case cites. A retired identifier names nothing, so a citation to it is a defect rather than a reference. Without the lifecycle, a half-written provision and a removed one look identical to a cited one.
 
@@ -42,7 +42,7 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 ### Replace every citation on a rename
 
-**Requirement:** A provision rename MUST replace every citation of the old identifier in one change.
+**Statement:** A provision rename MUST replace every citation of the old identifier in one change.
 
 **Rationale:** A heading rename renames the identifier, and the repository keeps no alias to catch stragglers. Every citation the rename misses names a provision that no longer exists, and readers follow it nowhere. Replacing all of them in one change keeps the repository resolvable at every commit.
 
@@ -50,7 +50,7 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 ### Publish a LiteSpec release from a tag
 
-**Requirement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
+**Statement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
 
 **Rationale:** A git tag is the only durable artifact that names a release: branches move and files change, but the tag stays. Reading the current release from the highest tag gives maintainers, consumers, and tools one shared answer. Writing that version into the manifest, the changelog, and the template in the same release keeps the three from disagreeing.
 
@@ -68,7 +68,7 @@ A maintainer writes a new provision on a page. The provision stays in `draft` un
 
 ```text
 ### State the rule
-**Requirement:** A consumer MUST do the thing.
+**Statement:** A consumer MUST do the thing.
 **Rationale:** The thing matters.
 ```
 

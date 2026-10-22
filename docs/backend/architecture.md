@@ -32,7 +32,7 @@ CQRS separates the command and query models inside the one Application part: a c
 
 ### Use five application parts
 
-**Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline parts.
+**Statement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline parts.
 
 **Rationale:** Five fixed parts give every type one home a reader can predict. `Application.Abstractions` holds the contracts that more than one module names: pipeline positions, cross-module ports, transport-neutral failures, and published integration events. It depends on Domain and nothing else, and no type in it names a use case, a handler, or a module.
 
@@ -54,7 +54,7 @@ WebApi/
 
 ### Point dependencies inward
 
-**Requirement:** A project reference MUST point inward, so Domain references no outer layer and WebApi composes the process.
+**Statement:** A project reference MUST point inward, so Domain references no outer layer and WebApi composes the process.
 
 **Rationale:** Inner code never names outer code, so business rules compile and test without adapters or hosting. An outward reference would drag technical concerns into Domain or coordination into Infrastructure. Application coordinates Domain, Infrastructure implements the boundaries both declare, and the reference matrix in [Dependencies](../workspace/dependencies.md) applies exactly.
 
@@ -64,19 +64,19 @@ WebApi/
 
 ### Own each layer's contract types
 
-**Requirement:** A layer MUST define its own outward contracts rather than reuse an inner layer's type, except for shared-kernel values and aggregate typed identifiers.
+**Statement:** A layer MUST define its own outward contracts rather than reuse an inner layer's type, except for shared-kernel values and aggregate typed identifiers.
 
 **Rationale:** When each layer defines its own outward contracts, a change to an inner shape stops at the boundary instead of rippling through every outer layer. Shared-kernel values cross because the kernel is shared by definition, and aggregate typed identifiers cross because messages must name their targets.
 
 ### Keep one Application part
 
-**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
+**Statement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
 
 **Rationale:** Commands, queries, and reactions coordinate the same use cases, so splitting them into Write, Read, Contracts, and Event-handler parts buys deployment boundaries the backend never uses, at the cost of a dependency every use case must cross. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): separate command and query models inside one Application part, with cross-module contracts in Application.Abstractions.
 
 ### Organize every layer by module and use case
 
-**Requirement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
+**Statement:** Every layer MUST use the same module names and order its folders as module, then aggregate, then layer detail.
 
 **Rationale:** The same module names in every layer let a reader move from a Domain aggregate to its handler, its repository, and its endpoint without a map. An aggregate stays flat only when its plural name equals the single module name. Module is an organization term, not a runtime base type, so no `IModule` or `ModuleRoot` contract exists.
 
@@ -117,7 +117,7 @@ fail when a type path contains Shared, Common, Util, Helpers, Core, or Misc
 
 ### Place a type at the lowest folder that holds its consumers
 
-**Requirement:** A type MUST live at the lowest folder containing every consumer that names it.
+**Statement:** A type MUST live at the lowest folder containing every consumer that names it.
 
 **Rationale:** Counting consumers gives each type exactly one folder, so placement needs no judgment call. The lowest folder is the use-case folder when one use case names the type, the aggregate folder when several use cases of one aggregate name it, the module folder when several aggregates of one module name it, and `Application.Abstractions` when more than one module names the type, or when two layers name it with no module between them. A type only Infrastructure names is an Infrastructure type.
 
@@ -129,25 +129,25 @@ Domain's shared kernel is the one folder of that name a solution keeps. Its memb
 
 ### Keep implementation types hidden
 
-**Requirement:** An application MUST keep each handler, validator, definition, persistence implementation, and endpoint implementation inside its own part and closed to extension.
+**Statement:** An application MUST keep each handler, validator, definition, persistence implementation, and endpoint implementation inside its own part and closed to extension.
 
 **Rationale:** Hidden implementations keep each part's surface to the contracts other parts actually use. A public handler invites direct construction that bypasses the pipeline, and an inheritable one invites overrides that split behavior across subclasses. Messages, results, and ports stay public only when another part uses them, and automatic discovery is not a reason to widen visibility.
 
 ### Keep business invariants in Domain
 
-**Requirement:** An aggregate or value object MUST be the only place that enforces a state transition or invariant.
+**Statement:** An aggregate or value object MUST be the only place that enforces a state transition or invariant.
 
 **Rationale:** The aggregate or value object that owns data is the only code that sees every change to it. A rule duplicated in a handler drifts from the aggregate that owns it, and then the same action is allowed through one path and refused through another.
 
 ### Separate command and query behavior
 
-**Requirement:** A command MUST mutate aggregates through repositories while a query projects read results without loading one.
+**Statement:** A command MUST mutate aggregates through repositories while a query projects read results without loading one.
 
 **Rationale:** Reads that load aggregates pay for invariant enforcement they cannot use, and writes that read from projections enforce rules against stale shapes. Commands mutate aggregates through repositories while queries project read results without loading one. An enabled persistence extension may replace the read boundary for named aggregate paths, but a command still never enforces an invariant from a read projection.
 
 ### Declare the execution host for work that outlives a request
 
-**Requirement:** An application MUST declare the execution host that runs its durable dispatch, queue consumption, and scheduled work.
+**Statement:** An application MUST declare the execution host that runs its durable dispatch, queue consumption, and scheduled work.
 
 **Rationale:** The declared host is either the WebApi process or a Worker project. A rule that only restricts when a Worker may exist never says where the work runs without one, so a project can host background services inside WebApi while deviating from no named rule and recording no decision. Naming the host makes the choice visible whichever way it goes.
 
@@ -159,7 +159,7 @@ The host is a composition decision, not a code-placement decision. The backgroun
 
 ### Create a Worker project when background work needs its own process
 
-**Requirement:** An application MUST create a Worker project when background work needs independent scaling, independent deployment, or isolation from request-path resource limits.
+**Statement:** An application MUST create a Worker project when background work needs independent scaling, independent deployment, or isolation from request-path resource limits.
 
 **Rationale:** A shared process couples scaling, deployment, and resource limits: a restart to deploy an endpoint change interrupts a dispatch loop, and request load and dispatch load compete for one thread pool where neither scales alone. When background work needs independent scaling, deployment, or isolation, it gets its own process. A product with one deployable unit and modest background load accepts that coupling deliberately, which is why the choice is declared rather than assumed.
 
@@ -167,13 +167,13 @@ The host is a composition decision, not a code-placement decision. The backgroun
 
 ### Test structural boundaries
 
-**Requirement:** An application MUST prove project references, package boundaries, visibility, module folders, and aggregate inheritance with architecture tests.
+**Statement:** An application MUST prove project references, package boundaries, visibility, module folders, and aggregate inheritance with architecture tests.
 
 **Rationale:** Project references, package boundaries, visibility, module folders, and aggregate inheritance are invisible at runtime: the application runs the same with or without them. A structural rule that only a reviewer checks stops holding as soon as review misses one file, so architecture tests prove each one on every run.
 
 ### Compose each process explicitly
 
-**Requirement:** A host MUST register its own transport services and call the Infrastructure entry point without building a second provider.
+**Statement:** A host MUST register its own transport services and call the Infrastructure entry point without building a second provider.
 
 **Rationale:** Each host registers its own services and calls the shared Infrastructure entry point, so the full composition of a process is visible in one place. A second provider built mid-registration would resolve a different object graph than the host runs. WebApi and Worker are the only composition roots: Domain contains no registration code, and Application exposes contracts without resolving services.
 

@@ -18,7 +18,7 @@ The OpenAPI generator builds the published contract from metadata declared on ea
 
 ### Use one endpoint per operation
 
-**Requirement:** A WebApi endpoint MUST implement `IEndpoint`, map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
+**Statement:** A WebApi endpoint MUST implement `IEndpoint`, map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
 
 **Rationale:** When one class owns one route, a reviewer finds the input mapping, the dispatch, and the result mapping for that route in one place, and no route drifts into a second pattern unnoticed. Without that rule, operations share classes or helpers, and a change to one route silently affects another. This provision states the .NET form of `litespec/backend/api#map-one-operation-per-endpoint`.
 
@@ -35,19 +35,19 @@ At startup, WebApi scans its own assembly for non-abstract `IEndpoint` implement
 
 ### Exclude MVC controllers from the stack
 
-**Requirement:** A WebApi project MUST NOT route requests through MVC controllers or `ControllerBase`.
+**Statement:** A WebApi project MUST NOT route requests through MVC controllers or `ControllerBase`.
 
 **Rationale:** Controllers and endpoint classes route, filter, and map errors through different models. When both exist, a reviewer checks two mappings for every behavior, and error responses drift apart. One model means one place defines how requests reach handlers and how failures reach clients.
 
 ### Declare operation metadata in the contract
 
-**Requirement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and typed results or `Produces` metadata, and a summary.
+**Statement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and typed results or `Produces` metadata, and a summary.
 
 **Rationale:** Generated clients name their calls from `operationId`, so an unnamed or unstable operation breaks every client regeneration. Authorization and Problem Details metadata tell a client which policies apply and which failures to handle; without them the client guesses. Route-lambda comments never reach the contract, so the summary and description are declared explicitly. This provision states the .NET form of `litespec/backend/api#declare-stable-operation-metadata-in-the-contract`.
 
 ### Mark polymorphic transport models with discriminators
 
-**Requirement:** A data-bearing set MUST map to an abstract base record with one sealed record per case, published as `oneOf` with a string discriminator.
+**Statement:** A data-bearing set MUST map to an abstract base record with one sealed record per case, published as `oneOf` with a string discriminator.
 
 **Rationale:** A concrete base record cannot mark the discriminator as required, so a client could send a payload that names no case. String discriminators carry the Domain union's stable case codes, so the wire value survives renames of code identifiers. Without the discriminator, deserialization picks a case by shape, and two cases with similar fields become ambiguous. This provision states the .NET form of `litespec/backend/api#mark-polymorphic-models-with-discriminators`.
 

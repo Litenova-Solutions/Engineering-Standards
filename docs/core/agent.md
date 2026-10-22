@@ -28,7 +28,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 ### Select task context
 
-**Requirement:** An agent MUST query the project model for the records that cover the request, and read the generated agent context, before editing.
+**Statement:** An agent MUST query the project model for the records that cover the request, and read the generated agent context, before editing.
 
 **Rationale:** Without the query, an agent reads either too little and invents the missing rules, or half the repository and buries the task in unrelated guidance. The query returns the smallest record set that covers the request, with the links the model computed from code, screens, and test runs, so the agent starts from approved intent.
 
@@ -36,7 +36,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 ### Follow the local pattern before the model query
 
-**Requirement:** A change adding no module, business record, frontend, dependency, or public boundary MAY skip the model query, reading the agent context and neighboring code instead.
+**Statement:** A change adding no module, business record, frontend, dependency, or public boundary MAY skip the model query, reading the agent context and neighboring code instead.
 
 **Rationale:** A small edit that adds no new surface does not need the full record set: the agent context plus the neighboring file already show the approved shape. Requiring a model query for every small change would slow ordinary work without adding information. Boundary-adding changes keep the full query, because a new module, record, frontend, dependency, or public boundary needs the wider context the model selects.
 
@@ -44,7 +44,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 ### Load applicable extensions
 
-**Requirement:** An agent MUST load selected project extensions and selected applicable local extensions before editing code or prose inside the extension's boundary.
+**Statement:** An agent MUST load selected project extensions and selected applicable local extensions before editing code or prose inside the extension's boundary.
 
 **Rationale:** An extension replaces baseline guidance inside its boundary. An agent that edits there without loading the extension follows the baseline the extension replaced, and the change contradicts the project's own selection.
 
@@ -52,37 +52,37 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 ### Apply guidance precedence
 
-**Requirement:** An agent MUST apply the project exception, the extension, the deeper page, and the shallower page in that order.
+**Statement:** An agent MUST apply the project exception, the extension, the deeper page, and the shallower page in that order.
 
 **Rationale:** Overlapping guidance is normal: a project exception narrows a shared rule, an extension replaces a baseline default, and a stack page refines its area page. Without a fixed order, two agents resolve the same overlap differently and the workspace drifts. The order puts the most local approved decision first, so the broader baseline fills only the gaps it leaves.
 
 ### Replace only declared conventions
 
-**Requirement:** An agent MAY apply a replacement for a convention only when an approved exception record declares that replacement.
+**Statement:** An agent MAY apply a replacement for a convention only when an approved exception record declares that replacement.
 
 **Rationale:** Conventions exist to be replaced, but only through a recorded decision. An undocumented local preference that silently replaces a baseline default looks identical to a mistake, so the next agent fixes it back. The exception record keeps the replacement visible, dated, and reviewable.
 
 ### Stop on unresolved conflict
 
-**Requirement:** An agent MUST stop when applicable requirements disagree without declared precedence and quote both provision IDs and paths.
+**Statement:** An agent MUST stop when applicable requirements disagree without declared precedence and quote both provision IDs and paths.
 
 **Rationale:** When two requirements disagree and no precedence decides, any continuation invents a compromise neither provision approved. Stopping with both provision identifiers and paths hands the decision to a person with exactly the evidence the decision needs.
 
 ### Inspect existing work before editing
 
-**Requirement:** An agent MUST read `git status` before editing and preserve user changes, untracked files, and unrelated generated output.
+**Statement:** An agent MUST read `git status` before editing and preserve user changes, untracked files, and unrelated generated output.
 
 **Rationale:** A working tree can hold the user's own uncommitted edits, untracked files, and generated output from an unrelated task. An agent that edits without looking overwrites or deletes work outside its scope. Reading `git status` first marks that work as untouchable.
 
 ### Restrict unapproved side effects
 
-**Requirement:** An agent MUST NOT act without approval on packages, migrations, authentication, a public API, production data, releases, spending, or outside calls that change state.
+**Statement:** An agent MUST NOT act without approval on packages, migrations, authentication, a public API, production data, releases, spending, or outside calls that change state.
 
 **Rationale:** The listed changes alter project boundaries beyond an ordinary implementation edit: they move money or data, open security boundaries, or change state outside the repository. None of them can be judged from the task text alone, so the task authorizer approves each one before the agent acts.
 
 ### Make coherent scoped changes
 
-**Requirement:** An agent MUST make the smallest coherent change that satisfies the authorized request.
+**Statement:** An agent MUST make the smallest coherent change that satisfies the authorized request.
 
 **Rationale:** A change that stops at code and skips its records, tests, or operating evidence leaves the workspace claiming behavior nothing proves. A change that sprawls past the request drags unrelated files into review. The smallest coherent change keeps the records, code, tests, and evidence that belong together in one reviewable unit.
 

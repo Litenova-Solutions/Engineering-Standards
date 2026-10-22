@@ -28,7 +28,7 @@ The Svelte stack uses these bindings:
 
 ### Keep primitives and composites in one shared package
 
-**Requirement:** A workspace MUST hold its registry primitives and its composites in one shared UI package, with no copy in an application.
+**Statement:** A workspace MUST hold its registry primitives and its composites in one shared UI package, with no copy in an application.
 
 **Rationale:** A primitive copied into two applications diverges on the first upstream update, and the divergence is invisible because both copies compile. One shared package holding the registry primitives and the composites keeps every application on the same source: an update lands once and reaches all of them. This realizes litespec/frontend/components#keep-shared-ui-in-one-package.
 
@@ -36,7 +36,7 @@ The Svelte stack uses these bindings:
 
 ### Use no raw element in page code
 
-**Requirement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
+**Statement:** A component under a route or module folder MUST NOT declare a layout or interactive element, and each refusal names the composite to use.
 
 **Rationale:** A raw layout or interactive element carries no focus management, no state, and no accessibility wiring, so each use rebuilds what a composite already provides. The lint refusal names the composite to use, so the reader gets the answer with the error instead of searching for it. This realizes litespec/frontend/components#use-composites-for-layout-and-interaction-in-page-code.
 
@@ -56,19 +56,19 @@ Text elements stay available, because a sentence is not a component decision: `p
 
 ### Place a drawing no composite makes in a visual file
 
-**Requirement:** A visual file MAY write class names, and uses semantic theme tokens only.
+**Statement:** A visual file MAY write class names, and uses semantic theme tokens only.
 
 **Rationale:** Some drawings have no composite: a stock-location map, a packing-slip preview, a public frame. Refusing them outright would push the drawing into an arbitrary value that no token governs. The visual file name declares the exception visibly, and semantic theme tokens keep even the exception inside the palette. The React and Svelte sections name the file pattern for each stack. This realizes litespec/frontend/components#place-a-drawing-no-composite-makes-in-an-exception-file.
 
 ### Meet accessibility requirements
 
-**Requirement:** The route suite MUST check keyboard reach, visible focus, target size, and status announcements on every route.
+**Statement:** The route suite MUST check keyboard reach, visible focus, target size, and status announcements on every route.
 
 **Rationale:** Keyboard reach, visible focus, target size, and status announcements hold only when every route proves them. A route the suite skips can ship unreachable controls or silent updates with no error. Checking all four on every route makes the guarantees hold for the whole product, not just the routes somebody specified. This realizes litespec/frontend/components#support-keyboard-focus-labels-and-announcements.
 
 ### Protect rich content boundaries
 
-**Requirement:** A component MUST NOT pass untrusted content to a raw HTML sink.
+**Statement:** A component MUST NOT pass untrusted content to a raw HTML sink.
 
 **Rationale:** A raw HTML sink renders whatever it receives, so untrusted content passed to it runs as page markup. Stored rich content therefore needs a decision record naming the sanitizer, the allowed elements and attributes, the link policy, and the test cases before any component renders it. The React and Svelte sections name the sink for each stack. This realizes litespec/frontend/components#sanitize-untrusted-rich-content.
 

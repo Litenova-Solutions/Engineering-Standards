@@ -18,7 +18,7 @@ Every version resolves through central package management or the committed lockf
 
 ### Use the project reference graph
 
-**Requirement:** A project reference MUST follow the graph in the table in this section and add no other edge.
+**Statement:** A project reference MUST follow the graph in the table in this section and add no other edge.
 
 **Rationale:** An undeclared reference lets a layer reach past its boundary, and review cannot refuse what no graph forbids. The table names every permitted edge, so composition stays in the hosts and each project names only the layers its job needs. This provision states the .NET form of `litespec/workspace/dependencies#follow-the-declared-dependency-graph`.
 
@@ -39,19 +39,19 @@ Every version resolves through central package management or the committed lockf
 
 ### Keep Domain package-free
 
-**Requirement:** The Domain project MUST reference no package beyond the .NET base class library.
+**Statement:** The Domain project MUST reference no package beyond the .NET base class library.
 
 **Rationale:** A package in Domain makes business rules depend on a framework, a provider, or a messenger. Marten, EF Core, LiteBus, ASP.NET Core, injection, serialization, and logging packages all stay outside, so Domain builds on the base class library alone. This provision states the .NET form of `litespec/workspace/dependencies#keep-domain-dependency-free`.
 
 ### Keep Application dependencies narrow
 
-**Requirement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and needed Microsoft abstractions, plus the `IQuerySession` read boundary.
+**Statement:** Application MUST reference only LiteBus command and query abstractions, required read abstractions, and needed Microsoft abstractions, plus the `IQuerySession` read boundary.
 
 **Rationale:** Application coordinates; Infrastructure hides technology. A provider package in Application makes the coordination layer depend on the technology it was meant to stay free of. The Requirement names the one permitted read boundary; everything else provider-shaped stays out. This provision states the .NET form of `litespec/workspace/dependencies#keep-application-free-of-provider-packages`.
 
 ### Pin every dependency centrally
 
-**Requirement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, using the pin `litespec.manifest.json` states when it states one.
+**Statement:** Every NuGet and npm version MUST resolve through central management or the committed lockfile, using the pin `litespec.manifest.json` states when it states one.
 
 **Rationale:** An inline version in a project file is invisible to the manifest that is supposed to own it, and two projects drift to two versions of one dependency. Central management or the lockfile resolves every version in one place, using the manifest pin where one exists. This provision states the .NET form of `litespec/workspace/dependencies#pin-every-dependency-version-centrally`.
 

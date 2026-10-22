@@ -22,7 +22,7 @@ The OpenAPI document is generated from the code during the Release build, never 
 
 ### Map one operation per endpoint
 
-**Requirement:** An endpoint MUST map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
+**Statement:** An endpoint MUST map one route operation, convert input to an Application message, dispatch through its mediator, and map the result.
 
 **Rationale:** One endpoint class per route operation gives each route a single owner, so its input mapping, dispatch, and result mapping live in one place. An endpoint that served several operations would mix their mappings and force one class to change for unrelated routes.
 
@@ -30,19 +30,19 @@ The OpenAPI document is generated from the code during the Release build, never 
 
 ### Keep endpoint dependencies transport-focused
 
-**Requirement:** An endpoint MUST NOT take an aggregate repository, a persistence session or context, a provider client, or an application service.
+**Statement:** An endpoint MUST NOT take an aggregate repository, a persistence session or context, a provider client, or an application service.
 
 **Rationale:** An endpoint that took a repository, session, provider, or application service could reach business state or providers without passing the pipeline. Endpoints hold no request-scoped dependency because the application registers them at startup; handlers take mediators and HTTP-boundary services such as an actor accessor.
 
 ### Defer error mapping to the global handler
 
-**Requirement:** An endpoint MUST NOT catch a `UseCaseException`, a `DomainException`, or a validation failure.
+**Statement:** An endpoint MUST NOT catch a `UseCaseException`, a `DomainException`, or a validation failure.
 
 **Rationale:** One global handler produces every error response from every exception type. An endpoint that caught an exception would create a second mapping for the same failure, and the two would diverge: the same refusal would answer different statuses or codes depending on which endpoint raised it.
 
 ### Apply only coarse policies at the endpoint
 
-**Requirement:** A WebApi endpoint MUST enforce only coarse authenticated, role, or scope policies, leaving target decisions to the application guard.
+**Statement:** A WebApi endpoint MUST enforce only coarse authenticated, role, or scope policies, leaving target decisions to the application guard.
 
 **Rationale:** Authentication establishes who is calling, not whether the caller may act on this specific resource. Coarse policies at the endpoint check the caller; the application guard decides the target from the permissions the use case needs. An endpoint that decided target authorization would duplicate business data access the guard already owns. Target authorization lives in `litespec/backend/application#enforce-target-authorization-in-the-pipeline`.
 
@@ -50,7 +50,7 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 
 ### Return stable Problem Details
 
-**Requirement:** An error response MUST use [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457) Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
+**Statement:** An error response MUST use [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457) Problem Details carrying a stable application `code`, the current `traceId`, and an `errors` entry for each field failure.
 
 **Rationale:** A stable machine-readable code lets a client branch on the failure without parsing prose, and the trace identifier connects the response to its diagnostics. One entry per field failure tells the caller everything wrong with the request in one answer. RFC 9457 defines the Problem Details media type the contract uses.
 
@@ -101,13 +101,13 @@ The endpoint never catches the failure. The diagram shows how a Domain exception
 
 ### Record each result's HTTP status
 
-**Requirement:** A result MUST carry `httpStatus` exactly when an HTTP entry point reaches its use case.
+**Statement:** A result MUST carry `httpStatus` exactly when an HTTP entry point reaches its use case.
 
 **Rationale:** The outcome table, the route, and the tests read one recorded status instead of each choosing their own. Recording a status for a use case reached only by reactions or jobs would invent an HTTP answer nobody sends.
 
 ### Use consistent status codes
 
-**Requirement:** A WebApi operation MUST return the status code that its outcome table assigns.
+**Statement:** A WebApi operation MUST return the status code that its outcome table assigns.
 
 **Rationale:** A client branches on status before it reads a body, so a code that disagrees with the outcome table hides the real outcome. The outcome table assigns each result its status once, and the operation returns exactly that code.
 
@@ -129,7 +129,7 @@ The endpoint never catches the failure. The diagram shows how a Domain exception
 
 ### Require the marker header on cookie-authenticated writes
 
-**Requirement:** The API MUST refuse a cookie-authenticated write without the project's marker header.
+**Statement:** The API MUST refuse a cookie-authenticated write without the project's marker header.
 
 **Rationale:** Cookies travel with every request, including ones a malicious page triggers, so a cookie-authenticated write needs proof the project's own page sent it. A page on another site cannot add a custom header, so the header's absence exposes a cross-site forgery. A write is any request other than GET, HEAD, or OPTIONS. The header takes the form `X-<Project>-Request: 1`, with the exact name set in project configuration.
 
@@ -137,7 +137,7 @@ The refused request is unauthenticated, so it answers 401 under `litespec/backen
 
 ### Keep routes resource-oriented
 
-**Requirement:** A route MUST use lowercase plural resource segments, kebab-case subresources, route parameters for identity, query parameters for filtering, and the body for command data.
+**Statement:** A route MUST use lowercase plural resource segments, kebab-case subresources, route parameters for identity, query parameters for filtering, and the body for command data.
 
 **Rationale:** A predictable route shape lets a caller derive an unfamiliar operation from a familiar one: plural resource segments, kebab-case subresources, route parameters for identity, query parameters for filtering, and command data in the body. A route that encoded actions or identities anywhere else would force the caller to read each route's documentation.
 
@@ -145,7 +145,7 @@ The refused request is unauthenticated, so it answers 401 under `litespec/backen
 
 ### State an unexpressible transition as a custom method
 
-**Requirement:** A WebApi route MUST express a state transition the five HTTP verbs cannot carry as a POST custom method ending in a colon-suffixed verb.
+**Statement:** A WebApi route MUST express a state transition the five HTTP verbs cannot carry as a POST custom method ending in a colon-suffixed verb.
 
 **Rationale:** Some transitions fit no standard verb, and stuffing them into one overloads its meaning. The custom-method form marks the final segment as a command rather than a nested resource: a path segment names a resource, while a state-noun segment such as `/closure` and a bare verb segment such as `/abandon` both encode the action without predicting each other. [AIP-136](https://google.aip.dev/136) defines this form.
 
@@ -161,7 +161,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 ### Apply PATCH to a partial update
 
-**Requirement:** A WebApi operation MUST apply a partial update with PATCH and the `application/merge-patch+json` media type.
+**Statement:** A WebApi operation MUST apply a partial update with PATCH and the `application/merge-patch+json` media type.
 
 **Rationale:** A partial update names only the fields it changes. Sending them with PATCH and the merge-patch media type gives those semantics a standard meaning; a PUT body for a partial change either repeats fields the caller does not change or invents merge semantics per field. [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789) defines PATCH and [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) defines the merge-patch media type.
 
@@ -169,7 +169,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 ### Use PUT for a whole replacement
 
-**Requirement:** A PUT operation MUST replace the whole resource or sub-resource its path names.
+**Statement:** A PUT operation MUST replace the whole resource or sub-resource its path names.
 
 **Rationale:** Whole replacement gives PUT one predictable meaning: the body becomes the resource, and an omitted member removes its value. A PUT body carrying a subset would force the server to choose between dropping omitted members and inventing per-field merges. Partial changes use PATCH instead, under `litespec/backend/api#apply-patch-to-a-partial-update`.
 
@@ -177,7 +177,7 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 ### Bound collection queries
 
-**Requirement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and the use case's declared maximum limit of 100 or lower.
+**Statement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and the use case's declared maximum limit of 100 or lower.
 
 **Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Deterministic ordering keeps pages stable, the default limit of 20 bounds the common case, and the declared maximum of 100 or lower caps the worst case. Cursor mechanics live in `litespec/backend/api#use-opaque-cursors-for-collection-paging` and `litespec/backend/api#version-cursors-with-stable-sort-values`.
 
@@ -196,19 +196,19 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 ### Use opaque cursors for collection paging
 
-**Requirement:** A collection endpoint MUST page with an opaque cursor and refuse a malformed cursor with 400 and code `invalid_cursor`.
+**Statement:** A collection endpoint MUST page with an opaque cursor and refuse a malformed cursor with 400 and code `invalid_cursor`.
 
 **Rationale:** A cursor that exposed offsets or internals would let callers craft requests against storage details and break when those details change. An opaque cursor keeps paging state server-defined, and the endpoint treats it as untrusted input: a malformed cursor, or an unsupported cursor version, answers 400 with code `invalid_cursor`.
 
 ### Version cursors with stable sort values
 
-**Requirement:** A paging cursor MUST carry a version and the last stable sort values, including a unique tie-breaker, and no sensitive value in readable form.
+**Statement:** A paging cursor MUST carry a version and the last stable sort values, including a unique tie-breaker, and no sensitive value in readable form.
 
 **Rationale:** Paging walks a sorted sequence, so the cursor must name exactly where the last page stopped: the version lets the sort evolve without breaking stored cursors, and the last stable sort values with a unique tie-breaker keep the walk exact when values repeat. The tie-breaker matches the query's stable order under `litespec/backend/api#bound-collection-queries`. No sensitive value travels in readable form, because callers store and replay cursors.
 
 ### Treat OpenAPI as a generated contract
 
-**Requirement:** A WebApi project MUST generate its OpenAPI document during the Release build.
+**Statement:** A WebApi project MUST generate its OpenAPI document during the Release build.
 
 **Rationale:** A handwritten contract drifts from the code it describes with the first unmirrored change. Generating the document during the Release build keeps the contract a function of the code, so the file the pinned generator reads stays current.
 
@@ -227,19 +227,19 @@ When TypeScript consumes the API, the pinned generator reads the source artifact
 
 ### Declare stable operation metadata in the contract
 
-**Requirement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and a summary.
+**Statement:** An operation MUST declare a stable `operationId`, its authorization, request, success, and Problem Details metadata, and a summary.
 
 **Rationale:** Generated clients name their methods from `operationId`, so an unstable name renames client code on every generation. Authorization metadata cites the enforced policies and Problem Details metadata covers every documented failure status, so the client models security and failure before its first call. Comments on handlers are not contract documentation, so operations carry explicit summaries and descriptions.
 
 ### Commit the generated contract its consumers read
 
-**Requirement:** A WebApi project MUST commit its generated OpenAPI artifact when a frontend or external consumer reads it.
+**Statement:** A WebApi project MUST commit its generated OpenAPI artifact when a frontend or external consumer reads it.
 
 **Rationale:** A committed artifact makes every contract change visible in review and lets CI fail when the document was not regenerated. Without the committed file, a breaking contract change hides inside a code change. Consumers read the artifact through the generated client, model, schema, and query-option packages.
 
 ### Reflect enforced authentication in the contract
 
-**Requirement:** A generated OpenAPI document MUST declare the security scheme and per-operation security requirement for every endpoint that enforces authentication.
+**Statement:** A generated OpenAPI document MUST declare the security scheme and per-operation security requirement for every endpoint that enforces authentication.
 
 **Rationale:** A consumer that learns an authentication requirement from a runtime 401 has already built the wrong client: declared security schemes and per-operation requirements let it build the right one. Handwritten security metadata drifts from registered schemes, so the document derives them from the registered authentication schemes.
 
@@ -247,7 +247,7 @@ When TypeScript consumes the API, the pinned generator reads the source artifact
 
 ### Publish precise, complete schemas
 
-**Requirement:** A generated schema MUST declare the closed value set, bounds, format, and required control headers of each field and parameter it describes.
+**Statement:** A generated schema MUST declare the closed value set, bounds, format, and required control headers of each field and parameter it describes.
 
 **Rationale:** A caller that learns limits from the document validates before sending; a caller that learns them from runtime rejections discovers one limit per failed request. Declaring the closed value set, bounds, format, and required control headers of each field and parameter moves every checkable limit into the contract.
 
@@ -257,13 +257,13 @@ An operation requiring a control header declares it as a required parameter, for
 
 ### Expose development tooling in Development only
 
-**Requirement:** A WebApi project MUST expose Scalar and development tooling in Development only.
+**Statement:** A WebApi project MUST expose Scalar and development tooling in Development only.
 
 **Rationale:** Development tooling such as Scalar exposes the full API surface for exploration, which is what development needs and what a hosted environment must not offer. Mapping it in Development only keeps exploration local while hosted environments serve only the API.
 
 ### Mirror a Domain closed set as a transport model of the same shape
 
-**Requirement:** A WebApi transport model for a Domain closed set MUST preserve the shape of that set.
+**Statement:** A WebApi transport model for a Domain closed set MUST preserve the shape of that set.
 
 **Rationale:** Each case of a closed set can carry different data, and a transport shape that differs from its Domain set discards information the Domain carries. Preserving the shape keeps every case and its data on the wire. Label-only sets follow `litespec/backend/api#publish-label-only-sets-as-string-enums`, and data-bearing sets follow `litespec/backend/api#mark-polymorphic-models-with-discriminators`. Narrowing follows `litespec/backend/application#record-a-decision-for-closed-set-narrowing`.
 
@@ -271,13 +271,13 @@ An operation requiring a control header declares it as a required parameter, for
 
 ### Publish label-only sets as string enums
 
-**Requirement:** A transport model for a label-only set MUST publish its values as an OpenAPI string `enum`.
+**Statement:** A transport model for a label-only set MUST publish its values as an OpenAPI string `enum`.
 
 **Rationale:** A label-only set carries no case data, so its labels are the complete contract and a string enum carries them exactly. The permission to use a plain enum for this one situation lives in `litespec/backend/domain#model-every-closed-set-of-domain-values-as-a-closed-type-hierarchy`.
 
 ### Mark polymorphic models with discriminators
 
-**Requirement:** A data-bearing set MUST map to a polymorphic model with one case per variant, published as `oneOf` with a string discriminator.
+**Statement:** A data-bearing set MUST map to a polymorphic model with one case per variant, published as `oneOf` with a string discriminator.
 
 **Rationale:** A polymorphic payload without a discriminator forces the reader to guess the case from its fields. A required string discriminator names the case on every payload, so no payload validates without one. The strings equal the Domain union's stable case codes and stay stable across identifier renames.
 
@@ -291,7 +291,7 @@ An operation requiring a control header declares it as a required parameter, for
 
 ### Reject a collapsed or borrowed wire contract
 
-**Requirement:** A WebApi transport model MUST NOT collapse a data-bearing set into an `enum` or reuse a Domain or Application type as the wire contract.
+**Statement:** A WebApi transport model MUST NOT collapse a data-bearing set into an `enum` or reuse a Domain or Application type as the wire contract.
 
 **Rationale:** Collapsing a data-bearing set into an enum discards the data that distinguishes its cases, and reusing a Domain or Application type as the wire contract couples the public contract to inner shapes. Each layer owns its own contract type per `litespec/backend/architecture#own-each-layers-contract-types`, so the wire contract is always a dedicated transport model. Narrowing follows `litespec/backend/application#record-a-decision-for-closed-set-narrowing`.
 

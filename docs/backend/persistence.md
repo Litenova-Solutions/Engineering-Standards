@@ -28,19 +28,19 @@ The manifest pins both providers' packages, because the extension is part of thi
 
 ### Stage aggregate writes through domain repositories
 
-**Requirement:** A command handler MUST reach persistence only through a Domain repository, never through the session directly.
+**Statement:** A command handler MUST reach persistence only through a Domain repository, never through the session directly.
 
 **Rationale:** The repository is the only path from a handler to the store, so every write passes a reviewable boundary that loads one aggregate type. Infrastructure implements each repository with the scoped session, and the repository exposes no session, generic query, or save operation. A handler that reached the session directly could bypass aggregate loading and scatter store calls through Application.
 
 ### Query through the read session
 
-**Requirement:** A query handler MUST project through the read session, applying filter, scope, ordering, and limit before materialization.
+**Statement:** A query handler MUST project through the read session, applying filter, scope, ordering, and limit before materialization.
 
 **Rationale:** The session already projects, filters, and pages, so a read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that only repeats it. Applying filter, scope, ordering, and limit before materialization keeps that work in the database; materializing first loads rows the caller never sees. Ordering and paging follow `litespec/backend/api#bound-collection-queries`.
 
 ### Commit each command pipeline once
 
-**Requirement:** Exactly one global command post-handler MUST commit the session for a command pipeline.
+**Statement:** Exactly one global command post-handler MUST commit the session for a command pipeline.
 
 **Rationale:** One commit point makes the transaction boundary visible: everything the handler staged succeeds or fails together, and a failed command leaves the session uncommitted. If handlers or repositories committed, a later failure in the same pipeline would leave a partial write behind. Handlers, repositories, validators, reactions, and endpoints never commit.
 
@@ -56,19 +56,19 @@ A failed submission leaves the session uncommitted, so no partial expense is sto
 
 ### Collect events without a public unit of work
 
-**Requirement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
+**Statement:** A repository MUST register each touched aggregate with the internal scoped event buffer that the post-handler drains.
 
 **Rationale:** Pending events must leave the process exactly when their write commits, so the post-handler drains the buffer and commits in one place. A public unit-of-work type would expose that mechanics to every handler; the internal buffer keeps it inside the pipeline. Best-effort delivery publishes after the commit succeeds.
 
 ### Keep mappings and aliases explicit
 
-**Requirement:** Each stored aggregate MUST declare a stable document alias, typed-identifier mapping, and the indexes its accepted queries need.
+**Statement:** Each stored aggregate MUST declare a stable document alias, typed-identifier mapping, and the indexes its accepted queries need.
 
 **Rationale:** Document types and collection names are storage identity: if they followed code names, renaming a class would orphan every stored document. An explicit alias, identifier mapping, and index list keeps storage identity independent of code names, with the store configuration owned in Infrastructure.
 
 ### Keep serialization behavior out of Domain
 
-**Requirement:** Infrastructure MUST own the JSON contract for stored documents, including member names, constructors, converters, and polymorphic registration.
+**Statement:** Infrastructure MUST own the JSON contract for stored documents, including member names, constructors, converters, and polymorphic registration.
 
 **Rationale:** Serialization metadata on Domain types couples the business model to one store's format, so changing the format would mean editing the rules. Infrastructure owns member names, constructors, converters, and polymorphic registration, and Domain stays free of serialization metadata. Every concrete type behind a base or interface is registered, because an unregistered subtype fails at read time.
 
@@ -76,7 +76,7 @@ Registration covers the types this store actually persists. The store that write
 
 ### Evolve stored document contracts explicitly
 
-**Requirement:** A rename, removal, type change, member move, or discriminator change MUST have a reviewed data transformation or an expand-and-contract rollout.
+**Statement:** A rename, removal, type change, member move, or discriminator change MUST have a reviewed data transformation or an expand-and-contract rollout.
 
 **Rationale:** Stored JSON member names, required values, and discriminator values are database schema: old documents stay on disk after the code changes. Without a reviewed transformation or an expand-and-contract rollout, a rename or type change makes old documents unreadable. An additive member still defines its behavior for documents written earlier.
 
@@ -84,19 +84,19 @@ An additive change is the only kind that needs no transformation, and it is addi
 
 ### Bound aggregate document growth
 
-**Requirement:** An aggregate document MUST NOT embed a collection that has no accepted business bound.
+**Statement:** An aggregate document MUST NOT embed a collection that has no accepted business bound.
 
 **Rationale:** A document grows with every write to its collection, so an unbounded embedded collection eventually exceeds size limits and slows every load of its aggregate. Data without an accepted business bound belongs in another aggregate, an owned document record, or a separate query-shaped document, depending on the consistency boundary it needs.
 
 ### Use database naming conventions
 
-**Requirement:** A PostgreSQL schema, table, column, index, constraint, document alias, or SQL identifier MUST use `snake_case`.
+**Statement:** A PostgreSQL schema, table, column, index, constraint, document alias, or SQL identifier MUST use `snake_case`.
 
 **Rationale:** One casing rule lets anyone predict a table or column name from the code type without opening the mapping. Code types keep normal language naming while the mapping layer converts once: under the baseline provider the store configuration sets the casing, and under the `efcore` extension a naming plugin applies it, so no configuration repeats the rule per entity.
 
 ### Control production schema changes
 
-**Requirement:** A hosted environment MUST apply schema changes through a reviewed step before traffic shifts, not from a starting replica.
+**Statement:** A hosted environment MUST apply schema changes through a reviewed step before traffic shifts, not from a starting replica.
 
 **Rationale:** A schema change that runs from a starting replica races every other starting replica, and the winner is nondeterministic. A reviewed step produces an artifact that is approved before it runs, and a deployment step applies that migration before traffic shifts. Development and disposable integration databases may still apply schema automatically.
 
@@ -104,7 +104,7 @@ A tool that alters the schema from application startup is not a reviewed step wh
 
 ### Test persistence against PostgreSQL
 
-**Requirement:** Repository behavior, projections, mappings, correctness indexes, commit behavior, and schema application MUST run against the pinned PostgreSQL through Testcontainers.
+**Statement:** Repository behavior, projections, mappings, correctness indexes, commit behavior, and schema application MUST run against the pinned PostgreSQL through Testcontainers.
 
 **Rationale:** Only the pinned PostgreSQL runs the real query planner, constraints, and type behavior. An in-memory substitute proves the test's own model of the database, so a query that passes against it can fail in production. HTTP integration through the real host is covered under `litespec/backend/testing#test-http-integration-through-the-real-application-host`.
 

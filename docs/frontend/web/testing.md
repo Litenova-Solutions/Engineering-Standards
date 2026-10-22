@@ -29,13 +29,13 @@ On the Svelte stack, the mocks rule forbids replacing Svelte, SvelteKit, the que
 
 ### Match test level to risk
 
-**Requirement:** A web frontend MUST use Vitest for pure logic, Playwright for navigation and integration, and the route contract for every address.
+**Statement:** A web frontend MUST use Vitest for pure logic, Playwright for navigation and integration, and the route contract for every address.
 
 **Rationale:** Vitest runs beside the module with no browser, so pure logic stays fast and precise. Playwright runs against a running stack, so navigation and integration prove real browser behavior. The route contract visits every address, so no route ships unproved. Each level proves what only it can, and fast tests never pay for a browser. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
 ### Assert each declared refusal by its code
 
-**Requirement:** A web evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its Result's code.
+**Statement:** A web evidence specification for a use case declaring a refusal MUST reach that refusal and assert it by its Result's code.
 
 **Rationale:** The refusal alert carries the Result's code in the rendered page, so the test names the exact refusal it provokes. Asserting by code ties the test to the specification's named outcome instead of to wording that rewording can change. A declared refusal no test reaches is a refusal nobody has seen render. This realizes litespec/frontend/testing#assert-each-declared-refusal-by-its-code.
 
@@ -47,13 +47,13 @@ await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout
 
 ### Keep mocks at owned boundaries
 
-**Requirement:** A web test MUST NOT replace a library its stack section names.
+**Statement:** A web test MUST NOT replace a library its stack section names.
 
 **Rationale:** A mock replaces what the test owns: its own boundary's answers. Replacing a framework or library instead proves the mock's behavior rather than the product's, and hides the integration the test was meant to cover. The React section names the rendering library, the router, and the query library. The Svelte section names Svelte, SvelteKit, the query library, and the form library. This realizes litespec/frontend/testing#keep-mocks-at-owned-boundaries.
 
 ### Use network mocks for component tests
 
-**Requirement:** A web component or logic test that needs HTTP MUST serve its answers through network mocks generated from the published contract.
+**Statement:** A web component or logic test that needs HTTP MUST serve its answers through network mocks generated from the published contract.
 
 **Rationale:** A component or logic test that needs HTTP serves its answers through network mocks generated from the published contract, so the generated client stays in its production path and the test proves the real call shape. A mocked client would prove the mock: the component passes against answers the API never sends. This realizes litespec/frontend/testing#use-network-mocks-for-component-tests.
 
@@ -61,7 +61,7 @@ await expect(refusalFor(page, "failure/orders.not_found")).toBeVisible({ timeout
 
 ### Prove the module mirror in a structure test
 
-**Requirement:** A web frontend calling the API MUST hold a Vitest test resolving modules to backend use cases and naming no refused folder.
+**Statement:** A web frontend calling the API MUST hold a Vitest test resolving modules to backend use cases and naming no refused folder.
 
 **Rationale:** The module tree mirrors the backend's use cases by path, and a backend rename silently breaks that mirror. A Vitest structure test resolves each folder against the backend's Application tree and names any refused folder, so drift fails the build instead of stranding a specification. This realizes litespec/frontend/testing#prove-the-module-mirror-in-a-structure-test.
 
@@ -75,7 +75,7 @@ test("every module folder names a backend use case, and no folder is named for n
 
 ### Run browser checks through the Playwright CLI
 
-**Requirement:** A browser suite MUST run through the Playwright CLI, addressable per route and per file.
+**Statement:** A browser suite MUST run through the Playwright CLI, addressable per route and per file.
 
 **Rationale:** The developer, the drill, and the integration job all share the command line, so a suite runnable per route and per file through the Playwright CLI is repeatable by the next investigator. A check that runs only inside an editor plugin or a proxy runner cannot be repeated anywhere else. This realizes litespec/frontend/testing#run-browser-checks-through-the-command-line.
 

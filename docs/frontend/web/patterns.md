@@ -8,7 +8,7 @@ A product records its UI pattern choices in one catalog, and each chosen pattern
 
 ### Implement a chosen pattern once
 
-**Requirement:** The shared web UI packages MUST implement each chosen pattern once at the source paths the catalog names for `react` and `svelte`.
+**Statement:** The shared web UI packages MUST implement each chosen pattern once at the source paths the catalog names for `react` and `svelte`.
 
 **Rationale:** Each web platform implements a chosen pattern once, at the source path the catalog names for `react` or `svelte`, so every React and Svelte route composes the same behavior. A route that redraws the pattern instead creates a second decision the catalog cannot track, and the two copies diverge. This realizes litespec/frontend/patterns#implement-a-chosen-pattern-once.
 

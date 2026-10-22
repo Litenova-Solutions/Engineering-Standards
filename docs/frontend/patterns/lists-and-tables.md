@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply orders list: 268 orders across man
 
 ### Keep a list's view in its address
 
-**Requirement:** A list MUST keep its filters, sort order, and page in the URL.
+**Statement:** A list MUST keep its filters, sort order, and page in the URL.
 
 **Rationale:** A view kept in the address survives the back button, a refresh, and a pasted link, so all three return to the same rows. Without it, opening one record loses the filters the reader set, and a link sent to a colleague opens the unfiltered first page instead of the rows under discussion.
 
 ### Align money to the right with its currency
 
-**Requirement:** A table MUST right-align a money column and show the currency of every amount in it.
+**Statement:** A table MUST right-align a money column and show the currency of every amount in it.
 
 **Rationale:** Right alignment lines up place value down the column, so a reader compares hundreds against thousands without reading each figure digit by digit. A currency on every amount keeps EUR 125.00 distinct from a bare 125.00, so an export or a screenshot never leaves finance guessing which money it shows.
 

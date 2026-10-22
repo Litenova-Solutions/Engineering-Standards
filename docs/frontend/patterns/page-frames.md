@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply back office: order SO-1042 for Mar
 
 ### Name the page in one heading
 
-**Requirement:** Each page MUST show one top-level heading that names the record, list, or task it holds.
+**Statement:** Each page MUST show one top-level heading that names the record, list, or task it holds.
 
 **Rationale:** One heading names the open record, list, or task, so a reader who arrived from a link or a search knows where they landed. Without it, two headings compete for that job, and the reader guesses which line to trust while assistive tech announces the wrong one.
 
 ### Show one primary action in a page frame
 
-**Requirement:** A page frame MUST show at most one primary action outside its rows and overlays.
+**Statement:** A page frame MUST show at most one primary action outside its rows and overlays.
 
 **Rationale:** One primary action names the step readers take most often next on the page, such as New delivery on a deliveries list. Without that single answer, two equal buttons force the reader to compare labels on every visit, and the hurried click lands on the wrong one.
 

@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply back office: 268 orders including 
 
 ### State what failed and the next step
 
-**Requirement:** A refusal or error message MUST state what failed and the next step the reader can take.
+**Statement:** A refusal or error message MUST state what failed and the next step the reader can take.
 
 **Rationale:** A message that only says something went wrong leaves the reader guessing whether to retry, fix input, or ask for help, and most readers retry blindly or give up. Naming what failed plus the one next step turns the dead end into a task the reader can complete.
 
 ### Keep the reader's input through a failure
 
-**Requirement:** A failed save MUST keep the reader's unsaved input on the screen.
+**Statement:** A failed save MUST keep the reader's unsaved input on the screen.
 
 **Rationale:** Retyping a whole form to fix one refused field wastes the reader's time and introduces new typos. Worse, readers who lose work to a failure stop trusting the form and copy long answers elsewhere before saving.
 

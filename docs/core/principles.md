@@ -22,55 +22,55 @@ Structural boundaries need mechanical proof: a project or package reference, com
 
 ### Keep one authored source
 
-**Requirement:** A consumer MUST author each record once in its home file and derive every other appearance from the model.
+**Statement:** A consumer MUST author each record once in its home file and derive every other appearance from the model.
 
 **Rationale:** Two homes for one fact become two facts with the next edit: each copy changes on its own schedule while readers guess which one rules. Deriving every other appearance from the model keeps the authored record as the single place a change lands. Coverage, history, and status computed from the model stay true without anyone typing them by hand.
 
 ### Locate package versions in the manifest
 
-**Requirement:** A consumer MUST resolve the standards-selected stack versions from `litespec.manifest.json`.
+**Statement:** A consumer MUST resolve the standards-selected stack versions from `litespec.manifest.json`.
 
 **Rationale:** The manifest is the version authority for the stack the standards select, so every consumer resolves the same tested combination. A version pinned in prose or remembered by an agent drifts from that authority with the next manifest change. Consumer dependencies still live in package manifests and lockfiles; only the standards-selected stack versions resolve from `litespec.manifest.json`.
 
 ### Locate record status in frontmatter
 
-**Requirement:** A consumer MUST carry each record's `status`, `owner`, `decider`, and `decideBy` date in its frontmatter.
+**Statement:** A consumer MUST carry each record's `status`, `owner`, `decider`, and `decideBy` date in its frontmatter.
 
 **Rationale:** Status in frontmatter exposes it to tools and reviewers in one predictable place. Entries inherit their page's `owner` and `status` unless they set their own, so one header governs the whole page. Status kept in prose hides from every check and goes stale with the next edit. The [model page](model.md) defines the common fields.
 
 ### Prove cases with tests
 
-**Requirement:** A test MUST prove a case only by calling its use case and asserting its result.
+**Statement:** A test MUST prove a case only by calling its use case and asserting its result.
 
 **Rationale:** A passing test that never calls the use case proves nothing about the behavior it claims. Calling the use case and asserting its result ties the proof to the shipped path. A case without such a test is a known gap with an owner and an end date, not silent coverage. The [model page](model.md) defines the `proves` link.
 
 ### Classify record authority
 
-**Requirement:** A record MUST carry exactly one status of draft, approved, or retired, with a draft naming its `decider` and `decideBy` date.
+**Statement:** A record MUST carry exactly one status of draft, approved, or retired, with a draft naming its `decider` and `decideBy` date.
 
 **Rationale:** Exactly one status tells every reader what a record is: under review, authoritative, or past. A draft without a `decider` and `decideBy` date waits on nobody and decides nothing. Two statuses, or none, leave agents guessing whether the record governs their task.
 
 ### Refuse approval behind a draft decision
 
-**Requirement:** A record MUST NOT be approved while a decision behind it is a draft.
+**Statement:** A record MUST NOT be approved while a decision behind it is a draft.
 
 **Rationale:** Approval on a draft turns an undecided choice into an authoritative record that later readers trust. The records then rest on a choice nobody made. Approving the decision first keeps the chain sound: decided choice, then the records behind it.
 
 ### Separate authority from implementation
 
-**Requirement:** A record MUST NOT write its own implementation status, because implemented and verified are computed from code and test runs.
+**Statement:** A record MUST NOT write its own implementation status, because implemented and verified are computed from code and test runs.
 
 **Rationale:** An approved record states a planned target, not a claim that behavior runs. Writing implemented or verified by hand turns the plan into a false completion report with the next commit. The [model page](model.md) defines how the model computes both from code and test runs.
 
 ### Retire public behavior deliberately
 
-**Requirement:** A retired use case MUST name no entry point in `reachedThrough`.
+**Statement:** A retired use case MUST name no entry point in `reachedThrough`.
 
 **Rationale:** A retired record stays readable as the past and cannot own still-supported public behavior. A use case that still names an entry point in `reachedThrough` claims a route the team no longer supports. Removing the route before retiring the record keeps the retirement honest.
 
 ### Prove enforceable boundaries mechanically
 
-**Requirement:** A consumer MUST prove each enforceable boundary mechanically: a reference, visibility, an architecture test, a behavior test, or a lint rule.
+**Statement:** A consumer MUST prove each enforceable boundary mechanically: a reference, visibility, an architecture test, a behavior test, or a lint rule.
 
 **Rationale:** A boundary stated only in prose holds until the first commit that ignores it. Mechanical proof, such as a reference, a visibility rule, an architecture test, a behavior test, or a lint rule, fails the build or the check the day the boundary breaks. Specifications then explain the decisions that need judgment, while tools guard the constraints that do not. Enforceable boundaries include project and package references, compiler visibility, permission guards, store constraints, and lint rules.
 
@@ -78,19 +78,19 @@ Structural boundaries need mechanical proof: a project or package reference, com
 
 ### Require current complexity activation
 
-**Requirement:** A consumer MUST add packages, projects, wrappers, background processes, caches, queues, or distributed patterns only for a current documented requirement.
+**Statement:** A consumer MUST add packages, projects, wrappers, background processes, caches, queues, or distributed patterns only for a current documented requirement.
 
 **Rationale:** Each package, project, wrapper, background process, cache, queue, or distributed pattern adds maintenance, failure modes, and concepts every later reader must learn. A current use case, decision, or requirement names the activation criterion that justifies that cost. Preference and possible future need never establish one, so speculative machinery never enters on a guess.
 
 ### Name boundary intent
 
-**Requirement:** A consumer MUST use business operation names, specific command and query mediators, and business-action external ports at boundaries.
+**Statement:** A consumer MUST use business operation names, specific command and query mediators, and business-action external ports at boundaries.
 
 **Rationale:** Boundaries are where components meet and where future readers orient themselves. Business operation names, specific command and query mediators, and business-action external ports state the purpose and owner at that meeting point. A precise name lets a newcomer place the interaction without opening either side.
 
 ### Avoid generic boundary names
 
-**Requirement:** A consumer MUST NOT use generic `bus`, `manager`, `helper`, `processor`, or `service` names when a narrower name exists.
+**Statement:** A consumer MUST NOT use generic `bus`, `manager`, `helper`, `processor`, or `service` names when a narrower name exists.
 
 **Rationale:** Names such as `bus`, `manager`, `helper`, `processor`, and `service` say nothing about the business action, so unrelated responsibility collects behind them with every change. The narrower name keeps each boundary to the action it names.
 

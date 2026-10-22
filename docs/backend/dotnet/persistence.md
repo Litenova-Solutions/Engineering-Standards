@@ -18,13 +18,13 @@ Marten is the baseline provider, supplying the session, the read session, and do
 
 ### Stage aggregate writes through repositories
 
-**Requirement:** A command handler MUST reach persistence only through a Domain repository, never through `IDocumentSession`.
+**Statement:** A command handler MUST reach persistence only through a Domain repository, never through `IDocumentSession`.
 
 **Rationale:** Infrastructure implements each Domain repository with the scoped session, so the handler stages work without naming a provider type. A repository that exposed the session, a generic query, or a save operation would hand the handler the provider surface the layer exists to hide. This provision states the .NET form of `litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories`.
 
 ### Query through IQuerySession
 
-**Requirement:** A query handler MUST project through `IQuerySession`, applying filter, scope, ordering, and limit before materialization.
+**Statement:** A query handler MUST project through `IQuerySession`, applying filter, scope, ordering, and limit before materialization.
 
 **Rationale:** The read session already filters, orders, pages, and projects; a read-store interface per aggregate, a generic read repository, or a callback wrapper adds a layer that repeats it. Ordering and paging follow `litespec/backend/api#bound-collection-queries`. This provision states the .NET form of `litespec/backend/persistence#query-through-the-read-session`.
 
@@ -37,7 +37,7 @@ The table names the binding per provider. The obligation to project with filter,
 
 ### Commit once in the command pipeline
 
-**Requirement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
+**Statement:** Exactly one global command post-handler MUST call `SaveChangesAsync` for a command pipeline.
 
 **Rationale:** Exactly one post-handler commits, so a failed command leaves the scoped session uncommitted and no partial work persists. A second committer, in a handler, repository, validator, reaction, or endpoint, would store work the pipeline later refuses. This provision states the .NET form of `litespec/backend/persistence#commit-each-command-pipeline-once`.
 

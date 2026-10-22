@@ -20,7 +20,7 @@ In Svelte terms: a page is a route file, a load is a loader, and a query creator
 
 ### Load route data in the loader
 
-**Requirement:** A route's loader MUST prefetch each read it needs through the query cache before the component runs.
+**Statement:** A route's loader MUST prefetch each read it needs through the query cache before the component runs.
 
 **Rationale:** A loader that prefetches each read through the query cache lets the page render with its data instead of appearing first and spinning after. The cache owns freshness, so the router holds no second copy that could disagree with it. This realizes litespec/frontend/rendering#load-route-data-before-rendering.
 
@@ -53,7 +53,7 @@ export async function load({ parent, params }) {
 
 ### Read route data with a suspense query
 
-**Requirement:** A component MUST read route data with a suspense query over the same cache key its loader filled.
+**Statement:** A component MUST read route data with a suspense query over the same cache key its loader filled.
 
 **Rationale:** The loader filled one cache key, and the component reads that same key. A read naming another key issues a second request, and the two answers can disagree. A failed read reaches the route's error boundary, which draws the shared problem state instead of a half-rendered page. This realizes litespec/frontend/rendering#read-route-data-from-the-route-cache.
 
@@ -73,7 +73,7 @@ const order = createQuery(() => orderQuery(orderId));
 
 ### Keep search parameters validated by a schema
 
-**Requirement:** A route MUST declare its search parameters in a validated schema, including its filters and its page.
+**Statement:** A route MUST declare its search parameters in a validated schema, including its filters and its page.
 
 **Rationale:** A filter declared in a schema makes the filtered list a link: shareable, bookmarkable, reopenable. The same filter in component state reaches nobody and is lost on the first navigation away. Validation keeps a hand-edited address from reaching the page as values the page cannot interpret. This realizes litespec/frontend/rendering#keep-address-parameters-validated-by-a-schema.
 
@@ -91,7 +91,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 ### Split one chunk per route and per language
 
-**Requirement:** A frontend MUST load each route and each language as its own chunk, with no icon set or language imported whole.
+**Statement:** A frontend MUST load each route and each language as its own chunk, with no icon set or language imported whole.
 
 **Rationale:** A signed-in user opens one address and reads one language, so the download should match: one chunk per route and one per language, with no icon set or language imported whole. Anything more makes a reader wait for code and words they will never see, like a Dutch reader downloading English for a dashboard they never leave. This realizes litespec/frontend/rendering#load-each-route-and-each-language-separately.
 
@@ -99,13 +99,13 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 ### Load a route on intent
 
-**Requirement:** A frontend MUST prefetch the route a pointer is over, and never treat that prefetch as a cache beyond the query cache.
+**Statement:** A frontend MUST prefetch the route a pointer is over, and never treat that prefetch as a cache beyond the query cache.
 
 **Rationale:** Prefetching the route a pointer is over fills the query cache before the click, so most navigations render from data already held. The prefetch must never act as a second cache beyond the query cache: two caches serve a stale answer beside a fresh one with no error anywhere. This realizes litespec/frontend/rendering#prefetch-a-route-on-intent.
 
 ### Define route metadata deliberately
 
-**Requirement:** A public route MUST define its title, its description, its canonical address, and its indexing policy, while a private route refuses indexing.
+**Statement:** A public route MUST define its title, its description, its canonical address, and its indexing policy, while a private route refuses indexing.
 
 **Rationale:** A public route's title, description, canonical address, and indexing policy are what a search result and a shared link show; without them the page arrives as a bare address. A private route refuses indexing, because an indexed console address exposes to search what a signed-in user believes is private.
 
@@ -113,13 +113,13 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 ### Keep authenticated caching explicit
 
-**Requirement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
+**Statement:** Actor-specific data MUST declare its cache key, partition, invalidation owner, and security review before caching, beside the query definition setting the key.
 
 **Rationale:** A cache that outlives its actor serves one reader's data to another, so actor-specific data stays uncached until its cache key, partition, invalidation owner, and security review are declared beside the query definition that sets the key. A cache partitioned per request is the safe server shape, and an uncached read is the safe default. This realizes litespec/frontend/rendering#keep-authenticated-caching-explicit.
 
 ### Keep proxy behavior at the edge
 
-**Requirement:** A development or edge proxy rule MUST route only, and never decide who the actor is or what the actor may read.
+**Statement:** A development or edge proxy rule MUST route only, and never decide who the actor is or what the actor may read.
 
 **Rationale:** A development or edge proxy runs before the request reaches the API, so it cannot see the resource authorization depends on; any identity or permission decision it made would rest on missing facts. It routes only. Forwarding the API's own paths gives the browser one origin, which makes an HTTP-only session cookie a first-party cookie of the page. This realizes litespec/frontend/rendering#keep-proxy-behavior-at-the-edge.
 
@@ -127,7 +127,7 @@ const search = orderSearch.parse(Object.fromEntries(url.searchParams));
 
 ### Build the server query cache per request
 
-**Requirement:** A server-rendered frontend MUST construct its query cache inside each request.
+**Statement:** A server-rendered frontend MUST construct its query cache inside each request.
 
 **Rationale:** A server renders for many readers at once. A query cache built inside each request dies with its reader, so no reader sees another's data. A cache outliving one request would serve the next reader the previous reader's answer. This realizes litespec/frontend/rendering#build-the-server-data-cache-per-request.
 

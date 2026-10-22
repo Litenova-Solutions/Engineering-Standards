@@ -26,7 +26,7 @@ A [Case](../reference/glossary.md) states one behavior the product must show, an
 
 ### Keep the test suites the size requires
 
-**Requirement:** A backend codebase MUST hold exactly the test suites its size requires: architecture and integration for small, adding acceptance for large.
+**Statement:** A backend codebase MUST hold exactly the test suites its size requires: architecture and integration for small, adding acceptance for large.
 
 **Rationale:** Each suite owns one boundary and one harness, so a project that keeps exactly its suites knows where each new test belongs. A missing suite pushes its tests into another suite's harness, where they run with the wrong fixtures, and an extra unnamed suite collects the tests nobody placed. Unit suites stay optional in both sizes, and acceptance stays optional for small. An acceptance suite without the executable BDD extension is an unnamed baseline suite: select the extension, or name the suite for what it actually is.
 
@@ -42,13 +42,13 @@ A small codebase holds the first two. Acceptance appears when the executable BDD
 
 ### Test Domain in isolation
 
-**Requirement:** A Domain test MUST use explicit inputs with no database, HTTP host, container, clock, or mock.
+**Statement:** A Domain test MUST use explicit inputs with no database, HTTP host, container, clock, or mock.
 
 **Rationale:** Domain behavior is deterministic: explicit inputs in, new state or a refusal out. A database, host, container, clock, or mock in a Domain test hides nondeterminism behind the call, so the same test can pass and fail without a code change. The suite covers factories, every lifecycle state, allowed and rejected transitions, invariants, value equality, collections, money rules, exceptions, and raised events.
 
 ### Test Application coordination
 
-**Requirement:** An Application test MUST substitute repositories, clocks, actor accessors, and external ports, then assert the handler's coordination.
+**Statement:** An Application test MUST substitute repositories, clocks, actor accessors, and external ports, then assert the handler's coordination.
 
 **Rationale:** A handler's job is coordination: load the right aggregates, call Domain behavior, stage the result. Substitutes for repositories, clocks, actor accessors, and ports isolate that coordination, so a failure names the handler rather than the database or the provider. The assertion covers which aggregate was loaded, which Domain behavior ran, what was staged, and what was returned, and validator tests cover each structural rule separately.
 
@@ -67,13 +67,13 @@ The test asserts which aggregate was loaded, what was staged, and what was retur
 
 ### Test HTTP integration through the real application host
 
-**Requirement:** An HTTP integration test MUST run through the real application host with the real configuration, covering Problem Details, authentication, and resource authorization.
+**Statement:** An HTTP integration test MUST run through the real application host with the real configuration, covering Problem Details, authentication, and resource authorization.
 
 **Rationale:** Only the real host wires the real routing, serialization, authentication, and authorization. A test that bypasses the host proves the handler again and misses the boundary where status codes, Problem Details shapes, and policy denials are actually produced. Persistence behavior is covered against PostgreSQL under `litespec/backend/persistence#test-persistence-against-postgresql`, and both run on the harness that `litespec/backend/testing#share-one-production-faithful-integration-harness` owns.
 
 ### Isolate integration state
 
-**Requirement:** An integration test MUST reset database state between cases through one documented strategy and depend on no test order.
+**Statement:** An integration test MUST reset database state between cases through one documented strategy and depend on no test order.
 
 **Rationale:** When two cases share mutable business state, each passes or fails depending on which ran first, and a failure cannot be reproduced alone. One documented reset strategy removes that coupling. Container and host fixtures may still be shared for cost, because only mutable business state must not leak.
 
@@ -81,13 +81,13 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 ### Assert architecture boundaries with tests
 
-**Requirement:** An architecture test MUST assert the structural boundaries that `litespec/backend/architecture#test-structural-boundaries` names.
+**Statement:** An architecture test MUST assert the structural boundaries that `litespec/backend/architecture#test-structural-boundaries` names.
 
 **Rationale:** The compiler does not enforce project references, visibility, or folder placement, so a review miss on any of them lands in the main branch silently. An architecture test turns each structural boundary into a failure the suite reports on the change that broke it.
 
 ### Tag the test that proves each Case
 
-**Requirement:** Each Case MUST be proved by a test carrying its proves tag and calling its use case.
+**Statement:** Each Case MUST be proved by a test carrying its proves tag and calling its use case.
 
 **Rationale:** A Case states one behavior the product must show, and the `proves` tag is the test's claim that it shows it. Without that claim, a deleted behavior leaves passing tests and no failing record. The model builder confirms an acceptance scenario when its `When` step belongs to the use case steps class, and an integration test when its body names the use case message type. A Case no test proves is recorded as a Known gap with owner and end date. The test asserts the result, and the Result code for a refusal.
 
@@ -106,7 +106,7 @@ The tag names the Case, the steps call the submit-expense use case, and the mode
 
 ### Prove each Rule at its enforcement point
 
-**Requirement:** Each Rule MUST be proved at the point its `enforcedBy` names: governed Cases for validator and guard Rules, a proves tag otherwise.
+**Statement:** Each Rule MUST be proved at the point its `enforcedBy` names: governed Cases for validator and guard Rules, a proves tag otherwise.
 
 **Rationale:** Each Rule holds at exactly one enforcement point: the validator, the store, the guard, or the aggregate. A test that proves it anywhere else passes while the enforcement point drifts. A refused request proves a validator Rule, an integration test that provokes the refusal proves a store Rule, and the Cases of its reacting use case prove a reaction Rule. The builder confirms an aggregate or store claim when the test body names the governed business record code type.
 
@@ -114,13 +114,13 @@ The validator enforces input shape as a checked-before Rule. The store enforces 
 
 ### Use evidence rather than one coverage target
 
-**Requirement:** A repository MUST NOT treat one coverage percentage as the definition of sufficient testing.
+**Statement:** A repository MUST NOT treat one coverage percentage as the definition of sufficient testing.
 
 **Rationale:** A single coverage percentage rewards tests that execute lines without asserting behavior: a suite can reach the target while proving no Case. Coverage stays useful as review input, so the project collects line and branch numbers without treating any value as sufficient. The evidence is Case proof, Domain negative cases, integration boundaries, security behavior, and architecture rules.
 
 ### Share one production-faithful integration harness
 
-**Requirement:** The integration suite MUST own one database container fixture, one application host factory, and one database isolation helper.
+**Statement:** The integration suite MUST own one database container fixture, one application host factory, and one database isolation helper.
 
 **Rationale:** One fixture, one host factory, and one reset helper give every integration test the same database and configuration. A container per test group multiplies the run time by the group count, and it buys no isolation that a cloned database lacks. The fixture starts the pinned PostgreSQL once per test run, and it supplies each test group its connection string before the host builds.
 

@@ -8,7 +8,7 @@ A Svelte component holds its state in runes, with props from `$props` and derive
 
 ### Write components in runes mode
 
-**Requirement:** A component MUST hold its local state in runes, with props from `$props` and derived values from `$derived`.
+**Statement:** A component MUST hold its local state in runes, with props from `$props` and derived values from `$derived`.
 
 **Rationale:** Runes are the reactivity model the compiler understands: `$state` for local state, `$props` for inputs, and `$derived` for computed values. Legacy reactive statements and untyped prop access bypass that model and behave differently under the compiler. An effect covers what derivation cannot express, so nothing needs the legacy forms.
 
@@ -25,7 +25,7 @@ A Svelte component holds its state in runes, with props from `$props` and derive
 
 ### Keep component boundaries typed
 
-**Requirement:** A component MUST type its props, its events, and its snippets under strict mode.
+**Statement:** A component MUST type its props, its events, and its snippets under strict mode.
 
 **Rationale:** An untyped prop fails at the call site the next author writes, which is the most expensive place to learn a shape: after writing the code that uses it. Strict mode turns that failure into a build error at the author's own call. Typed events and snippets do the same for what the component reports and what it lets callers fill in.
 

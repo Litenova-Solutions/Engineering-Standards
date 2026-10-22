@@ -34,13 +34,13 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Record the audit adoption decision
 
-**Requirement:** An audit adoption decision MUST record its owner, status, decider, decide-by, audited categories, threshold, access model, integrity method, and records entry.
+**Statement:** An audit adoption decision MUST record its owner, status, decider, decide-by, audited categories, threshold, access model, integrity method, and records entry.
 
 **Rationale:** Which actions to audit, how long to keep them, and how to protect them are policy choices, so the project declares them once in the adoption decision. A reviewer reads the declared policy before reading the implementation, and no record is approved while the decision is still draft. Without that order, each reviewer reconstructs the policy from the code and two reviewers reconstruct different policies.
 
 ### Declare audit selection on every Command
 
-**Requirement:** Every Command MUST declare that it is audited, or declare that it is excluded together with the reason for exclusion.
+**Statement:** Every Command MUST declare that it is audited, or declare that it is excluded together with the reason for exclusion.
 
 **Rationale:** An audit selection that lives only in code is invisible: a reader cannot tell an unaudited Command from an audited one whose call is missing. A declaration on every Command turns each omission into a visible statement with a reason. Review then reads the selection instead of hunting for missing calls.
 
@@ -48,19 +48,19 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Cover the required audit categories
 
-**Requirement:** An audit selection MUST include authentication, authorization denial, grant change, monetary action, tenant configuration, personal-data read, bulk export, and background-process change.
+**Statement:** An audit selection MUST include authentication, authorization denial, grant change, monetary action, tenant configuration, personal-data read, bulk export, and background-process change.
 
 **Rationale:** Each listed category answers a question a security review, a customer, or a supervisory authority asks after an incident: who signed in, who was refused, who changed a grant, who moved money, and the rest. A trail that omits a category has no answer when that question arrives. The list fixes the floor so no project discovers the gap during its first review.
 
 ### Exclude indiscriminate auditing
 
-**Requirement:** A project MUST NOT audit every Command without a recorded selection.
+**Statement:** A project MUST NOT audit every Command without a recorded selection.
 
 **Rationale:** A trail that records every Command buries the sensitive action inside routine traffic, and the reviewer who must read it stops reading. Volume then defeats the review the trail exists to support. A recorded selection keeps the trail small enough to read.
 
 ### Emit audit records at the mediation boundary
 
-**Requirement:** An audit producer MUST run in the mediation pipeline stages that dispatch the Command.
+**Statement:** An audit producer MUST run in the mediation pipeline stages that dispatch the Command.
 
 **Rationale:** Only the pipeline stages that dispatch the Command observe the whole attempt, including attempts the handler never reaches. An audit call inside the handler misses every attempt that throws before it and every refusal the pipeline makes. The pipeline is therefore the one place that records all three outcomes.
 
@@ -68,7 +68,7 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Restrict handler contribution to determined values
 
-**Requirement:** A handler MUST contribute only the audit values that the handler alone determines.
+**Statement:** A handler MUST contribute only the audit values that the handler alone determines.
 
 **Rationale:** The declaration, the actor, and the request context already fix most fields before the handler runs. Only the handler knows the values it alone determines, such as a generated target identity or a composed reason. Letting the handler write the rest invites a second copy of each field that drifts from the first.
 
@@ -76,19 +76,19 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Exclude derived audit trails
 
-**Requirement:** An audit trail MUST NOT be derived from domain events, database triggers, or change data capture.
+**Statement:** An audit trail MUST NOT be derived from domain events, database triggers, or change data capture.
 
 **Rationale:** Domain events, triggers, and change data capture describe committed state change. They carry no refused attempt, no use-case identity, and no request origin, which are the fields a reviewer reads. A trail derived from them answers what changed and never who attempted it.
 
 ### Record the required audit fields
 
-**Requirement:** An audit record MUST contain actor, action, target, outcome, business time, record time, and tenant, fixed where the tenancy extension is absent.
+**Statement:** An audit record MUST contain actor, action, target, outcome, business time, record time, and tenant, fixed where the tenancy extension is absent.
 
 **Rationale:** Actor, action, target, outcome, the two times, and the tenant together answer who attempted what, against whose data, with what result, and when. Business time states when the action happened and record time states when the evidence was written, so a delayed write stays visible as a delay. A record missing any of them leaves the accountability question half answered.
 
 ### State the action as use-case identity
 
-**Requirement:** An audit `action` MUST use the identity of the use case that the actor invoked.
+**Statement:** An audit `action` MUST use the identity of the use case that the actor invoked.
 
 **Rationale:** A reviewer who reads an action value opens the specification of that use case to learn the intended behavior. A separate action vocabulary needs a mapping to those specifications, and the mapping drifts as both sides change. Reusing the use-case identity keeps record and specification joined with no mapping to maintain.
 
@@ -96,19 +96,19 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Record the failure code on an unsuccessful attempt
 
-**Requirement:** An audit record with a `denied` or `failed` outcome MUST carry the stable failure code that the attempt produced.
+**Statement:** An audit record with a `denied` or `failed` outcome MUST carry the stable failure code that the attempt produced.
 
 **Rationale:** A refused permission and an exhausted precondition need different responses, but both look like failure without a code. The stable failure code tells the reviewer which one the attempt produced. It also lets trend queries count one kind of refusal across the whole trail.
 
 ### Version the audit record shape
 
-**Requirement:** An audit record MUST carry an explicit schema version.
+**Statement:** An audit record MUST carry an explicit schema version.
 
 **Rationale:** A retained record outlives several shapes of the application that wrote it. An explicit version lets a later reader parse each record in the shape it was written in. Without it, every shape change forces a rewrite of retained evidence.
 
 ### Use a closed actor set
 
-**Requirement:** An audit actor MUST be one of `person`, `company`, `provider`, `system`, or `guest`.
+**Statement:** An audit actor MUST be one of `person`, `company`, `provider`, `system`, or `guest`.
 
 **Rationale:** An absent actor collapses three answers into one: a scheduled process acted, a device acted, or no one recorded the actor, and only the third is a defect. The five kinds separate them: a device maps to the person whose account authorized it, with the device as the client description, and a named process maps to `system`. A free-text actor would let each writer spell the same actor differently and break every actor filter.
 
@@ -116,13 +116,13 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Record delegated administrative access
 
-**Requirement:** An action that an actor takes under an administrative or support grant MUST record that the grant was used.
+**Statement:** An action that an actor takes under an administrative or support grant MUST record that the grant was used.
 
 **Rationale:** Support staff act inside customer data under a grant, and without a marker their actions read exactly like customer actions. The marker makes a no-silent-access commitment demonstrable: every supplier-side action says so on its own record. A reviewer who cannot separate the two cannot verify the commitment.
 
 ### Record every attempt outcome
 
-**Requirement:** An audit record MUST carry an outcome of `succeeded`, `denied`, or `failed`.
+**Statement:** An audit record MUST carry an outcome of `succeeded`, `denied`, or `failed`.
 
 **Rationale:** A trail of successes is a change history, not evidence. The refused attempt carries the security signal, and the failed attempt carries the operating signal. Three outcomes keep both signals in the same trail as the successes they qualify.
 
@@ -130,37 +130,37 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Record refused authorization
 
-**Requirement:** An authorization decision that refuses an audited action MUST produce an audit record.
+**Statement:** An authorization decision that refuses an audited action MUST produce an audit record.
 
 **Rationale:** Repeated refusal is the first indicator of a compromised or probing account, and no other record holds it: nothing changed, so nothing else was written. Each refusal therefore writes its own record. A trail without refusals shows an attacker who never failed.
 
 ### Record failed audited attempts
 
-**Requirement:** An audited action that the actor was permitted to take and that did not complete MUST produce an audit record.
+**Statement:** An audited action that the actor was permitted to take and that did not complete MUST produce an audit record.
 
 **Rationale:** A permitted attempt that throws is neither a success nor a refusal, and without a record it vanishes entirely. Writing it separates an operating defect from an access problem: failures cluster around broken behavior, denials cluster around missing permission. Support reads that split before it reads the logs.
 
 ### Record the request origin
 
-**Requirement:** An audit record produced from an inbound request MUST carry the request origin address, the client description, and the request identifier.
+**Statement:** An audit record produced from an inbound request MUST carry the request origin address, the client description, and the request identifier.
 
 **Rationale:** Two records naming one account state nothing about location. The same account acting from two countries within one minute states that the account is compromised, but only when each record carries origin, client, and request identifier. The request identifier further joins the record to the exact request in the diagnostic log.
 
 ### Record the operation trace identity
 
-**Requirement:** An audit record MUST carry the trace identifier of the operation that produced it.
+**Statement:** An audit record MUST carry the trace identifier of the operation that produced it.
 
 **Rationale:** The audit record states what was attempted, and the diagnostic log states what the software did while attempting it. The trace identifier joins the two, so an investigation moves from evidence to detail in one step. Without it, the investigation stops at the audit record and reconstructs the rest by time.
 
 ### Exclude secrets and payment data
 
-**Requirement:** An audit record MUST NOT contain a credential, token, session identifier, encryption key, or payment instrument value.
+**Statement:** An audit record MUST NOT contain a credential, token, session identifier, encryption key, or payment instrument value.
 
 **Rationale:** The trail is retained, widely readable, and append-only, which is the worst combination for a secret: retention extends the exposure and append-only removes the repair. A credential or payment value written once stays readable for the whole retention period. Secrets and payment values therefore travel in the systems built to hold them, never in the trail.
 
 ### Exclude personal data beyond actor identity
 
-**Requirement:** An audit record MUST NOT contain personal data other than the pseudonymous identifier of the actor and the target.
+**Statement:** An audit record MUST NOT contain personal data other than the pseudonymous identifier of the actor and the target.
 
 **Rationale:** A record holding a name, an address, or a message body turns retention into an erasure conflict: the law asks for deletion and the trail asks for keeping. Pseudonymous identifiers keep the record meaningful while the mapping lives, and erasable once the mapping goes. The record then survives erasure instead of fighting it.
 
@@ -170,43 +170,43 @@ A pseudonymous identifier is still personal data where the party holding it can 
 
 ### Exclude state snapshots
 
-**Requirement:** An audit record MUST NOT contain a copy of the state before or after the audited change.
+**Statement:** An audit record MUST NOT contain a copy of the state before or after the audited change.
 
 **Rationale:** The domain event stream already holds each change under its own retention. Copying before and after state into the trail duplicates that storage and widens every record with data the reviewer did not ask for. The trail adds the actor and the reason, which nothing else holds, and leaves the change itself to the stream.
 
 ### Commit a success record with its business change
 
-**Requirement:** An audit record with a `succeeded` outcome MUST commit in the same database transaction as the change it describes.
+**Statement:** An audit record with a `succeeded` outcome MUST commit in the same database transaction as the change it describes.
 
 **Rationale:** One transaction makes the action and its evidence inseparable: the change commits with its record or neither commits. Separate writes admit both an unrecorded action and a record of a rolled-back action. Either one leaves the trail disagreeing with the data it describes.
 
 ### Write an unsuccessful record outside the failed transaction
 
-**Requirement:** An audit record with a `denied` or `failed` outcome MUST be written on a connection that the failing transaction does not roll back.
+**Statement:** An audit record with a `denied` or `failed` outcome MUST be written on a connection that the failing transaction does not roll back.
 
 **Rationale:** A denied or failed attempt ends with its transaction rolling back, which would take a record written inside it. The record therefore travels on a connection the rollback does not touch. The evidence of a refusal outlives the refusal itself.
 
 ### Stage the audit write before the business commit
 
-**Requirement:** An audit producer that stages a success record MUST run before the pipeline stage that commits the business transaction.
+**Statement:** An audit producer that stages a success record MUST run before the pipeline stage that commits the business transaction.
 
 **Rationale:** A success record staged after the commit reaches a transaction that is already closed, so the write has nowhere to land. The producer therefore runs before the pipeline stage that commits. Pipeline priority states that order explicitly instead of leaving it to registration order.
 
 ### Publish unsuccessful write failures
 
-**Requirement:** An audit deployment MUST publish the write failure count of its unsuccessful-outcome path.
+**Statement:** An audit deployment MUST publish the write failure count of its unsuccessful-outcome path.
 
 **Rationale:** The separate connection for unsuccessful records accepts a rare lost record when the process dies between the refusal and the write. Continuous loss is a defect, not bad luck, and only a published count separates the two. The deployment publishes that count so monitoring tells rarity from breakage.
 
 ### Scope every record to its tenant
 
-**Requirement:** An audit record describing an action inside tenant-owned data MUST carry the identity of that tenant.
+**Statement:** An audit record describing an action inside tenant-owned data MUST carry the identity of that tenant.
 
 **Rationale:** The tenant is the filter for every read of the trail: each customer reads its own records and no one else's. A record without a tenant identity serves an internal reviewer and no customer. Scoping every record at write time keeps that filter exact.
 
 ### Enforce append-only through storage privilege
 
-**Requirement:** An audit store MUST refuse update and delete through the privileges granted to the writing account.
+**Statement:** An audit store MUST refuse update and delete through the privileges granted to the writing account.
 
 **Rationale:** An audit store that relies on absent code paths stays append-only until someone writes the missing path. Revoked privileges refuse update and delete no matter what the code attempts. A reviewer verifies a privilege in the database instead of auditing every line for a missing write.
 
@@ -214,7 +214,7 @@ A pseudonymous identifier is still personal data where the party holding it can 
 
 ### Provide tamper evidence
 
-**Requirement:** An audit store MUST chain each record to its predecessor with a SHA-256 hash over a canonical serialization of both.
+**Statement:** An audit store MUST chain each record to its predecessor with a SHA-256 hash over a canonical serialization of both.
 
 **Rationale:** The hash chain detects an edit and a removal, because a changed or missing record breaks every value after it. Detection is the obligation: it lets a reviewer prove the trail is intact. Prevention at a higher cost is not required.
 
@@ -224,7 +224,7 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Anchor the audit chain outside its own store
 
-**Requirement:** An audit store SHOULD publish a periodic checkpoint of its chain head to a destination that the store's own operators cannot rewrite.
+**Statement:** An audit store SHOULD publish a periodic checkpoint of its chain head to a destination that the store's own operators cannot rewrite.
 
 **Deviation:** A store whose recorded threat model excludes its own operators publishes no checkpoint.
 
@@ -234,49 +234,49 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Verify the integrity chain on a schedule
 
-**Requirement:** An audit deployment MUST verify its integrity chain on a recurring schedule and raise an alert on a break.
+**Statement:** An audit deployment MUST verify its integrity chain on a recurring schedule and raise an alert on a break.
 
 **Rationale:** Tamper evidence nobody checks proves nothing: a break sits in the store until someone looks. Scheduled verification turns the chain into a standing claim the deployment re-proves on each run. The alert carries the break to an operator instead of waiting for the next review.
 
 ### Add a correcting record
 
-**Requirement:** A correction to the trail MUST be a new record that references the earlier one.
+**Statement:** A correction to the trail MUST be a new record that references the earlier one.
 
 **Rationale:** An edited history carries no evidential value, because the reviewer cannot tell a correction from a cover-up. A new record that references the earlier one keeps both visible: the mistake and its fix. The trail then shows its own repairs instead of hiding them.
 
 ### Retain each category for its declared period
 
-**Requirement:** An audit deployment MUST delete a record after the retention period declared for its category.
+**Statement:** An audit deployment MUST delete a record after the retention period declared for its category.
 
 **Rationale:** Each category declares its retention in the adoption decision, and the deployment deletes records when that period ends. Deletion on schedule keeps retention defensible: kept data has a declared reason and nothing kept lacks one. An indefinite period is the hardest retention to defend and the easiest to correct at design time.
 
 ### Remove the identity mapping on erasure
 
-**Requirement:** An erasure request MUST remove the mapping from actor identifier to person and retain every audit record.
+**Statement:** An erasure request MUST remove the mapping from actor identifier to person and retain every audit record.
 
 **Rationale:** Erasure asks that the person stop being identifiable, while accountability asks that the record stay. Removing the mapping from identifier to person satisfies both: the record keeps its evidential value and no longer points at anyone. This works only because the record holds no other personal data.
 
 ### Give the trail a read path
 
-**Requirement:** An audited system MUST provide a trail read as a use case needing a Permission record, filtered by tenant, actor, action, target, and outcome.
+**Statement:** An audited system MUST provide a trail read as a use case needing a Permission record, filtered by tenant, actor, action, target, and outcome.
 
 **Rationale:** A trail no use case reads is storage, not a control. The read path is a use case with its own Permission record: the actor holds a Role at a scope, the Role allows the Permission, and the guard permits the read. Tenant, actor, action, target, and outcome filters keep each reader inside the records they may see.
 
 ### Audit reads of the trail
 
-**Requirement:** A read of the audit trail MUST itself produce an audit record.
+**Statement:** A read of the audit trail MUST itself produce an audit record.
 
 **Rationale:** Reading the evidence is itself a sensitive action: the trail shows who did what across the whole product. A read that writes no record leaves the reviewer outside the trail. Recording each read puts the reviewer inside the same accountability as everyone else.
 
 ### Record personal-data reads
 
-**Requirement:** A query returning personal data across a boundary MUST produce an audit record, defining the account boundary in the adoption decision where tenancy is absent.
+**Statement:** A query returning personal data across a boundary MUST produce an audit record, defining the account boundary in the adoption decision where tenancy is absent.
 
 **Rationale:** A read changes no state and therefore leaves no other trace, so a disclosure without a record cannot be investigated. The audit record on a cross-boundary personal-data query states who read whose data and when. Where tenancy is absent, the adoption decision defines the account boundary the rule watches.
 
 ### Record a bulk read inside its own boundary
 
-**Requirement:** A query returning personal data for more subjects than its declared threshold MUST produce an audit record, inside one tenant or account boundary as well.
+**Statement:** A query returning personal data for more subjects than its declared threshold MUST produce an audit record, inside one tenant or account boundary as well.
 
 **Rationale:** The cross-boundary rule catches a disclosure to the wrong party, but it misses an export of every record a party may read one at a time, which is the shape a copied dataset has. A query above the declared threshold therefore writes a record even inside one boundary. [Article 30 of the GDPR](https://gdpr-info.eu/art-30-gdpr/) asks what categories of data were processed and by whom, and an unrecorded bulk read answers neither.
 
@@ -284,13 +284,13 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Record bulk export
 
-**Requirement:** An export that returns a set of records to a caller MUST produce an audit record naming the requested scope.
+**Statement:** An export that returns a set of records to a caller MUST produce an audit record naming the requested scope.
 
 **Rationale:** Bulk extraction is the highest-consequence read in most products: one call moves a dataset across the boundary. Naming the requested scope states what left the system. Without it, the project learns the shape of a leak from the party that received it.
 
 ### Reject an undeclared Command
 
-**Requirement:** An automated check MUST fail when a Command declares neither audited nor excluded status, with a composition refusal at startup satisfying this rule.
+**Statement:** An automated check MUST fail when a Command declares neither audited nor excluded status, with a composition refusal at startup satisfying this rule.
 
 **Rationale:** The next Command is written by someone who did not read this page. Only an automated gate catches it: the build or startup fails while the declaration is missing. A selection that depends on every author remembering is a selection with holes.
 

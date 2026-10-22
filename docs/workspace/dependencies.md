@@ -28,31 +28,31 @@ A package outside the manifest lands only with a written decision: the use case 
 
 ### Follow the declared dependency graph
 
-**Requirement:** A dependency between layers or modules MUST follow the declared graph and add no other edge.
+**Statement:** A dependency between layers or modules MUST follow the declared graph and add no other edge.
 
 **Rationale:** The declared graph is the list of crossings review checks. An undeclared edge lets a layer reach past its boundary, and review cannot refuse what no graph forbids. Each new edge then needs an explicit decision instead of arriving silently with an import.
 
 ### Keep Domain dependency-free
 
-**Requirement:** The Domain layer MUST depend on no external package or framework.
+**Statement:** The Domain layer MUST depend on no external package or framework.
 
 **Rationale:** Domain holds business rules, and business rules outlive frameworks. Depending on no external package or framework keeps the rules testable and portable on their own. Persistence, messaging, web, injection, serialization, and logging libraries all stay outside.
 
 ### Keep Application free of provider packages
 
-**Requirement:** Application MUST depend only on messaging abstractions, required read abstractions, and the one declared read boundary.
+**Statement:** Application MUST depend only on messaging abstractions, required read abstractions, and the one declared read boundary.
 
 **Rationale:** Application coordinates use cases through abstractions; Infrastructure hides the technology behind them. A provider package in Application makes the coordination layer depend on the technology Infrastructure was meant to hide, so a provider change reaches two layers. Only messaging abstractions, required read abstractions, and the one declared read boundary stay.
 
 ### Keep providers in Infrastructure
 
-**Requirement:** A database provider, external SDK, resilience, discovery, or serialization adapter MUST live in Infrastructure.
+**Statement:** A database provider, external SDK, resilience, discovery, or serialization adapter MUST live in Infrastructure.
 
 **Rationale:** A database provider, an external SDK, and resilience, discovery, and serialization adapters all change with their technology. Keeping them in Infrastructure keeps each provider change inside one layer, apart from the read boundary the ownership table assigns to Application.
 
 ### Pin every dependency version centrally
 
-**Requirement:** Every dependency version MUST resolve through central management or the committed lockfile, at the pin `litespec.manifest.json` states where it states one.
+**Statement:** Every dependency version MUST resolve through central management or the committed lockfile, at the pin `litespec.manifest.json` states where it states one.
 
 **Rationale:** An inline version in one module file is invisible to the manifest that is supposed to own it, so two modules drift to two versions of the same package. Central management or the committed lockfile resolves every version in one owned place: the manifest pins the baseline stack the standards name, and the consumer's own central file or lockfile pins the product's own packages. A consumer cannot add its packages to a manifest it does not own, so its pins live beside its code, and `litespec/workspace/dependencies#approve-new-packages-explicitly` is what admits them.
 
@@ -60,19 +60,19 @@ A package outside the manifest lands only with a written decision: the use case 
 
 ### Approve new packages explicitly
 
-**Requirement:** A package absent from the manifest MUST have a decision naming its use case, alternatives, owning layer, operating cost, and removal condition.
+**Statement:** A package absent from the manifest MUST have a decision naming its use case, alternatives, owning layer, operating cost, and removal condition.
 
 **Rationale:** A package arrives with a cost nobody revisits: updates, advisories, license review, and migration work. The decision names the use case, the alternatives, the owning layer, the operating cost, and the removal condition while the alternatives are still fresh. A baseline package lands in the manifest in the same change as its decision. A consumer-owned package lands in the consumer's central file instead, because the manifest belongs to the LiteSpec release rather than to the consumer.
 
 ### Keep frontend applications isolated
 
-**Requirement:** A frontend MUST NOT import another application's source or another module's internal feature files.
+**Statement:** A frontend MUST NOT import another application's source or another module's internal feature files.
 
 **Rationale:** When one frontend imports another's source, neither can change its internals without checking the other, so the two release as one. A frontend also stays out of another module's internal feature files for the same reason. Sharing goes through a shared package with a documented public entry point that depends on no application.
 
 ### Keep the approved web UI dependency boundary
 
-**Requirement:** A React web frontend MUST take its UI packages from the `uiBaseline` in `litespec.manifest.json`, and a Svelte web frontend from `uiBaselineSvelte`.
+**Statement:** A React web frontend MUST take its UI packages from the `uiBaseline` in `litespec.manifest.json`, and a Svelte web frontend from `uiBaselineSvelte`.
 
 **Rationale:** A fixed UI baseline keeps every screen drawing from the same design system, styling, base components, icons, and utilities. Taking UI packages only from `uiBaseline` for React and `uiBaselineSvelte` for Svelte keeps that set reviewed and versioned in one place. Each baseline pins the design system, styling, base components, icons, and the utility packages the installed source imports directly.
 

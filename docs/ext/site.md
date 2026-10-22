@@ -22,7 +22,7 @@ It switches on no record type: prices and claims read Requirement entries and Te
 
 ### Render every page to static files
 
-**Requirement:** The site build MUST write every page as a static file that needs no server at request time.
+**Statement:** The site build MUST write every page as a static file that needs no server at request time.
 
 **Rationale:** A static file needs no application server, no database, and no per-request rendering: the host serves bytes. The failure surface shrinks to the file set itself, so a traffic spike or a database outage cannot take the marketing pages down with the application.
 
@@ -36,7 +36,7 @@ dist/nl/prijzen/index.html
 
 ### Avoid client scripts without a named interactive need
 
-**Requirement:** A page MUST NOT ship a client script unless the site records the interactive need that script serves.
+**Statement:** A page MUST NOT ship a client script unless the site records the interactive need that script serves.
 
 **Rationale:** A reader reads a marketing page rather than operating it, so each script slows the page and widens its failure surface without earning its place by default. Recording the interactive need beside each script, such as a theme switch kept across pages, keeps the script count at what readers actually use.
 
@@ -44,13 +44,13 @@ dist/nl/prijzen/index.html
 
 ### Load every script from the site origin
 
-**Requirement:** The site MUST serve every client script from its own origin.
+**Statement:** The site MUST serve every client script from its own origin.
 
 **Rationale:** A script from another origin runs with the page's authority while living outside the release: it can change, fail, or track readers without a site deployment. Serving every script from the site's own origin keeps the release self-contained and reviewable in one place.
 
 ### State allowed sources in a content security policy
 
-**Requirement:** The site MUST publish a content security policy naming every source its pages load.
+**Statement:** The site MUST publish a content security policy naming every source its pages load.
 
 **Rationale:** Loading rules in prose rely on every author remembering them; a content security policy enforces them in the browser instead. A source nobody named fails closed rather than loading on trust, so one forgotten reference breaks visibly instead of leaking quietly.
 
@@ -62,13 +62,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Load nothing from a third-party origin
 
-**Requirement:** A page MUST NOT load fonts, scripts, styles, images, or analytics from a third-party origin.
+**Statement:** A page MUST NOT load fonts, scripts, styles, images, or analytics from a third-party origin.
 
 **Rationale:** Fonts, scripts, styles, images, or analytics from another origin send reader visits to that party and fail when that party fails. Shipping all of them with the site keeps reader privacy inside the site's own control and removes the outside dependency.
 
 ### Give every page one main heading and landmark elements
 
-**Requirement:** Every page MUST carry exactly one top-level heading and landmark elements for its regions.
+**Statement:** Every page MUST carry exactly one top-level heading and landmark elements for its regions.
 
 **Rationale:** One top-level heading tells every reader, and every crawler, what the page is about; two headings or none leave both guessing. Landmark elements expose the header, navigation, main content, and footer to assistive tools, so a reader who navigates by regions reaches each one directly.
 
@@ -83,13 +83,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Name every page with a title and a description
 
-**Requirement:** Every page MUST state a title element and a description its search result shows.
+**Statement:** Every page MUST state a title element and a description its search result shows.
 
 **Rationale:** Search results and browser tabs show the title first and the description beneath it; a page without either appears under a file name with a guessed snippet. Both come from the page frontmatter, so each page states its own instead of inheriting the site's.
 
 ### Point every page at its absolute canonical address
 
-**Requirement:** Every page MUST carry a canonical link with the absolute address of that page.
+**Statement:** Every page MUST carry a canonical link with the absolute address of that page.
 
 **Rationale:** Several addresses can serve one page through trailing slashes, parameters, or mirrors. The canonical link names the one absolute address to index, and the absolute form leaves no host to guesswork.
 
@@ -101,7 +101,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Reference language alternates from every translated page
 
-**Requirement:** Every page on a site with more than one language MUST link each language alternate with its language tag and a default fallback.
+**Statement:** Every page on a site with more than one language MUST link each language alternate with its language tag and a default fallback.
 
 **Rationale:** A crawler that finds one language without links to the others indexes each translation as a separate unrelated page. The alternate links map each language to its address, and the default fallback tells the crawler where to send a reader no language matches. A single-language site carries no alternate links.
 
@@ -115,7 +115,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Generate a sitemap covering every page
 
-**Requirement:** The site build MUST generate a sitemap listing every page with the language alternates of that page.
+**Statement:** The site build MUST generate a sitemap listing every page with the language alternates of that page.
 
 **Rationale:** A hand-written sitemap drifts: pages ship without entries and deleted pages linger as dead links. Generating the sitemap from the pages that exist keeps it exact, and carrying each page's language alternates lets a crawler find every language from one file.
 
@@ -130,7 +130,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ### Point crawler rules at the sitemap
 
-**Requirement:** The site MUST publish crawler rules pointing to the sitemap address.
+**Statement:** The site MUST publish crawler rules pointing to the sitemap address.
 
 **Rationale:** Crawlers read `robots.txt` from the site root before anything else. Pointing at the sitemap from that file sends every crawler to the full page list first, and access rules for crawler-only paths live beside the pointer.
 
@@ -144,7 +144,7 @@ Sitemap: https://example.test/sitemap.xml
 
 ### List every page for language models
 
-**Requirement:** The site build MUST generate a page list naming every page with its address and description.
+**Statement:** The site build MUST generate a page list naming every page with its address and description.
 
 **Rationale:** A language model that answers from the site needs the page list in one fetchable file instead of a crawl. The `llms.txt` file names every page with the address and description a model needs to cite it, and generating it from the pages keeps the list exact.
 
@@ -158,13 +158,13 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Publish full page text for language models
 
-**Requirement:** The site build MUST generate a full-text file with the text of every default-language page.
+**Statement:** The site build MUST generate a full-text file with the text of every default-language page.
 
 **Rationale:** A model that reads the whole site at once needs the text without fetching each page. The `llms-full.txt` file carries the plain text of the default-language pages, and non-default languages stay out so the file holds one language.
 
 ### Publish a Markdown copy beside every page
 
-**Requirement:** Every page MUST link a Markdown copy of its own text served beside that page.
+**Statement:** Every page MUST link a Markdown copy of its own text served beside that page.
 
 **Rationale:** An agent that reads the page wants its text without layout, styles, or scripts. The Markdown copy beside each page carries exactly that, and the link in the page head leads from the page to its copy.
 
@@ -176,7 +176,7 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Mark pages with JSON-LD structured data
 
-**Requirement:** Every page MUST carry JSON-LD structured data for the organization, the site, and the page with breadcrumbs, offers, questions, or article body where each applies.
+**Statement:** Every page MUST carry JSON-LD structured data for the organization, the site, and the page with breadcrumbs, offers, questions, or article body where each applies.
 
 **Rationale:** Search engines build rich results from structured data, not from guessed page text. One JSON-LD graph per page describes the organization and the site once, then the page with its breadcrumb trail; price pages add offers, question pages add questions with answers, and articles state their article body. Without the graph, the page still ranks but never earns the rich result.
 
@@ -188,7 +188,7 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Keep each repeated fact in one data source
 
-**Requirement:** A repeated fact MUST live in one data source every page reads, as a Term record with labels per language for a product word.
+**Statement:** A repeated fact MUST live in one data source every page reads, as a Term record with labels per language for a product word.
 
 **Rationale:** A company name or address typed into ten pages disagrees the day one page updates without the other nine. One data source that every page reads turns the change into one edit, and a product word lives there as a Term record with labels per language.
 
@@ -196,13 +196,13 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Render every language from one page structure
 
-**Requirement:** Each language MUST supply only text into one page structure the site holds once.
+**Statement:** Each language MUST supply only text into one page structure the site holds once.
 
 **Rationale:** When each language owns its own markup, one redesign must land in every language separately and one of them lags. One page structure with per-language text keeps structure in one file, so a translation adds wording without ever forking the page.
 
 ### Mark unfinished facts with visible placeholders
 
-**Requirement:** A page whose owner has not supplied a fact MUST carry a visible placeholder naming that fact.
+**Statement:** A page whose owner has not supplied a fact MUST carry a visible placeholder naming that fact.
 
 **Rationale:** An owner who has not supplied a price or a date leaves a gap the page cannot fill honestly. A visible placeholder names the missing fact in place, so reviewers see the gap and the owner knows exactly what to supply, instead of the page publishing a guess.
 
@@ -210,19 +210,19 @@ Sitemap: https://example.test/sitemap.xml
 
 ### Reject a release build carrying a placeholder
 
-**Requirement:** A release build MUST fail while a visible placeholder remains on any page.
+**Statement:** A release build MUST fail while a visible placeholder remains on any page.
 
 **Rationale:** A placeholder that reaches the public site states a falsehood to every reader. Failing the release build while one remains stops the falsehood at the gate, while a development build only warns so authors keep working.
 
 ### Read site prices and claims from consumer records
 
-**Requirement:** Every price and claim on the site MUST come from the consumer records the site convention names.
+**Statement:** Every price and claim on the site MUST come from the consumer records the site convention names.
 
 **Rationale:** Prices and claims are commercial facts the site repeats without owning. Reading them from the named consumer records keeps one owner for each fact, so a price changed in the record reaches the site on the next build instead of waiting for someone to remember the site.
 
 ### Declare each static site in the project record
 
-**Requirement:** A consumer selecting this extension MUST declare each static site with its name, path, and generator.
+**Statement:** A consumer selecting this extension MUST declare each static site with its name, path, and generator.
 
 **Rationale:** Tools find the site through the `paths.sites` entry, which names where the site lives and which generator builds it. A site nobody declared is a site no check reads, so its pages drift outside every gate.
 

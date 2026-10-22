@@ -20,7 +20,7 @@ This extension replaces `{litespec/page#state-one-action}`, or states that it re
 
 ### State one extension action
 
-**Requirement:** The activated extension MUST perform one testable action.
+**Statement:** The activated extension MUST perform one testable action.
 
 **Rationale:** Explain the extension-specific constraint.
 

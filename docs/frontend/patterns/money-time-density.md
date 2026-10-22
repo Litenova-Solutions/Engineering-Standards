@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply shop: order SO-1042 for Maria Garc
 
 ### Show the currency of every amount
 
-**Requirement:** Every amount MUST show its currency.
+**Statement:** Every amount MUST show its currency.
 
 **Rationale:** A currency on every amount keeps EUR 125.00 distinct from GBP 125.00 on every screen and export. Without it, a second currency turns each bare figure into a guess, and a pasted number carries no way to settle the guess.
 
 ### State the time zone of a shared moment
 
-**Requirement:** A moment shown to readers in different time zones MUST state its time zone.
+**Statement:** A moment shown to readers in different time zones MUST state its time zone.
 
 **Rationale:** A stated zone keeps 09:32 in Amsterdam from reading as 09:32 in London. Without it, two readers plan the same delivery window an hour apart, and the warehouse meets only one of them.
 

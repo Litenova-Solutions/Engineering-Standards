@@ -18,7 +18,7 @@ A type is visible only to the projects that need it: implementations stay `inter
 
 ### Use five application projects
 
-**Requirement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
+**Statement:** An application MUST use Domain, Application.Abstractions, Application, Infrastructure, and WebApi as its five baseline projects.
 
 **Rationale:** `Application.Abstractions` holds the contracts that more than one module names: the pipeline's own positions, the cross-module ports, the transport-neutral failures, and the published integration events. It references Domain and the required LiteBus module abstractions, and nothing else, so no type in it can name a use case, a handler, or a module.
 
@@ -40,7 +40,7 @@ apps/api/src/{ProjectName}.WebApi/
 
 ### Keep one Application assembly
 
-**Requirement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
+**Statement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
 **Rationale:** Splitting Application into Write, Read, Contracts, and event-handler assemblies would buy a deployment boundary the stack never uses, and every use case would pay for it with a project reference to cross. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): the command and query models differ, while one assembly holds them.
 
@@ -48,7 +48,7 @@ This provision states the .NET form of `litespec/backend/architecture#keep-one-a
 
 ### Keep implementation types internal
 
-**Requirement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
+**Statement:** A handler, validator, definition, persistence implementation, or endpoint implementation MUST be declared `internal sealed`.
 
 **Rationale:** A public type is an offer to every project, so an implementation left public invites callers it was never written for. Messages, results, markers, and ports stay public only when another project uses them; handlers, validators, and implementations stay `internal sealed`. Assembly scanning reads internal types through the one public marker, so it never justifies widening visibility.
 

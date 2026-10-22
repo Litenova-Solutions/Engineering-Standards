@@ -8,13 +8,13 @@ A backend built on .NET declares the `dotnet` stack in `litespec.project.json`. 
 
 ### Declare dotnet as the backend stack
 
-**Requirement:** A project whose backend runs on .NET MUST name `dotnet` in the `stacks` of `litespec.project.json`.
+**Statement:** A project whose backend runs on .NET MUST name `dotnet` in the `stacks` of `litespec.project.json`.
 
 **Rationale:** The `stacks` entry applies every page in this folder with its checks and analyzers, so an undeclared backend follows no .NET rule. It also selects the readers the model builder uses for C# handlers, events, failure codes, and scenarios.
 
 ### Write test results the model builder reads
 
-**Requirement:** A .NET test run MUST write its results as TRX or JUnit XML under `paths.testResults`.
+**Statement:** A .NET test run MUST write its results as TRX or JUnit XML under `paths.testResults`.
 
 **Rationale:** The model builder computes verified status from TRX and JUnit XML only. A run written in another format, or outside `paths.testResults`, verifies no Case even when every test passes.
 

@@ -22,79 +22,79 @@ Selecting `report` switches on the Limit record type: the request budget and eac
 
 ### Record reporting need
 
-**Requirement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
+**Statement:** A reporting proposal MUST record the report, representative data volume, plan or limitation, latency target, maximum result, and operating owner.
 
 **Rationale:** Reporting infrastructure costs a Worker, storage, and operating attention, so the team writes down the report, a representative data volume, the plan or limitation, the latency target, the maximum result, and the operating owner before building any of it. The use-case page carries that record with its owner and status, and it shows why a normal request projection cannot meet the boundary.
 
 ### Avoid speculative reporting systems
 
-**Requirement:** A project MUST NOT create reporting infrastructure for possible future analytics.
+**Statement:** A project MUST NOT create reporting infrastructure for possible future analytics.
 
 **Rationale:** A reporting system built for analytics the product may never need charges its full operating cost from day one while serving no accepted query. Each report or export earns its infrastructure with a current cost boundary, not a guess about future analysis.
 
 ### Parameterize report SQL
 
-**Requirement:** A reporting query MUST parameterize every actor, tenant, filter, range, sort, and pagination value.
+**Statement:** A reporting query MUST parameterize every actor, tenant, filter, range, sort, and pagination value.
 
 **Rationale:** A report concatenates actor, tenant, filters, ranges, sorting, and pagination into SQL that reads across the database. Binding every one of those values as a parameter keeps tenant and actor isolation intact and closes the injection hole string concatenation opens.
 
 ### Keep raw SQL in Infrastructure
 
-**Requirement:** Infrastructure MUST own raw reporting SQL and connection handling.
+**Statement:** Infrastructure MUST own raw reporting SQL and connection handling.
 
 **Rationale:** Raw SQL names tables, dialects, and connection handling that belong to one provider. Keeping it in Infrastructure lets Application and Domain state what the report means without depending on how one database phrases it.
 
 ### Review report plans
 
-**Requirement:** A report owner MUST review query plans and indexes with representative data.
+**Statement:** A report owner MUST review query plans and indexes with representative data.
 
 **Rationale:** A query that flies over a hundred local rows can scan millions in production. The report owner reviews query plans and indexes against representative data, so the true cost shows before the report ships rather than after it slows the database.
 
 ### Apply item-read authorization
 
-**Requirement:** A report or export MUST enforce actor, role, ownership, tenant, and sensitive-field rules that apply to item reads.
+**Statement:** A report or export MUST enforce actor, role, ownership, tenant, and sensitive-field rules that apply to item reads.
 
 **Rationale:** A report that reads ten thousand rows at once crosses the same actor, role, ownership, tenant, and sensitive-field boundaries as ten thousand single reads. Enforcing the item-read rules on the bulk path stops the report from exposing rows its reader may not open one by one.
 
 ### Run budget-exceeding exports in Worker
 
-**Requirement:** An export exceeding its request budget MUST run through Worker, with the budget a Limit record the export's use case names.
+**Statement:** An export exceeding its request budget MUST run through Worker, with the budget a Limit record the export's use case names.
 
 **Rationale:** An export that outlasts its request budget holds an HTTP connection open while the reader waits and the server counts threads. Running it in a Worker returns the request immediately, and the budget in its Limit record tells the team exactly when an export outgrows the request path.
 
 ### Protect export output
 
-**Requirement:** An export worker MUST store output in approved object storage with an owner, expiry, and short-lived authorized download.
+**Statement:** An export worker MUST store output in approved object storage with an owner, expiry, and short-lived authorized download.
 
 **Rationale:** An export file concentrates sensitive rows into one downloadable object that outlives the request that built it. Approved object storage with an owner, an expiry, and a short-lived authorized download gives that object controlled access and a defined end instead of a permanent public link.
 
 ### Scope export output to the tenant
 
-**Requirement:** An export MUST store its output under a tenant-scoped object-storage path.
+**Statement:** An export MUST store its output under a tenant-scoped object-storage path.
 
 **Rationale:** Export addresses are predictable, and a shared folder lets one tenant guess another tenant's file name. A tenant-scoped storage path puts each tenant's exports under its own prefix, so a guessed address stays inside the guesser's own data.
 
 ### Define report limits
 
-**Requirement:** A report specification MUST state each bound as a Limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
+**Statement:** A report specification MUST state each bound as a Limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
 
 **Rationale:** Date range, rows, execution time, concurrent jobs, output size, and storage lifetime each cap one dimension of report cost. Limit records hold all six, so a runaway report hits a documented bound instead of an exhausted database, a full disk, or a surprise invoice.
 
 ### Support report cancellation
 
-**Requirement:** A report implementation MUST support cancellation and remove expired outputs.
+**Statement:** A report implementation MUST support cancellation and remove expired outputs.
 
 **Rationale:** A reader who closes the tab leaves the report running, and an export nobody downloads still occupies storage. Cancellation stops the abandoned work, and expiry removes the abandoned file, so neither consumes resources indefinitely.
 
 ### Escape formula-leading export values
 
-**Requirement:** A CSV or spreadsheet export MUST escape formula-leading values unless a reviewed field intentionally contains a formula.
+**Statement:** A CSV or spreadsheet export MUST escape formula-leading values unless a reviewed field intentionally contains a formula.
 
 **Rationale:** A value starting with `=`, `+`, `-`, or `@` becomes a live formula when the export opens in a spreadsheet, running in the opener's application with the opener's data. Escaping those values keeps data as data, except in a reviewed field the team intentionally fills with a formula.
 
 ### Define export encoding and columns
 
-**Requirement:** An export format MUST use explicit character encoding and a stable column contract.
+**Statement:** An export format MUST use explicit character encoding and a stable column contract.
 
 **Rationale:** An export without a stated encoding arrives garbled on the first machine that guesses differently, and columns that shift per release break every parser built on them. Explicit encoding with a stable column contract lets consumers parse the file without guessing either.
 

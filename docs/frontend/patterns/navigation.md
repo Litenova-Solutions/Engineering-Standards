@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply console: seven areas from Home to 
 
 ### Mark the current section
 
-**Requirement:** The navigation MUST mark the section that holds the current page.
+**Statement:** The navigation MUST mark the section that holds the current page.
 
 **Rationale:** A marked section tells a reader who arrived from a link, a notification, or a search which area holds the open page. Without it, every page looks like the start, and the reader reopens the sidebar to learn where they already are.
 
 ### Give every page its own address
 
-**Requirement:** Every page MUST have its own URL that opens it directly.
+**Statement:** Every page MUST have its own URL that opens it directly.
 
 **Rationale:** A direct address lets a reader share, bookmark, and reopen a page, and lets a notification or a record link to it. Without it, support cannot send the page under discussion, and a refresh drops the reader back to the start.
 

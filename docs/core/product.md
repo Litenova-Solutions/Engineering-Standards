@@ -43,127 +43,127 @@ A decision sets the position, and a product topic page states it as requirements
 
 ### Keep business intent under product
 
-**Requirement:** A consumer MUST keep its brief, product topic pages, decisions, constraints, problems, and features under `docs/product/`, and its research under `docs/research/`.
+**Statement:** A consumer MUST keep its brief, product topic pages, decisions, constraints, problems, and features under `docs/product/`, and its research under `docs/research/`.
 
 **Rationale:** Intent split across notes and books gives no single answer to the question an agent asks before building. One home per kind, with the brief, topics, decisions, constraints, problems, and features under `docs/product/` and research under `docs/research/`, gives every reader one place to look. A second home for any kind starts a second truth about the business.
 
 ### State one product
 
-**Requirement:** A consumer MUST state exactly one Product record in its brief, with boundary, never list, and audience.
+**Statement:** A consumer MUST state exactly one Product record in its brief, with boundary, never list, and audience.
 
 **Rationale:** One product record gives every reader one answer to what the business is, who it serves, and where it stops. The boundary and audience focus every later choice; the never list refuses what the product does not become, so tempting expansions meet a written refusal. Two product statements let each plan cite the one it prefers.
 
 ### Answer every constraint
 
-**Requirement:** A consumer MUST record each outside rule as a Constraint with source and applicability, and mark constraints answered.
+**Statement:** A consumer MUST record each outside rule as a Constraint with source and applicability, and mark constraints answered.
 
 **Rationale:** An unanswered constraint is an outside rule the product can break unknowingly: a law, a regulation, or provider terms the team never examined. Recording each rule with its source and applicability proves the team asked. A project with no outside rules records that answer too, so a later reader can tell examined from ignored.
 
 ### State each topic in one page shape
 
-**Requirement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the frontmatter field `reviewBy`.
+**Statement:** A `product-topic` page MUST carry the chapter sections and the commitment sections of the product topic template, and the frontmatter field `reviewBy`.
 
 **Rationale:** The fixed shape puts the present, the future, and the past of one topic on one page. The chapter sections carry the story for people: Summary, The situation, What we do, Why it is better, A worked example, Costs and risks, and How sure we are. The commitment sections carry the testable commitments and the choices behind them: Rules, Position, Refusals, Open questions, Next, History, and Evidence. Rules holds every testable commitment as a Requirement entry; Position holds choices with their decisions, including choices no system carries. A reader learns where each answer sits once and finds it on every topic. The `reviewBy` field makes the reread due rather than optional.
 
 ### Place the story before the commitments
 
-**Requirement:** A `product-topic` page MUST place its chapter for people before its commitments.
+**Statement:** A `product-topic` page MUST place its chapter for people before its commitments.
 
 **Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so the reader understands the choice before meeting its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/product#cite-sources-for-chapter-claims` states. Commitments first would ask agreement before understanding.
 
 ### Cite sources for chapter claims
 
-**Requirement:** Each claim in the chapter MUST cite its source.
+**Statement:** Each claim in the chapter MUST cite its source.
 
 **Rationale:** A number without its source cannot be rechecked when the market moves or a reader doubts it. The chapter convinces only when every claim traces to its source. Unsourced claims turn the story into a pitch that later plans cannot verify.
 
 ### Identify every requirement
 
-**Requirement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
+**Statement:** Each Requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with kind, statement, and for a promise its values with effective dates.
 
 **Rationale:** An identifier lets a behavior record name the commitment it fulfills and lets the model resolve the name. A commitment written only as prose cannot be traced from code back to intent. Kinds are promise, behavior, quality, target, and practice. A target names what is counted in `measure` with the date or milestone in `by`; a practice is a commitment kept in how the company works rather than in code. Any requirement can name in `deliveredBy` the planned, later, or refused feature that carries it.
 
 ### Cite requirements from records
 
-**Requirement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfills`.
+**Statement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfills`.
 
 **Rationale:** The link runs from behavior to intent, so a product change shows exactly which rules, use cases, and journeys to revisit. Without the `fulfills` name, a price or policy change starts with a search instead of a list, and some records stay behind. The product page stays free of behavior while every behavior record points back to intent.
 
 ### Keep behavior out of product pages
 
-**Requirement:** A product page MUST NOT describe states, entry points, failure codes, or handlers.
+**Statement:** A product page MUST NOT describe states, entry points, failure codes, or handlers.
 
 **Rationale:** A product page that names states, entry points, failure codes, or handlers becomes a second specification, and it drifts from the first with the next behavior change. Two specifications force every reader to ask which one the code follows. Behavior records own behavior and name the requirements they fulfill, so each fact has one home.
 
 ### Record research with read sources
 
-**Requirement:** A Research record under `docs/research/` MUST state its question and list each source with its read date.
+**Statement:** A Research record under `docs/research/` MUST state its question and list each source with its read date.
 
 **Rationale:** A fact without its source cannot be rechecked when a decision depends on it. The read date shows when the outside fact was true, so a later reader knows whether to trust or refresh it. Research without sources and dates asks every later choice to rest on memory.
 
 ### State each problem and feature
 
-**Requirement:** A Problem MUST state who it affects and what they face, and a Feature the problems it solves and its state.
+**Statement:** A Problem MUST state who it affects and what they face, and a Feature the problems it solves and its state.
 
 **Rationale:** A problem that names who it affects and what they face points to the people a solution must serve. Problems without owners attract solutions nobody needs. A feature names the problems it solves and its state, planned, shipped, later, or refused, so each offer traces to a pain. A refused feature keeps its reason, so the team never relitigates the refusal.
 
 ### Trace every choice to a decision
 
-**Requirement:** Every Position and Refusals entry MUST link an unretired decision record, and an approved one whenever the page is approved.
+**Statement:** Every Position and Refusals entry MUST link an unretired decision record, and an approved one whenever the page is approved.
 
 **Rationale:** A position with no decision behind it is an opinion nobody approved. The link lets a reader check who chose it, when, and on what evidence. Requiring an unretired decision, approved whenever the page is approved, keeps live positions backed by live choices.
 
 ### Record each product choice as a decision
 
-**Requirement:** A decision that sets product records MUST name them in `decides` and carry the sections of the decision template.
+**Statement:** A decision that sets product records MUST name them in `decides` and carry the sections of the decision template.
 
 **Rationale:** A business choice argued from options and evidence can be revisited on its merits; one argued from authority cannot. The decision template carries Context, Options, Decision, Consequences, and Evidence, so each choice shows what else was weighed. Naming the affected product records in `decides` ties the reasoning to what it settled. A decision reopened by a condition rather than a date stays stable until the world actually changes.
 
 ### Name the person who approved a decision
 
-**Requirement:** Only the named decider approves a decision, and an approved decision MUST carry `decided`.
+**Statement:** Only the named decider approves a decision, and an approved decision MUST carry `decided`.
 
 **Rationale:** Product, commercial, and legal choices belong to an accountable person, as `litespec/core/system#keep-decision-authority-with-accountable-people` states. Naming the decider while the decision is a draft shows who must approve before release. Building can start on a draft while approval gates the release, so agent work never stalls on one person's queue. The `decided` date proves the approval happened.
 
 ### Replace a decision with a new record
 
-**Requirement:** A changed choice MUST be a new decision naming the old one in `replaces`, with the old one retired in the same change.
+**Statement:** A changed choice MUST be a new decision naming the old one in `replaces`, with the old one retired in the same change.
 
 **Rationale:** A decision edited in place loses the reason it once held, and every topic page that cited it silently changes meaning. A new decision naming the old one in `replaces`, with the old one retired in the same change, keeps the reasoning chain intact. The replaced record stays readable as the past, so a later reader can follow why the position moved.
 
 ### Derive history from decisions
 
-**Requirement:** The History section of a product topic page MUST list exactly the decisions that decide its entries, as a generated region.
+**Statement:** The History section of a product topic page MUST list exactly the decisions that decide its entries, as a generated region.
 
 **Rationale:** A past typed by hand drifts from the records it claims with the next decision. Listing exactly the decisions that decide the page's entries, as a generated region only the model builder writes, keeps History equal to the record graph. Regions are fenced as the [model page](model.md) defines.
 
 ### Treat generated research as source material
 
-**Requirement:** An agent MUST treat records generated outside `docs/` as source material until a Research record or an approved decision states the claim.
+**Statement:** An agent MUST treat records generated outside `docs/` as source material until a Research record or an approved decision states the claim.
 
 **Rationale:** Records generated outside `docs/` mix verified facts, inferences, and recommendations in one confident voice. Treating them as source material with no authority keeps a recommendation from being built as if someone decided it. A Research record or an approved decision restates the claim before anything rests on it.
 
 ### Review a topic by its date
 
-**Requirement:** The owner MUST reread a `product-topic` page against its decisions and evidence before its `reviewBy` date, then move the date.
+**Statement:** The owner MUST reread a `product-topic` page against its decisions and evidence before its `reviewBy` date, then move the date.
 
 **Rationale:** A stale strategy misdirects every plan built on it, and nothing in the code fails when a market or a price moves. The owner rereading the page against its decisions and evidence before the `reviewBy` date catches the drift while the topic still guides work. Moving the date after the reread schedules the next one.
 
 ### Load product intent before commercial work
 
-**Requirement:** An agent MUST read the product brief and the affected product topics before changing behavior that touches price, money, markets, customers, or terms.
+**Statement:** An agent MUST read the product brief and the affected product topics before changing behavior that touches price, money, markets, customers, or terms.
 
 **Rationale:** Commercial behavior that contradicts the business position still compiles and passes its tests: no check compares a price or term against the brief. Only the product pages say it is wrong. Reading the brief and the affected topics before changing price, money, markets, customers, or terms keeps the code inside the position the business approved.
 
 ### Derive requirement coverage from the model
 
-**Requirement:** A consumer MUST derive its requirement coverage from the model, never by hand.
+**Statement:** A consumer MUST derive its requirement coverage from the model, never by hand.
 
 **Rationale:** Coverage kept by hand goes stale with the next record change and then reports intent the system no longer carries, or hides intent it now does. The model lists each requirement with the records that fulfill it, computed from the current graph. A requirement no record fulfills is intent the system does not carry yet, visible as a gap rather than a guess.
 
 ### Build intent before specification before code
 
-**Requirement:** A behavior change MUST land intent, research, decision, requirement, specification, code, and tests in that order; a decision written after its code is a defect.
+**Statement:** A behavior change MUST land intent, research, decision, requirement, specification, code, and tests in that order; a decision written after its code is a defect.
 
 **Rationale:** The order makes each layer checkable before the next builds on it: intent first, then research, decision, and requirement, then specification records, then code and tests. A specification written before its decision argues from code instead of from intent. A decision written after its code justifies what already shipped. Approval follows `litespec/core/principles#refuse-approval-behind-a-draft-decision`: nothing is approved behind a draft.
 
@@ -177,13 +177,13 @@ The order of work: intent, then the choice and its commitment, then specificatio
 
 ### Reject an unfulfilled requirement
 
-**Requirement:** A consumer MUST fail its checks on a promise, behavior, or quality requirement that nothing fulfills or delivers, outside a Known gap.
+**Statement:** A consumer MUST fail its checks on a promise, behavior, or quality requirement that nothing fulfills or delivers, outside a Known gap.
 
 **Rationale:** Failing the checks on an unfulfilled promise, behavior, or quality requirement keeps intent and system aligned: the team either connects the requirement or admits the gap. A rule, use case, or journey fulfills a requirement, and a planned, later, or refused feature delivers it. A target or practice is measured or kept outside the code, so deleting one to clear the check loses intent instead of proving it. Planned work belongs to its feature, so a Known gap marks only what nobody owns.
 
 ### Build on a draft decision before approval
 
-**Requirement:** An agent MAY build on a `draft` decision while approval gates the release, not the code.
+**Statement:** An agent MAY build on a `draft` decision while approval gates the release, not the code.
 
 **Rationale:** Approval before every edit stalls agent work on a queue of one person. Building on a draft keeps work moving while the decider reviews. The release still needs the approval, so nothing ships on a draft alone.
 

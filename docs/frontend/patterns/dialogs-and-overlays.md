@@ -18,13 +18,13 @@ The drawings on this page use the Acme Supply back office: the spring lighting l
 
 ### Name the command on a confirm action
 
-**Requirement:** A confirmation dialog MUST label its confirm action with the command it runs.
+**Statement:** A confirmation dialog MUST label its confirm action with the command it runs.
 
 **Rationale:** Staff often scan only the buttons before clicking, so the button text is the last chance to state what happens. A button labeled `OK` or `Yes` forces the reader to reread the dialog title to know what they confirm, and under time pressure they click without rereading and run the wrong command.
 
 ### Return focus when an overlay closes
 
-**Requirement:** An overlay MUST return focus to the control that opened it when it closes.
+**Statement:** An overlay MUST return focus to the control that opened it when it closes.
 
 **Rationale:** Keyboard and screen-reader users navigate by focus position, so closing an overlay must put them back where they started. Focus that falls back to the top of the page strands them far from their row in a long list, and they must tab through the whole page to continue.
 

@@ -14,7 +14,7 @@ A use-case specification states its Cases: worked examples leading from a situat
 
 ### Use the four client test projects
 
-**Requirement:** A client solution MUST contain Domain, Application, Web, and end-to-end test projects and no other baseline test project.
+**Statement:** A client solution MUST contain Domain, Application, Web, and end-to-end test projects and no other baseline test project.
 
 **Rationale:** Each project matches one boundary of the client, so a failing test names the layer that broke. There is no API factory, no PostgreSQL container, and no database reset, because there is no server or database. A backend test project added here would pull server fixtures into a client that has nothing to run them against.
 
@@ -30,31 +30,31 @@ tests/
 
 ### Prove each case with a test
 
-**Requirement:** Each Case of a use case MUST be proved by an automated test whose steps call the use case and assert the Result.
+**Statement:** Each Case of a use case MUST be proved by an automated test whose steps call the use case and assert the Result.
 
 **Rationale:** A test that calls the use case and asserts the Result proves the specification still holds after every change. The link between Case and test is computed from the test, so it cannot claim coverage it lacks. A Case no test proves becomes a Known gap with an owner and an end date, which keeps the gap visible and assigned instead of forgotten. This realizes litespec/frontend/testing#prove-a-case-by-calling-its-use-case.
 
 ### Test the core without a browser
 
-**Requirement:** A Domain or Application test MUST run with no browser, JavaScript host, or storage.
+**Statement:** A Domain or Application test MUST run with no browser, JavaScript host, or storage.
 
 **Rationale:** Domain and Application hold no browser types, so their tests need no browser, JavaScript host, or storage. A core test that needs an interop substitute proves the layering already broke: the production code reaches past its boundary. The fix belongs in the layering, not in the test setup. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
 ### Replace interop in component tests
 
-**Requirement:** A component test MUST inject a test double for every Application interface, including interop.
+**Statement:** A component test MUST inject a test double for every Application interface, including interop.
 
 **Rationale:** A component test substitutes every Application interface, including interop, so the component renders with no browser and the test asserts on user-visible output rather than markup structure. Coverage includes keyboard interaction and each declared route state, because those are the behaviors a component owns. Starting a real browser here would make the suite slow without proving more. This realizes litespec/frontend/testing#keep-mocks-at-owned-boundaries and litespec/frontend/testing#test-observable-states.
 
 ### Verify real browser behavior end to end
 
-**Requirement:** A browser suite MUST cover the primary release flow, startup with storage unavailable, offline startup, and export followed by import.
+**Statement:** A browser suite MUST cover the primary release flow, startup with storage unavailable, offline startup, and export followed by import.
 
 **Rationale:** The primary release flow, startup with storage unavailable, offline startup, and export followed by import are the paths where a product with no server loses user work. None of them can run without a real browser: storage denial, offline caches, and file download are browser behaviors. A suite that skips them leaves the riskiest paths unproved. This realizes litespec/frontend/testing#match-test-level-to-risk.
 
 ### Enforce the first-load budget
 
-**Requirement:** CI MUST measure the compressed transfer size of the published framework payload and fail above the recorded budget.
+**Statement:** CI MUST measure the compressed transfer size of the published framework payload and fail above the recorded budget.
 
 **Rationale:** The framework payload is what the visitor waits for, and only compressed transfer size measures that wait; directory size does not. The measurement names the tool that produced it and the compression it applied, because two tools reporting different numbers for one payload make a budget unreviewable. A published size-limit tool holding the budget in its configuration is the baseline. A project-owned script recording the same two facts is equally valid.
 

@@ -42,37 +42,37 @@ The problem carries the trace identifier the API returns for the request, so sup
 
 ### Generate the client from the published contract
 
-**Requirement:** A frontend MUST generate its client, types, schemas, and operation options from the API's published OpenAPI document.
+**Statement:** A frontend MUST generate its client, types, schemas, and operation options from the API's published OpenAPI document.
 
 **Rationale:** A handwritten copy of a request, a response, or a schema drifts from the contract silently: the API changes, the copy still compiles, and the page sends a request the API no longer accepts. A generated client turns the same contract change into a compile error in every application at once, at the call sites that must change.
 
 ### Use one configured client per application
 
-**Requirement:** A frontend MUST configure the generated client once, and route every read and write through it.
+**Statement:** A frontend MUST configure the generated client once, and route every read and write through it.
 
 **Rationale:** The configured client owns the base address, the credentials, the headers, and the mapping from a failure to a problem. A call that builds its own request opts out of all four at once: it can point at the wrong host, miss the session cookie, skip the write marker, and surface a raw failure the page cannot render. Routing every read and write through the one client keeps those four decisions in one place.
 
 ### Keep the session in an API owned cookie
 
-**Requirement:** The API MUST hold the browser session in an HTTP-only cookie, with frontend code holding no token.
+**Statement:** The API MUST hold the browser session in an HTTP-only cookie, with frontend code holding no token.
 
 **Rationale:** Every value a script can read is a value any script on the page can read, including a script an attacker injected. Tokens kept in frontend code or browser storage are therefore readable by the same attack the session is meant to resist. The API runs the authorization code flow and keeps the tokens encrypted in an HTTP-only cookie the browser sends on its own, so frontend code never holds a token. A refused sign-in lands on a signed-out page rather than on an error, because the reader is simply not signed in.
 
 ### Set the write marker on every request
 
-**Requirement:** A client MUST send its marker header on every write, with the API accepting a cookie-authenticated write only when it carries that header.
+**Statement:** A client MUST send its marker header on every write, with the API accepting a cookie-authenticated write only when it carries that header.
 
 **Rationale:** A browser attaches its cookies to a cross-site request on its own, so the cookie alone cannot tell the page's own write from a forged post submitted from another site. The marker header separates the two: the page's client adds it to every write, and a page on another site cannot add a custom header without a preflight the API never grants. The API therefore accepts a cookie-authenticated write only when the header is present. The header name varies by project, so configuration owns it rather than code; it has the form `X-<Project>-Request` with the value `1`.
 
 ### Map every failure to one problem type
 
-**Requirement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing its trace identifier in copyable form.
+**Statement:** A frontend MUST convert every failure into one problem type, deciding from its code and showing its trace identifier in copyable form.
 
 **Rationale:** A raw response body carries whatever the API included: field names, internals, sometimes data the reader should never see. Rendering it leaks that content and gives the reader no consistent recovery path, because each failure looks different. One problem type gives every failure the same shape: the page branches on the published code, so its decision survives a reworded message, and the trace identifier in the detail lets support find the request the reader saw fail. The identifier stays out of the headline, which says what happened in words the team wrote.
 
 ### Place a refusal beside what was refused
 
-**Requirement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
+**Statement:** A refusal MUST render beside the record or control that was refused, in the sentence the application holds for that code.
 
 **Rationale:** A refusal at the top of a page says that something failed but not what, so the reader scans the page to find the control that caused it. Rendered beside the refused record or control, the refusal answers both questions at once. The sentence comes from the application's own dictionary for that code rather than from the response body, so the words stay consistent and translatable; the code in the markup lets a test provoke the refusal by name.
 
@@ -90,19 +90,19 @@ The sentence comes from the application's dictionary rather than the response bo
 
 ### Place a field refusal on its field
 
-**Requirement:** A field problem MUST reach the field it names through the frame's one helper, with the form staying open until resolved or abandoned.
+**Statement:** A field problem MUST reach the field it names through the frame's one helper, with the form staying open until resolved or abandoned.
 
 **Rationale:** A list of problems above a long form forces the reader to read each sentence and each label to pair them, and a problem below the fold is missed entirely. The frame's one helper puts each problem on the field it names, so the reader sees what to fix where they fix it. The form stays open until each problem is resolved or the reader abandons the form, so no input is lost to a closed dialog.
 
 ### Validate a form with the generated schema
 
-**Requirement:** A form MUST validate against the generated schema for its request body, extended with the application's own rules rather than replaced by them.
+**Statement:** A form MUST validate against the generated schema for its request body, extended with the application's own rules rather than replaced by them.
 
 **Rationale:** The generated schema is the contract's statement of what the API accepts, so it holds even where the browser accepts more. Validating the form against it refuses bad input before the request leaves the page. The application extends the schema with the message shown for each rule and any rule the contract cannot express, rather than replacing it, so the form can never accept what the API refuses.
 
 ### Update the cache a command changed
 
-**Requirement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
+**Statement:** A successful command MUST invalidate every query whose answer it changed, and no other query.
 
 **Rationale:** The query cache owns freshness: a page renders the cached answer, not a new request. A command that changes a record but leaves its cache entry therefore shows the old record until something else happens to refetch, so the reader's own write appears to have no effect. Invalidating exactly the queries the command changed refreshes what changed; invalidating more costs a needless request per affected page.
 
@@ -122,49 +122,49 @@ After `submitExpense` succeeds, the page invalidates the `listExpenses` query an
 
 ### Assign state to the narrowest owner
 
-**Requirement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
+**Statement:** A value MUST live with the narrowest owner that can hold it: server data, then the address, then form state, then the component's own state.
 
 **Rationale:** Server data belongs in the query cache, shareable values in the address, input in form state, and the rest in the component's own state. A value kept above its narrowest owner, typically in a shared store, makes unrelated components re-render when it changes and hides where the change came from. The order gives each value the smallest audience that can use it.
 
 ### Route a personal value in a header
 
-**Requirement:** A value naming a person MUST travel in a request header rather than the query string, with the contract declaring the header each operation reads.
+**Statement:** A value naming a person MUST travel in a request header rather than the query string, with the contract declaring the header each operation reads.
 
 **Rationale:** A query string leaks: proxies log it, the browser keeps it in history, and the next page the reader opens receives it as the referrer. A value naming a person therefore travels in a request header the contract declares per operation, where it reaches the API without landing in those three places. The address keeps its own copy for filters and paging, so a filtered list stays a link somebody can share.
 
 ### Read a permission from the session
 
-**Requirement:** A page MUST offer a command from the session Actor's Permissions at the record's scope, with the API deciding every command.
+**Statement:** A page MUST offer a command from the session Actor's Permissions at the record's scope, with the API deciding every command.
 
 **Rationale:** Permissions are the project's Permission records: an actor holds a role at a scope, a role allows permissions, and a use case needs permissions. The page reads the signed-in actor's permission codes from the session the API returns, and offers only the commands those permissions allow at the record's scope, so the reader is never offered an action that ends in a refusal. The API still decides every command, so an offered action that should have been hidden is refused rather than executed.
 
 ### Name the zone for every timestamp
 
-**Requirement:** A formatter rendering a timestamp MUST receive an explicit IANA time zone, resolved by the caller from the record the screen shows.
+**Statement:** A formatter rendering a timestamp MUST receive an explicit IANA time zone, resolved by the caller from the record the screen shows.
 
 **Rationale:** An instant from the API carries no zone, so a formatter left to pick one shows the reader's own zone: a dispatch cut-off reads as midnight in the reader's city instead of the warehouse's. The caller resolves the zone from the record the screen shows: a record with its own zone states it, otherwise the account's zone applies, and an account that chooses none falls back to UTC. Passing the zone explicitly makes each timestamp name whose day it belongs to.
 
 ### Keep secrets out of browser storage
 
-**Requirement:** A frontend MUST NOT store a refresh token, a provider secret, or a privileged credential in browser storage or a browser-visible variable.
+**Statement:** A frontend MUST NOT store a refresh token, a provider secret, or a privileged credential in browser storage or a browser-visible variable.
 
 **Rationale:** Local storage, session storage, IndexedDB, and a build-time public variable are all readable by any script on the page, so a secret kept there is available to the same injected script the secret is meant to resist. Refresh tokens, provider secrets, and privileged credentials therefore stay out of the browser entirely. A preference the reader chooses, such as a theme or a locale, is not a secret and can be stored under a named key in the frame.
 
 ### Make optimistic behavior recoverable
 
-**Requirement:** An optimistic update MUST declare its stable client identity, its conflict behavior, its failure rollback, and its reconciliation path.
+**Statement:** An optimistic update MUST declare its stable client identity, its conflict behavior, its failure rollback, and its reconciliation path.
 
 **Rationale:** An optimistic update shows a value the server has not confirmed. Without a stable client identity the retry after a failure creates a duplicate; without declared conflict behavior two writers overwrite each other silently; without a rollback path a failed update leaves the shown value wrong. Declaring identity, conflict behavior, rollback, and reconciliation up front makes each of those cases designed instead of improvised. Money, irreversible actions, and uncertain authorization skip optimism entirely and wait for the server result.
 
 ### Announce the outcome of an optimistic update
 
-**Requirement:** An optimistic update MUST announce its reconciled outcome through a live region when the server result differs from the value shown.
+**Statement:** An optimistic update MUST announce its reconciled outcome through a live region when the server result differs from the value shown.
 
 **Rationale:** A rollback is a silent visual change: the shown value changes back with no event a screen reader announces. The reader heard the optimistic value confirmed and hears nothing when it is withdrawn, so they act on a value the server refused. Announcing the reconciled outcome through a live region tells them what actually holds. [The ARIA live-region technique](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19) is the mechanism, and a test of the route asserts the announcement.
 
 ### Localize copy through locale dictionaries
 
-**Requirement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
+**Statement:** Copy MUST resolve through locale dictionaries with fill and plural support, one chunk per language, and typed keys with a declared fallback.
 
 **Rationale:** One sentence written in two components drifts at the first rewording, because the author finds one copy and misses the other. A dictionary per language keeps each sentence in one place, keyed by a typed key the compiler checks, with fill and plural support so variable content and counts render correctly in every language. One chunk per language keeps a reader's download to the language they read, and a key the catalog lacks fails where the declared fallback says it fails instead of rendering a raw key.
 
