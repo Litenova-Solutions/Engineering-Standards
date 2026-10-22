@@ -7,10 +7,23 @@
   "status": "approved",
   "decided": "2026-02-01",
   "options": [
-    "14 days",
-    "21 days",
-    "28 days"
+    {
+      "name": "14 days",
+      "for": "Copies turn over fast for holds.",
+      "against": "Readers rush through long books."
+    },
+    {
+      "name": "21 days",
+      "for": "Most readers finish in three weeks.",
+      "against": "Holds wait a week longer."
+    },
+    {
+      "name": "28 days",
+      "for": "Slow readers keep up.",
+      "against": "Popular copies sit idle."
+    }
   ],
+  "chosen": "21 days",
   "changeWhen": "Reader demand shifts.",
   "decides": [],
   "basedOn": []

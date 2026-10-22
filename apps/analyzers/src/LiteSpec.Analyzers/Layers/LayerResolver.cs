@@ -34,6 +34,8 @@ internal static class LayerResolver
             case "APPLICATION": return Layer.Application;
             case "INFRASTRUCTURE": return Layer.Infrastructure;
             case "WEBAPI": return Layer.WebApi;
+            case "TEST": return Layer.Test;
+            case "TESTS": return Layer.Test;
             default: return Layer.None;
         }
     }
@@ -41,6 +43,7 @@ internal static class LayerResolver
     /// <summary>Reads the layer from the last segments of an assembly name.</summary>
     public static Layer FromAssemblyName(string assemblyName)
     {
+        if (EndsWithSegment(assemblyName, "Tests") || EndsWithSegment(assemblyName, "Test")) return Layer.Test;
         if (EndsWithSegment(assemblyName, "Application.Abstractions")) return Layer.ApplicationAbstractions;
         if (EndsWithSegment(assemblyName, "Domain")) return Layer.Domain;
         if (EndsWithSegment(assemblyName, "Application")) return Layer.Application;

@@ -1,6 +1,6 @@
 ---
 {
-  "type": "product-topic",
+  "type": "requirement-page",
   "title": "Approval",
   "owner": "expenses-team",
   "status": "approved",
@@ -11,7 +11,7 @@
       "title": "Decided within five days",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "behavior",
+      "kind": "functional",
       "statement": "Each submitted expense is decided within five business days.",
       "basedOn": []
     },
@@ -21,7 +21,7 @@
       "title": "Receipt over threshold",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "behavior",
+      "kind": "functional",
       "statement": "An expense above the receipt threshold carries a receipt.",
       "basedOn": []
     },
@@ -31,7 +31,7 @@
       "title": "No self approval",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "behavior",
+      "kind": "functional",
       "statement": "Nobody approves their own expense.",
       "basedOn": []
     },
@@ -41,7 +41,7 @@
       "title": "Single reimbursement",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "behavior",
+      "kind": "functional",
       "statement": "An approved expense is reimbursed at most once.",
       "basedOn": []
     }

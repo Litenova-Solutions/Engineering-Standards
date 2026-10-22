@@ -17,7 +17,7 @@ public sealed class AsyncMethodAnalyzer : LayerAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(Descriptors.LS3001, Descriptors.LS3002);
 
-    private protected override bool AppliesTo(Layer layer) => layer != Layer.None;
+    private protected override bool AppliesTo(Layer layer) => layer != Layer.None && layer != Layer.Test;
 
     private protected override void Register(CompilationStartAnalysisContext context)
     {

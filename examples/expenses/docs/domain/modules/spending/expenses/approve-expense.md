@@ -5,7 +5,7 @@
   "title": "Approve expense",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/approve-expense"
   ],
@@ -16,7 +16,6 @@
   "raises": [
     "event/expense.expense-approved"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.no-self-approval"
   ],
@@ -27,7 +26,6 @@
       "title": "Approved",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The expense is approved."
     },
     {
@@ -36,20 +34,19 @@
       "title": "Own expense",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.own_expense",
-      "httpStatus": 403,
+      "code": "spending.own-expense",
       "meaning": "The approver submitted the expense."
     },
     {
-      "type": "case",
-      "id": "case/approve-expense.approving-a-submitted-expense-succeeds",
+      "type": "scenario",
+      "id": "scenario/approve-expense.approving-a-submitted-expense-succeeds",
       "title": "Approving a submitted expense succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "An employee submitted an expense with its receipt.",
-      "action": "The manager approves the expense.",
+      "given": "An employee submitted an expense with its receipt.",
+      "when": "The manager approves the expense.",
       "result": "result/approve-expense.approved",
-      "expect": "The expense is approved."
+      "then": "The expense is approved."
     }
   ]
 }

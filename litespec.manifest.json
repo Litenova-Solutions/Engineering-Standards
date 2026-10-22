@@ -42,7 +42,7 @@
       ],
       "replaces": [],
       "switchesOn": [
-        "case"
+        "scenario"
       ]
     },
     "compat": {
@@ -67,7 +67,7 @@
       "activationScope": "local",
       "applicableKinds": [
         "module",
-        "business-record",
+        "aggregate",
         "use-case"
       ],
       "replaces": [],

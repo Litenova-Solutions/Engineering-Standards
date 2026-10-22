@@ -5,5 +5,5 @@ public sealed class ExpenseAlreadyReimbursedException()
     : DomainException("The expense is already reimbursed.")
 {
     /// <summary>The stable failure code.</summary>
-    public override string Code => "failure/spending.already_reimbursed";
+    public override string Code => "spending.already-reimbursed";
 }

@@ -2,7 +2,7 @@ namespace Expenses.Integration.Tests.Spending.Expenses.SubmitExpense;
 
 public sealed class SubmitExpenseTests(ExpensesApiFixture api) : IClassFixture<ExpensesApiFixture>
 {
-    /// <proves>case/submit-expense.submitting-with-a-receipt-succeeds</proves>
+    /// <proves>scenario/submit-expense.submitting-with-a-receipt-succeeds</proves>
     [Fact]
     public async Task An_expense_is_submitted_through_a_helper_of_the_worldAsync()
     {

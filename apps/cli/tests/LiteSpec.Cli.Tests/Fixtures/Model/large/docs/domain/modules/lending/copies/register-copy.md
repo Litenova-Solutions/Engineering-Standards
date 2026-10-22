@@ -5,7 +5,7 @@
   "title": "Register copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/manage-copies"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/copy.copy-registered"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.copy-shelf-home"
-  ],
-  "results": [
-    "result/register-copy.registered",
-    "result/register-copy.copy-already-registered"
-  ],
-  "cases": [
-    "case/register-copy.registering-a-new-copy-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Registered",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The copy is registered."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Copy already registered",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_already_registered",
-      "httpStatus": 409,
+      "code": "lending.copy-already-registered",
       "meaning": "The copy is already registered."
     },
     {
-      "type": "case",
-      "id": "case/register-copy.registering-a-new-copy-succeeds",
+      "type": "scenario",
+      "id": "scenario/register-copy.registering-a-new-copy-succeeds",
       "title": "Registering a new copy succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A new copy arrives at the desk.",
-      "action": "The librarian registers the copy.",
+      "given": "A new copy arrives at the desk.",
+      "when": "The librarian registers the copy.",
       "result": "result/register-copy.registered",
-      "expect": "The copy is registered."
+      "then": "The copy is registered."
     }
   ]
 }

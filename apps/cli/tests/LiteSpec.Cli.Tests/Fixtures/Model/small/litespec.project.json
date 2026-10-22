@@ -17,15 +17,19 @@
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
-    "language": "docs/language.json",
-    "application": "apps/api/src/Library.Application",
-    "domain": "apps/api/src/Library.Domain",
-    "webapi": "apps/api/src/Library.WebApi",
+    "glossary": "docs/glossary.json",
     "testRoots": [
       "apps/api/tests"
     ],
     "frontends": [],
     "records": {}
+  },
+  "stackConfig": {
+    "dotnet": {
+      "application": "apps/api/src/Library.Application",
+      "domain": "apps/api/src/Library.Domain",
+      "webapi": "apps/api/src/Library.WebApi"
+    }
   },
   "selectedExtensions": []
 }

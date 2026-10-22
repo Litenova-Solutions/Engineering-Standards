@@ -58,7 +58,9 @@ public sealed class TypedIdentifierAnalyzer : LayerAnalyzer
         }
 
         var definition = baseType.OriginalDefinition;
-        if (definition.TypeKind != TypeKind.Class || definition.Arity != 1 || definition.Name != "AggregateRoot")
+        if (definition.TypeKind != TypeKind.Class
+            || definition.Arity != 1
+            || (definition.Name != "AggregateRoot" && definition.Name != "Entity"))
         {
             return;
         }
@@ -126,7 +128,8 @@ public sealed class TypedIdentifierAnalyzer : LayerAnalyzer
             foreach (var baseType in declaration.BaseList.Types)
             {
                 var name = baseType.Type is QualifiedNameSyntax qualified ? qualified.Right : baseType.Type;
-                if (name is GenericNameSyntax generic && generic.Identifier.Text == "AggregateRoot")
+                if (name is GenericNameSyntax generic
+                    && (generic.Identifier.Text == "AggregateRoot" || generic.Identifier.Text == "Entity"))
                 {
                     return baseType.Type.GetLocation();
                 }

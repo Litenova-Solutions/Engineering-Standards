@@ -11,8 +11,6 @@
       "title": "Submit expense",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "submit-expense",
-      "codeType": "SubmitExpense",
       "meaning": "Submit an expense and attach receipts."
     },
     {
@@ -21,8 +19,6 @@
       "title": "Approve expense",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "approve-expense",
-      "codeType": "ApproveExpense",
       "meaning": "Approve or reject a submitted expense."
     },
     {
@@ -31,8 +27,6 @@
       "title": "Reimburse expense",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "reimburse-expense",
-      "codeType": "ReimburseExpense",
       "meaning": "Reimburse an approved expense."
     },
     {
@@ -41,8 +35,6 @@
       "title": "List expenses",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "list-expenses",
-      "codeType": "ListExpenses",
       "meaning": "Read own expenses."
     },
     {
@@ -51,8 +43,6 @@
       "title": "Manage policy",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "manage-policy",
-      "codeType": "ManagePolicy",
       "meaning": "Set the receipt threshold."
     },
     {
@@ -61,8 +51,6 @@
       "title": "Export expenses",
       "owner": "expenses-team",
       "status": "approved",
-      "code": "export-expenses",
-      "codeType": "ExportExpenses",
       "meaning": "Export approved expenses for finance."
     }
   ]

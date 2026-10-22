@@ -189,7 +189,7 @@ sealed class DotnetScenarioReader : IScenarioReader
                 if (literal.IsKind(SyntaxKind.StringLiteralToken)
                     && literal.Value is string text)
                 {
-                    foreach (System.Text.RegularExpressions.Match match in Identifiers.FailureCode().Matches(text))
+                    foreach (System.Text.RegularExpressions.Match match in Identifiers.RefusalCode().Matches(text))
                     {
                         codes.Add(match.Value);
                     }

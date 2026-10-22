@@ -1,15 +1,23 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/lending.hold",
+  "type": "aggregate",
+  "id": "aggregate/lending.hold",
   "title": "Hold",
   "owner": "lending-team",
   "status": "approved",
-  "codeName": "Hold",
   "states": [
-    "Waiting",
-    "Ready",
-    "Canceled"
+    {
+      "name": "Waiting",
+      "meaning": "The hold waits for its copy."
+    },
+    {
+      "name": "Ready",
+      "meaning": "The copy waits on the pickup shelf."
+    },
+    {
+      "name": "Canceled",
+      "meaning": "The reader gave up the hold."
+    }
   ],
   "records": [
     {
@@ -18,8 +26,7 @@
       "title": "Names one copy",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "always-true",
-      "enforcedBy": "aggregate",
+      "kind": "invariant",
       "statement": "A hold names one copy.",
       "governs": [
         "use-case/lending.place-hold"

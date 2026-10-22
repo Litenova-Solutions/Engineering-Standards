@@ -129,7 +129,7 @@ sealed class DotnetBackendReader : IBackendReader
         {
             if (LiteralText(token) is { } literal)
             {
-                foreach (System.Text.RegularExpressions.Match match in Identifiers.FailureCode().Matches(literal))
+                foreach (System.Text.RegularExpressions.Match match in Identifiers.RefusalCode().Matches(literal))
                 {
                     model.Literals.Add(new CodeLiteral(
                         match.Value,

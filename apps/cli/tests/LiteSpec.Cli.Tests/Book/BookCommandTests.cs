@@ -19,9 +19,9 @@ public sealed class BookCommandTests
         Assert.True(File.Exists(Path.Combine(temp.Path, "index.html")), "index.html was not written.");
         Assert.True(File.Exists(Path.Combine(temp.Path, "assets", "book.css")), "assets/book.css was not written.");
         Assert.True(File.Exists(Path.Combine(temp.Path, "assets", "book.js")), "assets/book.js was not written.");
-        // business-record/lending.loan in the fixture model maps to business-record/lending/loan.html.
+        // aggregate/lending.loan in the fixture model maps to aggregate/lending/loan.html.
         Assert.True(
-            File.Exists(Path.Combine(temp.Path, "business-record", "lending", "loan.html")),
+            File.Exists(Path.Combine(temp.Path, "aggregate", "lending", "loan.html")),
             "No record page was written.");
     }
 

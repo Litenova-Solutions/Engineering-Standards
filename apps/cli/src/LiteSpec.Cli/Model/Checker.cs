@@ -15,18 +15,18 @@ static partial class Checker
         "record-shape", "invalid-field", "identifier-form", "identifier-duplicate",
         "use-case-name-clash", "reference-unresolved", "draft-gate",
         "owner-unknown", "draft-without-decider", "known-gap-expired", "gap-unknown-check",
-        "rule-name-negation", "use-case-without-success", "case-result-unresolved",
+        "rule-name-negation", "use-case-without-success", "scenario-result-unresolved",
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
         "size-type-missing", "product-not-singleton",
-        "journey-reach", "use-case-access", "result-status", "region-unknown",
-        "use-case-without-case", "requirement-unfulfilled",
-        "business-record-name-clash", "decision-decides-nothing", "link-unresolved",
+        "journey-reach", "use-case-access", "region-unknown",
+        "use-case-without-scenario", "requirement-unfulfilled",
+        "aggregate-name-clash", "decision-decides-nothing", "link-unresolved",
     };
 
     /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfills them.</summary>
     private static readonly HashSet<string> FulfilledKinds = new(StringComparer.Ordinal)
     {
-        "promise", "behavior", "quality",
+        "functional", "quality", "business",
     };
 
     /// <summary>Feature states under which a requirement is not yet, or never, made true by code.</summary>
@@ -48,7 +48,6 @@ static partial class Checker
         Time("fulfillment", () => CheckFulfilment(model, findings));
         Time("links", () => CheckLinks(model, findings));
         Time("access", () => CheckAccess(model, findings));
-        Time("status", () => CheckResultStatus(model, findings));
         Time("regions", () => CheckRegions(model, findings));
         Time("profile", () => CheckSizeTypes(model, findings));
         Time("reach", () => CheckJourneyReach(model, findings));
@@ -103,10 +102,10 @@ static partial class Checker
                 continue;
             }
 
-            // A gap naming a use case also covers findings about the cases and results it holds.
+            // A gap naming a use case also covers findings about the scenarios and results it holds.
             var subjects = new List<string> { finding.Subject };
 
-            if ((finding.Subject.StartsWith("case/", StringComparison.Ordinal) || finding.Subject.StartsWith("result/", StringComparison.Ordinal))
+            if ((finding.Subject.StartsWith("scenario/", StringComparison.Ordinal) || finding.Subject.StartsWith("result/", StringComparison.Ordinal))
                 && Identifiers.TrySplit(finding.Subject, out _, out var home, out _)
                 && home is not null
                 && ModelBuilder.UseCaseOf(model, home) is { } holder)
@@ -207,8 +206,16 @@ static partial class Checker
                 RequireIds(record, "audience", 1, findings);
                 break;
 
+            case "goal":
+                RequireString(record, "statement", findings);
+                RequireString(record, "measure", findings);
+                RequireString(record, "target", findings);
+                RequireString(record, "by", findings);
+                break;
+
             case "constraint":
                 RequireString(record, "source", findings);
+                RequireEnum(record, "category", ["technical", "organizational", "convention"], findings);
                 RequireBoolean(record, "applies", findings);
                 RequireString(record, "appliesBecause", findings);
                 break;
@@ -225,23 +232,28 @@ static partial class Checker
                 if (record.Status == "approved")
                 {
                     RequireDate(record, "decided", findings);
+                    RequireString(record, "chosen", findings);
                 }
 
                 break;
 
             case "requirement":
-                RequireEnum(record, "kind", ["promise", "behavior", "quality", "target", "practice"], findings);
+                RequireEnum(record, "kind", ["functional", "quality", "business"], findings);
                 RequireString(record, "statement", findings);
 
-                if (record.Field("kind") == "promise")
+                if (record.Field("kind") == "business")
                 {
                     RequireArray(record, "values", 1, findings);
                 }
 
-                if (record.Field("kind") == "target")
+                if (record.Has("measure"))
+                {
+                    RequireString(record, "by", findings);
+                }
+
+                if (record.Has("by"))
                 {
                     RequireString(record, "measure", findings);
-                    RequireString(record, "by", findings);
                 }
 
                 break;
@@ -263,10 +275,15 @@ static partial class Checker
                     RequireIds(record, "solves", 1, findings);
                 }
 
+                if (record.Field("state") == "planned")
+                {
+                    RequireString(record, "by", findings);
+                }
+
                 break;
 
             case "actor":
-                RequireEnum(record, "kind", ["person", "company", "provider", "system", "guest"], findings);
+                RequireEnum(record, "kind", ["person", "organization", "system"], findings);
                 break;
 
             case "role":
@@ -275,8 +292,6 @@ static partial class Checker
                 break;
 
             case "permission":
-                RequirePattern(record, "code", @"^[a-z0-9]+(-[a-z0-9]+)*$", "kebab-case", findings);
-                RequirePattern(record, "codeType", @"^[A-Z][A-Za-z0-9]*$", "PascalCase", findings);
                 RequireString(record, "meaning", findings);
                 break;
 
@@ -290,25 +305,28 @@ static partial class Checker
                 RequireArray(record, "dependsOn", 0, findings);
                 break;
 
-            case "business-record":
-                RequireString(record, "codeName", findings);
+            case "aggregate":
                 RequireArray(record, "states", 1, findings);
+                RequireStateEntries(record, findings);
                 break;
 
             case "rule":
-                RequireEnum(record, "kind", ["always-true", "checked-before", "across-records"], findings);
-                RequireEnum(record, "enforcedBy", ["validator", "aggregate", "store", "guard", "reaction"], findings);
+                RequireEnum(record, "kind", ["invariant", "precondition", "calculation", "cross-aggregate"], findings);
                 RequireString(record, "statement", findings);
                 RequireIds(record, "governs", 1, findings);
                 break;
 
             case "use-case":
-                RequireEnum(record, "operation", ["command", "query"], findings);
+                RequireEnum(record, "kind", ["command", "query", "reaction"], findings);
                 // A retired use case names no entry point, so only a live one must be reached.
                 if (record.Status != "retired")
                 {
                     RequireIds(record, "reachedThrough", 1, findings);
                 }
+                break;
+
+            case "external-system":
+                RequireIds(record, "actor", 1, findings);
                 break;
 
             case "result":
@@ -319,19 +337,22 @@ static partial class Checker
                 {
                     RequireString(record, "code", findings);
 
-                    if (record.Field("code") is { } code && !Identifiers.FailureCode().IsMatch(code))
+                    if (record.Field("code") is { } code
+                        && (code.Length == 0
+                            || !Identifiers.RefusalCode().IsMatch(code)
+                            || Identifiers.RefusalCode().Match(code).Value != code))
                     {
-                        findings.Add(new Finding("invalid-field", $"Result '{record.Id}' has code '{code}', which is not a failure code.", record.File, record.Line, SubjectOf(record)));
+                        findings.Add(new Finding("invalid-field", $"Result '{record.Id}' has code '{code}', which is not a refusal code.", record.File, record.Line, SubjectOf(record)));
                     }
                 }
 
                 break;
 
-            case "case":
-                RequireString(record, "situation", findings);
-                RequireString(record, "action", findings);
+            case "scenario":
+                RequireString(record, "given", findings);
+                RequireString(record, "when", findings);
+                RequireString(record, "then", findings);
                 RequireString(record, "result", findings);
-                RequireString(record, "expect", findings);
                 break;
 
             case "event":
@@ -340,7 +361,7 @@ static partial class Checker
                 break;
 
             case "entry-point":
-                RequireEnum(record, "kind", ["web-app", "public-api", "cli", "mcp-server", "site", "reaction", "job"], findings);
+                RequireEnum(record, "kind", ["app", "api", "cli", "job", "reaction"], findings);
                 break;
 
             case "limit":
@@ -350,24 +371,19 @@ static partial class Checker
                 break;
 
             case "runbook":
-                if (!record.Has("limit") && !record.Has("trigger"))
-                {
-                    findings.Add(new Finding("record-shape", $"Runbook '{record.Id}' names neither a limit nor a trigger.", record.File, record.Line, SubjectOf(record)));
-                }
-
+                RequireString(record, "trigger", findings);
                 break;
 
-            case "exception":
-                RequireString(record, "standard", findings);
+            case "deviation":
+                RequireString(record, "provision", findings);
                 RequireString(record, "reason", findings);
                 RequireDate(record, "reviewBy", findings);
                 RequireString(record, "removeWhen", findings);
 
-                if (record.Field("standard") is { } provision
-                    && !IsProvisionCitation(provision)
-                    && !(model.ById.TryGetValue(provision, out var standard) && standard.Type == "standard"))
+                if (record.Field("provision") is { } provision
+                    && !IsProvisionCitation(provision))
                 {
-                    findings.Add(new Finding("invalid-field", $"Exception '{record.Id}' names '{provision}', which is neither a shared provision nor a project standard.", record.File, record.Line, SubjectOf(record)));
+                    findings.Add(new Finding("invalid-field", $"Deviation '{record.Id}' names '{provision}', which is not a shared provision.", record.File, record.Line, SubjectOf(record)));
                 }
 
                 break;
@@ -528,9 +544,9 @@ static partial class Checker
                 moduleNames.Add(name);
             }
 
-            if (record.Type == "business-record" && !recordNames.Add(name))
+            if (record.Type == "aggregate" && !recordNames.Add(name))
             {
-                findings.Add(new Finding("business-record-name-clash", $"Business-record name '{name}' is used twice; rule and event homes cannot resolve.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("aggregate-name-clash", $"Aggregate name '{name}' is used twice; rule and event homes cannot resolve.", record.File, record.Line, SubjectOf(record)));
             }
 
             if (record.Type == "use-case")
@@ -549,7 +565,7 @@ static partial class Checker
         {
             foreach (var record in clash.Value)
             {
-                findings.Add(new Finding("use-case-name-clash", $"Use-case name '{clash.Key}' is used twice; result and case homes cannot resolve.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("use-case-name-clash", $"Use-case name '{clash.Key}' is used twice; result and scenario homes cannot resolve.", record.File, record.Line, SubjectOf(record)));
             }
         }
 
@@ -567,9 +583,9 @@ static partial class Checker
 
             var known = prefix switch
             {
-                "use-case" or "business-record" => moduleNames.Contains(home),
+                "use-case" or "aggregate" => moduleNames.Contains(home),
                 "rule" => moduleNames.Contains(home) || recordNames.Contains(home),
-                "result" or "case" => useCaseNames.ContainsKey(home),
+                "result" or "scenario" => useCaseNames.ContainsKey(home),
                 "event" => recordNames.Contains(home),
                 _ => true,
             };
@@ -583,16 +599,6 @@ static partial class Checker
 
     private static void CheckCitations(ProjectModel model, List<Finding> findings)
     {
-        var codes = new HashSet<string>(model.Code.Literals.Select(literal => literal.Value), StringComparer.Ordinal);
-
-        foreach (var record in model.Records.Where(left => left.Type == "result"))
-        {
-            if (record.Field("code") is { } code)
-            {
-                codes.Add(code);
-            }
-        }
-
         foreach (var record in model.Records)
         {
             if (record.Raw.ValueKind != JsonValueKind.Object)
@@ -625,7 +631,7 @@ static partial class Checker
 
             foreach (var id in cited.Order(StringComparer.Ordinal))
             {
-                if (!Resolves(model, codes, id))
+                if (!Resolves(model, id))
                 {
                     findings.Add(new Finding("reference-unresolved", $"Record '{record.Id}' cites '{id}', which no record holds.", record.File, record.Line, SubjectOf(record)));
                 }
@@ -661,7 +667,7 @@ static partial class Checker
             () => new List<Finding>(),
             (text, _, local) =>
             {
-                CheckTextCitations(model, codes, text.File, text.Text, text.StartLine, text.Subject, local);
+                CheckTextCitations(model, text.File, text.Text, text.StartLine, text.Subject, local);
 
                 return local;
             },
@@ -678,7 +684,6 @@ static partial class Checker
 
     private static void CheckTextCitations(
         ProjectModel model,
-        HashSet<string> codes,
         string file,
         string text,
         int startLine,
@@ -705,14 +710,14 @@ static partial class Checker
 
         foreach (var entry in cited.OrderBy(left => left.Value).ThenBy(left => left.Key, StringComparer.Ordinal))
         {
-            if (!Resolves(model, codes, entry.Key))
+            if (!Resolves(model, entry.Key))
             {
                 findings.Add(new Finding("reference-unresolved", $"Citation '{entry.Key}' resolves to no record.", file, entry.Value, subject));
             }
         }
     }
 
-    private static bool Resolves(ProjectModel model, HashSet<string> codes, string id)
+    private static bool Resolves(ProjectModel model, string id)
     {
         if (model.ById.ContainsKey(id))
         {
@@ -722,11 +727,6 @@ static partial class Checker
         if (id.StartsWith("litespec/", StringComparison.Ordinal))
         {
             return model.Provisions.Count == 0 || model.Provisions.Contains(id);
-        }
-
-        if (id.StartsWith("failure/", StringComparison.Ordinal))
-        {
-            return codes.Contains(id);
         }
 
         return false;
@@ -808,7 +808,7 @@ static partial class Checker
                 continue;
             }
 
-            var undelivered = requirement.Ids("deliveredBy").Any(id =>
+            var undelivered = requirement.Ids("feature").Any(id =>
                 model.ById.TryGetValue(id, out var feature)
                 && UndeliveredStates.Contains(feature.Field("state") ?? ""));
 
@@ -840,10 +840,10 @@ static partial class Checker
             }
 
             if (model.Config.Size == "large"
-                && !model.Records.Any(record => record.Type == "case"
-                    && Identifiers.TrySplit(record.Id, out _, out var caseHome, out _) && caseHome == name))
+                && !model.Records.Any(record => record.Type == "scenario"
+                    && Identifiers.TrySplit(record.Id, out _, out var scenarioHome, out _) && scenarioHome == name))
             {
-                findings.Add(new Finding("use-case-without-case", $"Use case '{useCase.Id}' has no case.", useCase.File, useCase.Line, SubjectOf(useCase)));
+                findings.Add(new Finding("use-case-without-scenario", $"Use case '{useCase.Id}' has no scenario.", useCase.File, useCase.Line, SubjectOf(useCase)));
             }
 
             if (model.Status.TryGetValue(useCase.Id, out var status) && !status.Implemented)
@@ -852,9 +852,9 @@ static partial class Checker
             }
         }
 
-        foreach (var kase in model.Records.Where(record => record.Type == "case"))
+        foreach (var scenario in model.Records.Where(record => record.Type == "scenario"))
         {
-            var resultId = kase.Ids("result").FirstOrDefault();
+            var resultId = scenario.Ids("result").FirstOrDefault();
 
             if (resultId is null)
             {
@@ -866,12 +866,12 @@ static partial class Checker
                 continue;
             }
 
-            var caseHome = Identifiers.TrySplit(kase.Id, out _, out var left, out _) ? left : null;
+            var scenarioHome = Identifiers.TrySplit(scenario.Id, out _, out var left, out _) ? left : null;
             var resultHome = Identifiers.TrySplit(result.Id, out _, out var right, out _) ? right : null;
 
-            if (caseHome is null || caseHome != resultHome)
+            if (scenarioHome is null || scenarioHome != resultHome)
             {
-                findings.Add(new Finding("case-result-unresolved", $"Case '{kase.Id}' ends in '{resultId}' of another use case.", kase.File, kase.Line, SubjectOf(kase)));
+                findings.Add(new Finding("scenario-result-unresolved", $"Scenario '{scenario.Id}' ends in '{resultId}' of another use case.", scenario.File, scenario.Line, SubjectOf(scenario)));
             }
         }
 
@@ -884,7 +884,7 @@ static partial class Checker
         }
 
         var provesByClaim = model.Proves
-            .GroupBy(link => (link.Scenario, link.Case))
+            .GroupBy(link => (link.Scenario, link.Claim))
             .ToDictionary(group => group.Key, group => group.First());
 
         foreach (var test in model.Tests)
@@ -970,46 +970,6 @@ static partial class Checker
             }
 
             findings.Add(new Finding("use-case-access", $"Use case '{useCase.Id}' names no permission, is not anonymous, and is reached beyond reactions and jobs.", useCase.File, useCase.Line, SubjectOf(useCase)));
-        }
-    }
-
-    private static void CheckResultStatus(ProjectModel model, List<Finding> findings)
-    {
-        var useCaseByName = model.Records
-            .Where(record => record.Type == "use-case")
-            .Select(record => (Record: record, Split: Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : null))
-            .Where(entry => entry.Split is not null)
-            .GroupBy(entry => entry.Split!, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.First().Record, StringComparer.Ordinal);
-
-        foreach (var result in model.Records.Where(record => record.Type == "result"))
-        {
-            if (!Identifiers.TrySplit(result.Id, out _, out var home, out _)
-                || home is null
-                || !useCaseByName.TryGetValue(home, out var useCase)
-                || useCase.Ids("reachedThrough").Count == 0)
-            {
-                continue;
-            }
-
-            if (ModelBuilder.BackgroundOnly(model, useCase))
-            {
-                if (result.Has("httpStatus"))
-                {
-                    findings.Add(new Finding("result-status", $"Result '{result.Id}' carries an httpStatus but '{useCase.Id}' is reached only through reactions or jobs.", result.File, result.Line, SubjectOf(result)));
-                }
-
-                continue;
-            }
-
-            if (!result.Has("httpStatus"))
-            {
-                findings.Add(new Finding("result-status", $"Result '{result.Id}' has no httpStatus.", result.File, result.Line, SubjectOf(result)));
-            }
-            else if (ResultStatus(result) is not (>= 200 and <= 599))
-            {
-                findings.Add(new Finding("result-status", $"Result '{result.Id}' has httpStatus '{result.Raw.GetProperty("httpStatus")}', which is no HTTP status.", result.File, result.Line, SubjectOf(result)));
-            }
         }
     }
 
@@ -1101,33 +1061,34 @@ static partial class Checker
         Identifiers.SharedCitation().IsMatch(text)
         && Identifiers.SharedCitation().Match(text).Value == text;
 
-    private static int? ResultStatus(Record record)
-    {
-        if (record.Raw.ValueKind != JsonValueKind.Object
-            || !record.Raw.TryGetProperty("httpStatus", out var value))
-        {
-            return null;
-        }
-
-        if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var number))
-        {
-            return number;
-        }
-
-        if (value.ValueKind == JsonValueKind.String
-            && int.TryParse(value.GetString(), out var text))
-        {
-            return text;
-        }
-
-        return null;
-    }
-
     private static void RequireString(Record record, string field, List<Finding> findings)
     {
         if (record.Field(field) is not { Length: > 0 })
         {
             findings.Add(new Finding("record-shape", $"Record '{record.Id}' has no {field}.", record.File, record.Line, SubjectOf(record)));
+        }
+    }
+
+    private static void RequireStateEntries(Record record, List<Finding> findings)
+    {
+        if (!record.Raw.TryGetProperty("states", out var value) || value.ValueKind != JsonValueKind.Array)
+        {
+            return;
+        }
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object
+                || !entry.TryGetProperty("name", out var name)
+                || name.ValueKind != JsonValueKind.String
+                || string.IsNullOrEmpty(name.GetString())
+                || !entry.TryGetProperty("meaning", out var meaning)
+                || meaning.ValueKind != JsonValueKind.String
+                || string.IsNullOrEmpty(meaning.GetString()))
+            {
+                findings.Add(new Finding("invalid-field", $"Aggregate '{record.Id}' holds a state without a name and a meaning.", record.File, record.Line, SubjectOf(record)));
+                return;
+            }
         }
     }
 

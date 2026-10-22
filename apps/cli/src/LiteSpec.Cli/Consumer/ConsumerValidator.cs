@@ -6,7 +6,7 @@ namespace LiteSpec.Consumer;
 /// <summary>
 ///     The <c>litespec consumer</c> command: holds a consumer repository to the release it pinned.
 ///     It checks the project record, the manifest version and the named stacks and extensions,
-///     every page's frontmatter and required sections, the language record with
+///     every page's frontmatter and required sections, the glossary with
 ///     the rejected words, and the controlled UI through the UI validator.
 /// </summary>
 static partial class ConsumerValidator
@@ -122,7 +122,7 @@ static partial class ConsumerValidator
 
         public string RecordSchemaFile { get; set; } = "";
 
-        public string LanguageSchemaFile { get; set; } = "";
+        public string GlossarySchemaFile { get; set; } = "";
 
         public JsonNode? Project { get; set; }
 
@@ -142,7 +142,7 @@ static partial class ConsumerValidator
 
         public JsonNode? UiPackage { get; set; }
 
-        public string LanguageSummary { get; set; } = "";
+        public string GlossarySummary { get; set; } = "";
 
         public string Today { get; } = DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
@@ -151,9 +151,9 @@ static partial class ConsumerValidator
             StandardsRoot = LiteSpecHome.RequireRoot();
             ProjectSchemaFile = LiteSpecHome.PathTo("schemas/litespec-project.schema.json");
             RecordSchemaFile = LiteSpecHome.PathTo("schemas/record.schema.json");
-            LanguageSchemaFile = LiteSpecHome.PathTo("schemas/language.schema.json");
+            GlossarySchemaFile = LiteSpecHome.PathTo("schemas/glossary.schema.json");
 
-            foreach (var schemaFile in new[] { ProjectSchemaFile, RecordSchemaFile, LanguageSchemaFile })
+            foreach (var schemaFile in new[] { ProjectSchemaFile, RecordSchemaFile, GlossarySchemaFile })
             {
                 if (!File.Exists(schemaFile))
                 {
@@ -192,7 +192,7 @@ static partial class ConsumerValidator
             }
 
             CheckPages(this);
-            CheckLanguageAndProse(this);
+            CheckGlossaryAndProse(this);
             CheckControlledUi(this);
         }
 
@@ -222,7 +222,7 @@ static partial class ConsumerValidator
 
             Console.WriteLine($"Consumer: {Root}");
             Console.WriteLine($"Files scanned: {Files.Count} under {DocsPath}, frontmatter pages: {Pages}");
-            Console.WriteLine(LanguageSummary);
+            Console.WriteLine(GlossarySummary);
 
             if (Advisories.Count > 0)
             {

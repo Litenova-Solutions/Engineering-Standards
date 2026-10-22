@@ -11,7 +11,7 @@
       "title": "Expenses app",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "web-app"
+      "kind": "app"
     }
   ]
 }

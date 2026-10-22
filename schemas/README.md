@@ -6,7 +6,7 @@ You maintain the LiteSpec repository and change a JSON contract, or you build a 
 
 ## What it is
 
-`schemas/` holds the seven JSON Schema contracts of the release. Each file validates one JSON artifact: the release manifest, the consumer project file, the record frontmatter, the language record, the design contract, the pattern catalog, or the source lock. Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`, so a pinned consumer keeps resolving the shape it reviewed.
+`schemas/` holds the seven JSON Schema contracts of the release. Each file validates one JSON artifact: the release manifest, the consumer project file, the record frontmatter, the glossary, the design contract, the pattern catalog, or the source lock. Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`, so a pinned consumer keeps resolving the shape it reviewed.
 
 ## Quick start
 
@@ -25,7 +25,7 @@ The command checks each `$id` against the manifest version, validates the manife
 | `litespec-manifest.schema.json` | `litespec.manifest.json` | `litespec validate` |
 | `litespec-project.schema.json` | `litespec.project.json` | `litespec consumer`, `litespec init` |
 | `record.schema.json` | Frontmatter of every consumer record page | `litespec consumer` |
-| `language.schema.json` | `docs/language.json` | `litespec consumer` |
+| `glossary.schema.json` | `docs/glossary.json` | `litespec consumer` |
 | `design-contract.schema.json` | Metadata block of `DESIGN.md` | `litespec ui` |
 | `ui-pattern-catalog.schema.json` | `docs/ui/pattern-catalog.json` | `litespec ui` |
 | `ui-source-lock.schema.json` | `packages/ui/ui-source-lock.json` | `litespec ui` |
@@ -46,7 +46,7 @@ The shared evaluator lives in `apps/cli/src/LiteSpec.Cli/Schemas/JsonSchema.cs`.
 
 ### Language schema
 
-`language.schema.json` (`schemaVersion` 2) owns the shape of the consumer language record: one Term entry per concept with its meaning, labels, rejected synonyms, broader and narrower terms, and closed-set values, plus the mannered terms no page may use. `litespec consumer` validates the record through it and then checks prose against the terms.
+`glossary.schema.json` (`schemaVersion` 2) owns the shape of the consumer glossary: one Term entry per concept with its meaning, labels, rejected synonyms, broader and narrower terms, and closed-set values, plus the mannered terms no page may use. `litespec consumer` validates the record through it and then checks prose against the terms.
 
 ### Design contract schema
 
@@ -62,7 +62,7 @@ The shared evaluator lives in `apps/cli/src/LiteSpec.Cli/Schemas/JsonSchema.cs`.
 
 ## How it works
 
-Each reader loads its schema file and passes values to the shared evaluator. The evaluator first runs the keyword gate: a schema carrying a keyword the evaluator does not implement fails with `SCHEMA_UNSUPPORTED_KEYWORD` instead of validating. It then validates the value and reports each mismatch with its location. The readers add the checks JSON Schema cannot express: the manifest `$id` home and version, the project selection rules, the record body sections, the language prose check, the design contract implementation check, the catalog cross-property references, and the lock digest check.
+Each reader loads its schema file and passes values to the shared evaluator. The evaluator first runs the keyword gate: a schema carrying a keyword the evaluator does not implement fails with `SCHEMA_UNSUPPORTED_KEYWORD` instead of validating. It then validates the value and reports each mismatch with its location. The readers add the checks JSON Schema cannot express: the manifest `$id` home and version, the project selection rules, the record body sections, the glossary prose check, the design contract implementation check, the catalog cross-property references, and the lock digest check.
 
 ## How to change one safely
 

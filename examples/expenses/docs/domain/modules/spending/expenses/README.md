@@ -1,16 +1,27 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/spending.expense",
+  "type": "aggregate",
+  "id": "aggregate/spending.expense",
   "title": "Expense",
   "owner": "expenses-team",
   "status": "approved",
-  "codeName": "Expense",
   "states": [
-    "Submitted",
-    "Approved",
-    "Rejected",
-    "Reimbursed"
+    {
+      "name": "Submitted",
+      "meaning": "The expense waits for a decision."
+    },
+    {
+      "name": "Approved",
+      "meaning": "A manager approved the expense."
+    },
+    {
+      "name": "Rejected",
+      "meaning": "A manager rejected the expense."
+    },
+    {
+      "name": "Reimbursed",
+      "meaning": "Finance reimbursed the expense."
+    }
   ],
   "records": [
     {
@@ -19,8 +30,7 @@
       "title": "Receipt required above threshold",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "checked-before",
-      "enforcedBy": "validator",
+      "kind": "precondition",
       "statement": "An expense above the policy threshold needs a receipt.",
       "governs": [
         "use-case/spending.submit-expense"
@@ -37,8 +47,7 @@
       "title": "Approver is not submitter",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "checked-before",
-      "enforcedBy": "aggregate",
+      "kind": "precondition",
       "statement": "An approver is not the submitter.",
       "governs": [
         "use-case/spending.approve-expense"
@@ -55,8 +64,7 @@
       "title": "Reimbursed once",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "always-true",
-      "enforcedBy": "aggregate",
+      "kind": "invariant",
       "statement": "An expense is reimbursed at most once.",
       "governs": [
         "use-case/spending.reimburse-expense"
@@ -73,8 +81,7 @@
       "title": "Approved before reimbursement",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "checked-before",
-      "enforcedBy": "aggregate",
+      "kind": "precondition",
       "statement": "An expense is reimbursed only after approval.",
       "governs": [
         "use-case/spending.reimburse-expense"

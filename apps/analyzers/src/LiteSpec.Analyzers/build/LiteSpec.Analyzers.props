@@ -2,7 +2,7 @@
     <!--
         Lets a project name its LiteSpec layer explicitly:
             <LiteSpecLayer>Domain</LiteSpecLayer>
-        Values: Domain, Application.Abstractions, Application, Infrastructure, WebApi, None.
+        Values: Domain, Application.Abstractions, Application, Infrastructure, WebApi, Test, None.
         Without it, the analyzers read the layer from the assembly name suffix.
     -->
     <ItemGroup>

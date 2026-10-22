@@ -5,7 +5,7 @@
   "title": "Register copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/manage-copies"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/copy.copy-registered"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.copy-shelf-home"
   ],
-  "results": [
-    "result/register-copy.registered",
-    "result/register-copy.copy-already-registered"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Registered",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The copy is registered."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Copy already registered",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_already_registered",
-      "httpStatus": 409,
+      "code": "lending.copy-already-registered",
       "meaning": "The copy is already registered."
     }
   ]

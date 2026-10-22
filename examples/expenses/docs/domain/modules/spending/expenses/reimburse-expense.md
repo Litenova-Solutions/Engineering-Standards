@@ -5,7 +5,7 @@
   "title": "Reimburse expense",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/reimburse-expense"
   ],
@@ -16,7 +16,6 @@
   "raises": [
     "event/expense.expense-reimbursed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.single-reimbursement"
   ],
@@ -27,7 +26,6 @@
       "title": "Reimbursed",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The expense is reimbursed."
     },
     {
@@ -36,8 +34,7 @@
       "title": "Not approved",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.not_approved",
-      "httpStatus": 409,
+      "code": "spending.not-approved",
       "meaning": "The expense is not approved."
     },
     {
@@ -46,20 +43,19 @@
       "title": "Already reimbursed",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.already_reimbursed",
-      "httpStatus": 409,
+      "code": "spending.already-reimbursed",
       "meaning": "The expense is already reimbursed."
     },
     {
-      "type": "case",
-      "id": "case/reimburse-expense.reimbursing-an-approved-expense-succeeds",
+      "type": "scenario",
+      "id": "scenario/reimburse-expense.reimbursing-an-approved-expense-succeeds",
       "title": "Reimbursing an approved expense succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "A manager approved an expense.",
-      "action": "Finance reimburses the expense.",
+      "given": "A manager approved an expense.",
+      "when": "Finance reimburses the expense.",
       "result": "result/reimburse-expense.reimbursed",
-      "expect": "The expense is reimbursed."
+      "then": "The expense is reimbursed."
     }
   ]
 }

@@ -5,7 +5,7 @@
   "title": "List expenses",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "query",
+  "kind": "query",
   "needs": [
     "permission/list-expenses"
   ],
@@ -14,7 +14,6 @@
     "entry-point/expenses-app"
   ],
   "raises": [],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
@@ -25,19 +24,18 @@
       "title": "Listed",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The expenses are listed."
     },
     {
-      "type": "case",
-      "id": "case/list-expenses.listing-own-expenses-succeeds",
+      "type": "scenario",
+      "id": "scenario/list-expenses.listing-own-expenses-succeeds",
       "title": "Listing own expenses succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "An employee submitted two expenses.",
-      "action": "The employee lists their expenses.",
+      "given": "An employee submitted two expenses.",
+      "when": "The employee lists their expenses.",
       "result": "result/list-expenses.listed",
-      "expect": "Both expenses are listed."
+      "then": "Both expenses are listed."
     }
   ]
 }

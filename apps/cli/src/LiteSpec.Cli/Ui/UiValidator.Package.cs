@@ -52,7 +52,7 @@ static partial class UiValidator
                 var registry = Child(config, "registry");
                 if (Truthy(registry) && !StrictEqual(registry, Dot(Child(baseline, "registry"), "url")) && !baselineOverride)
                 {
-                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{Show(registry)}' is not the built-in shadcn-svelte registry; an additional registry requires an exception");
+                    Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{Show(registry)}' is not the built-in shadcn-svelte registry; an additional registry requires a deviation");
                 }
 
                 return;
@@ -88,7 +88,7 @@ static partial class UiValidator
             var registries = Child(config, "registries");
             if (registries is { Found: true, Node: not null } && RegistriesNonEmpty(registries.Node) && !baselineOverride)
             {
-                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: an additional registry requires an exception");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: an additional registry requires a deviation");
             }
         }
 
@@ -138,7 +138,7 @@ static partial class UiValidator
             var baselineRegistry = Child(baseline, "registry");
             if ((!StrictEqual(Dot(lockRegistry, "name"), Dot(baselineRegistry, "name")) || !StrictEqual(Dot(lockRegistry, "url"), Dot(baselineRegistry, "url"))) && !baselineOverride)
             {
-                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{ShowOr(Dot(lockRegistry, "name"), "(unnamed)")}' is not the built-in {ShowOr(Dot(baselineRegistry, "name"), "registry")} registry; an additional registry requires an exception");
+                Errors.Add($"[litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package] {label}: registry '{ShowOr(Dot(lockRegistry, "name"), "(unnamed)")}' is not the built-in {ShowOr(Dot(baselineRegistry, "name"), "registry")} registry; an additional registry requires a deviation");
             }
 
             foreach (var key in new[] { "style", "base", "cssVariables", "baseColor", "theme", "chartColor", "font", "fontHeading", "icons", "radius", "menuAccent", "menuColor", "componentsStyle" })

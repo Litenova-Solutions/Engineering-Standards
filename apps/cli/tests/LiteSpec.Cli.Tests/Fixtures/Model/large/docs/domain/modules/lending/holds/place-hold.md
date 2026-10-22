@@ -5,7 +5,7 @@
   "title": "Place hold",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/place-hold"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/hold.hold-placed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.hold-pickup-window"
-  ],
-  "results": [
-    "result/place-hold.placed",
-    "result/place-hold.hold-already-waiting"
-  ],
-  "cases": [
-    "case/place-hold.placing-a-hold-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Placed",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The hold is placed."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Hold already waiting",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.hold_already_waiting",
-      "httpStatus": 409,
+      "code": "lending.hold-already-waiting",
       "meaning": "A hold is already waiting."
     },
     {
-      "type": "case",
-      "id": "case/place-hold.placing-a-hold-succeeds",
+      "type": "scenario",
+      "id": "scenario/place-hold.placing-a-hold-succeeds",
       "title": "Placing a hold succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A copy is on loan to another reader.",
-      "action": "The reader places a hold.",
+      "given": "A copy is on loan to another reader.",
+      "when": "The reader places a hold.",
       "result": "result/place-hold.placed",
-      "expect": "The hold is placed."
+      "then": "The hold is placed."
     }
   ]
 }

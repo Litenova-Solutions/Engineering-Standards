@@ -5,7 +5,7 @@
   "title": "Place hold",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/place-hold"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/hold.hold-placed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.hold-pickup-window"
   ],
-  "results": [
-    "result/place-hold.placed",
-    "result/place-hold.hold-already-waiting"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Placed",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The hold is placed."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Hold already waiting",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.hold_already_waiting",
-      "httpStatus": 409,
+      "code": "lending.hold-already-waiting",
       "meaning": "A hold is already waiting."
     }
   ]

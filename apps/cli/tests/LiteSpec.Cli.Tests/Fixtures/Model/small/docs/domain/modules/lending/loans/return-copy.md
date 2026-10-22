@@ -5,7 +5,7 @@
   "title": "Return copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/loan.loan-returned"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
   ],
-  "results": [
-    "result/return-copy.returned",
-    "result/return-copy.loan-inactive"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Returned",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The copy is returned."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Loan inactive",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.loan_not_active",
-      "httpStatus": 409,
+      "code": "lending.loan-not-active",
       "meaning": "The loan is inactive."
     }
   ]

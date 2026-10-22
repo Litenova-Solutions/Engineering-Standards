@@ -1,14 +1,19 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/spending.policy",
+  "type": "aggregate",
+  "id": "aggregate/spending.policy",
   "title": "Policy",
   "owner": "expenses-team",
   "status": "approved",
-  "codeName": "Policy",
   "states": [
-    "Active",
-    "Retired"
+    {
+      "name": "Active",
+      "meaning": "The policy threshold applies."
+    },
+    {
+      "name": "Retired",
+      "meaning": "The policy no longer applies."
+    }
   ],
   "records": [
     {
@@ -17,8 +22,7 @@
       "title": "Threshold never negative",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "always-true",
-      "enforcedBy": "aggregate",
+      "kind": "invariant",
       "statement": "A threshold is never negative.",
       "governs": [
         "use-case/spending.set-receipt-threshold"

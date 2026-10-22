@@ -11,8 +11,6 @@
       "title": "Borrow copy",
       "owner": "lending-team",
       "status": "approved",
-      "code": "borrow-copy",
-      "codeType": "BorrowCopy",
       "meaning": "Borrow an available copy."
     },
     {
@@ -21,8 +19,6 @@
       "title": "Read loans",
       "owner": "lending-team",
       "status": "approved",
-      "code": "read-loans",
-      "codeType": "ReadLoans",
       "meaning": "Read own loans."
     },
     {
@@ -31,8 +27,6 @@
       "title": "Manage copies",
       "owner": "lending-team",
       "status": "approved",
-      "code": "manage-copies",
-      "codeType": "ManageCopies",
       "meaning": "Register and retire copies."
     },
     {
@@ -41,8 +35,6 @@
       "title": "Place hold",
       "owner": "lending-team",
       "status": "approved",
-      "code": "place-hold",
-      "codeType": "PlaceHold",
       "meaning": "Place and cancel holds."
     },
     {
@@ -51,8 +43,6 @@
       "title": "Borrow copy again",
       "owner": "lending-team",
       "status": "approved",
-      "code": "borrow-copy-again",
-      "codeType": "BorrowCopyAgain",
       "meaning": "Borrow an available copy again."
     }
   ]

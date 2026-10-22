@@ -212,14 +212,14 @@ sealed class UiFixture : IDisposable
         return Run();
     }
 
-    /// <summary>Writes one Exception record under the default exceptions folder.</summary>
-    public string WriteException(string name, string standard, string reviewBy) =>
-        WriteExceptionFile($"docs/exceptions/{name}.md",
-            ExceptionMeta($"exception/{name}", $"Fixture exception {name}", standard, reviewBy),
-            $"Fixture exception {name}");
+    /// <summary>Writes one Deviation record under the default deviations folder.</summary>
+    public string WriteDeviation(string name, string provision, string reviewBy) =>
+        WriteDeviationFile($"docs/deviations/{name}.md",
+            DeviationMeta($"deviation/{name}", $"Fixture deviation {name}", provision, reviewBy),
+            $"Fixture deviation {name}");
 
-    /// <summary>Writes one Exception record at a consumer-relative path.</summary>
-    public string WriteExceptionFile(string relative, JsonObject meta, string heading)
+    /// <summary>Writes one Deviation record at a consumer-relative path.</summary>
+    public string WriteDeviationFile(string relative, JsonObject meta, string heading)
     {
         var file = Join(relative);
         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
@@ -227,15 +227,15 @@ sealed class UiFixture : IDisposable
         return file;
     }
 
-    /// <summary>The frontmatter of a fixture Exception record.</summary>
-    public static JsonObject ExceptionMeta(string id, string title, string standard, string reviewBy) => new()
+    /// <summary>The frontmatter of a fixture Deviation record.</summary>
+    public static JsonObject DeviationMeta(string id, string title, string provision, string reviewBy) => new()
     {
-        ["type"] = "exception",
+        ["type"] = "deviation",
         ["id"] = id,
         ["title"] = title,
         ["owner"] = "fixture",
         ["status"] = "approved",
-        ["standard"] = standard,
+        ["provision"] = provision,
         ["reason"] = "The fixture needs this departure.",
         ["reviewBy"] = reviewBy,
         ["removeWhen"] = "The fixture no longer needs it.",
@@ -338,7 +338,7 @@ sealed class UiFixture : IDisposable
             "packages/ui/src/styles",
             "apps/web/src/routes",
             "apps/web/src/modules",
-            "docs/exceptions",
+            "docs/deviations",
             "litespec/schemas",
             "litespec/docs/frontend/patterns",
         })

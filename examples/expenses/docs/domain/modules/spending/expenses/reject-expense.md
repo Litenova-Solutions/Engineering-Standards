@@ -5,7 +5,7 @@
   "title": "Reject expense",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/approve-expense"
   ],
@@ -16,7 +16,6 @@
   "raises": [
     "event/expense.expense-rejected"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
@@ -27,7 +26,6 @@
       "title": "Rejected",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The expense is rejected."
     },
     {
@@ -36,20 +34,19 @@
       "title": "Not submitted",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.not_submitted",
-      "httpStatus": 409,
+      "code": "spending.not-submitted",
       "meaning": "The expense is already decided."
     },
     {
-      "type": "case",
-      "id": "case/reject-expense.rejecting-a-submitted-expense-succeeds",
+      "type": "scenario",
+      "id": "scenario/reject-expense.rejecting-a-submitted-expense-succeeds",
       "title": "Rejecting a submitted expense succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "An employee submitted an expense outside the policy.",
-      "action": "The manager rejects the expense with a reason.",
+      "given": "An employee submitted an expense outside the policy.",
+      "when": "The manager rejects the expense with a reason.",
       "result": "result/reject-expense.rejected",
-      "expect": "The expense is rejected."
+      "then": "The expense is rejected."
     }
   ]
 }

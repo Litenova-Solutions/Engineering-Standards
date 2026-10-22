@@ -5,7 +5,7 @@
   "title": "Export expenses",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/export-expenses"
   ],
@@ -14,7 +14,6 @@
     "entry-point/expenses-app"
   ],
   "raises": [],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
@@ -25,7 +24,6 @@
       "title": "Exported",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The approved expenses are exported."
     },
     {
@@ -34,20 +32,19 @@
       "title": "Nothing approved",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.nothing_approved",
-      "httpStatus": 409,
+      "code": "spending.nothing-approved",
       "meaning": "No approved expense awaits export."
     },
     {
-      "type": "case",
-      "id": "case/export-expenses.exporting-approved-expenses-succeeds",
+      "type": "scenario",
+      "id": "scenario/export-expenses.exporting-approved-expenses-succeeds",
       "title": "Exporting approved expenses succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "Two expenses were approved this week.",
-      "action": "Finance exports the approved expenses.",
+      "given": "Two expenses were approved this week.",
+      "when": "Finance exports the approved expenses.",
       "result": "result/export-expenses.exported",
-      "expect": "The approved expenses are exported."
+      "then": "The approved expenses are exported."
     }
   ]
 }

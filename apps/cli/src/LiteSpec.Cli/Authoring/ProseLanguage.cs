@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace LiteSpec.Authoring;
 
 /// <summary>
-///     The project language record: the mannered terms and rejected synonyms both validators check.
+///     The project glossary: the mannered terms and rejected synonyms both validators check.
 /// </summary>
 static partial class Prose
 {
@@ -21,9 +21,9 @@ static partial class Prose
     const string RegexMetacharacters = ".*+?^${}()|[]\\";
 
     /// <summary>
-    ///     Compiles a language record once so a scan over many files does not rebuild every pattern per file.
+    ///     Compiles a glossary once so a scan over many files does not rebuild every pattern per file.
     /// </summary>
-    /// <param name="language">The language record.</param>
+    /// <param name="language">The glossary.</param>
     /// <returns>The compiled record, or null when there is none.</returns>
     public static CompiledLanguage? CompileLanguage(JsonNode? language)
     {
@@ -81,7 +81,7 @@ static partial class Prose
     /// </summary>
     /// <param name="relative">The documentation-root-relative path, with forward slashes; scopes match against it.</param>
     /// <param name="raw">The page text.</param>
-    /// <param name="compiled">The compiled language record, or null to skip the check.</param>
+    /// <param name="compiled">The compiled glossary, or null to skip the check.</param>
     /// <param name="add">Receives each finding as (relative, line, code, message).</param>
     public static void CheckLanguage(string relative, string raw, CompiledLanguage? compiled, Action<string, int, string, string> add)
     {
@@ -117,7 +117,7 @@ static partial class Prose
     /// </summary>
     /// <param name="relative">The repository-root-relative path, with forward slashes; scopes match against it.</param>
     /// <param name="raw">The file text, scanned whole: the Markdown exemptions do not apply.</param>
-    /// <param name="compiled">The compiled language record, or null to skip the check.</param>
+    /// <param name="compiled">The compiled glossary, or null to skip the check.</param>
     /// <param name="add">Receives each finding as (relative, line, code, message).</param>
     public static void CheckLanguageInSource(string relative, string raw, CompiledLanguage? compiled, Action<string, int, string, string> add)
     {
@@ -326,7 +326,7 @@ static partial class Prose
 }
 
 /// <summary>
-///     A language record compiled once so a scan over many files does not rebuild every pattern per file.
+///     A glossary compiled once so a scan over many files does not rebuild every pattern per file.
 /// </summary>
 sealed class CompiledLanguage
 {

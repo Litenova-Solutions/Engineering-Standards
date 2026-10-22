@@ -16,8 +16,8 @@ litespec model check --root apps/cli/tests/LiteSpec.Cli.Tests/Fixtures/Model/sma
 
 ## Fixtures
 
-- `small/` is a library loans system at size small. It holds one module, three business records, eight use cases, results, rules, events, actors, roles, permissions, entry points, terms, one exception, and one known gap. It has no problems, features, journeys, cases, constraints, research, limits, or runbooks. Seven use cases have handlers. The eighth is covered by the open known gap.
-- `large/` holds the same records plus problems, features, journeys, one case per use case, constraints, research, limits, runbooks, and a frontend route that imports a generated client operation. Each case has one proving scenario.
+- `small/` is a library loans system at size small. It holds one module, three aggregates, eight use cases, results, rules, events, actors, roles, permissions, entry points, terms, one deviation, and one known gap. It has no problems, features, journeys, scenarios, constraints, research, limits, or runbooks. Seven use cases have handlers. The eighth is covered by the open known gap.
+- `large/` holds the same records plus problems, features, journeys, one scenario per use case, constraints, research, limits, runbooks, one goal, one external system, and a frontend route that imports a generated client operation. Each scenario has one proving test.
 
 Both fixtures exit 0 under `check`. Each names the same owner, approves every record, and resolves every citation.
 
@@ -38,9 +38,9 @@ The builder and the suite use these codes:
 - `gap-unknown-check`
 - `rule-name-negation`
 - `use-case-without-success`
-- `use-case-without-case`
+- `use-case-without-scenario`
 - `requirement-unfulfilled`
-- `case-result-unresolved`
+- `scenario-result-unresolved`
 - `refusal-not-thrown`
 - `use-case-unimplemented`
 - `proves-unconfirmed`
@@ -48,9 +48,8 @@ The builder and the suite use these codes:
 - `product-not-singleton`
 - `journey-reach`
 - `use-case-access`
-- `result-status`
 - `region-unknown`
-- `business-record-name-clash`
+- `aggregate-name-clash`
 - `decision-decides-nothing`
 - `link-unresolved`
 

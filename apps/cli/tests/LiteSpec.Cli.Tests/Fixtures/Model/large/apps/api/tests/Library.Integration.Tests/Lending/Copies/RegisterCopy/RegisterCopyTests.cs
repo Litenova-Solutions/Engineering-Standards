@@ -2,7 +2,7 @@ namespace Library.Integration.Tests.Lending.Copies.RegisterCopy;
 
 public sealed class RegisterCopyTests(LibraryApiFixture api) : IClassFixture<LibraryApiFixture>
 {
-    /// <proves>case/register-copy.registering-a-new-copy-succeeds</proves>
+    /// <proves>scenario/register-copy.registering-a-new-copy-succeeds</proves>
     [Fact]
     public async Task A_new_copy_is_registered_through_a_helper_of_the_world()
     {

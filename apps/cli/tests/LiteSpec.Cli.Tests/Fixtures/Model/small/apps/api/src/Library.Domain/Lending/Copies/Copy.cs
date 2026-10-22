@@ -7,6 +7,6 @@ public sealed class Copy
     public void Retire(bool onLoan)
     {
         if (onLoan)
-            throw new InvalidOperationException("failure/lending.copy_on_loan");
+            throw new InvalidOperationException("lending.copy-on-loan");
     }
 }

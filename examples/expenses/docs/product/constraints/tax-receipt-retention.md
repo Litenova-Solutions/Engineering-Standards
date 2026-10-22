@@ -6,6 +6,7 @@
   "owner": "expenses-team",
   "status": "approved",
   "source": "National tax law keeps business receipts for 7 years.",
+  "category": "organizational",
   "applies": true,
   "appliesBecause": "Expenses stores receipts for reimbursed expenses."
 }

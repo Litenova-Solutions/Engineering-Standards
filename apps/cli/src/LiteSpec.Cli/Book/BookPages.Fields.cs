@@ -10,20 +10,22 @@ static partial class BookPages
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["boundary"] = "Boundary", ["neverDoes"] = "Never does", ["audience"] = "Audience",
-            ["source"] = "Source", ["applies"] = "Applies", ["appliesBecause"] = "Why it applies",
+            ["source"] = "Source", ["category"] = "Category", ["applies"] = "Applies", ["appliesBecause"] = "Why it applies",
             ["question"] = "Question", ["sources"] = "Sources", ["decided"] = "Decided",
-            ["options"] = "Options", ["changeWhen"] = "Change when",
-            ["kind"] = "Kind", ["statement"] = "Statement", ["values"] = "Values",
+            ["options"] = "Options", ["chosen"] = "Chosen", ["changeWhen"] = "Change when",
+            ["kind"] = "Kind", ["statement"] = "Statement", ["rationale"] = "Rationale",
+            ["measure"] = "Measure", ["target"] = "Target", ["by"] = "By", ["values"] = "Values",
             ["state"] = "State", ["refusedBecause"] = "Why refused",
-            ["scope"] = "Scope", ["code"] = "Code", ["codeType"] = "Name in code", ["meaning"] = "Meaning",
+            ["scope"] = "Scope", ["code"] = "Code", ["meaning"] = "Meaning",
             ["goal"] = "Goal", ["actor"] = "Actor", ["dependsOn"] = "Depends on",
-            ["codeName"] = "Name in code", ["states"] = "States",
-            ["enforcedBy"] = "Enforced by", ["refusal"] = "Refusal",
-            ["operation"] = "Operation", ["anonymous"] = "Anonymous",
-            ["outcome"] = "Outcome", ["status"] = "HTTP status",
-            ["situation"] = "Situation", ["action"] = "Action", ["expect"] = "Expect",
-            ["carries"] = "Carries", ["path"] = "Path", ["offers"] = "Offers",
-            ["bound"] = "Bound", ["value"] = "Value", ["trigger"] = "Trigger",
+            ["summary"] = "Summary", ["states"] = "States", ["transitions"] = "Transitions", ["data"] = "Data",
+            ["refusal"] = "Refusal",
+            ["anonymous"] = "Anonymous", ["input"] = "Input", ["output"] = "Output",
+            ["outcome"] = "Outcome",
+            ["given"] = "Given", ["when"] = "When", ["then"] = "Then", ["examples"] = "Examples",
+            ["carries"] = "Carries", ["path"] = "Path",
+            ["sends"] = "Sends", ["receives"] = "Receives", ["failure"] = "On failure",
+            ["bound"] = "Bound", ["value"] = "Value", ["trigger"] = "Trigger", ["severity"] = "Severity",
             ["reason"] = "Reason", ["reviewBy"] = "Review by", ["removeWhen"] = "Remove when",
             ["check"] = "Check", ["endsBy"] = "Ends by",
             ["term"] = "English", ["labels"] = "Labels", ["rejected"] = "Rejected words",
@@ -35,28 +37,29 @@ static partial class BookPages
         new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal)
         {
             ["product"] = ["boundary", "neverDoes", "audience"],
-            ["constraint"] = ["source", "applies", "appliesBecause"],
+            ["goal"] = ["statement", "measure", "target", "by"],
+            ["constraint"] = ["source", "category", "applies", "appliesBecause"],
             ["research"] = ["question", "sources"],
-            ["decision"] = ["decided", "options", "changeWhen"],
-            ["requirement"] = ["kind", "statement", "values"],
+            ["decision"] = ["decided", "options", "chosen", "changeWhen"],
+            ["requirement"] = ["kind", "statement", "rationale", "measure", "by", "values"],
             ["problem"] = ["statement"],
-            ["feature"] = ["state", "refusedBecause"],
+            ["feature"] = ["state", "by", "refusedBecause"],
             ["actor"] = ["kind", "holds"],
             ["role"] = ["scope"],
-            ["permission"] = ["code", "codeType", "meaning"],
-            ["journey"] = ["actor", "goal", "steps"],
-            ["module"] = [],
-            ["business-record"] = ["codeName", "states"],
-            ["rule"] = ["kind", "enforcedBy", "statement"],
-            ["use-case"] = ["operation", "anonymous", "input"],
-            ["result"] = ["outcome", "code", "httpStatus", "meaning"],
-            ["case"] = ["situation", "action", "expect"],
+            ["permission"] = ["meaning"],
+            ["journey"] = ["goal", "steps"],
+            ["module"] = ["summary"],
+            ["aggregate"] = ["summary", "states", "transitions", "data"],
+            ["rule"] = ["kind", "statement"],
+            ["use-case"] = ["kind", "anonymous", "input", "output"],
+            ["result"] = ["outcome", "code", "meaning"],
+            ["scenario"] = ["given", "when", "then", "examples"],
             ["event"] = ["meaning", "carries"],
             ["entry-point"] = ["kind", "path"],
+            ["external-system"] = ["sends", "receives", "failure"],
             ["limit"] = ["bound", "value"],
-            ["runbook"] = ["trigger"],
-            ["standard"] = [],
-            ["exception"] = ["reason", "reviewBy", "removeWhen"],
+            ["runbook"] = ["trigger", "severity"],
+            ["deviation"] = ["reason", "reviewBy", "removeWhen"],
             ["known-gap"] = ["check", "endsBy", "reason"],
             ["term"] = ["term", "meaning", "labels", "rejected", "broader", "narrower", "values", "mannered"],
         };
@@ -64,16 +67,17 @@ static partial class BookPages
     static readonly IReadOnlySet<string> SkipFields = new HashSet<string>(StringComparer.Ordinal)
     {
         "type", "id", "title", "owner", "status", "records",
-        "decides", "basedOn", "affects", "solves", "fulfills", "governs", "raises",
-        "reactsTo", "allows", "needs", "reachedThrough", "dependsOn", "terms",
-        "result", "offers", "runbook", "limit", "subject", "replaces",
+        "decides", "basedOn", "affects", "solves", "serves", "feature", "fulfills", "governs", "raises",
+        "allows", "needs", "reachedThrough", "dependsOn", "terms",
+        "result", "runbook", "subject", "replaces", "provision",
+        "actor", "trigger",
     };
 
     static readonly IReadOnlySet<string> IdFields = new HashSet<string>(StringComparer.Ordinal)
-        { "actor", "result", "refusal", "standard", "limit", "runbook" };
+        { "actor", "result", "refusal", "provision", "runbook" };
 
     static readonly IReadOnlySet<string> IdListFields = new HashSet<string>(StringComparer.Ordinal)
-        { "audience", "broader", "narrower", "refusal", "standard" };
+        { "audience", "broader", "narrower", "refusal", "provision" };
 
     static bool IsNumber(JsonNode? value) =>
         value is JsonValue scalar && scalar.GetValueKind() == System.Text.Json.JsonValueKind.Number;
@@ -141,7 +145,48 @@ static partial class BookPages
             var hasObjects = list.Any(entry => entry is JsonObject or JsonArray);
             if (field == "options")
             {
+                if (hasObjects)
+                {
+                    var rows = string.Concat(list.Select(entry =>
+                    {
+                        var obj = entry as JsonObject;
+                        return $"<tr><td>{BookRender.EscOr(obj?["name"], "")}</td><td>{BookRender.EscOr(obj?["for"], "")}</td><td>{BookRender.EscOr(obj?["against"], "")}</td></tr>";
+                    }));
+                    return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Option</th><th>For</th><th>Against</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                }
+
                 return $"<ol class=\"plain\">{string.Concat(list.Select(item => $"<li>{BookRender.Esc(item)}</li>"))}</ol>";
+            }
+
+            if (field == "states" && hasObjects)
+            {
+                var rows = string.Concat(list.Select(entry =>
+                {
+                    var obj = entry as JsonObject;
+                    return $"<tr><td><code>{BookRender.EscOr(obj?["name"], "")}</code></td><td>{BookRender.EscOr(obj?["meaning"], "")}</td></tr>";
+                }));
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>State</th><th>Meaning</th></tr></thead><tbody>{rows}</tbody></table></div>";
+            }
+
+            if (field == "transitions" && hasObjects)
+            {
+                var rows = string.Concat(list.Select(entry =>
+                {
+                    var obj = entry as JsonObject;
+                    var by = BookRender.StrProp(obj, "by") is { } byId ? BookRender.RecordLink(index, rel, byId) : "";
+                    return $"<tr><td><code>{BookRender.EscOr(obj?["from"], "")}</code></td><td><code>{BookRender.EscOr(obj?["to"], "")}</code></td><td>{by}</td></tr>";
+                }));
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>From</th><th>To</th><th>By</th></tr></thead><tbody>{rows}</tbody></table></div>";
+            }
+
+            if (field == "data" && hasObjects)
+            {
+                var rows = string.Concat(list.Select(entry =>
+                {
+                    var obj = entry as JsonObject;
+                    return $"<tr><td><code>{BookRender.EscOr(obj?["name"], "")}</code></td><td>{BookRender.EscOr(obj?["meaning"], "")}</td><td>{BookRender.EscOr(obj?["classification"], "")}</td></tr>";
+                }));
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Name</th><th>Meaning</th><th>Classification</th></tr></thead><tbody>{rows}</tbody></table></div>";
             }
 
             if (field == "sources" && hasObjects)
@@ -158,7 +203,7 @@ static partial class BookPages
                 return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead>{head}</thead><tbody>{rows}</tbody></table></div>";
             }
 
-            if (field == "input" && hasObjects)
+            if ((field == "input" || field == "output") && hasObjects)
             {
                 var rows = string.Concat(list.Select(entry =>
                 {
@@ -206,9 +251,9 @@ static partial class BookPages
                     var requires = obj?["requires"] is JsonArray needed
                         ? string.Join(", ", needed.Select(BookRender.Esc))
                         : BookRender.EscOr(obj?["requires"], "");
-                    return $"<tr><td class=\"num\">{position + 1}</td><td>{useCase}</td><td>{actor}</td><td>{requires}</td></tr>";
+                    return $"<tr><td class=\"num\">{position + 1}</td><td>{useCase}</td><td>{actor}</td><td>{requires}</td><td>{BookRender.EscOr(obj?["gives"], "")}</td></tr>";
                 }));
-                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th></th><th>Use case</th><th>Actor</th><th>Requires</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th></th><th>Use case</th><th>Actor</th><th>Requires</th><th>Gives</th></tr></thead><tbody>{rows}</tbody></table></div>";
             }
 
             if (field == "labels" && list.Count > 0 && !(list[0] is JsonValue candidate && candidate.TryGetValue<string>(out _)))

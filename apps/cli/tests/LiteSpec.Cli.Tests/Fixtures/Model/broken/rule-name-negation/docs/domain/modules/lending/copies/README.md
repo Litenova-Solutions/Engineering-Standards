@@ -1,15 +1,23 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/lending.copy",
+  "type": "aggregate",
+  "id": "aggregate/lending.copy",
   "title": "Copy",
   "owner": "lending-team",
   "status": "approved",
-  "codeName": "Copy",
   "states": [
-    "Available",
-    "OnLoan",
-    "Retired"
+    {
+      "name": "Available",
+      "meaning": "The copy sits on its shelf."
+    },
+    {
+      "name": "OnLoan",
+      "meaning": "A reader holds the copy."
+    },
+    {
+      "name": "Retired",
+      "meaning": "The copy left lending."
+    }
   ],
   "records": [
     {
@@ -18,8 +26,7 @@
       "title": "Has one home shelf",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "always-true",
-      "enforcedBy": "aggregate",
+      "kind": "invariant",
       "statement": "A copy has no home shelf when retired.",
       "governs": [
         "use-case/lending.register-copy"

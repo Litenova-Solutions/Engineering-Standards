@@ -5,7 +5,7 @@
   "title": "Extend loan",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/loan.loan-extended"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
-  ],
-  "results": [
-    "result/extend-loan.extended",
-    "result/extend-loan.extension-refused"
-  ],
-  "cases": [
-    "case/extend-loan.extending-an-active-loan-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Extended",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The loan is extended."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Extension refused",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.extension_refused",
-      "httpStatus": 409,
+      "code": "lending.extension-refused",
       "meaning": "The extension is refused."
     },
     {
-      "type": "case",
-      "id": "case/extend-loan.extending-an-active-loan-succeeds",
+      "type": "scenario",
+      "id": "scenario/extend-loan.extending-an-active-loan-succeeds",
       "title": "Extending an active loan succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A reader holds an active loan.",
-      "action": "The reader extends the loan.",
+      "given": "A reader holds an active loan.",
+      "when": "The reader extends the loan.",
       "result": "result/extend-loan.extended",
-      "expect": "The loan is extended."
+      "then": "The loan is extended."
     }
   ]
 }

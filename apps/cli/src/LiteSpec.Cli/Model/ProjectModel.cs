@@ -8,8 +8,8 @@ sealed record ImplementsLink(string Path, string To, string Kind);
 /// <summary>One computed calls link: a screen to a use case.</summary>
 sealed record CallsLink(string Screen, string To, string Operation);
 
-/// <summary>One computed proves link: a scenario to a case.</summary>
-sealed record ProvesLink(string Scenario, string Case, bool Confirmed, bool? Passing, bool Indirect);
+/// <summary>One computed proves link: a test to the record it claims.</summary>
+sealed record ProvesLink(string Scenario, string Claim, bool Confirmed, bool? Passing, bool Indirect);
 
 /// <summary>One use case's computed status.</summary>
 sealed record UseCaseStatus(bool Implemented, bool Verified);
@@ -41,8 +41,8 @@ sealed class ProjectModel
     public Dictionary<string, UseCaseStatus> Status { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, string> EffectiveStatus { get; } = new(StringComparer.Ordinal);
 
-    /// <summary>Failure codes by the class whose literal carries them.</summary>
-    public Dictionary<string, HashSet<string>> ExceptionCodes { get; } = new(StringComparer.Ordinal);
+    /// <summary>Refusal codes by the class whose literal carries them.</summary>
+    public Dictionary<string, HashSet<string>> RefusalCodes { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Records by id.</summary>
     public IReadOnlyDictionary<string, Record> ById =>
@@ -81,7 +81,7 @@ sealed class ProjectModel
 
                 if (record.Type == "use-case")
                 {
-                    WriteNullable(writer, "businessRecord", ModelBuilder.BusinessRecordOf(this, record)?.Id);
+                    WriteNullable(writer, "aggregate", ModelBuilder.AggregateOf(this, record)?.Id);
                 }
 
                 writer.WriteString("file", Config.Relative(record.File));
@@ -137,7 +137,7 @@ sealed class ProjectModel
 
             writer.WriteEndArray();
 
-            writer.WriteStartArray("exceptions");
+            writer.WriteStartArray("codes");
 
             foreach (var literal in Code.Literals.OrderBy(left => left.Value, StringComparer.Ordinal))
             {
@@ -305,7 +305,7 @@ sealed class ProjectModel
             {
                 writer.WriteStartObject();
                 writer.WriteString("scenario", link.Scenario);
-                writer.WriteString("case", link.Case);
+                writer.WriteString("claim", link.Claim);
                 writer.WriteBoolean("confirmed", link.Confirmed);
 
                 if (link.Passing is null)

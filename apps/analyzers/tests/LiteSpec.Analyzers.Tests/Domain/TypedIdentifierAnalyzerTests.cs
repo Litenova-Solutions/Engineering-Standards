@@ -121,6 +121,46 @@ public sealed class TypedIdentifierAnalyzerTests
             }
             """);
 
+    [Fact(DisplayName = "LS1012 accepts a child entity with a typed identity")]
+    public Task AcceptsAChildEntityWithATypedIdentity() =>
+        Verify.AnalyzerAsync<TypedIdentifierAnalyzer>("""
+            using System;
+
+            namespace Shop.Orders;
+
+            public abstract class Entity<TId>
+            {
+                protected Entity(TId id) { Id = id; }
+                public TId Id { get; }
+            }
+
+            public readonly record struct OrderLineId(Guid Value);
+
+            public sealed class OrderLine : Entity<OrderLineId>
+            {
+                public OrderLine(OrderLineId id) : base(id) { }
+            }
+            """);
+
+    [Fact(DisplayName = "LS1012 reports a Guid used directly as a child entity identity")]
+    public Task ReportsAGuidUsedDirectlyAsAChildEntityIdentity() =>
+        Verify.AnalyzerAsync<TypedIdentifierAnalyzer>("""
+            using System;
+
+            namespace Shop.Orders;
+
+            public abstract class Entity<TId>
+            {
+                protected Entity(TId id) { Id = id; }
+                public TId Id { get; }
+            }
+
+            public sealed class OrderLine : {|LS1012:Entity<Guid>|}
+            {
+                public OrderLine(Guid id) : base(id) { }
+            }
+            """);
+
     [Fact(DisplayName = "LS1012 ignores identifiers outside Domain")]
     public Task IgnoresIdentifiersOutsideDomain() =>
         Verify.AnalyzerAsync<TypedIdentifierAnalyzer>("""

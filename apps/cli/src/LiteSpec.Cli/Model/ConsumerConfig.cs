@@ -23,8 +23,8 @@ sealed class ConsumerConfig
     /// <summary>Where written records live.</summary>
     public IReadOnlyList<string> RecordRoots { get; private set; } = [];
 
-    /// <summary>The language record.</summary>
-    public string LanguagePath { get; private set; } = "";
+    /// <summary>The glossary.</summary>
+    public string GlossaryPath { get; private set; } = "";
 
     /// <summary>The backend layers.</summary>
     public string ApplicationRoot { get; private set; } = "";
@@ -91,13 +91,20 @@ sealed class ConsumerConfig
                 ? found
                 : (JsonElement?)null;
 
+        var dotnet = document.RootElement.TryGetProperty("stackConfig", out var stacksConfig)
+            && stacksConfig.ValueKind == JsonValueKind.Object
+            && stacksConfig.TryGetProperty("dotnet", out var dotnetConfig)
+            && dotnetConfig.ValueKind == JsonValueKind.Object
+                ? dotnetConfig
+                : (JsonElement?)null;
+
         // Records live under the documentation roots that paths.docs names.
         config.RecordRoots = ReadRoots(config.Root, paths, "docs", ["docs"]);
-        config.LanguagePath = Combine(config.Root, ReadString(paths, "language", "docs/language.json"));
-        config.ApplicationRoot = Resolve(config.Root, ReadString(paths, "application", "apps/api/src/*.Application"));
-        config.DomainRoot = Resolve(config.Root, ReadString(paths, "domain", "apps/api/src/*.Domain"));
-        config.WebApiRoot = Resolve(config.Root, ReadString(paths, "webapi", "apps/api/src/*.WebApi"));
-        config.InfrastructureRoot = Resolve(config.Root, ReadString(paths, "infrastructure", "apps/api/src/*.Infrastructure"));
+        config.GlossaryPath = Combine(config.Root, ReadString(paths, "glossary", "docs/glossary.json"));
+        config.ApplicationRoot = Resolve(config.Root, ReadString(dotnet, "application", "apps/api/src/*.Application"));
+        config.DomainRoot = Resolve(config.Root, ReadString(dotnet, "domain", "apps/api/src/*.Domain"));
+        config.WebApiRoot = Resolve(config.Root, ReadString(dotnet, "webapi", "apps/api/src/*.WebApi"));
+        config.InfrastructureRoot = Resolve(config.Root, ReadString(dotnet, "infrastructure", "apps/api/src/*.Infrastructure"));
         config.TestRoots = ReadRoots(config.Root, paths, "testRoots", []);
         config.Frontends = ReadFrontends(config.Root, paths);
         config.ApiClientSrc = Path.Combine(

@@ -8,6 +8,9 @@
   "state": "shipped",
   "solves": [
     "problem/overdue-loans-pile-up"
+  ],
+  "serves": [
+    "goal/faster-pickup"
   ]
 }
 ---

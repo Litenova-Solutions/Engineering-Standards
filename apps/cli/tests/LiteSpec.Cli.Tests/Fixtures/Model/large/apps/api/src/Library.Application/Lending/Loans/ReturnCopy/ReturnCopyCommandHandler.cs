@@ -5,7 +5,7 @@ public sealed class ReturnCopyCommandHandler
     public Task Handle(ReturnCopyCommand command)
     {
         if (command.LoanId == Guid.Empty)
-            throw new InvalidOperationException("failure/lending.loan_not_active");
+            throw new InvalidOperationException("lending.loan-not-active");
         return Task.CompletedTask;
     }
 }

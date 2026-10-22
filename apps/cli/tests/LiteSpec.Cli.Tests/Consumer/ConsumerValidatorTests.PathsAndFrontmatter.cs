@@ -73,12 +73,12 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "frontend 'web' has unknown platform 'dotnet'");
     }
 
-    [Fact(DisplayName = "language record path that is not on disk")]
-    public void LanguageRecordPathThatIsNotOnDisk()
+    [Fact(DisplayName = "glossary path that is not on disk")]
+    public void GlossaryPathThatIsNotOnDisk()
     {
         using var folder = ConsumerFixture.Create();
-        ConsumerFixture.MutateProject(folder.Path, project => PathsOf(project)["language"] = "docs/missing.json");
-        AssertProblem(RunConsumer(folder.Path), "paths.language 'docs/missing.json' does not exist");
+        ConsumerFixture.MutateProject(folder.Path, project => PathsOf(project)["glossary"] = "docs/missing.json");
+        AssertProblem(RunConsumer(folder.Path), "paths.glossary 'docs/missing.json' does not exist");
     }
 
     [Fact(DisplayName = "frontend path that is not on disk")]
@@ -139,15 +139,15 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "/status");
     }
 
-    [Fact(DisplayName = "use-case operation outside command and query")]
-    public void UseCaseOperationOutsideCommandAndQuery()
+    [Fact(DisplayName = "use-case kind outside command, query and reaction")]
+    public void UseCaseKindOutsideCommandQueryAndReaction()
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
             "docs/domain/modules/orders/cancel-order.md",
-            meta => meta["operation"] = "mutation");
-        AssertProblem(RunConsumer(folder.Path), "/operation");
+            meta => meta["kind"] = "mutation");
+        AssertProblem(RunConsumer(folder.Path), "/kind");
     }
 
     [Fact(DisplayName = "result entry without its outcome")]
@@ -168,7 +168,7 @@ public sealed partial class ConsumerValidatorTests
         ConsumerFixture.MutateMeta(
             folder.Path,
             "docs/domain/modules/orders/cancel-order.md",
-            meta => meta["type"] = "aggregate");
+            meta => meta["type"] = "business-record");
         AssertProblem(RunConsumer(folder.Path), "matches 0 of");
     }
 

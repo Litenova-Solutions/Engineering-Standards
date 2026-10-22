@@ -5,7 +5,7 @@
   "title": "Set receipt threshold",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/manage-policy"
   ],
@@ -14,7 +14,6 @@
     "entry-point/expenses-app"
   ],
   "raises": [],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"
   ],
@@ -25,7 +24,6 @@
       "title": "Threshold set",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The receipt threshold is set."
     },
     {
@@ -34,20 +32,19 @@
       "title": "Negative threshold",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.negative_threshold",
-      "httpStatus": 422,
+      "code": "spending.negative-threshold",
       "meaning": "The threshold is negative."
     },
     {
-      "type": "case",
-      "id": "case/set-receipt-threshold.setting-the-threshold-succeeds",
+      "type": "scenario",
+      "id": "scenario/set-receipt-threshold.setting-the-threshold-succeeds",
       "title": "Setting the threshold succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "Finance agreed a new receipt threshold with the managers.",
-      "action": "The manager sets the receipt threshold.",
+      "given": "Finance agreed a new receipt threshold with the managers.",
+      "when": "The manager sets the receipt threshold.",
       "result": "result/set-receipt-threshold.threshold-set",
-      "expect": "The receipt threshold is set."
+      "then": "The receipt threshold is set."
     }
   ]
 }

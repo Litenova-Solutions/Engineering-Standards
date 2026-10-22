@@ -26,7 +26,7 @@ sealed record RecordRead(
     IReadOnlyList<Finding> Problems);
 
 /// <summary>
-///     Finds every written record: page records, entries, terms and project standards.
+///     Finds every written record: page records, entries and terms.
 /// </summary>
 static class RecordReader
 {
@@ -79,7 +79,6 @@ static class RecordReader
         });
 
         ReadTerms(config, records, problems);
-        ReadAgentStandards(config, records);
 
         return new RecordRead(records, bodies, ReadProvisions(config), problems);
     }
@@ -204,12 +203,12 @@ static class RecordReader
 
     private static void ReadTerms(ConsumerConfig config, List<Record> records, List<Finding> problems)
     {
-        if (!File.Exists(config.LanguagePath))
+        if (!File.Exists(config.GlossaryPath))
         {
             return;
         }
 
-        var text = SourceTree.Read(config.LanguagePath);
+        var text = SourceTree.Read(config.GlossaryPath);
 
         JsonDocument document;
 
@@ -220,8 +219,8 @@ static class RecordReader
         catch (JsonException exception)
         {
             problems.Add(new Finding(
-                "invalid-field", $"The language record is not JSON: {exception.Message}",
-                config.LanguagePath, 1, null));
+                "invalid-field", $"The glossary is not JSON: {exception.Message}",
+                config.GlossaryPath, 1, null));
             return;
         }
 
@@ -250,132 +249,13 @@ static class RecordReader
                     Title = StringField(term, "term") ?? "",
                     Owner = StringField(term, "owner"),
                     Status = StringField(term, "status"),
-                    File = config.LanguagePath,
+                    File = config.GlossaryPath,
                     Line = line,
                     IsEntry = true,
                     Raw = term.Clone(),
                 });
             }
         }
-    }
-
-    private static void ReadAgentStandards(ConsumerConfig config, List<Record> records)
-    {
-        var owner = config.Owners.FirstOrDefault();
-
-        foreach (var file in AgentFiles(config.Root))
-        {
-            var lines = SourceTree.Read(file).Split('\n');
-
-            for (var index = 0; index < lines.Length; index++)
-            {
-                var match = Identifiers.StandardHeading().Match(lines[index].TrimEnd('\r'));
-
-                if (!match.Success)
-                {
-                    continue;
-                }
-
-                var id = match.Groups["id"].Value;
-                var section = Section(lines, index);
-                var raw = JsonSerializer.SerializeToElement(new
-                {
-                    type = "standard",
-                    id,
-                    title = HeadingTitle(lines[index]),
-                });
-
-                records.Add(new Record
-                {
-                    Type = "standard",
-                    Id = id,
-                    Title = HeadingTitle(lines[index]),
-                    Owner = owner,
-                    Status = SectionStatus(section),
-                    Decider = SectionMarker(section, "decider"),
-                    DecideBy = SectionMarker(section, "decide-by", "decide by"),
-                    File = file,
-                    Line = index + 1,
-                    IsEntry = false,
-                    Raw = raw,
-                });
-            }
-        }
-    }
-
-    /// <summary>The heading's section: the lines until the next heading.</summary>
-    private static IReadOnlyList<string> Section(string[] lines, int heading)
-    {
-        var section = new List<string>();
-
-        for (var index = heading + 1; index < lines.Length; index++)
-        {
-            if (lines[index].TrimStart().StartsWith('#'))
-            {
-                break;
-            }
-
-            section.Add(lines[index]);
-        }
-
-        return section;
-    }
-
-    /// <summary>Approved, unless the section carries a status marker.</summary>
-    private static string SectionStatus(IReadOnlyList<string> section)
-    {
-        var marked = SectionMarker(section, "status")?.ToLowerInvariant();
-
-        return marked is "draft" or "approved" or "retired" ? marked : "approved";
-    }
-
-    /// <summary>The value a `Name: value` marker line carries, when one names it.</summary>
-    private static string? SectionMarker(IReadOnlyList<string> section, params string[] names)
-    {
-        foreach (var line in section)
-        {
-            var text = line.Trim().TrimEnd('\r').TrimStart('>', ' ').Trim();
-
-            foreach (var name in names)
-            {
-                foreach (var form in new[] { $"{name}:", $"**{name}:**", $"**{name}**:" })
-                {
-                    if (text.StartsWith(form, StringComparison.OrdinalIgnoreCase))
-                    {
-                        var value = text[form.Length..].Trim().Trim('*', ' ', '\t');
-
-                        return value.Length > 0 ? value : null;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static IReadOnlyList<string> AgentFiles(string root)
-    {
-        var found = new List<string>();
-
-        foreach (var file in SourceTree.Files(root))
-        {
-            if (!Path.GetFileName(file).Equals("AGENTS.md", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var relative = Path.GetRelativePath(root, file);
-
-            if (relative.StartsWith("litespec" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
-                || relative.StartsWith(".agents" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            found.Add(file);
-        }
-
-        return found;
     }
 
     private static IReadOnlySet<string> ReadProvisions(ConsumerConfig config)
@@ -398,14 +278,6 @@ static class RecordReader
         && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
-
-    private static string HeadingTitle(string line)
-    {
-        var text = line.Trim().TrimStart('#').Trim();
-        var open = text.LastIndexOf("(", StringComparison.Ordinal);
-
-        return open > 0 ? text[..open].Trim() : text;
-    }
 
     /// <summary>The 1-based line where the needle first occurs, or 1.</summary>
     public static int LineOf(string text, string needle)

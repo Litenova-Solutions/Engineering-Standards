@@ -28,7 +28,7 @@ static class Querier
             {
                 if (RecordTypes.LinkTargets.ContainsKey(property.Name)
                     || RecordTypes.NestedLinkFields.Contains(property.Name)
-                    || property.Name is "replaces" or "refusal" or "standard")
+                    || property.Name is "replaces" or "refusal" or "provision")
                 {
                     var targets = ModelBuilder.TargetsOf(property.Value);
 
@@ -57,8 +57,8 @@ static class Querier
                 implements = model.Implements.Where(link => link.To == id).Select(link => link.Path).ToList(),
                 calls = model.Calls.Where(link => link.To == id).Select(link => link.Screen).ToList(),
                 proves = model.Proves
-                    .Where(link => CaseOf(model, link.Case) == CaseName(id))
-                    .Select(link => new { scenario = link.Scenario, kase = link.Case, confirmed = link.Confirmed, passing = link.Passing })
+                    .Where(link => ScenarioOf(model, link.Claim) == ScenarioName(id))
+                    .Select(link => new { scenario = link.Scenario, claim = link.Claim, confirmed = link.Confirmed, passing = link.Passing })
                     .ToList(),
             };
         }
@@ -81,9 +81,9 @@ static class Querier
             new JsonSerializerOptions { WriteIndented = true, NewLine = "\n" });
     }
 
-    private static string? CaseOf(ProjectModel model, string caseId) =>
-        Identifiers.TrySplit(caseId, out _, out var home, out _) ? home : null;
+    private static string? ScenarioOf(ProjectModel model, string scenarioId) =>
+        Identifiers.TrySplit(scenarioId, out _, out var home, out _) ? home : null;
 
-    private static string? CaseName(string useCaseId) =>
+    private static string? ScenarioName(string useCaseId) =>
         Identifiers.TrySplit(useCaseId, out _, out _, out var name) ? name : null;
 }

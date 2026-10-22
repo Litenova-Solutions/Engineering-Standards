@@ -5,7 +5,7 @@
   "title": "Borrow copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/loan.loan-borrowed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
-  ],
-  "results": [
-    "result/borrow-copy.archived-borrowed",
-    "result/borrow-copy.archive-unavailable"
-  ],
-  "cases": [
-    "case/borrow-copy.archiving-an-available-copy-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Archived borrowed",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The archived copy is lent."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Archive unavailable",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_not_available",
-      "httpStatus": 409,
+      "code": "lending.copy-not-available",
       "meaning": "The archived copy is unavailable."
     },
     {
-      "type": "case",
-      "id": "case/borrow-copy.archiving-an-available-copy-succeeds",
+      "type": "scenario",
+      "id": "scenario/borrow-copy.archiving-an-available-copy-succeeds",
       "title": "Archiving an available copy succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A copy sits available in the archive.",
-      "action": "The reader borrows the archived copy.",
+      "given": "A copy sits available in the archive.",
+      "when": "The reader borrows the archived copy.",
       "result": "result/borrow-copy.archived-borrowed",
-      "expect": "The loan is active."
+      "then": "The loan is active."
     }
   ]
 }

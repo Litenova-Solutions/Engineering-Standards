@@ -5,7 +5,7 @@
   "title": "Attach receipt",
   "owner": "expenses-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/submit-expense"
   ],
@@ -16,7 +16,6 @@
   "raises": [
     "event/receipt.receipt-attached"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"
   ],
@@ -27,7 +26,6 @@
       "title": "Attached",
       "owner": "expenses-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The receipt is attached."
     },
     {
@@ -36,20 +34,19 @@
       "title": "Expense decided",
       "owner": "expenses-team",
       "outcome": "refusal",
-      "code": "failure/spending.expense_decided",
-      "httpStatus": 409,
+      "code": "spending.expense-decided",
       "meaning": "The expense is already decided."
     },
     {
-      "type": "case",
-      "id": "case/attach-receipt.attaching-a-receipt-succeeds",
+      "type": "scenario",
+      "id": "scenario/attach-receipt.attaching-a-receipt-succeeds",
       "title": "Attaching a receipt succeeds",
       "owner": "expenses-team",
       "status": "approved",
-      "situation": "An employee submitted an expense below the threshold with no receipt.",
-      "action": "The employee attaches the receipt.",
+      "given": "An employee submitted an expense below the threshold with no receipt.",
+      "when": "The employee attaches the receipt.",
       "result": "result/attach-receipt.attached",
-      "expect": "The receipt is attached."
+      "then": "The receipt is attached."
     }
   ]
 }

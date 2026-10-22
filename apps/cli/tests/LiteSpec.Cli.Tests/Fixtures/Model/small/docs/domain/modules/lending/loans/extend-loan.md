@@ -5,7 +5,7 @@
   "title": "Extend loan",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/loan.loan-extended"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
   ],
-  "results": [
-    "result/extend-loan.extended",
-    "result/extend-loan.extension-refused"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Extended",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The loan is extended."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Extension refused",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.extension_refused",
-      "httpStatus": 409,
+      "code": "lending.extension-refused",
       "meaning": "The extension is refused."
     }
   ]

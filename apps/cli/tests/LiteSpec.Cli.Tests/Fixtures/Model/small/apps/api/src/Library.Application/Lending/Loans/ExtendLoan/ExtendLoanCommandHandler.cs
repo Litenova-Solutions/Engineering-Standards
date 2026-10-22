@@ -5,7 +5,7 @@ public sealed class ExtendLoanCommandHandler
     public Task Handle(ExtendLoanCommand command)
     {
         if (command.Days <= 0)
-            throw new InvalidOperationException("failure/lending.extension_refused");
+            throw new InvalidOperationException("lending.extension-refused");
         return Task.CompletedTask;
     }
 }

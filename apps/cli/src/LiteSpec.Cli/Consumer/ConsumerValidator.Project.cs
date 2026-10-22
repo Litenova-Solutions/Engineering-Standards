@@ -54,7 +54,7 @@ static partial class ConsumerValidator
         var configuredPaths = new[]
         {
             ("paths.docs", "docs", "the page scan finds no record to check"),
-            ("paths.language", "language", "the vocabulary and mannered-term checks resolve nothing"),
+            ("paths.glossary", "glossary", "the vocabulary and mannered-term checks resolve nothing"),
         };
 
         foreach (var (field, key, consequence) in configuredPaths)

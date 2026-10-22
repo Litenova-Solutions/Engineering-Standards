@@ -14,7 +14,7 @@ public sealed class SealedClassAnalyzer : LayerAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(Descriptors.LS3004);
 
-    private protected override bool AppliesTo(Layer layer) => layer != Layer.None;
+    private protected override bool AppliesTo(Layer layer) => layer != Layer.None && layer != Layer.Test;
 
     private protected override void Register(CompilationStartAnalysisContext context) =>
         context.RegisterCompilationEndAction(Analyze);

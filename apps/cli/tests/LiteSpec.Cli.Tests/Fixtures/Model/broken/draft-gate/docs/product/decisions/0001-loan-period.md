@@ -8,9 +8,21 @@
   "decider": "lending-team",
   "decideBy": "2027-01-01",
   "options": [
-    "14 days",
-    "21 days",
-    "28 days"
+    {
+      "name": "14 days",
+      "for": "Copies turn over fast for holds.",
+      "against": "Readers rush through long books."
+    },
+    {
+      "name": "21 days",
+      "for": "Most readers finish in three weeks.",
+      "against": "Holds wait a week longer."
+    },
+    {
+      "name": "28 days",
+      "for": "Slow readers keep up.",
+      "against": "Popular copies sit idle."
+    }
   ],
   "changeWhen": "Reader demand shifts.",
   "decides": [

@@ -87,7 +87,7 @@ public sealed partial class UiValidatorTests
         fixture.WriteManifest("dependencies", new JsonObject { ["flowbite-svelte"] = "1.33.1" });
         UiFixture.AssertProblem(
             fixture.Run(),
-            "second general-purpose visual dependency 'flowbite-svelte' requires an exception");
+            "second general-purpose visual dependency 'flowbite-svelte' requires a deviation");
     }
 
     // Svelte baseline (litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package,
@@ -212,26 +212,26 @@ public sealed partial class UiValidatorTests
     }
 
     [Fact]
-    public void A_Svelte_Registry_Exception_Carries_The_Frontend_Provision()
+    public void A_Svelte_Registry_Deviation_Carries_The_Frontend_Provision()
     {
         using var fixture = UiFixture.Create();
         fixture.AsSvelte();
         var components = (JsonObject)UiFixture.ReadJson(fixture.ComponentsFile)!;
         components["registry"] = "https://blocks.fixture.test";
         UiFixture.WriteJson(fixture.ComponentsFile, components);
-        fixture.WriteException("extra-registry", "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package", "2099-01-01");
+        fixture.WriteDeviation("extra-registry", "litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package", "2099-01-01");
         UiFixture.AssertClean(fixture.Run());
     }
 
     [Fact]
-    public void A_Svelte_UI_Exception_With_An_Expired_Review_Date()
+    public void A_Svelte_UI_Deviation_With_An_Expired_Review_Date()
     {
         using var fixture = UiFixture.Create();
         fixture.AsSvelte();
-        fixture.WriteException("ui-authority", "litespec/frontend/ui#select-one-visual-authority", "2020-01-01");
+        fixture.WriteDeviation("ui-authority", "litespec/frontend/ui#select-one-visual-authority", "2020-01-01");
         UiFixture.AssertProblem(
             fixture.Run(),
-            "[litespec/frontend/ui#select-one-visual-authority] docs/exceptions/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
+            "[litespec/frontend/ui#select-one-visual-authority] docs/deviations/ui-authority.md: review date 2020-01-01 has passed; renew the decision");
     }
 
     [Fact]

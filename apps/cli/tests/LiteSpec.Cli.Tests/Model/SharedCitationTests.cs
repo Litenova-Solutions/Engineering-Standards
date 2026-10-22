@@ -33,6 +33,9 @@ public sealed class SharedCitationTests
         var folder = Path.Combine(root, "litespec", "docs", "core");
         Directory.CreateDirectory(folder);
         File.WriteAllText(Path.Combine(folder, "principles.md"), PinnedPage);
+        var backend = Path.Combine(root, "litespec", "docs", "backend");
+        Directory.CreateDirectory(backend);
+        File.WriteAllText(Path.Combine(backend, "application.md"), PinnedDeviationTarget);
     }
 
     static void AppendCitation(string root, string citation)
@@ -49,5 +52,16 @@ public sealed class SharedCitationTests
         ### Retire records with replaces
 
         A retired record stays readable.
+        """;
+
+    /// <summary>The provision the fixture's deviation cites, so pinning stays complete.</summary>
+    const string PinnedDeviationTarget = """
+        # Application Layer
+
+        ## Standards
+
+        ### Enforce target authorization in the pipeline
+
+        Authorization runs once per command.
         """;
 }

@@ -41,7 +41,7 @@ static class ModelBuilder
             MatchEvents(model);
             ComputeImplements(model);
             ComputeCalls(model);
-            ComputeExceptionCodes(model);
+            ComputeRefusalCodes(model);
             ComputeProves(model);
             ComputeStatus(model);
             ComputeAuthority(model);
@@ -103,7 +103,7 @@ static class ModelBuilder
         {
             if (RecordTypes.LinkTargets.TryGetValue(property.Name, out _)
                 || RecordTypes.NestedLinkFields.Contains(property.Name)
-                || property.Name is "replaces" or "refusal" or "standard")
+                || property.Name is "replaces" or "refusal" or "provision")
             {
                 var targets = TargetsOf(property.Value);
 
@@ -141,7 +141,7 @@ static class ModelBuilder
                 break;
 
             case JsonValueKind.Object:
-                foreach (var name in new[] { "role", "useCase", "requires" })
+                foreach (var name in new[] { "role", "useCase", "requires", "events" })
                 {
                     if (value.TryGetProperty(name, out var nested))
                     {
@@ -188,7 +188,7 @@ static class ModelBuilder
     /// <summary>
     ///     Computes each record's effective status: draft when the record is a draft, when a draft
     ///     decision decides it, or when a requirement it fulfills is effectively a draft. A result or
-    ///     a case takes its use case's effective status.
+    ///     a scenario takes its use case's effective status.
     /// </summary>
     private static void ComputeAuthority(ProjectModel model)
     {
@@ -214,7 +214,7 @@ static class ModelBuilder
             model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;
         }
 
-        foreach (var record in model.Records.Where(record => record.Type is "result" or "case"))
+        foreach (var record in model.Records.Where(record => record.Type is "result" or "scenario"))
         {
             var own = Own(record);
             var useCase = Identifiers.TrySplit(record.Id, out _, out var home, out _) && home is not null
@@ -246,7 +246,7 @@ static class ModelBuilder
         var module = Naming.Kebab(parts[events - 2]);
 
         var owner = model.Records.FirstOrDefault(record =>
-            record.Type == "business-record"
+            record.Type == "aggregate"
             && Path.GetFileName(Path.GetDirectoryName(record.File)) == plural
             && Path.GetFileName(Path.GetDirectoryName(Path.GetDirectoryName(record.File))) == module);
 
@@ -318,8 +318,8 @@ static class ModelBuilder
                 && RecordTypes.BackgroundEntryKinds.Contains(point.Field("kind") ?? ""));
     }
 
-    /// <summary>The business record whose folder holds the use case's page.</summary>
-    public static Record? BusinessRecordOf(ProjectModel model, Record useCase)
+    /// <summary>The aggregate whose folder holds the use case's page.</summary>
+    public static Record? AggregateOf(ProjectModel model, Record useCase)
     {
         if (useCase.Type != "use-case")
         {
@@ -329,20 +329,20 @@ static class ModelBuilder
         var folder = Path.GetDirectoryName(useCase.File);
 
         return model.Records
-            .Where(record => record.Type == "business-record"
+            .Where(record => record.Type == "aggregate"
                 && string.Equals(Path.GetDirectoryName(record.File), folder, StringComparison.Ordinal))
             .OrderBy(record => record.Id, StringComparer.Ordinal)
             .FirstOrDefault();
     }
 
-    /// <summary>The use case a result or case home names, when one holds it.</summary>
+    /// <summary>The use case a result or scenario home names, when one holds it.</summary>
     public static Record? UseCaseOf(ProjectModel model, string home) =>
         model.ById.Values.FirstOrDefault(record =>
             record.Type == "use-case"
             && Identifiers.TrySplit(record.Id, out _, out _, out var name)
             && name == home);
 
-    private static void ComputeExceptionCodes(ProjectModel model)
+    private static void ComputeRefusalCodes(ProjectModel model)
     {
         foreach (var literal in model.Code.Literals)
         {
@@ -351,10 +351,10 @@ static class ModelBuilder
                 continue;
             }
 
-            if (!model.ExceptionCodes.TryGetValue(literal.Class, out var codes))
+            if (!model.RefusalCodes.TryGetValue(literal.Class, out var codes))
             {
                 codes = new HashSet<string>(StringComparer.Ordinal);
-                model.ExceptionCodes[literal.Class] = codes;
+                model.RefusalCodes[literal.Class] = codes;
             }
 
             codes.Add(literal.Value);
@@ -380,7 +380,7 @@ static class ModelBuilder
 
     private static bool Indirect(ProjectModel model, string claim)
     {
-        if (!model.ById.TryGetValue(claim, out var claimed) || claimed.Type != "case")
+        if (!model.ById.TryGetValue(claim, out var claimed) || claimed.Type != "scenario")
         {
             return false;
         }
@@ -392,9 +392,9 @@ static class ModelBuilder
     }
 
     /// <summary>
-    ///     Confirms a proves claim. A scenario proves a case through a when step of
-    ///     the use case's steps class, asserting the result's code or status for a
-    ///     refusal; a reaction or job case through a then step; an integration test
+    ///     Confirms a proves claim. A test proves a scenario through a when step of
+    ///     the use case's steps class, asserting the result's code for a
+    ///     refusal; a reaction or job scenario through a then step; an integration test
     ///     by naming the message type; and a rule test by naming the governed
     ///     record's code type.
     /// </summary>
@@ -410,7 +410,7 @@ static class ModelBuilder
             return ConfirmRule(model, test, claimed);
         }
 
-        if (claimed.Type != "case")
+        if (claimed.Type != "scenario")
         {
             return false;
         }
@@ -469,7 +469,7 @@ static class ModelBuilder
         }
 
         return test.Codes.Contains(code)
-            || model.ExceptionCodes.Any(entry =>
+            || model.RefusalCodes.Any(entry =>
                 entry.Value.Contains(code) && test.Identifiers.Contains(entry.Key));
     }
 
@@ -510,7 +510,7 @@ static class ModelBuilder
 
     private static bool ConfirmRule(ProjectModel model, ScenarioInfo test, Record rule)
     {
-        var codeNames = new HashSet<string>(StringComparer.Ordinal);
+        var typeNames = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var target in rule.Ids("governs"))
         {
@@ -519,31 +519,31 @@ static class ModelBuilder
                 continue;
             }
 
-            if (governed.Type == "business-record")
+            if (governed.Type == "aggregate"
+                && Identifiers.TrySplit(governed.Id, out _, out _, out var aggregate)
+                && aggregate is not null)
             {
-                if (governed.Field("codeName") is { } direct)
-                {
-                    codeNames.Add(direct);
-                }
+                typeNames.Add(Naming.Pascal(aggregate));
             }
             else if (governed.Type == "use-case"
-                && BusinessRecordOf(model, governed) is { } holder
-                && holder.Field("codeName") is { } held)
+                && AggregateOf(model, governed) is { } holder
+                && Identifiers.TrySplit(holder.Id, out _, out _, out var held)
+                && held is not null)
             {
-                codeNames.Add(held);
+                typeNames.Add(Naming.Pascal(held));
             }
         }
 
-        return codeNames.Count > 0
+        return typeNames.Count > 0
             && test.Identifiers.Any(identifier =>
-                codeNames.Any(codeName =>
-                    identifier.Equals(codeName, StringComparison.Ordinal)
-                    || identifier.StartsWith(codeName, StringComparison.Ordinal)));
+                typeNames.Any(typeName =>
+                    identifier.Equals(typeName, StringComparison.Ordinal)
+                    || identifier.StartsWith(typeName, StringComparison.Ordinal)));
     }
 
-    private static Record? RefusalOf(ProjectModel model, Record kase)
+    private static Record? RefusalOf(ProjectModel model, Record scenario)
     {
-        var resultId = kase.Ids("result").FirstOrDefault();
+        var resultId = scenario.Ids("result").FirstOrDefault();
 
         return resultId is not null
             && model.ById.TryGetValue(resultId, out var result)
@@ -569,12 +569,17 @@ static class ModelBuilder
     /// </summary>
     private static bool Triggers(ProjectModel model, ScenarioInfo test, Record useCase)
     {
-        var reactsTo = useCase.Ids("reactsTo").ToHashSet(StringComparer.Ordinal);
+        var trigger = useCase.Raw.ValueKind == JsonValueKind.Object
+            && useCase.Raw.TryGetProperty("trigger", out var value)
+            ? TargetsOf(value)
+                .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "event")
+                .ToHashSet(StringComparer.Ordinal)
+            : [];
 
-        if (reactsTo.Count > 0)
+        if (trigger.Count > 0)
         {
             var producers = model.Records
-                .Where(record => record.Type == "use-case" && record.Ids("raises").Any(reactsTo.Contains))
+                .Where(record => record.Type == "use-case" && record.Ids("raises").Any(trigger.Contains))
                 .Select(record => Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : null)
                 .OfType<string>();
 
@@ -616,33 +621,8 @@ static class ModelBuilder
                 || string.Equals(step.Receiver, stepsClass[..^"Steps".Length], StringComparison.OrdinalIgnoreCase)));
     }
 
-    private static bool Asserts(ScenarioInfo test, Record refusal)
-    {
-        if (refusal.Field("code") is { } code && test.Codes.Contains(code))
-        {
-            return true;
-        }
-
-        return ResultStatus(refusal) is { } status && test.Statuses.Contains(status);
-    }
-
-    private static int? ResultStatus(Record refusal)
-    {
-        if (refusal.Raw.ValueKind != JsonValueKind.Object
-            || !refusal.Raw.TryGetProperty("status", out var value))
-        {
-            return null;
-        }
-
-        if (value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out var number))
-        {
-            return number;
-        }
-
-        return value.ValueKind == JsonValueKind.String && int.TryParse(value.GetString(), out var text)
-            ? text
-            : null;
-    }
+    private static bool Asserts(ScenarioInfo test, Record refusal) =>
+        refusal.Field("code") is { } code && test.Codes.Contains(code);
 
     private static void ComputeStatus(ProjectModel model)
     {
@@ -656,7 +636,7 @@ static class ModelBuilder
             }
         }
 
-        var cases = model.Records.Where(record => record.Type == "case").ToList();
+        var scenarios = model.Records.Where(record => record.Type == "scenario").ToList();
 
         foreach (var useCase in model.Records.Where(record => record.Type == "use-case"))
         {
@@ -665,14 +645,14 @@ static class ModelBuilder
                 continue;
             }
 
-            var own = cases.Where(kase =>
-                Identifiers.TrySplit(kase.Id, out _, out var home, out _) && home == name).ToList();
+            var own = scenarios.Where(scenario =>
+                Identifiers.TrySplit(scenario.Id, out _, out var home, out _) && home == name).ToList();
 
             var verified = own.Count > 0;
 
-            foreach (var kase in own)
+            foreach (var scenario in own)
             {
-                var links = model.Proves.Where(link => link.Case == kase.Id).ToList();
+                var links = model.Proves.Where(link => link.Claim == scenario.Id).ToList();
 
                 if (links.Count == 0 || links.Any(link => !link.Confirmed || link.Passing != true))
                 {

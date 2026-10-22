@@ -1,14 +1,19 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/spending.receipt",
+  "type": "aggregate",
+  "id": "aggregate/spending.receipt",
   "title": "Receipt",
   "owner": "expenses-team",
   "status": "approved",
-  "codeName": "Receipt",
   "states": [
-    "Attached",
-    "Removed"
+    {
+      "name": "Attached",
+      "meaning": "The receipt sits on the expense."
+    },
+    {
+      "name": "Removed",
+      "meaning": "The receipt left the expense."
+    }
   ],
   "records": [
     {
@@ -17,8 +22,7 @@
       "title": "Attaches before decision",
       "owner": "expenses-team",
       "status": "approved",
-      "kind": "checked-before",
-      "enforcedBy": "aggregate",
+      "kind": "precondition",
       "statement": "A receipt attaches before the expense is decided.",
       "governs": [
         "use-case/spending.attach-receipt"

@@ -5,7 +5,7 @@
   "title": "List loans",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "query",
+  "kind": "query",
   "needs": [
     "permission/read-loans"
   ],
@@ -14,14 +14,9 @@
     "entry-point/library-app"
   ],
   "raises": [],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
-  "results": [
-    "result/list-loans.listed"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -29,7 +24,6 @@
       "title": "Listed",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The loans are listed."
     }
   ]

@@ -10,7 +10,7 @@ public sealed class StackReaderTests
     /// <summary><c>model build</c> on the fixture prints the counts its contents hold.</summary>
     [Theory]
     [InlineData("small", 61, 7, 0, 0)]
-    [InlineData("large", 76, 7, 1, 9)]
+    [InlineData("large", 78, 7, 1, 9)]
     public void Build_Prints_Fixture_Counts(string fixture, int records, int handlers, int screens, int scenarios)
     {
         using var temp = ModelFixture.Prepare(fixture);
@@ -54,18 +54,18 @@ public sealed class StackReaderTests
         Assert.Equal(JsonValueKind.Null, document.RootElement.GetProperty("testRun").ValueKind);
     }
 
-    /// <summary>A JUnit file verifies the passing case's use case and leaves the failing one unverified.</summary>
+    /// <summary>A JUnit file verifies the passing scenario's use case and leaves the failing one unverified.</summary>
     [Fact]
-    public void JUnit_Results_Verify_The_Passing_Case_Only()
+    public void JUnit_Results_Verify_The_Passing_Scenario_Only()
     {
         using var temp = ModelFixture.Prepare("small");
 
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-junit-case.md"),
-            BorrowCasePage);
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-junit-scenario.md"),
+            BorrowScenarioPage);
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-junit-case.md"),
-            ReturnCasePage);
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-junit-scenario.md"),
+            ReturnScenarioPage);
 
         var scenariosFolder = Path.Combine(
             temp.Path, "apps", "api", "tests", "Library.Acceptance.Tests", "JUnit");
@@ -94,18 +94,18 @@ public sealed class StackReaderTests
         Assert.False(status.GetProperty("use-case/lending.return-copy").GetProperty("verified").GetBoolean());
     }
 
-    /// <summary>A TRX file verifies the passing case's use case and leaves the failing one unverified.</summary>
+    /// <summary>A TRX file verifies the passing scenario's use case and leaves the failing one unverified.</summary>
     [Fact]
-    public void Trx_Results_Verify_The_Passing_Case_Only()
+    public void Trx_Results_Verify_The_Passing_Scenario_Only()
     {
         using var temp = ModelFixture.Prepare("small");
 
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-trx-case.md"),
-            BorrowCasePage);
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-trx-scenario.md"),
+            BorrowScenarioPage);
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-trx-case.md"),
-            ReturnCasePage);
+            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-trx-scenario.md"),
+            ReturnScenarioPage);
 
         var scenariosFolder = Path.Combine(
             temp.Path, "apps", "api", "tests", "Library.Acceptance.Tests", "Trx");
@@ -134,18 +134,18 @@ public sealed class StackReaderTests
         Assert.False(status.GetProperty("use-case/lending.return-copy").GetProperty("verified").GetBoolean());
     }
 
-    const string BorrowCasePage = """
+    const string BorrowScenarioPage = """
         ---
         {
-          "type": "case",
-          "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+          "type": "scenario",
+          "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
           "status": "approved",
-          "situation": "A copy sits available on its shelf.",
-          "action": "The reader borrows the copy.",
+          "given": "A copy sits available on its shelf.",
+          "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",
-          "expect": "The loan is active."
+          "then": "The loan is active."
         }
         ---
 
@@ -154,18 +154,18 @@ public sealed class StackReaderTests
         A reader borrows an available copy.
         """;
 
-    const string ReturnCasePage = """
+    const string ReturnScenarioPage = """
         ---
         {
-          "type": "case",
-          "id": "case/return-copy.returning-a-borrowed-copy-succeeds",
+          "type": "scenario",
+          "id": "scenario/return-copy.returning-a-borrowed-copy-succeeds",
           "title": "Returning a borrowed copy succeeds",
           "owner": "lending-team",
           "status": "approved",
-          "situation": "A loan stands active on a copy.",
-          "action": "The reader returns the copy.",
+          "given": "A loan stands active on a copy.",
+          "when": "The reader returns the copy.",
           "result": "result/return-copy.returned",
-          "expect": "The loan is returned."
+          "then": "The loan is returned."
         }
         ---
 
@@ -179,13 +179,13 @@ public sealed class StackReaderTests
 
         public sealed class TrxScenarios
         {
-            /// <proves>case/borrow-copy.borrowing-an-available-copy-succeeds</proves>
+            /// <proves>scenario/borrow-copy.borrowing-an-available-copy-succeeds</proves>
             public Task Borrowing_an_available_copy_succeeds() => Runner.RunScenarioAsync(
                 given => new RegisterCopySteps().RegisterACopy("copy-1"),
                 when => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
                 then => new BorrowCopySteps().TheLoanIsActive());
 
-            /// <proves>case/return-copy.returning-a-borrowed-copy-succeeds</proves>
+            /// <proves>scenario/return-copy.returning-a-borrowed-copy-succeeds</proves>
             public Task Returning_a_borrowed_copy_succeeds() => Runner.RunScenarioAsync(
                 given => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
                 when => new ReturnCopySteps().ReturnACopy("loan-1"),
@@ -198,13 +198,13 @@ public sealed class StackReaderTests
 
         public sealed class JUnitScenarios
         {
-            /// <proves>case/borrow-copy.borrowing-an-available-copy-succeeds</proves>
+            /// <proves>scenario/borrow-copy.borrowing-an-available-copy-succeeds</proves>
             public Task Borrowing_an_available_copy_succeeds() => Runner.RunScenarioAsync(
                 given => new RegisterCopySteps().RegisterACopy("copy-1"),
                 when => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
                 then => new BorrowCopySteps().TheLoanIsActive());
 
-            /// <proves>case/return-copy.returning-a-borrowed-copy-succeeds</proves>
+            /// <proves>scenario/return-copy.returning-a-borrowed-copy-succeeds</proves>
             public Task Returning_a_borrowed_copy_succeeds() => Runner.RunScenarioAsync(
                 given => new BorrowCopySteps().BorrowACopy("reader-1", "copy-1"),
                 when => new ReturnCopySteps().ReturnACopy("loan-1"),

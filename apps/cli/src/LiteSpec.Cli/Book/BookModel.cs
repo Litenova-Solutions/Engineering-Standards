@@ -26,20 +26,20 @@ sealed record Backlink(string From, string Field);
 /// <param name="Test">The scenario's test, or null when no test has that name.</param>
 sealed record ProofLink(JsonNode? Scenario, bool Confirmed, bool Indirect, bool? Passing, JsonObject? Test);
 
-/// <summary>One case's proof state from its proves links.</summary>
+/// <summary>One scenario's proof state from its proves links.</summary>
 /// <param name="State">The proof state key.</param>
 /// <param name="Links">The enriched proves links.</param>
-/// <param name="Claimed">Whether a test claims the case without holding the claim.</param>
-sealed record CaseProofResult(string State, IReadOnlyList<ProofLink> Links, bool Claimed);
+/// <param name="Claimed">Whether a test claims the scenario without holding the claim.</param>
+sealed record ScenarioProofResult(string State, IReadOnlyList<ProofLink> Links, bool Claimed);
 
-/// <summary>The results and cases that belong to one use case.</summary>
+/// <summary>The results and scenarios that belong to one use case.</summary>
 /// <param name="Results">The use case's results.</param>
-/// <param name="Cases">The use case's cases.</param>
-sealed record UseCaseKids(IReadOnlyList<JsonObject> Results, IReadOnlyList<JsonObject> Cases);
+/// <param name="Scenarios">The use case's scenarios.</param>
+sealed record UseCaseKids(IReadOnlyList<JsonObject> Results, IReadOnlyList<JsonObject> Scenarios);
 
 /// <summary>One use case's implementation state from the status map.</summary>
 /// <param name="Implemented">Whether code implements the use case.</param>
-/// <param name="Verified">Whether every case is proved by a passing test.</param>
+/// <param name="Verified">Whether every scenario is proved by a passing test.</param>
 sealed record UseCaseState(bool Implemented, bool Verified);
 
 /// <summary>One role an actor holds, with the role record when it resolves.</summary>
@@ -94,8 +94,8 @@ sealed class BookIndex
     /// <summary>Results by home module name.</summary>
     public Dictionary<string, List<JsonObject>> ResultsOf { get; init; } = new(StringComparer.Ordinal);
 
-    /// <summary>Cases by home module name.</summary>
-    public Dictionary<string, List<JsonObject>> CasesOf { get; init; } = new(StringComparer.Ordinal);
+    /// <summary>Scenarios by home module name.</summary>
+    public Dictionary<string, List<JsonObject>> ScenariosOf { get; init; } = new(StringComparer.Ordinal);
 
     /// <summary>Implements links by target record id.</summary>
     public Dictionary<string, List<JsonObject>> ImplementsByTarget { get; init; } = new(StringComparer.Ordinal);
@@ -103,8 +103,8 @@ sealed class BookIndex
     /// <summary>Calls links by target record id.</summary>
     public Dictionary<string, List<JsonObject>> CallsByTarget { get; init; } = new(StringComparer.Ordinal);
 
-    /// <summary>Proves links by case id.</summary>
-    public Dictionary<string, List<JsonObject>> ProvesByCase { get; init; } = new(StringComparer.Ordinal);
+    /// <summary>Proves links by claimed record id.</summary>
+    public Dictionary<string, List<JsonObject>> ProvesByClaim { get; init; } = new(StringComparer.Ordinal);
 
     /// <summary>Every entry of the tests array.</summary>
     public List<JsonNode?> Tests { get; set; } = [];
@@ -133,14 +133,14 @@ static class BookModel
     /// <summary>The navigation layers, in display order.</summary>
     public static readonly IReadOnlyList<BookLayer> Layers =
     [
-        new("Why", ["product", "constraint", "research", "decision", "requirement"]),
+        new("Why", ["product", "goal", "constraint", "research", "decision", "requirement"]),
         new("Problems and features", ["problem", "feature"]),
         new("People", ["actor", "role", "permission"]),
         new("Journeys", ["journey"]),
-        new("How the business works", ["module", "business-record", "rule", "use-case", "result", "case", "event"]),
-        new("Entry points", ["entry-point"]),
+        new("How the business works", ["module", "aggregate", "rule", "use-case", "result", "scenario", "event"]),
+        new("Entry points", ["entry-point", "external-system"]),
         new("Running it", ["limit", "runbook"]),
-        new("How we build", ["standard", "exception", "known-gap"]),
+        new("How we build", ["deviation", "known-gap"]),
         new("Terms", ["term"]),
     ];
 
@@ -148,6 +148,7 @@ static class BookModel
         new Dictionary<string, (string One, string Many)>(StringComparer.Ordinal)
         {
             ["product"] = ("Product", "Products"),
+            ["goal"] = ("Goal", "Goals"),
             ["constraint"] = ("Constraint", "Constraints"),
             ["research"] = ("Research", "Research"),
             ["decision"] = ("Decision", "Decisions"),
@@ -159,17 +160,17 @@ static class BookModel
             ["permission"] = ("Permission", "Permissions"),
             ["journey"] = ("Journey", "Journeys"),
             ["module"] = ("Module", "Modules"),
-            ["business-record"] = ("Business record", "Business records"),
+            ["aggregate"] = ("Aggregate", "Aggregates"),
             ["rule"] = ("Rule", "Rules"),
             ["use-case"] = ("Use case", "Use cases"),
             ["result"] = ("Result", "Results"),
-            ["case"] = ("Case", "Cases"),
+            ["scenario"] = ("Scenario", "Scenarios"),
             ["event"] = ("Event", "Events"),
             ["entry-point"] = ("Entry point", "Entry points"),
+            ["external-system"] = ("External system", "External systems"),
             ["limit"] = ("Limit", "Limits"),
             ["runbook"] = ("Runbook", "Runbooks"),
-            ["standard"] = ("Standard", "Standards"),
-            ["exception"] = ("Exception", "Exceptions"),
+            ["deviation"] = ("Deviation", "Deviations"),
             ["known-gap"] = ("Known gap", "Known gaps"),
             ["term"] = ("Term", "Terms"),
         };
@@ -181,23 +182,24 @@ static class BookModel
         ("basedOn", "Based on"),
         ("affects", "Affects"),
         ("solves", "Solves"),
+        ("serves", "Serves"),
+        ("feature", "Feature"),
         ("fulfills", "Fulfills"),
         ("governs", "Governs"),
         ("raises", "Raises"),
-        ("reactsTo", "Reacts to"),
+        ("trigger", "Trigger"),
         ("allows", "Allows"),
         ("needs", "Needs"),
         ("reachedThrough", "Reached through"),
         ("dependsOn", "Depends on"),
         ("terms", "Terms"),
         ("result", "Illustrates"),
-        ("offers", "Offers"),
+        ("actor", "Actor"),
         ("runbook", "Runbook"),
-        ("limit", "Limit"),
         ("subject", "About"),
         ("replaces", "Replaces"),
         ("refusal", "Refusal"),
-        ("standard", "Standard"),
+        ("provision", "Provision"),
     ];
 
     /// <summary>The incoming link headings by field.</summary>
@@ -208,27 +210,28 @@ static class BookModel
             ["basedOn"] = "Basis for",
             ["affects"] = "Problems affecting this",
             ["solves"] = "Solved by",
+            ["serves"] = "Served by",
+            ["feature"] = "Requirements",
             ["fulfills"] = "Fulfilled by",
             ["governs"] = "Governed by",
             ["raises"] = "Raised by",
-            ["reactsTo"] = "Reactions",
+            ["trigger"] = "Triggers",
             ["allows"] = "Allowed by",
             ["needs"] = "Needed by",
             ["reachedThrough"] = "Entry for",
             ["dependsOn"] = "Depended on by",
             ["terms"] = "Used by",
             ["result"] = "Illustrated by",
-            ["offers"] = "Offered by",
+            ["actor"] = "Systems for",
             ["runbook"] = "Runbook for",
-            ["limit"] = "Limit for",
             ["subject"] = "Known gaps",
             ["replaces"] = "Replaced by",
             ["refusal"] = "Refusal for",
-            ["standard"] = "Exceptions",
+            ["provision"] = "Deviations",
         };
 
     /// <summary>The record types in precedence order.</summary>
-    public static readonly IReadOnlyList<string> Precedence = ["constraint", "product", "requirement", "rule", "use-case"];
+    public static readonly IReadOnlyList<string> Precedence = ["constraint", "product", "requirement", "rule", "use-case", "result", "scenario"];
 
     /// <summary>The proof-state labels.</summary>
     public static readonly IReadOnlyDictionary<string, string> ProofLabels =
@@ -368,7 +371,7 @@ static class BookModel
         foreach (var record in records.OfType<JsonObject>())
         {
             var type = BookRender.StrProp(record, "type");
-            if (type != "result" && type != "case")
+            if (type != "result" && type != "scenario")
             {
                 continue;
             }
@@ -378,7 +381,7 @@ static class BookModel
                 continue;
             }
 
-            var map = type == "result" ? index.ResultsOf : index.CasesOf;
+            var map = type == "result" ? index.ResultsOf : index.ScenariosOf;
             if (!map.TryGetValue(home, out var list))
             {
                 list = [];
@@ -419,12 +422,12 @@ static class BookModel
 
         foreach (var link in links["proves"] as JsonArray ?? [])
         {
-            if (link is JsonObject obj && BookRender.StrProp(obj, "case") is { } kase)
+            if (link is JsonObject obj && BookRender.StrProp(obj, "claim") is { } claim)
             {
-                if (!index.ProvesByCase.TryGetValue(kase, out var list))
+                if (!index.ProvesByClaim.TryGetValue(claim, out var list))
                 {
                     list = [];
-                    index.ProvesByCase[kase] = list;
+                    index.ProvesByClaim[claim] = list;
                 }
 
                 list.Add(obj);
@@ -455,10 +458,10 @@ static class BookModel
         return index;
     }
 
-    /// <summary>One case's proof state from its proves links.</summary>
-    public static CaseProofResult CaseProof(BookIndex index, string caseId)
+    /// <summary>One scenario's proof state from its proves links.</summary>
+    public static ScenarioProofResult ScenarioProof(BookIndex index, string scenarioId)
     {
-        var links = index.ProvesByCase.TryGetValue(caseId, out var found) ? found : [];
+        var links = index.ProvesByClaim.TryGetValue(scenarioId, out var found) ? found : [];
         var enriched = links.Select(link => new ProofLink(
             link["scenario"],
             BookRender.IsTrue(link["confirmed"]),
@@ -487,16 +490,16 @@ static class BookModel
             }
         }
 
-        return new CaseProofResult(state, enriched, links.Count > 0 && confirmed.Count == 0);
+        return new ScenarioProofResult(state, enriched, links.Count > 0 && confirmed.Count == 0);
     }
 
-    /// <summary>The results and cases that belong to one use case.</summary>
+    /// <summary>The results and scenarios that belong to one use case.</summary>
     public static UseCaseKids UseCaseChildren(BookIndex index, string useCaseId)
     {
         var name = SplitId(useCaseId).Name;
         return new UseCaseKids(
             index.ResultsOf.TryGetValue(name, out var results) ? results : [],
-            index.CasesOf.TryGetValue(name, out var cases) ? cases : []);
+            index.ScenariosOf.TryGetValue(name, out var scenarios) ? scenarios : []);
     }
 
     /// <summary>One use case's implementation state from the status map.</summary>

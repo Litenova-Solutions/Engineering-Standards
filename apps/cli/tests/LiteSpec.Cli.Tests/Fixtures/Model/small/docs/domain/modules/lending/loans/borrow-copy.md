@@ -5,7 +5,7 @@
   "title": "Borrow copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/loan.loan-borrowed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
-  "results": [
-    "result/borrow-copy.borrowed",
-    "result/borrow-copy.copy-unavailable"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Borrowed",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 201,
       "meaning": "The copy is lent."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Copy unavailable",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_not_available",
-      "httpStatus": 409,
+      "code": "lending.copy-not-available",
       "meaning": "The copy is unavailable."
     }
   ]

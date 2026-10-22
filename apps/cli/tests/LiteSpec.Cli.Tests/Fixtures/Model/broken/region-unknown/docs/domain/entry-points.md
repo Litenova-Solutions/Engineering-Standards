@@ -11,7 +11,7 @@
       "title": "Library app",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "web-app"
+      "kind": "app"
     },
     {
       "type": "entry-point",

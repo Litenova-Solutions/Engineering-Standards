@@ -27,7 +27,7 @@
       }
     },
     "size": {
-      "description": "The size of this project. Small requires the core record types with Architecture and Integration test projects; large adds problems, features, journeys and cases with the Acceptance project.",
+      "description": "The size of this project. Small requires the core record types with Architecture and Integration test projects; large adds problems, features, journeys and scenarios with the Acceptance project.",
       "type": "string",
       "enum": ["small", "large"]
     },
@@ -52,8 +52,42 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": ["constraint", "research", "limit", "runbook"]
+        "enum": ["constraint", "research", "limit", "runbook", "goal", "external-system"]
       }
+    },
+    "stackConfig": {
+      "description": "Per-stack configuration, keyed by stack id. Each stack documents its own keys beside this schema.",
+      "type": "object",
+      "properties": {
+        "dotnet": {
+          "description": "Paths the model builder reads for the .NET backend. Each supports one segment wildcard expanding to the first matching folder.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "application": {
+              "description": "The Application project the model builder reads. Defaults to apps/api/src/*.Application.",
+              "$ref": "#/$defs/projectPath"
+            },
+            "domain": {
+              "description": "The Domain project the model builder reads. Defaults to apps/api/src/*.Domain.",
+              "$ref": "#/$defs/projectPath"
+            },
+            "infrastructure": {
+              "description": "The Infrastructure project the model builder reads. Defaults to apps/api/src/*.Infrastructure.",
+              "$ref": "#/$defs/projectPath"
+            },
+            "webapi": {
+              "description": "The WebApi project the model builder reads. Defaults to apps/api/src/*.WebApi.",
+              "$ref": "#/$defs/projectPath"
+            },
+            "apiSolution": {
+              "description": "Path to the API solution. A consumer with no backend omits it and records the decision that it has none.",
+              "$ref": "#/$defs/projectPath"
+            }
+          }
+        }
+      },
+      "additionalProperties": { "type": "object" }
     },
     "proof": {
       "description": "How the model builder confirms proof claims for this project.",
@@ -99,32 +133,12 @@
       "additionalProperties": false,
       "required": ["domainDocs", "uiDocs", "frontends"],
       "properties": {
-        "application": {
-          "description": "The Application project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Application.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "domain": {
-          "description": "The Domain project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Domain.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "infrastructure": {
-          "description": "The Infrastructure project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.Infrastructure.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "webapi": {
-          "description": "The WebApi project the model builder reads. A * in one segment expands to the first matching folder. Defaults to apps/api/src/*.WebApi.",
-          "$ref": "#/$defs/projectPath"
-        },
-        "apiSolution": {
-          "description": "Path to the API solution. A consumer with no backend omits it and records the decision that it has none.",
-          "$ref": "#/$defs/projectPath"
-        },
         "docs": {
           "description": "Root of the specification tree. Every Markdown file under it carries a metadata block unless the path is listed in unstructuredDocs.",
           "$ref": "#/$defs/projectPath"
         },
-        "language": {
-          "description": "The project language record, validated against schemas/language.schema.json. Defaults to language.json under the documentation root.",
+        "glossary": {
+          "description": "The project glossary, validated against schemas/glossary.schema.json. Defaults to glossary.json under the documentation root.",
           "$ref": "#/$defs/projectPath"
         },
         "languageScan": {
@@ -149,12 +163,12 @@
           "description": "Home folders per record type, where they differ from the defaults the model states.",
           "type": "object",
           "propertyNames": {
-            "pattern": "^(product|constraint|research|decision|requirement|problem|feature|actor|role|permission|journey|module|business-record|rule|use-case|result|case|event|entry-point|limit|runbook|exception|known-gap|term)$"
+            "pattern": "^(product|goal|constraint|research|decision|requirement|problem|feature|actor|role|permission|journey|module|aggregate|rule|use-case|result|scenario|event|entry-point|external-system|limit|runbook|deviation|known-gap|term)$"
           },
           "additionalProperties": { "$ref": "#/$defs/projectPath" }
         },
         "testRoots": {
-          "description": "Directories holding automated test source. A case is proved from one of these, as a scenario whose steps call the use case and assert the result.",
+          "description": "Directories holding automated test source. A scenario is proved from one of these, as a test whose steps call the use case and assert the result.",
           "type": "array",
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/projectPath" }
@@ -263,8 +277,8 @@
         }
       ]
     },
-    "scenarioWordLimit": {
-      "description": "The word bound a Scenario section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
+    "exampleWordLimit": {
+      "description": "The word bound an Example section stays within. Omitted, the recorded default of 120 applies, and the validator refuses a value below 40.",
       "type": "integer"
     },
     "prohibitedKinds": {

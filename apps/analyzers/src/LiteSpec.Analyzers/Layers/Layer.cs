@@ -6,11 +6,13 @@ namespace LiteSpec.Analyzers.Layers;
 /// </summary>
 internal enum Layer
 {
-    /// <summary>Not one of the five projects, or opted out with <c>LiteSpecLayer=None</c>.</summary>
+    /// <summary>Not one of the known projects, or opted out with <c>LiteSpecLayer=None</c>.</summary>
     None,
     Domain,
     ApplicationAbstractions,
     Application,
     Infrastructure,
     WebApi,
+    /// <summary>A test project, named <c>*.Tests</c> or declared with <c>LiteSpecLayer=Test</c>.</summary>
+    Test,
 }

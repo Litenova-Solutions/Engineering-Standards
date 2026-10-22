@@ -48,8 +48,8 @@ static partial class Renderer
     public static readonly HashSet<string> KnownRegions = new(StringComparer.Ordinal)
     {
         "history", "use-case-coverage", "sub-processors", "runbook-index", "rule-map",
-        "operations-log", "open-questions", "journeys", "glossary", "exceptions", "census",
-        "business-record-map", "audit-register", "alert-inventory", "counts",
+        "operations-log", "open-questions", "journeys", "glossary", "deviations", "census",
+        "aggregate-map", "audit-register", "alert-inventory", "counts",
     };
 
     /// <summary>One region fence: its name and the offset where it opens.</summary>
@@ -71,9 +71,9 @@ static partial class Renderer
             "open-questions" => OpenQuestions(model),
             "journeys" => Journeys(model, file),
             "glossary" => Glossary(model),
-            "exceptions" => Exceptions(model, file),
+            "deviations" => Deviations(model, file),
             "census" => Census(model),
-            "business-record-map" => BusinessRecordMap(model),
+            "aggregate-map" => AggregateMap(model),
             "audit-register" => AuditRegister(model),
             "alert-inventory" => AlertInventory(model, file),
             "counts" => Counts(model),
@@ -139,7 +139,7 @@ static partial class Renderer
         };
 
         foreach (var actor in model.Records
-                     .Where(record => record.Type == "actor" && record.Field("kind") == "provider")
+                     .Where(record => record.Type == "actor" && record.Field("kind") == "organization")
                      .OrderBy(record => record.Id, StringComparer.Ordinal))
         {
             var holds = ModelBuilder.TargetsOf(Holds(actor));
@@ -158,7 +158,7 @@ static partial class Renderer
                      .Where(record => record.Type == "runbook")
                      .OrderBy(record => record.Id, StringComparer.Ordinal))
         {
-            var trigger = runbook.Field("trigger") ?? runbook.Ids("limit").FirstOrDefault() ?? "";
+            var trigger = runbook.Field("trigger") ?? "";
 
             lines.Add($"- [{runbook.Title}]({RelativeLink(file, runbook.File)}): {trigger}");
         }
@@ -174,7 +174,7 @@ static partial class Renderer
             .OrderBy(record => record.Id, StringComparer.Ordinal)
             .ToList();
         var records = model.Records
-            .Where(record => record.Type == "business-record")
+            .Where(record => record.Type == "aggregate")
             .OrderBy(record => record.Id, StringComparer.Ordinal)
             .ToList();
         var placed = new HashSet<string>(StringComparer.Ordinal);
@@ -192,13 +192,13 @@ static partial class Renderer
 
             lines.Add($"### `{record.Id}`");
             lines.Add(string.Empty);
-            lines.Add("| Rule | Kind | Enforced by | Statement |");
-            lines.Add("|:---|:---|:---|:---|");
+            lines.Add("| Rule | Kind | Statement |");
+            lines.Add("|:---|:---|:---|");
 
             foreach (var rule in own)
             {
                 placed.Add(rule.Id);
-                lines.Add($"| `{rule.Id}` | {rule.Field("kind") ?? ""} | {rule.Field("enforcedBy") ?? ""} | {Cell(rule.Field("statement") ?? "")} |");
+                lines.Add($"| `{rule.Id}` | {rule.Field("kind") ?? ""} | {Cell(rule.Field("statement") ?? "")} |");
             }
 
             lines.Add(string.Empty);
@@ -210,12 +210,12 @@ static partial class Renderer
         {
             lines.Add("### Module rules");
             lines.Add(string.Empty);
-            lines.Add("| Rule | Kind | Enforced by | Statement |");
-            lines.Add("|:---|:---|:---|:---|");
+            lines.Add("| Rule | Kind | Statement |");
+            lines.Add("|:---|:---|:---|");
 
             foreach (var rule in rest)
             {
-                lines.Add($"| `{rule.Id}` | {rule.Field("kind") ?? ""} | {rule.Field("enforcedBy") ?? ""} | {Cell(rule.Field("statement") ?? "")} |");
+                lines.Add($"| `{rule.Id}` | {rule.Field("kind") ?? ""} | {Cell(rule.Field("statement") ?? "")} |");
             }
         }
 
@@ -233,7 +233,7 @@ static partial class Renderer
 
             if (model.ById.TryGetValue(target, out var governed)
                 && governed.Type == "use-case"
-                && ModelBuilder.BusinessRecordOf(model, governed)?.Id == record.Id)
+                && ModelBuilder.AggregateOf(model, governed)?.Id == record.Id)
             {
                 return true;
             }
@@ -268,7 +268,7 @@ static partial class Renderer
 
         foreach (var body in model.Bodies
                      .Where(candidate => model.ById.TryGetValue(candidate.PageId ?? "", out var page)
-                         && page.Type == "business-record"
+                         && page.Type == "aggregate"
                          && string.Equals(page.File, candidate.File, StringComparison.Ordinal))
                      .OrderBy(candidate => candidate.PageId, StringComparer.Ordinal))
         {
@@ -342,21 +342,21 @@ static partial class Renderer
         return string.Join('\n', lines);
     }
 
-    private static string Exceptions(ProjectModel model, string file)
+    private static string Deviations(ProjectModel model, string file)
     {
         var lines = new List<string>
         {
-            "| Exception | Provision |",
+            "| Deviation | Provision |",
             "|:---|:---|",
         };
 
-        foreach (var exception in model.Records
-                     .Where(record => record.Type == "exception")
+        foreach (var deviation in model.Records
+                     .Where(record => record.Type == "deviation")
                      .OrderBy(record => record.Id, StringComparer.Ordinal))
         {
-            var name = Path.GetFileNameWithoutExtension(exception.File);
+            var name = Path.GetFileNameWithoutExtension(deviation.File);
 
-            lines.Add($"| [{name}]({RelativeLink(file, exception.File)}) | `{exception.Field("standard") ?? ""}` |");
+            lines.Add($"| [{name}]({RelativeLink(file, deviation.File)}) | `{deviation.Field("provision") ?? ""}` |");
         }
 
         return string.Join('\n', lines);
@@ -368,7 +368,7 @@ static partial class Renderer
         {
             $"- workspace applications: {model.Records.Count(record => record.Type == "entry-point" && record.Has("path"))}",
             $"- domain modules: {model.Records.Count(record => record.Type == "module")}",
-            $"- aggregate roots: {model.Records.Count(record => record.Type == "business-record")}",
+            $"- aggregate roots: {model.Records.Count(record => record.Type == "aggregate")}",
             $"- use cases: {model.Records.Count(record => record.Type == "use-case")}",
             $"- reactions: {model.Code.Reactions.Count(reaction => reaction.Kind == "reaction")}",
             $"- recurring commands: {model.Code.Reactions.Count(reaction => reaction.Kind == "job" && !reaction.Class.EndsWith("Worker", StringComparison.Ordinal))}",
@@ -381,10 +381,10 @@ static partial class Renderer
         return string.Join('\n', lines);
     }
 
-    private static string BusinessRecordMap(ProjectModel model)
+    private static string AggregateMap(ProjectModel model)
     {
         var lines = new List<string>();
-        var records = model.Records.Where(record => record.Type == "business-record").ToList();
+        var records = model.Records.Where(record => record.Type == "aggregate").ToList();
 
         foreach (var module in model.Records
                      .Where(record => record.Type == "module")
@@ -403,18 +403,18 @@ static partial class Renderer
 
             lines.Add($"### `{module.Id}`");
             lines.Add(string.Empty);
-            lines.Add("| Business record | Code | Use cases |");
-            lines.Add("|:---|:---|:---|");
+            lines.Add("| Aggregate | Use cases |");
+            lines.Add("|:---|:---|");
 
             foreach (var record in own)
             {
                 var uses = model.Records
                     .Where(candidate => candidate.Type == "use-case"
-                        && ModelBuilder.BusinessRecordOf(model, candidate)?.Id == record.Id)
+                        && ModelBuilder.AggregateOf(model, candidate)?.Id == record.Id)
                     .OrderBy(candidate => candidate.Id, StringComparer.Ordinal)
                     .Select(candidate => $"`{candidate.Id}`");
 
-                lines.Add($"| `{record.Id}` | {record.Field("codeName") ?? ""} | {string.Join(", ", uses)} |");
+                lines.Add($"| `{record.Id}` | {string.Join(", ", uses)} |");
             }
 
             lines.Add(string.Empty);
@@ -444,7 +444,7 @@ static partial class Renderer
             var name = Identifiers.TrySplit(useCase.Id, out _, out _, out var useCaseName) ? useCaseName : null;
             var authorization = name is not null
                 && resultsByHome.TryGetValue(name, out var results)
-                && results.Any(result => result.Field("code")?.StartsWith("failure/authorization.", StringComparison.Ordinal) == true);
+                && results.Any(result => result.Field("code")?.StartsWith("authorization.", StringComparison.Ordinal) == true);
 
             if (useCase.Ids("needs").Count == 0 && !authorization)
             {

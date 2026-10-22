@@ -7,28 +7,24 @@ namespace LiteSpec.Model;
 /// </summary>
 static partial class Identifiers
 {
-    /// <summary>A citation of a project record or a failure code.</summary>
+    /// <summary>A citation of a project record.</summary>
     public static readonly Regex Citation = BuildCitation();
 
     /// <summary>A citation of a shared standards provision: litespec/&lt;page&gt;#&lt;slug&gt;.</summary>
     [GeneratedRegex(@"\blitespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*")]
     public static partial Regex SharedCitation();
 
-    /// <summary>A failure code. Modules are kebab-case, so both parts allow hyphens.</summary>
-    [GeneratedRegex(@"\bfailure/[a-z0-9_-]+(?:\.[a-z0-9_-]+)+\b")]
-    public static partial Regex FailureCode();
+    /// <summary>A refusal code in identifier form: module and name in kebab-case.</summary>
+    [GeneratedRegex(@"\b[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*\b")]
+    public static partial Regex RefusalCode();
 
     /// <summary>A written anchor on a reaction or job.</summary>
     [GeneratedRegex(@"<implements>\s*(?<id>use-case/[A-Za-z0-9][A-Za-z0-9._-]*)\s*</implements>")]
     public static partial Regex ImplementsTag();
 
-    /// <summary>A test's claim of the case or rule it proves.</summary>
-    [GeneratedRegex(@"<proves>\s*(?<id>(?:case|rule)/[A-Za-z0-9][A-Za-z0-9._-]*)\s*</proves>")]
+    /// <summary>A test's claim of the scenario or rule it proves.</summary>
+    [GeneratedRegex(@"<proves>\s*(?<id>(?:scenario|rule)/[A-Za-z0-9][A-Za-z0-9._-]*)\s*</proves>")]
     public static partial Regex ProvesTag();
-
-    /// <summary>A project standard carried as a heading.</summary>
-    [GeneratedRegex(@"^#{1,6}\s+.*\((?<id>standard/[a-z0-9][a-z0-9-]*\.[a-z0-9][a-z0-9-]*)\)\s*$")]
-    public static partial Regex StandardHeading();
 
     /// <summary>A shared provision carried as a heading, which holds no ID text.</summary>
     [GeneratedRegex(@"^###\s+(?<heading>.+?)\s*$")]
@@ -41,7 +37,7 @@ static partial class Identifiers
             RecordTypes.All.OrderBy(kind => kind, StringComparer.Ordinal).Select(Regex.Escape));
 
         return new Regex(
-            $@"(?<![A-Za-z0-9_./-])(?:{kinds}|failure)/[A-Za-z0-9][A-Za-z0-9._-]*",
+            $@"(?<![A-Za-z0-9_./-])(?:{kinds})/[A-Za-z0-9][A-Za-z0-9._-]*",
             RegexOptions.Compiled);
     }
 

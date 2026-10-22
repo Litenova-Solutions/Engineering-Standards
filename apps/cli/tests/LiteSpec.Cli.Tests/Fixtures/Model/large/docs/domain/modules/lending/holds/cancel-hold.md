@@ -5,7 +5,7 @@
   "title": "Cancel hold",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/place-hold"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/hold.hold-canceled"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.hold-pickup-window"
-  ],
-  "results": [
-    "result/cancel-hold.canceled",
-    "result/cancel-hold.hold-ended"
-  ],
-  "cases": [
-    "case/cancel-hold.canceling-a-waiting-hold-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Canceled",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The hold is canceled."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Hold ended",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.hold_not_waiting",
-      "httpStatus": 409,
+      "code": "lending.hold-not-waiting",
       "meaning": "The hold already left the queue."
     },
     {
-      "type": "case",
-      "id": "case/cancel-hold.canceling-a-waiting-hold-succeeds",
+      "type": "scenario",
+      "id": "scenario/cancel-hold.canceling-a-waiting-hold-succeeds",
       "title": "Canceling a waiting hold succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A reader holds a waiting hold.",
-      "action": "The reader cancels the hold.",
+      "given": "A reader holds a waiting hold.",
+      "when": "The reader cancels the hold.",
       "result": "result/cancel-hold.canceled",
-      "expect": "The hold is canceled."
+      "then": "The hold is canceled."
     }
   ]
 }

@@ -5,7 +5,7 @@
   "title": "Cancel hold",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/place-hold"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/hold.hold-canceled"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.hold-pickup-window"
   ],
-  "results": [
-    "result/cancel-hold.canceled",
-    "result/cancel-hold.hold-ended"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Canceled",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The hold is canceled."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Hold ended",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.hold_not_waiting",
-      "httpStatus": 409,
+      "code": "lending.hold-not-waiting",
       "meaning": "The hold already left the queue."
     }
   ]

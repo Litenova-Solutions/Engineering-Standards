@@ -4,14 +4,15 @@ namespace LiteSpec.Analyzers.Rules;
 
 /// <summary>
 ///     Every diagnostic the package reports. LS1xxx check Domain, LS2xxx the outer layers,
-///     LS3xxx code style in all five projects. Each one names the provision it enforces,
-///     and its help link opens that provision.
+///     LS3xxx code style in the five production projects, LS4xxx test projects. Each one
+///     names the provision it enforces, and its help link opens that provision.
 /// </summary>
 internal static class Descriptors
 {
     private const string DomainCategory = "LiteSpec.Domain";
     private const string LayersCategory = "LiteSpec.Layers";
     private const string StyleCategory = "LiteSpec.Style";
+    private const string TestsCategory = "LiteSpec.Tests";
 
     private static readonly Provision DomainOuterLayers = Provision.Of("backend/dotnet/domain", "keep-domain-free-of-outer-layer-concerns");
     private static readonly Provision ClosedSets = Provision.Of("backend/dotnet/domain", "model-every-closed-set-of-domain-values-without-enums");
@@ -30,6 +31,9 @@ internal static class Descriptors
     private static readonly Provision AsyncNames = Provision.Of("backend/dotnet/naming", "name-asynchronous-methods-completely");
     private static readonly Provision FileNames = Provision.Of("backend/dotnet/naming", "match-c-files-and-primary-types");
     private static readonly Provision ImplementationStyle = Provision.Of("backend/dotnet/naming", "keep-implementation-style-consistent");
+    private static readonly Provision ModuleFolders = Provision.Of("backend/domain", "organize-a-module-by-aggregate-and-concept");
+    private static readonly Provision RoleSuffixes = Provision.Of("workspace/naming", "use-architectural-suffixes");
+    private static readonly Provision ScenarioProof = Provision.Of("backend/dotnet/testing", "prove-each-case-with-a-test-that-calls-its-use-case");
 
     public static readonly DiagnosticDescriptor LS1001 = Create("LS1001", DomainCategory, DomainOuterLayers,
         "Domain references an outer-layer concern",
@@ -93,6 +97,11 @@ internal static class Descriptors
         "Identifier '{0}' must be a readonly record struct wrapping one Guid with no implicit conversion",
         "An aggregate identity is a readonly record struct wrapping one version 7 Guid, with no implicit conversion, primitive alias, or public parameterless creation path.");
 
+    public static readonly DiagnosticDescriptor LS1013 = Create("LS1013", DomainCategory, ModuleFolders,
+        "Domain event sits outside the Events folder",
+        "Domain event '{0}' lives in '{1}', outside the Events folder the model reads",
+        "A domain event is declared in a file under its aggregate's Events folder, where the model builder discovers it.");
+
     public static readonly DiagnosticDescriptor LS2001 = Create("LS2001", LayersCategory, InternalImplementations,
         "Implementation type is not internal sealed",
         "'{0}' is an implementation type and must be declared internal sealed",
@@ -112,6 +121,21 @@ internal static class Descriptors
         "Command handler writes through a document session",
         "Command handler '{0}' uses '{1}'; stage aggregate writes through a Domain repository",
         "A command handler reaches persistence only through a Domain repository, never through IDocumentSession.");
+
+    public static readonly DiagnosticDescriptor LS2005 = Create("LS2005", LayersCategory, RoleSuffixes,
+        "Handler name lacks its command or query suffix",
+        "'{0}' implements '{1}' and must end in '{2}'",
+        "A command handler is named {UseCase}CommandHandler and a query handler {UseCase}QueryHandler, so the model builder discovers each handler from its file name.");
+
+    public static readonly DiagnosticDescriptor LS2006 = Create("LS2006", LayersCategory, RoleSuffixes,
+        "Endpoint name lacks its suffix",
+        "'{0}' implements 'IEndpoint' and must end in 'Endpoint'",
+        "An endpoint is named {UseCase}Endpoint, so the model builder discovers each endpoint from its file name.");
+
+    public static readonly DiagnosticDescriptor LS2007 = Create("LS2007", LayersCategory, RoleSuffixes,
+        "Reaction or job name hides its kind",
+        "'{0}' is a {1} and must be named '{2}'",
+        "A reaction is named {Action}On{PastFact}Handler or *Reaction, and a job *Job, *Worker, or *Recurring*, so the model builder discovers each reaction and job by name.");
 
     public static readonly DiagnosticDescriptor LS3001 = Create("LS3001", StyleCategory, AsyncNames,
         "Asynchronous method name lacks Async",
@@ -134,6 +158,11 @@ internal static class Descriptors
         "Production C# seals every concrete class that nothing derives from.",
         compilationEnd: true);
 
+    public static readonly DiagnosticDescriptor LS4001 = Create("LS4001", TestsCategory, ScenarioProof,
+        "Test contains no assertion",
+        "Test '{0}' contains no assertion",
+        "A test calls the behavior it proves and asserts the result, so a passing test proves something.");
+
     private static DiagnosticDescriptor Create(
         string id, string category, Provision provision, string title, string message, string description, bool compilationEnd = false) =>
         new(
@@ -141,7 +170,7 @@ internal static class Descriptors
             title,
             message,
             category,
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: $"{description} Provision: {provision.Id}",
             helpLinkUri: provision.HelpLink,

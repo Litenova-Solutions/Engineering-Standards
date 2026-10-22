@@ -27,7 +27,7 @@ static partial class BookPages
         {
             var kids = BookModel.UseCaseChildren(index, BookRender.StrProp(record, "id") ?? "");
             facts.Add(("Results", $"<b>{kids.Results.Count}</b>"));
-            facts.Add(("Cases", $"<b>{kids.Cases.Count}</b>"));
+            facts.Add(("Scenarios", $"<b>{kids.Scenarios.Count}</b>"));
         }
 
         var parts = new List<string>();
@@ -48,9 +48,9 @@ static partial class BookPages
             }
         }
 
-        if (BookRender.StrProp(record, "type") == "case")
+        if (BookRender.StrProp(record, "type") == "scenario")
         {
-            parts.Add(RenderCaseProof(index, rel, record));
+            parts.Add(RenderScenarioProof(index, rel, record));
         }
 
         var outgoing = RenderOutgoingLinks(index, rel, record);
@@ -119,8 +119,8 @@ static partial class BookPages
                 ? "<span class=\"chip ok\">Yes</span> <span>code implements it</span>"
                 : "<span class=\"chip warn\">No</span> <span>no code implements it</span>", false));
             cells.Add(("Verified", state.Verified
-                ? "<span class=\"chip ok\">Yes</span> <span>every case proved by a passing test</span>"
-                : "<span class=\"chip warn\">No</span> <span>a case is unproved or failing</span>", false));
+                ? "<span class=\"chip ok\">Yes</span> <span>every scenario proved by a passing test</span>"
+                : "<span class=\"chip warn\">No</span> <span>a scenario is unproved or failing</span>", false));
         }
 
         return $"<div class=\"strip\" role=\"region\" aria-label=\"Authority\">{string.Concat(cells.Select(cell =>
@@ -235,7 +235,7 @@ static partial class BookPages
             parts.Add($"<h3>Called from</h3>\n<ul class=\"links\">{items}</ul>");
         }
 
-        var provesLinks = index.ProvesByCase.TryGetValue(id, out var proved) ? proved : [];
+        var provesLinks = index.ProvesByClaim.TryGetValue(id, out var proved) ? proved : [];
         if (provesLinks.Count > 0)
         {
             var items = string.Concat(provesLinks.Select(link =>
@@ -268,7 +268,7 @@ static partial class BookPages
 
     static string RenderUseCaseResults(BookIndex index, string rel, JsonObject record)
     {
-        var (results, cases) = BookModel.UseCaseChildren(index, BookRender.StrProp(record, "id") ?? "");
+        var (results, scenarios) = BookModel.UseCaseChildren(index, BookRender.StrProp(record, "id") ?? "");
         var parts = new List<string>();
         if (results.Count > 0)
         {
@@ -276,39 +276,36 @@ static partial class BookPages
             {
                 var fields = BookRender.Fields(result) ?? new JsonObject();
                 var code = BookRender.IsTruthy(fields["code"]) ? $" <code>{BookRender.Esc(fields["code"])}</code>" : "";
-                var status = fields["httpStatus"] is JsonValue number && number.GetValueKind() == System.Text.Json.JsonValueKind.Number
-                    ? $" <span class=\"dim\">HTTP {BookRender.Str(fields["httpStatus"])}</span>"
-                    : "";
-                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(result, "id") ?? "")} <span class=\"dim\">{BookRender.EscOr(fields["outcome"], "")}</span>{code}{status}</li>";
+                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(result, "id") ?? "")} <span class=\"dim\">{BookRender.EscOr(fields["outcome"], "")}</span>{code}</li>";
             }));
             parts.Add($"<h2 id=\"results\">Results</h2>\n<ul class=\"links\">{items}</ul>");
         }
 
-        if (cases.Count > 0)
+        if (scenarios.Count > 0)
         {
-            var items = string.Concat(cases.Select(kase =>
+            var items = string.Concat(scenarios.Select(scenario =>
             {
-                var state = BookModel.CaseProof(index, BookRender.StrProp(kase, "id") ?? "").State;
-                var fields = BookRender.Fields(kase) ?? new JsonObject();
-                var detail = string.Join(" &#8594; ", new[] { fields["situation"], fields["action"], fields["expect"] }
+                var state = BookModel.ScenarioProof(index, BookRender.StrProp(scenario, "id") ?? "").State;
+                var fields = BookRender.Fields(scenario) ?? new JsonObject();
+                var detail = string.Join(" &#8594; ", new[] { fields["given"], fields["when"], fields["then"] }
                     .Where(BookRender.IsTruthy)
                     .Select(BookRender.Esc));
-                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(kase, "id") ?? "")} {ProofChip(state)}"
+                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(scenario, "id") ?? "")} {ProofChip(state)}"
                     + (detail.Length > 0 ? $"<div class=\"dim\">{detail}</div>" : "") + "</li>";
             }));
-            parts.Add($"<h2 id=\"cases\">Cases</h2>\n<ul class=\"links\">{items}</ul>");
+            parts.Add($"<h2 id=\"scenarios\">Scenarios</h2>\n<ul class=\"links\">{items}</ul>");
         }
 
         return string.Join("\n", parts);
     }
 
-    static string RenderCaseProof(BookIndex index, string rel, JsonObject record)
+    static string RenderScenarioProof(BookIndex index, string rel, JsonObject record)
     {
-        var proof = BookModel.CaseProof(index, BookRender.StrProp(record, "id") ?? "");
+        var proof = BookModel.ScenarioProof(index, BookRender.StrProp(record, "id") ?? "");
         var parts = new List<string>
         {
             $"<h2 id=\"proof\">Proof</h2>\n<p>{ProofChip(proof.State)}"
-            + (proof.Claimed ? " A test claims this case, but the claim does not hold: no proving step calls the use case, or a refusal asserts no code." : "")
+            + (proof.Claimed ? " A test claims this scenario, but the claim does not hold: no proving step calls the use case, or a refusal asserts no code." : "")
             + "</p>",
         };
         if (proof.Links.Count > 0)

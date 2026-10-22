@@ -5,7 +5,7 @@
   "title": "Retire copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/manage-copies"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/copy.copy-retired"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.copy-shelf-home"
-  ],
-  "results": [
-    "result/retire-copy.retired",
-    "result/retire-copy.copy-on-loan"
-  ],
-  "cases": [
-    "case/retire-copy.retiring-an-available-copy-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Retired",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The copy is retired."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Copy on loan",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_on_loan",
-      "httpStatus": 409,
+      "code": "lending.copy-on-loan",
       "meaning": "The copy is on loan."
     },
     {
-      "type": "case",
-      "id": "case/retire-copy.retiring-an-available-copy-succeeds",
+      "type": "scenario",
+      "id": "scenario/retire-copy.retiring-an-available-copy-succeeds",
       "title": "Retiring an available copy succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A copy sits available past weeding.",
-      "action": "The librarian retires the copy.",
+      "given": "A copy sits available past weeding.",
+      "when": "The librarian retires the copy.",
       "result": "result/retire-copy.retired",
-      "expect": "The copy is retired."
+      "then": "The copy is retired."
     }
   ]
 }

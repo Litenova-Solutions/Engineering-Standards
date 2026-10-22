@@ -7,7 +7,7 @@ namespace LiteSpec.Tests.Consumer;
 
 /// <summary>
 /// Builds the throwaway small consumer every consumer case validates: a library-style shop with
-/// one module, one business record, one use case with its results, one rule and
+/// one module, one aggregate, one use case with its results, one rule and
 /// one event, actors, roles, permissions, entry points, one requirement, one
 /// decision, and one page per page style. Every test owns its own folder.
 /// </summary>
@@ -47,7 +47,7 @@ static class ConsumerFixture
             """),
         new("docs/product/pricing.md",
             """
-            {"type":"product-topic","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","kind":"promise","statement":"Every order carries a flat fee of one euro.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}]}]}
+            {"type":"requirement-page","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","kind":"business","statement":"Every order carries a flat fee of one euro.","rationale":"One fee keeps every receipt readable.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}]}]}
             """,
             """
             # Pricing
@@ -57,7 +57,7 @@ static class ConsumerFixture
             """),
         new("docs/product/decisions/0001-launch.md",
             """
-            {"type":"decision","id":"decision/0001-launch","title":"Launch with a flat fee","owner":"fixture","status":"approved","decided":"2026-01-01","options":["A flat fee on every order.","A percentage of each order total."],"changeWhen":"The fee changes when delivery costs move.","decides":["requirement/pricing.flat-fee"],"basedOn":[]}
+            {"type":"decision","id":"decision/0001-launch","title":"Launch with a flat fee","owner":"fixture","status":"approved","decided":"2026-01-01","options":[{"name":"Flat fee","for":"Every receipt shows the same fee line.","against":"Large orders pay too little for delivery."},{"name":"Percentage","for":"Large orders carry their delivery cost.","against":"Every receipt needs its own math."}],"chosen":"Flat fee","changeWhen":"The fee changes when delivery costs move.","decides":["requirement/pricing.flat-fee"],"basedOn":[]}
             """,
             """
             # Launch with a flat fee
@@ -105,7 +105,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/permissions.md",
             """
-            {"type":"permission-list","id":"permissions","title":"Permissions","owner":"fixture","status":"approved","records":[{"type":"permission","id":"permission/cancel-order","title":"Cancel order","code":"cancel-order","codeType":"CancelOrder","meaning":"The holder cancels an order they placed."}]}
+            {"type":"permission-list","id":"permissions","title":"Permissions","owner":"fixture","status":"approved","records":[{"type":"permission","id":"permission/cancel-order","title":"Cancel order","meaning":"The holder cancels an order they placed."}]}
             """,
             """
             # Permissions
@@ -115,7 +115,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/entry-points.md",
             """
-            {"type":"entry-point-list","id":"entry-points","title":"Entry points","owner":"fixture","status":"approved","records":[{"type":"entry-point","id":"entry-point/web","title":"Web shop","kind":"web-app","path":"apps/web"}]}
+            {"type":"entry-point-list","id":"entry-points","title":"Entry points","owner":"fixture","status":"approved","records":[{"type":"entry-point","id":"entry-point/web","title":"Web shop","kind":"app","path":"apps/web"}]}
             """,
             """
             # Entry points
@@ -135,7 +135,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/modules/orders/order-claims/README.md",
             """
-            {"type":"business-record","id":"business-record/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","codeName":"OrderClaim","states":["Draft","Canceled"],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"checked-before","enforcedBy":"validator","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","meaning":"An order claim was canceled.","carries":["orderId"]}]}
+            {"type":"aggregate","id":"aggregate/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","states":[{"name":"Draft","meaning":"The claim is open for changes."},{"name":"Canceled","meaning":"The customer canceled the claim."}],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"precondition","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","meaning":"An order claim was canceled.","carries":["orderId"]}]}
             """,
             """
             # Order claim
@@ -145,7 +145,7 @@ static class ConsumerFixture
             """),
         new("docs/domain/modules/orders/cancel-order.md",
             """
-            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","operation":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","outcome":"success","httpStatus":200,"meaning":"The order claim was canceled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"failure/orders.cancel-refused","httpStatus":409,"meaning":"The shipment already left, so the cancel is refused."}]}
+            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","kind":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","outcome":"success","meaning":"The order claim was canceled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"orders.cancel-refused","meaning":"The shipment already left, so the cancel is refused."}]}
             """,
             """
             # Cancel order
@@ -293,7 +293,7 @@ static class ConsumerFixture
             """),
     ];
 
-    const string LanguageJsonText = """
+    const string GlossaryJsonText = """
         {"schemaVersion":2,"terms":[{"id":"term/order-claim","term":"order claim","meaning":"A claim stating what a customer ordered from the shop.","labels":{"nl":"orderclaim","de":"Bestellanspruch"},"rejected":[{"word":"orderclaim","reason":"the words stay separate."}],"owner":"fixture","status":"approved"}],"mannered":[{"term":"load-bearing","instead":"required"}]}
         """;
 
@@ -352,7 +352,7 @@ static class ConsumerFixture
             WriteFile(folder.Path, page.Relative, Page(Meta(page.Meta), page.Body));
         }
 
-        WriteFile(folder.Path, "docs/language.json", $"{Stringify(Meta(LanguageJsonText))}\n");
+        WriteFile(folder.Path, "docs/glossary.json", $"{Stringify(Meta(GlossaryJsonText))}\n");
         return folder;
     }
 

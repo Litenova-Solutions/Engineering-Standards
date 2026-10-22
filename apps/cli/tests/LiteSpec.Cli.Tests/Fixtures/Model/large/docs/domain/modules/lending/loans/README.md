@@ -1,15 +1,23 @@
 ---
 {
-  "type": "business-record",
-  "id": "business-record/lending.loan",
+  "type": "aggregate",
+  "id": "aggregate/lending.loan",
   "title": "Loan",
   "owner": "lending-team",
   "status": "approved",
-  "codeName": "Loan",
   "states": [
-    "Active",
-    "Returned",
-    "Overdue"
+    {
+      "name": "Active",
+      "meaning": "The loan is open."
+    },
+    {
+      "name": "Returned",
+      "meaning": "The copy came back."
+    },
+    {
+      "name": "Overdue",
+      "meaning": "The loan passed its due date."
+    }
   ],
   "records": [
     {
@@ -18,8 +26,7 @@
       "title": "Has one borrower",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "always-true",
-      "enforcedBy": "aggregate",
+      "kind": "invariant",
       "statement": "A loan has one borrower.",
       "governs": [
         "use-case/lending.borrow-copy"
@@ -36,8 +43,7 @@
       "title": "Borrowed copy never leaves unscanned",
       "owner": "lending-team",
       "status": "approved",
-      "kind": "checked-before",
-      "enforcedBy": "validator",
+      "kind": "precondition",
       "statement": "A borrowed copy never leaves unscanned.",
       "governs": [
         "use-case/lending.borrow-copy"

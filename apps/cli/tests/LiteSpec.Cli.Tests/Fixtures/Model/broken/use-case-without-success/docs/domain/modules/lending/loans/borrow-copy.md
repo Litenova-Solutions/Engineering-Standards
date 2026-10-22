@@ -5,7 +5,7 @@
   "title": "Borrow copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,15 +16,8 @@
   "raises": [
     "event/loan.loan-borrowed"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
-  ],
-  "results": [
-    "result/borrow-copy.copy-unavailable"
-  ],
-  "cases": [
-    "case/borrow-copy.borrowing-an-available-copy-succeeds"
   ],
   "records": [
     {
@@ -33,20 +26,19 @@
       "title": "Copy unavailable",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_not_available",
-      "httpStatus": 409,
+      "code": "lending.copy-not-available",
       "meaning": "The copy is unavailable."
     },
     {
-      "type": "case",
-      "id": "case/borrow-copy.borrowing-an-available-copy-succeeds",
+      "type": "scenario",
+      "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
       "title": "Borrowing an available copy succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A copy sits available on its shelf.",
-      "action": "The reader borrows the copy.",
+      "given": "A copy sits available on its shelf.",
+      "when": "The reader borrows the copy.",
       "result": "result/borrow-copy.copy-unavailable",
-      "expect": "The refusal names the code."
+      "then": "The refusal names the code."
     }
   ]
 }

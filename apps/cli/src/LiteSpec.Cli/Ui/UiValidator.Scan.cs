@@ -189,7 +189,7 @@ static partial class UiValidator
                 {
                     if (dependencies.TryGetValue(name, out var dependency) && Truthy(dependency))
                     {
-                        Errors.Add($"[litespec/frontend/ui#select-one-visual-authority] {label}: second general-purpose visual dependency '{name}' requires an exception");
+                        Errors.Add($"[litespec/frontend/ui#select-one-visual-authority] {label}: second general-purpose visual dependency '{name}' requires a deviation");
                     }
                 }
 

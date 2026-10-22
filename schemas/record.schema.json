@@ -5,6 +5,7 @@
   "description": "The JSON frontmatter block opening a consumer documentation page: one page record or one page style, with the entry records it carries.",
   "oneOf": [
     { "$ref": "#/$defs/productPage" },
+    { "$ref": "#/$defs/goalPage" },
     { "$ref": "#/$defs/constraintPage" },
     { "$ref": "#/$defs/researchPage" },
     { "$ref": "#/$defs/decisionPage" },
@@ -14,12 +15,13 @@
     { "$ref": "#/$defs/rolePage" },
     { "$ref": "#/$defs/journeyPage" },
     { "$ref": "#/$defs/modulePage" },
-    { "$ref": "#/$defs/businessRecordPage" },
+    { "$ref": "#/$defs/aggregatePage" },
     { "$ref": "#/$defs/useCasePage" },
+    { "$ref": "#/$defs/externalSystemPage" },
     { "$ref": "#/$defs/runbookPage" },
-    { "$ref": "#/$defs/exceptionPage" },
+    { "$ref": "#/$defs/deviationPage" },
     { "$ref": "#/$defs/knownGapPage" },
-    { "$ref": "#/$defs/productTopicPage" },
+    { "$ref": "#/$defs/requirementPage" },
     { "$ref": "#/$defs/permissionListPage" },
     { "$ref": "#/$defs/entryPointListPage" },
     { "$ref": "#/$defs/limitSetPage" },
@@ -31,12 +33,16 @@
     { "$ref": "#/$defs/commandPage" },
     { "$ref": "#/$defs/configurationPage" },
     { "$ref": "#/$defs/glossaryPage" },
-    { "$ref": "#/$defs/scenarioCastPage" }
+    { "$ref": "#/$defs/exampleCastPage" }
   ],
   "$defs": {
     "productId": {
       "type": "string",
       "pattern": "^product/[a-z0-9][a-z0-9-]*$"
+    },
+    "goalId": {
+      "type": "string",
+      "pattern": "^goal/[a-z0-9][a-z0-9-]*$"
     },
     "constraintId": {
       "type": "string",
@@ -82,9 +88,9 @@
       "type": "string",
       "pattern": "^module/[a-z0-9][a-z0-9-]*$"
     },
-    "businessRecordId": {
+    "aggregateId": {
       "type": "string",
-      "pattern": "^business-record/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      "pattern": "^aggregate/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "ruleId": {
       "type": "string",
@@ -98,9 +104,9 @@
       "type": "string",
       "pattern": "^result/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
-    "caseId": {
+    "scenarioId": {
       "type": "string",
-      "pattern": "^case/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
+      "pattern": "^scenario/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "eventId": {
       "type": "string",
@@ -110,6 +116,10 @@
       "type": "string",
       "pattern": "^entry-point/[a-z0-9][a-z0-9-]*$"
     },
+    "externalSystemId": {
+      "type": "string",
+      "pattern": "^external-system/[a-z0-9][a-z0-9-]*$"
+    },
     "limitId": {
       "type": "string",
       "pattern": "^limit/[a-z0-9][a-z0-9-]*$"
@@ -118,13 +128,9 @@
       "type": "string",
       "pattern": "^runbook/[a-z0-9][a-z0-9-]*$"
     },
-    "projectStandardId": {
+    "deviationId": {
       "type": "string",
-      "pattern": "^standard/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
-    },
-    "exceptionId": {
-      "type": "string",
-      "pattern": "^exception/[a-z0-9][a-z0-9-]*$"
+      "pattern": "^deviation/[a-z0-9][a-z0-9-]*$"
     },
     "knownGapId": {
       "type": "string",
@@ -134,9 +140,9 @@
       "type": "string",
       "pattern": "^term/[a-z0-9][a-z0-9-]*$"
     },
-    "failureCode": {
+    "refusalCode": {
       "type": "string",
-      "pattern": "^failure/[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9_-]*$"
+      "pattern": "^[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$"
     },
     "standardsProvisionId": {
       "type": "string",
@@ -198,6 +204,16 @@
       "uniqueItems": true,
       "items": { "$ref": "#/$defs/problemId" }
     },
+    "goalIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/goalId" }
+    },
+    "featureIdArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/featureId" }
+    },
     "requirementIdArray": {
       "type": "array",
       "uniqueItems": true,
@@ -221,29 +237,14 @@
     "decidesArray": {
       "type": "array",
       "uniqueItems": true,
-      "items": {
-        "anyOf": [
-          { "$ref": "#/$defs/requirementId" },
-          { "$ref": "#/$defs/featureId" },
-          { "$ref": "#/$defs/ruleId" },
-          { "$ref": "#/$defs/constraintId" },
-          { "$ref": "#/$defs/permissionId" },
-          { "$ref": "#/$defs/roleId" },
-          { "$ref": "#/$defs/actorId" },
-          { "$ref": "#/$defs/exceptionId" },
-          { "$ref": "#/$defs/projectStandardId" },
-          { "$ref": "#/$defs/entryPointId" },
-          { "$ref": "#/$defs/limitId" },
-          { "$ref": "#/$defs/decisionId" }
-        ]
-      }
+      "items": { "$ref": "#/$defs/genericRecordId" }
     },
     "governsArray": {
       "type": "array",
       "uniqueItems": true,
       "items": {
         "anyOf": [
-          { "$ref": "#/$defs/businessRecordId" },
+          { "$ref": "#/$defs/aggregateId" },
           { "$ref": "#/$defs/useCaseId" }
         ]
       }
@@ -251,17 +252,11 @@
     "refusalValue": {
       "anyOf": [
         { "$ref": "#/$defs/resultId" },
-        { "$ref": "#/$defs/failureCode" }
+        { "$ref": "#/$defs/refusalCode" }
       ]
     },
     "limitValue": {
       "anyOf": [{ "type": "string" }, { "type": "number" }]
-    },
-    "standardRef": {
-      "anyOf": [
-        { "$ref": "#/$defs/standardsProvisionId" },
-        { "$ref": "#/$defs/projectStandardId" }
-      ]
     },
     "holdItem": {
       "type": "object",
@@ -279,7 +274,8 @@
       "properties": {
         "useCase": { "$ref": "#/$defs/useCaseId" },
         "actor": { "$ref": "#/$defs/actorId" },
-        "requires": { "$ref": "#/$defs/genericIdArray" }
+        "requires": { "$ref": "#/$defs/genericIdArray" },
+        "gives": { "$ref": "#/$defs/nonEmptyString" }
       }
     },
     "researchSource": {
@@ -291,7 +287,7 @@
         "read": { "$ref": "#/$defs/isoDate" }
       }
     },
-    "promiseValue": {
+    "businessValue": {
       "type": "object",
       "additionalProperties": false,
       "required": ["value", "effectiveFrom"],
@@ -299,6 +295,77 @@
         "value": { "$ref": "#/$defs/nonEmptyString" },
         "effectiveFrom": { "$ref": "#/$defs/isoDate" }
       }
+    },
+    "stateEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "meaning"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "decisionOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "for", "against"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "for": { "$ref": "#/$defs/nonEmptyString" },
+        "against": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "transitionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/nonEmptyString" },
+        "to": { "$ref": "#/$defs/nonEmptyString" },
+        "by": { "$ref": "#/$defs/useCaseId" }
+      }
+    },
+    "aggregateData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "meaning", "classification"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "meaning": { "$ref": "#/$defs/nonEmptyString" },
+        "classification": { "enum": ["public", "internal", "personal", "sensitive"] }
+      }
+    },
+    "questionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "decider", "decideBy"],
+      "properties": {
+        "question": { "$ref": "#/$defs/nonEmptyString" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" }
+      }
+    },
+    "questionsArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/questionEntry" }
+    },
+    "triggerObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "events": { "$ref": "#/$defs/eventIdArray" },
+        "schedule": { "$ref": "#/$defs/nonEmptyString" },
+        "deadline": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "triggerValue": {
+      "anyOf": [
+        { "$ref": "#/$defs/nonEmptyString" },
+        { "$ref": "#/$defs/eventId" },
+        { "$ref": "#/$defs/eventIdArray" },
+        { "$ref": "#/$defs/triggerObject" }
+      ]
     },
     "useCaseInput": {
       "type": "object",
@@ -323,11 +390,10 @@
           { "$ref": "#/$defs/permissionEntry" },
           { "$ref": "#/$defs/ruleEntry" },
           { "$ref": "#/$defs/resultEntry" },
-          { "$ref": "#/$defs/caseEntry" },
+          { "$ref": "#/$defs/scenarioEntry" },
           { "$ref": "#/$defs/eventEntry" },
           { "$ref": "#/$defs/entryPointEntry" },
-          { "$ref": "#/$defs/limitEntry" },
-          { "$ref": "#/$defs/standardEntry" }
+          { "$ref": "#/$defs/limitEntry" }
         ]
       }
     },
@@ -344,29 +410,35 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "kind": { "enum": ["promise", "behavior", "quality", "target", "practice"] },
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "kind": { "enum": ["functional", "quality", "business"] },
         "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "rationale": { "$ref": "#/$defs/nonEmptyString" },
         "values": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/promiseValue" }
+          "items": { "$ref": "#/$defs/businessValue" }
         },
         "measure": { "$ref": "#/$defs/nonEmptyString" },
         "by": { "$ref": "#/$defs/nonEmptyString" },
-        "deliveredBy": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": { "type": "string", "pattern": "^feature/[a-z0-9]+(-[a-z0-9]+)*$" }
-        },
+        "feature": { "$ref": "#/$defs/featureIdArray" },
         "basedOn": { "$ref": "#/$defs/basedOnArray" }
       },
       "allOf": [
         {
           "if": {
             "required": ["kind"],
-            "properties": { "kind": { "const": "target" } }
+            "properties": { "kind": { "const": "business" } }
           },
-          "then": { "required": ["measure", "by"] }
+          "then": { "required": ["values"] }
+        },
+        {
+          "if": { "required": ["measure"] },
+          "then": { "required": ["by"] }
+        },
+        {
+          "if": { "required": ["by"] },
+          "then": { "required": ["measure"] }
         },
         {
           "if": {
@@ -380,7 +452,7 @@
     "permissionEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "code", "codeType", "meaning"],
+      "required": ["type", "id", "title", "meaning"],
       "properties": {
         "type": { "const": "permission" },
         "id": { "$ref": "#/$defs/permissionId" },
@@ -390,14 +462,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "code": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*$"
-        },
-        "codeType": {
-          "type": "string",
-          "pattern": "^[A-Z][A-Za-z0-9]*$"
-        },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "meaning": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
@@ -413,7 +478,7 @@
     "ruleEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "kind", "enforcedBy", "statement"],
+      "required": ["type", "id", "title", "kind", "statement"],
       "properties": {
         "type": { "const": "rule" },
         "id": { "$ref": "#/$defs/ruleId" },
@@ -423,8 +488,8 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "kind": { "enum": ["always-true", "checked-before", "across-records"] },
-        "enforcedBy": { "enum": ["validator", "aggregate", "store", "guard", "reaction"] },
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "kind": { "enum": ["invariant", "precondition", "calculation", "cross-aggregate"] },
         "statement": { "$ref": "#/$defs/nonEmptyString" },
         "governs": { "$ref": "#/$defs/governsArray" },
         "refusal": { "$ref": "#/$defs/refusalValue" },
@@ -451,10 +516,10 @@
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
         "status": { "$ref": "#/$defs/status" },
-        "httpStatus": { "type": "integer", "minimum": 200, "maximum": 599 },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "outcome": { "enum": ["success", "refusal"] },
-        "code": { "$ref": "#/$defs/failureCode" },
+        "code": { "$ref": "#/$defs/refusalCode" },
         "meaning": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
@@ -467,23 +532,28 @@
         }
       ]
     },
-    "caseEntry": {
+    "scenarioEntry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "situation", "action", "result", "expect"],
+      "required": ["type", "id", "title", "given", "when", "then", "result"],
       "properties": {
-        "type": { "const": "case" },
-        "id": { "$ref": "#/$defs/caseId" },
+        "type": { "const": "scenario" },
+        "id": { "$ref": "#/$defs/scenarioId" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
         "status": { "$ref": "#/$defs/status" },
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "situation": { "$ref": "#/$defs/nonEmptyString" },
-        "action": { "$ref": "#/$defs/nonEmptyString" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "given": { "$ref": "#/$defs/nonEmptyString" },
+        "when": { "$ref": "#/$defs/nonEmptyString" },
+        "then": { "$ref": "#/$defs/nonEmptyString" },
         "result": { "$ref": "#/$defs/resultId" },
-        "expect": { "$ref": "#/$defs/nonEmptyString" }
+        "examples": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
       },
       "allOf": [
         {
@@ -508,6 +578,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "meaning": { "$ref": "#/$defs/nonEmptyString" },
         "carries": {
           "type": "array",
@@ -538,9 +609,9 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
-        "kind": { "enum": ["web-app", "public-api", "cli", "mcp-server", "site", "reaction", "job"] },
-        "path": { "$ref": "#/$defs/nonEmptyString" },
-        "offers": { "$ref": "#/$defs/permissionIdArray" }
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "kind": { "enum": ["app", "api", "cli", "job", "reaction"] },
+        "path": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
         {
@@ -565,34 +636,10 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "bound": { "$ref": "#/$defs/nonEmptyString" },
         "value": { "$ref": "#/$defs/limitValue" },
         "runbook": { "$ref": "#/$defs/runbookId" }
-      },
-      "allOf": [
-        {
-          "if": {
-            "required": ["status"],
-            "properties": { "status": { "const": "draft" } }
-          },
-          "then": { "required": ["decider", "decideBy"] }
-        }
-      ]
-    },
-    "standardEntry": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "id", "title"],
-      "properties": {
-        "type": { "const": "standard" },
-        "id": { "$ref": "#/$defs/projectStandardId" },
-        "title": { "$ref": "#/$defs/nonEmptyString" },
-        "owner": { "$ref": "#/$defs/ownerName" },
-        "status": { "$ref": "#/$defs/status" },
-        "decider": { "$ref": "#/$defs/ownerName" },
-        "decideBy": { "$ref": "#/$defs/isoDate" },
-        "terms": { "$ref": "#/$defs/termIdArray" },
-        "statement": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
         {
@@ -617,6 +664,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "boundary": { "$ref": "#/$defs/nonEmptyString" },
         "neverDoes": {
@@ -636,10 +684,40 @@
         }
       ]
     },
+    "goalPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "statement", "measure", "target", "by"],
+      "properties": {
+        "type": { "const": "goal" },
+        "id": { "$ref": "#/$defs/goalId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "measure": { "$ref": "#/$defs/nonEmptyString" },
+        "target": { "$ref": "#/$defs/nonEmptyString" },
+        "by": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
     "constraintPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status", "source", "applies", "appliesBecause"],
+      "required": ["type", "id", "title", "owner", "status", "source", "category", "applies", "appliesBecause"],
       "properties": {
         "type": { "const": "constraint" },
         "id": { "$ref": "#/$defs/constraintId" },
@@ -649,8 +727,10 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "source": { "$ref": "#/$defs/nonEmptyString" },
+        "category": { "enum": ["technical", "organizational", "convention"] },
         "applies": { "type": "boolean" },
         "appliesBecause": { "$ref": "#/$defs/nonEmptyString" }
       },
@@ -677,6 +757,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "sources": {
           "type": "array",
@@ -709,13 +790,15 @@
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "replaces": { "$ref": "#/$defs/decisionId" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "decided": { "$ref": "#/$defs/isoDate" },
         "options": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/nonEmptyString" }
+          "items": { "$ref": "#/$defs/decisionOption" }
         },
+        "chosen": { "$ref": "#/$defs/nonEmptyString" },
         "changeWhen": { "$ref": "#/$defs/nonEmptyString" },
         "decides": { "$ref": "#/$defs/decidesArray" },
         "basedOn": { "$ref": "#/$defs/basedOnArray" }
@@ -733,7 +816,7 @@
             "required": ["status"],
             "properties": { "status": { "const": "approved" } }
           },
-          "then": { "required": ["decided"] }
+          "then": { "required": ["decided", "chosen"] }
         }
       ]
     },
@@ -750,6 +833,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "affects": { "$ref": "#/$defs/actorIdArray" },
         "statement": { "$ref": "#/$defs/nonEmptyString" }
@@ -777,10 +861,13 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "state": { "enum": ["planned", "shipped", "later", "refused"] },
         "solves": { "$ref": "#/$defs/problemIdArray" },
-        "refusedBecause": { "$ref": "#/$defs/nonEmptyString" }
+        "serves": { "$ref": "#/$defs/goalIdArray" },
+        "refusedBecause": { "$ref": "#/$defs/nonEmptyString" },
+        "by": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
         {
@@ -796,6 +883,13 @@
             "properties": { "state": { "const": "refused" } }
           },
           "then": { "required": ["refusedBecause"] }
+        },
+        {
+          "if": {
+            "required": ["state"],
+            "properties": { "state": { "const": "planned" } }
+          },
+          "then": { "required": ["by"] }
         }
       ]
     },
@@ -812,8 +906,9 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "kind": { "enum": ["person", "company", "provider", "system", "guest"] },
+        "kind": { "enum": ["person", "organization", "system"] },
         "holds": {
           "type": "array",
           "uniqueItems": true,
@@ -843,6 +938,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "scope": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
         "allows": { "$ref": "#/$defs/permissionIdArray" }
@@ -870,6 +966,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "actor": { "$ref": "#/$defs/actorId" },
         "goal": { "$ref": "#/$defs/nonEmptyString" },
@@ -903,7 +1000,9 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
         "dependsOn": { "$ref": "#/$defs/moduleIdArray" }
       },
       "allOf": [
@@ -916,25 +1015,36 @@
         }
       ]
     },
-    "businessRecordPage": {
+    "aggregatePage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status", "codeName", "states"],
+      "required": ["type", "id", "title", "owner", "status", "states"],
       "properties": {
-        "type": { "const": "business-record" },
-        "id": { "$ref": "#/$defs/businessRecordId" },
+        "type": { "const": "aggregate" },
+        "id": { "$ref": "#/$defs/aggregateId" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
         "status": { "$ref": "#/$defs/status" },
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "codeName": { "$ref": "#/$defs/nonEmptyString" },
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
         "states": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/nonEmptyString" }
+          "items": { "$ref": "#/$defs/stateEntry" }
+        },
+        "transitions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/transitionEntry" }
+        },
+        "data": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/aggregateData" }
         }
       },
       "allOf": [
@@ -950,7 +1060,7 @@
     "useCasePage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status", "operation"],
+      "required": ["type", "id", "title", "owner", "status", "kind"],
       "properties": {
         "type": { "const": "use-case" },
         "id": { "$ref": "#/$defs/useCaseId" },
@@ -960,15 +1070,21 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "operation": { "enum": ["command", "query"] },
+        "kind": { "enum": ["command", "query", "reaction"] },
         "needs": { "$ref": "#/$defs/permissionIdArray" },
         "anonymous": { "type": "boolean" },
         "reachedThrough": { "$ref": "#/$defs/entryPointIdArray" },
         "raises": { "$ref": "#/$defs/eventIdArray" },
-        "reactsTo": { "$ref": "#/$defs/eventIdArray" },
+        "trigger": { "$ref": "#/$defs/triggerValue" },
         "fulfills": { "$ref": "#/$defs/requirementIdArray" },
         "input": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/useCaseInput" }
+        },
+        "output": {
           "type": "array",
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/useCaseInput" }
@@ -984,10 +1100,48 @@
         }
       ]
     },
+    "externalSystemPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "title", "owner", "status", "actor"],
+      "properties": {
+        "type": { "const": "external-system" },
+        "id": { "$ref": "#/$defs/externalSystemId" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/ownerName" },
+        "status": { "$ref": "#/$defs/status" },
+        "decider": { "$ref": "#/$defs/ownerName" },
+        "decideBy": { "$ref": "#/$defs/isoDate" },
+        "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
+        "records": { "$ref": "#/$defs/recordsArray" },
+        "actor": { "$ref": "#/$defs/actorId" },
+        "sends": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "receives": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "failure": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["status"],
+            "properties": { "status": { "const": "draft" } }
+          },
+          "then": { "required": ["decider", "decideBy"] }
+        }
+      ]
+    },
     "runbookPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status"],
+      "required": ["type", "id", "title", "owner", "status", "trigger"],
       "properties": {
         "type": { "const": "runbook" },
         "id": { "$ref": "#/$defs/runbookId" },
@@ -997,9 +1151,10 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "limit": { "$ref": "#/$defs/limitId" },
-        "trigger": { "$ref": "#/$defs/nonEmptyString" }
+        "trigger": { "$ref": "#/$defs/nonEmptyString" },
+        "severity": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
         {
@@ -1008,27 +1163,25 @@
             "properties": { "status": { "const": "draft" } }
           },
           "then": { "required": ["decider", "decideBy"] }
-        },
-        {
-          "anyOf": [{ "required": ["limit"] }, { "required": ["trigger"] }]
         }
       ]
     },
-    "exceptionPage": {
+    "deviationPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status", "standard", "reason", "reviewBy", "removeWhen"],
+      "required": ["type", "id", "title", "owner", "status", "provision", "reason", "reviewBy", "removeWhen"],
       "properties": {
-        "type": { "const": "exception" },
-        "id": { "$ref": "#/$defs/exceptionId" },
+        "type": { "const": "deviation" },
+        "id": { "$ref": "#/$defs/deviationId" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
         "status": { "$ref": "#/$defs/status" },
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
-        "standard": { "$ref": "#/$defs/standardRef" },
+        "provision": { "$ref": "#/$defs/standardsProvisionId" },
         "reason": { "$ref": "#/$defs/nonEmptyString" },
         "reviewBy": { "$ref": "#/$defs/isoDate" },
         "removeWhen": { "$ref": "#/$defs/nonEmptyString" }
@@ -1056,6 +1209,7 @@
         "decider": { "$ref": "#/$defs/ownerName" },
         "decideBy": { "$ref": "#/$defs/isoDate" },
         "terms": { "$ref": "#/$defs/termIdArray" },
+        "questions": { "$ref": "#/$defs/questionsArray" },
         "records": { "$ref": "#/$defs/recordsArray" },
         "check": { "$ref": "#/$defs/nonEmptyString" },
         "subject": { "$ref": "#/$defs/genericIdArray" },
@@ -1072,12 +1226,12 @@
         }
       ]
     },
-    "productTopicPage": {
+    "requirementPage": {
       "type": "object",
       "additionalProperties": false,
       "required": ["type"],
       "properties": {
-        "type": { "const": "product-topic" },
+        "type": { "const": "requirement-page" },
         "id": { "$ref": "#/$defs/nonEmptyString" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },
@@ -1265,12 +1419,12 @@
         "records": { "$ref": "#/$defs/recordsArray" }
       }
     },
-    "scenarioCastPage": {
+    "exampleCastPage": {
       "type": "object",
       "additionalProperties": false,
       "required": ["type"],
       "properties": {
-        "type": { "const": "scenario-cast" },
+        "type": { "const": "example-cast" },
         "id": { "$ref": "#/$defs/nonEmptyString" },
         "title": { "$ref": "#/$defs/nonEmptyString" },
         "owner": { "$ref": "#/$defs/ownerName" },

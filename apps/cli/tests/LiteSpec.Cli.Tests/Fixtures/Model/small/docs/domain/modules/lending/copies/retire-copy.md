@@ -5,7 +5,7 @@
   "title": "Retire copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/manage-copies"
   ],
@@ -16,15 +16,9 @@
   "raises": [
     "event/copy.copy-retired"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.copy-shelf-home"
   ],
-  "results": [
-    "result/retire-copy.retired",
-    "result/retire-copy.copy-on-loan"
-  ],
-  "cases": [],
   "records": [
     {
       "type": "result",
@@ -32,7 +26,6 @@
       "title": "Retired",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The copy is retired."
     },
     {
@@ -41,8 +34,7 @@
       "title": "Copy on loan",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.copy_on_loan",
-      "httpStatus": 409,
+      "code": "lending.copy-on-loan",
       "meaning": "The copy is on loan."
     }
   ]

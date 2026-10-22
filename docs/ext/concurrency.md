@@ -8,7 +8,7 @@ Concurrency and idempotency rules stop overlapping writes from silently overwrit
 
 Activation scope: `local`.
 
-Applicable specification kinds: `module`, `business-record`, `use-case`.
+Applicable specification kinds: `module`, `aggregate`, `use-case`.
 
 The consumer enables `concurrency` when accepted writes can conflict with each other, or when a retry can duplicate an irreversible or externally visible effect.
 

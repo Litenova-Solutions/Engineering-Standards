@@ -5,7 +5,7 @@
   "title": "Return copy",
   "owner": "lending-team",
   "status": "approved",
-  "operation": "command",
+  "kind": "command",
   "needs": [
     "permission/borrow-copy"
   ],
@@ -16,16 +16,8 @@
   "raises": [
     "event/loan.loan-returned"
   ],
-  "reactsTo": [],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
-  ],
-  "results": [
-    "result/return-copy.returned",
-    "result/return-copy.loan-inactive"
-  ],
-  "cases": [
-    "case/return-copy.returning-a-borrowed-copy-succeeds"
   ],
   "records": [
     {
@@ -34,7 +26,6 @@
       "title": "Returned",
       "owner": "lending-team",
       "outcome": "success",
-      "httpStatus": 200,
       "meaning": "The copy is returned."
     },
     {
@@ -43,20 +34,19 @@
       "title": "Loan inactive",
       "owner": "lending-team",
       "outcome": "refusal",
-      "code": "failure/lending.loan_never_existed",
-      "httpStatus": 409,
+      "code": "lending.loan-never-existed",
       "meaning": "The loan is inactive."
     },
     {
-      "type": "case",
-      "id": "case/return-copy.returning-a-borrowed-copy-succeeds",
+      "type": "scenario",
+      "id": "scenario/return-copy.returning-a-borrowed-copy-succeeds",
       "title": "Returning a borrowed copy succeeds",
       "owner": "lending-team",
       "status": "approved",
-      "situation": "A reader holds an active loan.",
-      "action": "The reader returns the copy.",
+      "given": "A reader holds an active loan.",
+      "when": "The reader returns the copy.",
       "result": "result/return-copy.returned",
-      "expect": "The loan is returned."
+      "then": "The loan is returned."
     }
   ]
 }
