@@ -18,7 +18,7 @@ static partial class BookPages
                 ? StatusCells(BookModel.UseCaseStatus(index, BookRender.StrProp(record, "id")))
                 : "";
             return $"<tr><td><a href=\"{rel}{BookModel.RecordUrl(BookRender.StrProp(record, "id") ?? "")}\">{BookRender.Esc(record["title"])}</a>"
-                + $"<div class=\"mono dim\">{BookRender.Esc(record["id"])}</div></td>"
+                + $"<div class=\"mono dim dev-only\">{BookRender.Esc(record["id"])}</div></td>"
                 + $"<td data-value=\"{BookRender.Esc(status)}\">{BookRender.StatusChip(status)}</td>"
                 + $"<td>{BookRender.EscOr(record["owner"], "")}</td>{extra}</tr>";
         }));
@@ -82,7 +82,7 @@ static partial class BookPages
             {
                 var name = hold.Role is not null
                     ? $"<a href=\"{rel}{BookModel.RecordUrl(BookRender.StrProp(hold.Role, "id") ?? "")}\">{BookRender.Esc(hold.Role["title"])}</a>"
-                    : $"<code>{BookRender.Esc(hold.Hold["role"])}</code>";
+                    : $"<span>Unknown role</span> <span class=\"mono dim dev-only\">{BookRender.Esc(hold.Hold["role"])}</span>";
                 return $"<tr><td>{name}</td><td>{BookRender.EscOr(hold.Hold["scope"], "")}</td></tr>";
             }));
             parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Role</th><th>Scope</th></tr></thead><tbody>{rows}</tbody></table></div>");
@@ -122,20 +122,21 @@ static partial class BookPages
         return string.Join("\n", parts);
     }
 
-    /// <summary>Renders the review page: known gaps, drafts, findings and covered findings.</summary>
+    /// <summary>Renders the review page: known gaps, drafts, questions, findings and covered findings.</summary>
     public static string RenderReview(BookIndex index, string rel, ReviewBundle review, string generatedDate)
     {
         var parts = new List<string>();
         parts.Add(BookRender.PageHeader(
             "Review",
             "Review",
-            $"Known gaps, drafts awaiting a decision, and check findings, as of {(generatedDate.Length >= 10 ? generatedDate[..10] : generatedDate)}.",
+            $"Known gaps, drafts awaiting a decision, open questions, and check findings, as of {(generatedDate.Length >= 10 ? generatedDate[..10] : generatedDate)}.",
             [
                 ("Known gaps", $"<b>{review.Gaps.Count}</b>"),
                 ("Drafts", $"<b>{review.WithDecider.Count + review.WithoutDecider.Count}</b>"),
+                ("Open questions", $"<b>{review.Questions.Count}</b>"),
                 ("Findings", $"<b>{review.Findings.Count}</b>"),
             ]));
-        parts.Add("<h2 id=\"gaps\">Known gaps</h2>");
+        parts.Add("<h2 id=\"gaps\">Known Gaps</h2>");
         if (review.Gaps.Count > 0)
         {
             var items = string.Concat(review.Gaps.Select(gap =>
@@ -147,7 +148,7 @@ static partial class BookPages
                     + $"<div class=\"t\">{(gap.Expired ? "Expired: " : "")}<a href=\"{rel}{BookModel.RecordUrl(BookRender.StrProp(gap.Record, "id") ?? "")}\">{BookRender.Esc(gap.Record["title"])}</a></div>"
                     + $"<div class=\"m\"><span>Owner {BookRender.EscOr(gap.Record["owner"], "none")}</span>"
                     + $"<span>Ends {BookRender.EscOr(fields["endsBy"], "no date")}</span>"
-                    + $"<span>Check <code>{BookRender.EscOr(fields["check"], "")}</code></span></div>"
+                    + $"<span class=\"dev-only\">Check <code>{BookRender.EscOr(fields["check"], "")}</code></span></div>"
                     + (BookRender.IsTruthy(fields["reason"]) ? $"<p class=\"d\">{BookRender.Esc(fields["reason"])}</p>" : "")
                     + (subjectLinks.Length > 0 ? $"<p class=\"d\">About {subjectLinks}</p>" : "")
                     + "</div></div>";
@@ -159,7 +160,7 @@ static partial class BookPages
             parts.Add("<p>No known gap is recorded.</p>");
         }
 
-        parts.Add("<h2 id=\"drafts\">Drafts awaiting a decision</h2>");
+        parts.Add("<h2 id=\"drafts\">Drafts Awaiting a Decision</h2>");
         var drafts = review.WithDecider.Concat(review.WithoutDecider).ToList();
         if (drafts.Count > 0)
         {
@@ -167,16 +168,34 @@ static partial class BookPages
             {
                 var fields = BookRender.Fields(record);
                 return $"<tr><td><a href=\"{rel}{BookModel.RecordUrl(BookRender.StrProp(record, "id") ?? "")}\">{BookRender.Esc(record["title"])}</a>"
-                    + $"<div class=\"mono dim\">{BookRender.Esc(record["id"])}</div></td>"
+                    + $"<div class=\"mono dim dev-only\">{BookRender.Esc(record["id"])}</div></td>"
                     + $"<td>{BookRender.Esc(BookModel.TypeLabel(BookRender.StrProp(record, "type")))}</td>"
                     + $"<td>{BookRender.EscOr(fields?["decider"], "no decider")}</td>"
                     + $"<td>{BookRender.EscOr(fields?["decideBy"], "no date")}</td></tr>";
             }));
-            parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Record</th><th>Type</th><th>Decider</th><th>Decide by</th></tr></thead><tbody>{rows}</tbody></table></div>");
+            parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Record</th><th>Type</th><th>Decider</th><th>Decide By</th></tr></thead><tbody>{rows}</tbody></table></div>");
         }
         else
         {
             parts.Add("<p>No draft awaits a decision.</p>");
+        }
+
+        parts.Add("<h2 id=\"questions\">Open Questions</h2>");
+        if (review.Questions.Count > 0)
+        {
+            var rows = string.Concat(review.Questions.Select(question =>
+            {
+                var id = BookRender.StrProp(question.Record, "id") ?? "";
+                return $"<tr><td><a href=\"{rel}{BookModel.RecordUrl(id)}\">{BookRender.Esc(question.Record["title"])}</a></td>"
+                    + $"<td>{BookRender.Esc(question.Question)}</td>"
+                    + $"<td>{BookRender.Esc(question.Decider ?? "no decider")}</td>"
+                    + $"<td>{BookRender.Esc(question.DecideBy ?? "no date")}</td></tr>";
+            }));
+            parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Record</th><th>Question</th><th>Decider</th><th>Decide By</th></tr></thead><tbody>{rows}</tbody></table></div>");
+        }
+        else
+        {
+            parts.Add("<p>No open question is recorded.</p>");
         }
 
         parts.Add("<h2 id=\"findings\">Findings</h2>");
@@ -188,8 +207,8 @@ static partial class BookPages
                     && BookRender.StrProp(finding, "subject") is { } id && index.ById.ContainsKey(id)
                     ? $"<p class=\"d\">About {BookRender.RecordLink(index, rel, id)}</p>" : "";
                 return "<div class=\"fitem\"><span class=\"sev high\"></span><div>"
-                    + $"<div class=\"t\"><code>{BookRender.Esc(finding?["code"])}</code> {BookRender.Esc(finding?["message"])}</div>"
-                    + $"<div class=\"m\"><span class=\"mono\">{BookRender.EscOr(finding?["path"], "")}{(BookRender.IsTruthy(finding?["line"]) ? $":{BookRender.Str(finding?["line"])}" : "")}</span></div>"
+                    + $"<div class=\"t\"><span class=\"dev-only\"><code>{BookRender.Esc(finding?["code"])}</code> </span>{BookRender.Esc(finding?["message"])}</div>"
+                    + $"<div class=\"m\"><span class=\"mono dev-only\">{BookRender.EscOr(finding?["path"], "")}{(BookRender.IsTruthy(finding?["line"]) ? $":{BookRender.Str(finding?["line"])}" : "")}</span></div>"
                     + subject + "</div></div>";
             }));
             parts.Add(items);
@@ -202,10 +221,10 @@ static partial class BookPages
 
         if (review.Known.Count > 0)
         {
-            parts.Add("<h2 id=\"known\">Findings covered by a known gap</h2>");
+            parts.Add("<h2 id=\"known\">Findings Covered by a Known Gap</h2>");
             var items = string.Concat(review.Known.Select(finding =>
-                $"<li><code>{BookRender.Esc(finding?["code"])}</code> {BookRender.Esc(finding?["message"])} "
-                + $"<span class=\"mono dim\">{BookRender.EscOr(finding?["path"], "")}{(BookRender.IsTruthy(finding?["line"]) ? $":{BookRender.Str(finding?["line"])}" : "")}</span></li>"));
+                $"<li><span class=\"dev-only\"><code>{BookRender.Esc(finding?["code"])}</code> </span>{BookRender.Esc(finding?["message"])} "
+                + $"<span class=\"mono dim dev-only\">{BookRender.EscOr(finding?["path"], "")}{(BookRender.IsTruthy(finding?["line"]) ? $":{BookRender.Str(finding?["line"])}" : "")}</span></li>"));
             parts.Add($"<details><summary>{review.Known.Count} covered findings</summary><ul class=\"links\">{items}</ul></details>");
         }
 
@@ -266,8 +285,88 @@ static partial class BookPages
         // unique to this page: no section heading on any page may reuse it.
         _ = rel;
         var embedded = BookRender.JsonCompact(entries).Replace("<", "\\u003c", StringComparison.Ordinal);
-        return BookRender.PageHeader("Search", "Search", "Filter every record by its title or id.")
+        return BookRender.PageHeader("Search", "Search", "Filter every record by its title, statement, meaning or scenario.")
             + "\n<div id=\"search-results\" role=\"status\" aria-live=\"polite\"><p>Type above to search.</p></div>"
             + $"\n<script>window.bookSearchIndex = {embedded};</script>";
+    }
+
+    /// <summary>Renders the goal index: one card per goal with its verified share.</summary>
+    public static string RenderGoalIndex(BookIndex index, string rel)
+    {
+        var goals = index.ByType.TryGetValue("goal", out var found) ? found : [];
+        var parts = new List<string>();
+        parts.Add(BookRender.PageHeader("Goals", "Goals", "One lens per goal: from the goal through its features and requirements to the verified state."));
+        foreach (var goal in goals)
+        {
+            var lens = BookModel.GoalLensOf(index, BookRender.StrProp(goal, "id") ?? "");
+            var fields = BookRender.Fields(goal) ?? new JsonObject();
+            parts.Add($"<div class=\"card\"><div class=\"h\"><b><a href=\"{rel}{BookModel.GoalUrl(BookRender.StrProp(goal, "id") ?? "")}\">{BookRender.Esc(goal["title"])}</a></b>"
+                + $"<span>{lens?.Verified ?? 0} of {lens?.Total ?? 0} requirements verified</span></div>"
+                + (BookRender.IsTruthy(fields["statement"]) ? $"<p>{BookRender.Esc(fields["statement"])}</p>" : "") + "</div>");
+        }
+
+        if (goals.Count == 0)
+        {
+            parts.Add("<p>No goal is recorded.</p>");
+        }
+
+        return string.Join("\n", parts);
+    }
+
+    /// <summary>Renders one goal's lens: its features with their requirements and proof state.</summary>
+    public static string RenderGoalLens(BookIndex index, string rel, JsonObject goal)
+    {
+        var goalId = BookRender.StrProp(goal, "id") ?? "";
+        var lens = BookModel.GoalLensOf(index, goalId);
+        var parts = new List<string>();
+        parts.Add(BookRender.PageHeader($"Lens · {BookModel.TypeLabel("goal")}", BookRender.Str(goal["title"]), "",
+            [
+                ("Features", $"<b>{lens?.Features.Count ?? 0}</b>"),
+                ("Requirements", $"<b>{lens?.Total ?? 0}</b>"),
+                ("Verified", $"<b>{lens?.Verified ?? 0}</b>"),
+            ]));
+        var about = RenderAbout(index, rel, goal);
+        if (about != "")
+        {
+            parts.Add(about);
+        }
+
+        var fieldsHtml = RenderFields(index, rel, goal);
+        if (fieldsHtml != "")
+        {
+            parts.Add(fieldsHtml);
+        }
+
+        if (lens is null || lens.Features.Count == 0)
+        {
+            parts.Add("<p>No feature serves this goal yet.</p>");
+            return string.Join("\n", parts);
+        }
+
+        foreach (var feature in lens.Features)
+        {
+            var featureId = BookRender.StrProp(feature.Feature, "id") ?? "";
+            parts.Add($"<h2>{BookRender.Esc(feature.Feature["title"])}</h2>");
+            parts.Add($"<p>{BookRender.RecordLink(index, rel, featureId)}</p>");
+            if (feature.Requirements.Count == 0)
+            {
+                parts.Add("<p>This feature carries no requirement yet.</p>");
+                continue;
+            }
+
+            var rows = string.Concat(feature.Requirements.Select(requirement =>
+            {
+                var state = BookModel.RequirementStateOf(index, BookRender.StrProp(requirement, "id"));
+                var chip = state.Verified ? "<span class=\"chip ok\">Verified</span>" : "<span class=\"chip warn\">Awaiting proof</span>";
+                return $"<tr><td>{BookRender.RecordLink(index, rel, BookRender.StrProp(requirement, "id") ?? "")}</td>"
+                    + $"<td>{BookRender.EscOr(BookRender.Fields(requirement)?["kind"], "")}</td>"
+                    + $"<td>{chip}</td></tr>";
+            }));
+            parts.Add("<div class=\"tablewrap\"><table class=\"tbl\">"
+                + "<thead><tr><th>Requirement</th><th>Kind</th><th>State</th></tr></thead>"
+                + $"<tbody>{rows}</tbody></table></div>");
+        }
+
+        return string.Join("\n", parts);
     }
 }

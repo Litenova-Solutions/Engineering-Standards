@@ -7,14 +7,21 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
-  "kind": "<person|company|provider|system|guest>",
+  "kind": "<person|organization|system>",
   "holds": [
     {
       "role": "role/<name>",
       "scope": "<scope>"
     }
   ],
-  "terms": ["term/<term-name>"]
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Actor display title>

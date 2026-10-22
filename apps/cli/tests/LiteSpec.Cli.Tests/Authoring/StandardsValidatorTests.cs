@@ -50,7 +50,7 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "pattern page whose heading names the pattern rather than an action")]
     public void PatternHeadingNamesThePattern() => Check(
-        root => StandardsFixture.Write(root, "docs/frontend/patterns/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.PatternPage, "## Patterns\n\n### Record header", "## Standards\n\n### Header layout")),
+        root => StandardsFixture.Write(root, "docs/frontend/patterns/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.PatternPage, "## Patterns\n\n### Record Header", "## Standards\n\n### Header layout")),
         ["HEADING_ACTION"]);
 
     [Fact(DisplayName = "tutorial that omits what the reader built")]
@@ -134,7 +134,7 @@ public sealed partial class StandardsValidatorTests
         Check(
             root =>
             {
-                var page = StandardsFixture.TopicPage.Replace("Keep the topic bounded", $"{verb} the topic boundary");
+                var page = StandardsFixture.TopicPage.Replace("Keep the Topic Bounded", $"{verb} the Topic Boundary");
                 page = page.Replace("keep-the-topic-bounded", $"{lower}-the-topic-boundary");
                 page = StandardsFixture.ReplaceFirst(page, "MUST keep the topic", $"MUST {lower} the topic");
                 StandardsFixture.Write(root, "docs/core/topic.md", page);
@@ -208,7 +208,7 @@ public sealed partial class StandardsValidatorTests
             "CONVENTION_DEFAULT_SENTENCE",
             "CONVENTION_MISSING_DEFAULT",
             "CONVENTION_MISSING_REPLACEMENT",
-            "CONVENTION_NORMATIVE",
+            "CONVENTION_REPLACEMENT_DEVIATION",
             "CONVENTION_REPLACEMENT_SENTENCE",
             "EXTENSION_ACTIVATION",
             "EXTENSION_BASELINE",
@@ -243,6 +243,8 @@ public sealed partial class StandardsValidatorTests
             "MANIFEST_JSON",
             "MANIFEST_PATH",
             "PAGE_EMPTY_SECTION",
+            "PAGE_EMPTY_SECTION_TEXT",
+            "PAGE_HEADING_CASE",
             "PAGE_MISSING_SECTION",
             "PAGE_SECTION_ORDER",
             "PAGE_TITLE_CASE",
@@ -260,6 +262,7 @@ public sealed partial class StandardsValidatorTests
             "SCHEMA_UNSUPPORTED_KEYWORD",
             "STACK_COMPOSITION_EXTRA",
             "STACK_COMPOSITION_MISSING",
+            "STANDARD_DEVIATION_NORMATIVE",
             "STANDARD_DEVIATION_SENTENCE",
             "STANDARD_EXAMPLE_LABEL",
             "STANDARD_INFORMATIVE_NORMATIVE",
@@ -276,6 +279,7 @@ public sealed partial class StandardsValidatorTests
             "STANDARD_UNLABELED_CONTENT",
             "TEMPLATE_INDEX_PATH",
             "VERIFY_COMMAND",
+            "VERIFY_DUPLICATE_EVIDENCE",
             "VERIFY_DUPLICATE_ID",
             "VERIFY_GENERIC_EVIDENCE",
             "VERIFY_HEADER",

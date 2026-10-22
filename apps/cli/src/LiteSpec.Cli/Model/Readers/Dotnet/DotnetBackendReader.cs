@@ -218,14 +218,25 @@ sealed class DotnetBackendReader : IBackendReader
         }
 
         var parts = Path.GetRelativePath(config.WebApiRoot, file)
-                        .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                        .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                        .SkipWhile(part => part == "Endpoints")
+                        .ToArray();
 
-        if (parts.Length < 4)
+        // Module/Aggregate/UseCase/XEndpoint.cs, or the single-aggregate flat form Module/UseCase/XEndpoint.cs.
+        string useCase;
+
+        if (parts.Length >= 4)
+        {
+            useCase = $"use-case/{Naming.Kebab(parts[0])}.{Naming.Kebab(parts[2])}";
+        }
+        else if (parts.Length == 3)
+        {
+            useCase = $"use-case/{Naming.Kebab(parts[0])}.{Naming.Kebab(parts[1])}";
+        }
+        else
         {
             return;
         }
-
-        var useCase = $"use-case/{Naming.Kebab(parts[0])}.{Naming.Kebab(parts[2])}";
 
         foreach (var invocation in root.DescendantNodes().OfType<InvocationExpressionSyntax>())
         {

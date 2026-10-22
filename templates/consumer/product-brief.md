@@ -10,17 +10,18 @@
   "boundary": "<What the product covers in one sentence>",
   "neverDoes": ["<One thing the product will never do>"],
   "audience": ["actor/<name>"],
-  "terms": ["term/<term-name>"]
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Product display title>
 
 ## Summary
 
-State what the product is and who uses it, in one short paragraph.
-
-## Business intent
-
-Link each product topic page under `docs/product/`, one line per area.
-
-- Link each topic page with its title and the question it answers.
+State the outcome the product exists to produce and why it matters, in one short paragraph.

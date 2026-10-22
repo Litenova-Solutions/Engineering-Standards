@@ -2,18 +2,18 @@
 
 ## Purpose
 
-A domain module gathers one business area's language, business records, rules, use cases, events, and permissions into pages that the model builder, the tool that checks the project, reads. This tutorial works through one kind of page at a time, using the spending module of the Expenses product as the worked example. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
+A domain module gathers one business area's glossary terms, aggregates, rules, use cases, events, and permissions into pages that the model builder, the tool that checks the project, reads. This tutorial works through one kind of page at a time, using the spending module of the Expenses product as the worked example. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
 
 ## Prerequisites
 
-- Finish [Start a consumer repository](getting-started.md) through its configuration steps.
+- Finish [Start a Consumer Repository](getting-started.md) through its configuration steps.
 - Read the product brief and the requirements this module fulfills.
 - Read the decisions that constrain identity, persistence, security, or external behavior.
-- Copy the `module.md`, `business-record.md`, and `use-case.md` templates from the [template index](../../templates/consumer/README.md).
+- Copy the `module.md`, `aggregate.md`, and `use-case.md` templates from the [template index](../../templates/consumer/README.md), and open `docs/glossary.json` for the module terms.
 
 ## Lesson
 
-1. Name the module language: write one Term entry per word with its meaning, its labels, and the words it rejects. Use the same term in documentation, domain types, application operations, API descriptions, and frontend features. This satisfies `litespec/backend/domain#use-one-ubiquitous-language`.
+1. Name the module terms: write one term entry per word with its meaning, its labels, and the words it rejects. Use the same term in documentation, domain types, use cases, API descriptions, and frontend features. This satisfies `litespec/backend/domain#use-one-ubiquitous-language` and `litespec/core/domain#define-every-domain-term-in-the-glossary`.
 
     | Term | Meaning | Rejected words |
     |:---|:---|:---|
@@ -24,21 +24,21 @@ A domain module gathers one business area's language, business records, rules, u
 
     Rejected words stop a later contributor from creating `Voucher` beside `Expense`. They also tell an agent which plausible names are wrong for this domain.
 
-2. Write the occasion before the rules. Name one occasion the module exists for: who acts, what surrounds them, and what they use today instead. Record it in the module page, and reuse its people and figures on every page beneath it. This satisfies `litespec/core/system#state-one-occasion-for-every-behavior-record` and `litespec/core/system#keep-a-scenario-informative`.
+2. Write the Example section before the rules. Name one occasion the module exists for: who acts, what surrounds them, and what they use today instead. Record it in the module page's Example section, and reuse its people and figures on every page beneath it. Keep the shared cast on the example cast page. This satisfies `litespec/core/domain#illustrate-pages-with-examples-from-the-cast`.
 
     Month end brings every team's expenses at once: employees paid work costs from their own pockets and wait weeks for a decision, chasing managers by email. Without an expense record, finance reconstructs who spent what from forwarded receipts and memory.
 
-3. Write the module record. Give the module a person-chosen identifier such as `module/spending`. Name each module it depends on, or remove the dependency field when the module stands alone. Spending depends on no other module, so its dependency list stays empty. This satisfies `litespec/core/system#group-language-and-use-cases-by-module`.
-4. Draw business record boundaries from invariants. A business record is a consistency boundary: state that must stay valid together in one command. An invariant is a condition that holds before and after every successful change. This satisfies `litespec/backend/domain#treat-aggregates-as-consistency-boundaries` and `litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary`.
+3. Write the module page with its summary. Give the module a person-chosen identifier such as `module/spending`. Name each module it depends on, or remove the dependency field when the module stands alone. Spending depends on no other module, so its dependency list stays empty. This satisfies `litespec/core/domain#state-every-module-dependency`.
+4. Draw aggregate boundaries from invariants. An aggregate is a consistency boundary: state that must stay valid together in one command. An invariant is a condition that holds before and after every successful change. This satisfies `litespec/backend/domain#treat-aggregates-as-consistency-boundaries` and `litespec/backend/domain#keep-child-entities-inside-the-aggregate-boundary`.
 
-    | Business record | Owns | References by typed ID |
+    | Aggregate | Owns | References by typed ID |
     |:---|:---|:---|
-    | `business-record/spending.expense` | Expense lifecycle, total, reimbursement facts | `ReceiptId`, `EmployeeId` |
-    | `business-record/spending.receipt` | Receipt attachment and removal | `ExpenseId` |
-    | `business-record/spending.policy` | Receipt threshold | None |
+    | `aggregate/spending.expense` | Expense lifecycle, total, reimbursement facts | `ReceiptId`, `EmployeeId` |
+    | `aggregate/spending.receipt` | Receipt attachment and removal | `ExpenseId` |
+    | `aggregate/spending.policy` | Receipt threshold | None |
 
-    A record owns a child when the child has no independent boundary and changes only through the record. Reference another record by typed ID when it changes on its own. Do not place `Employee` inside `Expense` for convenient navigation. This satisfies `litespec/backend/domain#reference-other-aggregates-by-id`.
-5. Define every state. A state is a business-valid condition with its required data and permitted behavior. Describe states before writing transitions. This satisfies `litespec/backend/domain#model-every-aggregate-lifecycle-with-state-types`.
+    An aggregate owns a child when the child has no independent boundary and changes only through the aggregate. Reference another aggregate by typed ID when it changes on its own. Do not place `Employee` inside `Expense` for convenient navigation. This satisfies `litespec/backend/domain#reference-other-aggregates-by-id`.
+5. Define every state. A state is a business-valid condition with its required data and permitted behavior. Describe states before writing transitions. This satisfies `litespec/backend/domain#model-every-aggregate-lifecycle-with-state-types` and `litespec/core/domain#model-each-aggregate-lifecycle-with-states`.
 
     | State | Meaning | Required facts |
     |:---|:---|:---|
@@ -62,16 +62,35 @@ A domain module gathers one business area's language, business records, rules, u
     ```
 
     For each state, answer what makes it true, which data it alone requires, and which actions it allows and rejects. An unanswered question stays on the page. It receives no guessed default.
-6. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with `not`, `no`, `never`, or `cannot` keeps that word in its name. This satisfies `litespec/core/system#state-each-rule-with-its-kind`.
+6. Connect the states with transitions. List every allowed state change with the use case that moves it in the aggregate's Transitions table. This satisfies `litespec/core/domain#connect-every-state-through-transitions`.
 
-    | Rule | Kind | Enforced by | Statement | Refusal |
-    |:---|:---|:---|:---|:---|
-    | `rule/expense.receipt-required-above-threshold` | `checked-before` | `validator` | An expense above the policy threshold needs a receipt. | `result/submit-expense.receipt-missing` |
-    | `rule/expense.approver-is-not-submitter` | `checked-before` | `aggregate` | An approver is not the submitter. | `result/approve-expense.own-expense` |
-    | `rule/expense.reimbursed-once` | `always-true` | `aggregate` | An expense is reimbursed at most once. | `result/reimburse-expense.already-reimbursed` |
+    | From | To | By Use Case |
+    |:---|:---|:---|
+    | None | Submitted | `use-case/spending.submit-expense` |
+    | Submitted | Approved | `use-case/spending.approve-expense` |
+    | Submitted | Rejected | `use-case/spending.approve-expense` |
+    | Approved | Reimbursed | `use-case/spending.reimburse-expense` |
 
-    An `always-true` rule holds after every change to its record. A `checked-before` rule rejects caller-correctable input before domain work starts. An `across-records` rule spans records that one transaction cannot hold. Input shape stays in the validator; current record state stays in the record. This satisfies `litespec/backend/application#separate-input-validation-from-invariants`.
-7. Name the people and their permissions. Write one actor page per party and one role page per grantable set. Name the permission each use case needs. This satisfies `litespec/backend/application#enforce-target-authorization-in-the-pipeline`.
+    Creation is a transition from None, so the first state stays reachable. One use case can move more than one transition: approval ends submitted either approved or rejected.
+7. Classify the aggregate data. List every field the aggregate keeps with its meaning and classification in the aggregate's Data table. This satisfies `litespec/core/domain#classify-every-aggregate-data-field`.
+
+    | Name | Meaning | Classification |
+    |:---|:---|:---|
+    | `total` | The amount claimed, with its currency | `internal` |
+    | `receipt` | The payment proof attached to the expense | `personal` |
+    | `approver` | The manager who decided, once decided | `internal` |
+
+    A `personal` or `sensitive` field needs erasure and export use cases covering it.
+8. Write the rules with kinds. Give each rule a person-chosen identifier of one to six lowercase words. A statement with `not`, `no`, `never`, or `cannot` keeps that word in its name. This satisfies `litespec/core/domain#state-each-rule-with-its-kind` and `litespec/core/domain#keep-the-negation-word-in-the-rule-name`.
+
+    | Rule | Kind | Statement | Refusal |
+    |:---|:---|:---|:---|
+    | `rule/expense.receipt-required-above-threshold` | `precondition` | An expense above the policy threshold needs a receipt. | `result/submit-expense.receipt-missing` |
+    | `rule/expense.approver-is-not-submitter` | `invariant` | An approver is not the submitter. | `result/approve-expense.own-expense` |
+    | `rule/expense.reimbursed-once` | `invariant` | An expense is reimbursed at most once. | `result/reimburse-expense.already-reimbursed` |
+
+    An `invariant` holds after every change to its aggregate. A `precondition` guards the behavior before it runs and refuses caller-correctable input. A `calculation` derives a value and is proven by a scenario with an examples table. A `cross-aggregate` rule spans aggregates and lives on a rule page. Each rule that refuses names its refusal. This satisfies `litespec/core/domain#name-the-refusal-a-broken-rule-produces` and `litespec/core/domain#keep-cross-aggregate-rules-on-a-rule-page`. Input shape stays in the validator; current aggregate state stays in the aggregate. This satisfies `litespec/backend/application#separate-input-validation-from-invariants`.
+9. Name the people and their permissions. Write one actor page per party and one role page per grantable set. Name the permission each use case needs. This satisfies `litespec/backend/application#enforce-target-authorization-in-the-pipeline`.
 
     | Actor | Role | Permission |
     |:---|:---|:---|
@@ -79,41 +98,42 @@ A domain module gathers one business area's language, business records, rules, u
     | `actor/manager` | `role/approver` at team scope | `permission/approve-expense` |
     | `actor/finance` | `role/finance` at platform scope | `permission/reimburse-expense` |
 
-8. Write the use cases. Give each use case a name that is unique across the project, so its results and cases resolve. Name the operation, the needed permissions, the entry points, the raised events, and the fulfilled requirements. This satisfies `litespec/backend/application#use-this-operation-layout` and `litespec/backend/application#keep-command-handlers-narrow`.
+10. Write the use cases. Give each use case a name that is unique across the project, so its results and scenarios resolve. Name the kind, the needed permissions, the entry points, the raised events, and the fulfilled requirements. This satisfies `litespec/backend/application#use-this-operation-layout` and `litespec/core/domain#give-each-use-case-one-kind`.
 
-    | Use case | Operation | Needs | Raises |
+    | Use case | Kind | Needs | Raises |
     |:---|:---|:---|:---|
     | `use-case/spending.submit-expense` | `command` | `permission/submit-expense` | `event/expense.expense-submitted` |
+    | `use-case/spending.approve-expense` | `command` | `permission/approve-expense` | None |
     | `use-case/spending.reimburse-expense` | `command` | `permission/reimburse-expense` | `event/expense.expense-reimbursed` |
     | `use-case/spending.list-expenses` | `query` | `permission/list-expenses` | None |
 
-    A query states no domain transition and names its read model. It loads no business record for presentation.
-9. Write one result per ending. A result is one way a use case ends: `success`, or a named `refusal` with its failure code. This satisfies `litespec/backend/application#model-expected-use-case-failures-explicitly` and `litespec/backend/api#use-consistent-status-codes`.
+    A query changes nothing and declares its `output`. It loads no aggregate for presentation. This satisfies `litespec/core/domain#declare-every-query-output`.
+11. Write one result per ending. A result is one way a use case ends: `success`, or a named `refusal` with its stable `code`. This satisfies `litespec/core/domain#end-every-use-case-in-named-results` and `litespec/backend/application#model-expected-use-case-failures-explicitly`.
 
-    | Result | Outcome | Code | Status |
+    | Result | Outcome | Code | Meaning |
     |:---|:---|:---|:---|
-    | `result/submit-expense.submitted` | `success` | None | 201 |
-    | `result/submit-expense.receipt-missing` | `refusal` | `failure/spending.receipt_missing` | 422 |
+    | `result/submit-expense.submitted` | `success` | None | The expense is submitted. |
+    | `result/submit-expense.receipt-missing` | `refusal` | `spending.receipt-missing` | The expense is above the threshold and carries no receipt. |
 
-    Each refusal explains what the caller sees. The failure code is stable across releases.
-10. Write the cases. A case is one working example: a situation and the result it leads to. Each case names its result. A case with no proving test yet becomes a known gap record with an owner and an end date.
+    Each refusal explains what the caller sees. The code is stable across releases. The backend stack derives the HTTP status from the outcome. This satisfies `litespec/backend/api#use-consistent-status-codes`.
+12. Write the scenarios. A scenario is one working example in `given`, `when`, `then`: the situation, the action, and the expected ending. Each scenario names the result it ends in. A scenario with no proving test yet becomes a known gap record with an owner and an end date. This satisfies `litespec/core/domain#write-every-scenario-in-given-when-then` and `litespec/core/domain#name-the-result-each-scenario-ends-in`.
 
-    | Case | Situation | Action | Result | Expect |
+    | Scenario | Given | When | Then | Result |
     |:---|:---|:---|:---|:---|
-    | `case/submit-expense.submitting-with-a-receipt-succeeds` | An employee paid for a train ticket and kept the receipt. | The employee submits the expense with the receipt. | `result/submit-expense.submitted` | The expense is submitted. |
-    | `case/approve-expense.approving-a-submitted-expense-succeeds` | An employee submitted an expense with its receipt. | The manager approves the expense. | `result/approve-expense.approved` | The expense is approved. |
+    | `scenario/submit-expense.submitting-with-a-receipt-succeeds` | An employee paid for a train ticket and kept the receipt. | The employee submits the expense with the receipt. | The expense is submitted. | `result/submit-expense.submitted` |
+    | `scenario/approve-expense.approving-a-submitted-expense-succeeds` | An employee submitted an expense with its receipt. | The manager approves the expense. | The expense is approved. | `result/approve-expense.approved` |
 
-    Name each test by the observable behavior it asserts. This satisfies `litespec/backend/testing#name-tests-by-observable-behavior`. An acceptance scenario carries one `/// <proves>case/...</proves>` tag. The model builder confirms the claim when the scenario calls the use case and asserts the result.
-11. Record the events. An event is an immutable record of a completed fact. Name what completed and which fields it carries. This satisfies `litespec/backend/dotnet/domain#raise-immutable-domain-facts`.
+    When the scenario proves a calculation, add an `examples` table with the debated rows. This satisfies `litespec/core/domain#tabulate-every-calculation-with-examples`. Name each test by the observable behavior it asserts. This satisfies `litespec/backend/testing#name-tests-by-observable-behavior`. An acceptance test carries one `/// <proves>scenario/...</proves>` tag. The model builder confirms the claim when the test calls the use case through the public boundary and asserts the result the scenario names.
+13. Record the events. An event is an immutable record of a completed fact. Name what completed and which fields it carries. This satisfies `litespec/core/domain#state-each-event-with-meaning-and-carries` and `litespec/backend/dotnet/domain#raise-immutable-domain-facts`.
 
     | Event | Meaning | Carries |
     |:---|:---|:---|
     | `event/expense.expense-submitted` | An expense was submitted. | `expenseId`, `amount`, `currency`, `employeeId` |
     | `event/expense.expense-reimbursed` | An expense was reimbursed. | `expenseId`, `amount`, `currency`, `reimbursedAt` |
 
-    Work that crosses a transaction or time boundary is a use case that reacts to an event, or a use case on a schedule. It declares what it reacts to and its delivery. This satisfies `litespec/backend/application#keep-event-reaction-implementations-explicit`.
-12. Keep one transaction per command. One handler stages the records its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline` and `litespec/backend/persistence#commit-each-command-pipeline-once`.
-13. Map the model to folders. Mirror the module, record, and use case path in every layer. This satisfies `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
+    Work that crosses a transaction or time boundary is a reaction: a use case of kind `reaction` that names its `trigger`, the events it answers or the schedule or deadline in words. This satisfies `litespec/core/domain#trigger-every-reaction` and `litespec/backend/application#keep-event-reaction-implementations-explicit`.
+14. Keep one transaction per command. One handler stages the aggregates its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline` and `litespec/backend/persistence#commit-each-command-pipeline-once`.
+15. Map the model to folders. Mirror the module, aggregate, and use case path in every layer. This satisfies `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
 
     ```text
     apps/api/src/Expenses.Domain/
@@ -135,10 +155,10 @@ A domain module gathers one business area's language, business records, rules, u
     ```
 
     Create subfolders only when real types require them.
-14. Run the model check. Run `litespec model check` from the consumer root. It resolves every citation, computes the code, screen, and test links, and reports each unproved case. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
+16. Run the model check. Run `litespec model check` from the consumer root. It resolves every citation, computes the code, screen, and test links, and reports each unproved scenario. The [command index](../tools/README.md) states how `litespec` runs in a consumer.
 
-## What you built
+## What You Built
 
-- One module with its language, records, rules, use cases, results, cases, events, and permissions.
+- One module with its terms, aggregates, rules, use cases, results, scenarios, events, and permissions.
 - Every identifier is person-chosen, and every citation resolves.
-- Every case is proved by a passing test or owned by a known gap.
+- Every scenario is proved by a passing test or owned by a known gap.

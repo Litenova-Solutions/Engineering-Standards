@@ -17,4 +17,6 @@
 
 # Finance
 
+## Summary
+
 Finance reimburses approved expenses.

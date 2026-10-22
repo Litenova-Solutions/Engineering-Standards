@@ -2,15 +2,15 @@
 
 ## Intent
 
-The audit extension is the LiteSpec bundle a project selects to record who attempted what against which target and what it produced; it satisfies obligations from 4 guidance bodies (NIST, ISO, PCI DSS, and OWASP) and from the General Data Protection Regulation (GDPR). This page states those obligations in one place: the frameworks, the GDPR articles, and the map from each obligation to the provision (one identified rule) that satisfies it. A team writing its audit adoption decision (the record of what it audits and why) reads it to state that reasoning without surveying the frameworks from scratch. The [Audit Trail](../ext/audit.md) owns every provision; this page explains and states no rules.
+The audit extension is the LiteSpec bundle a project selects to record who attempted what against which target and what it produced; it satisfies obligations from 4 guidance bodies (NIST, ISO, PCI DSS, and OWASP) and from the General Data Protection Regulation (GDPR). This page states those obligations in one place: the frameworks, the GDPR articles, and the map from each obligation to the provision (one identified rule) that satisfies it. A team writing its audit adoption decision reads it to state that reasoning without surveying the frameworks from scratch; the [Audit Trail](../ext/audit.md) owns every provision, and this page explains and states no rules.
 
 ## Reference
 
-### The frameworks
+### The Frameworks
 
 Four bodies of guidance apply to a business application that holds personal data or touches payments. They agree far more than they differ, so an implementation built to their union satisfies each one without a separate program per framework.
 
-#### NIST SP 800-53, AU family
+#### NIST SP 800-53, AU Family
 
 The AU controls split auditing into six questions. They are the most complete public statement of the problem.
 
@@ -61,7 +61,7 @@ The resolution is the record shape. A trail retained on a legal-obligation or le
 
 Two consequences follow for a project. Record the lawful basis and the retention period of each audited category in the adoption decision. Include the trail in the records of processing activities, because the trail is itself a processing activity.
 
-### Schema alignment
+### Schema Alignment
 
 The record shape follows a model that three sources describe in the same terms: an initiator performs an action on a target and produces an outcome at a time and from a place.
 
@@ -73,7 +73,7 @@ The record shape follows a model that three sources describe in the same terms: 
 
 Following that model at design time needs no extra work. It lets a project map the trail onto a security platform later without remodeling the store.
 
-### Obligation to provision map
+### Obligation to Provision Map
 
 | Obligation | Source | Provision |
 |:---|:---|:---|

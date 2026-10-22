@@ -15,8 +15,13 @@ static partial class StandardsValidator
     // looks up rather than pages that own provisions, and each one answers a
     // question at a single layer. (litespec/core/authoring#state-one-layer-per-page)
 
+    // The words that stay lowercase inside a Title Case heading, unless first or
+    // last: articles, coordinating conjunctions, and prepositions of four letters
+    // or fewer. Every other word starts with a capital.
     static readonly HashSet<string> TitleSmallWords = new(
-        ["a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"],
+        ["a", "an", "the", "and", "but", "for", "nor", "or", "so", "yet",
+         "as", "at", "by", "from", "in", "into", "of", "off", "on", "onto",
+         "over", "per", "to", "up", "upon", "via", "with"],
         StringComparer.Ordinal);
 
     static string? PageClass(string relative)
@@ -242,6 +247,10 @@ static partial class StandardsValidator
 
     static bool TitleCase(string value)
     {
+        // Code spans and explicit anchors keep their own case; the rule judges
+        // the words around them.
+        value = PageAnchorSuffixPattern().Replace(value, "");
+        value = InlineCodePattern().Replace(value, " ");
         var tokens = TitleTokenPattern().Matches(value).Cast<Match>().Select(match => match.Value).ToList();
         return tokens.Select((token, index) => (token, index)).All(item =>
         {
@@ -257,6 +266,61 @@ static partial class StandardsValidator
 
             return TitleCapitalPattern().IsMatch(item.token);
         });
+    }
+
+    // Every heading below the title uses Title Case. The page contract owns
+    // its H2 literals, and the root routing heading is a fixed literal too,
+    // so those stay untouched here and change with the contract instead. The
+    // generated provision index is tool output rather than authored headings.
+    static void CheckHeadingCase(string relative, string? kind, List<LineItem> clean, Action<string, int, string, string> add)
+    {
+        if (relative == Provisions.IndexPath)
+        {
+            return;
+        }
+
+        var contract = ExpectedSections(kind, relative);
+        var contractNames = contract is null
+            ? new HashSet<string>(StringComparer.Ordinal)
+            : new HashSet<string>(contract.Required.Concat(contract.Optional), StringComparer.Ordinal);
+        foreach (var item in clean)
+        {
+            var heading = HeadingCasePattern().Match(item.Line);
+            if (!heading.Success)
+            {
+                continue;
+            }
+
+            var level = heading.Groups[1].Value.Length;
+            var title = PageAnchorSuffixPattern().Replace(heading.Groups[2].Value, "").Trim();
+            if (level == 2 && (title == RoutingHeading || contractNames.Contains(title)))
+            {
+                continue;
+            }
+
+            if (title.Length > 0 && !TitleCase(title))
+            {
+                add(relative, item.Number, "PAGE_HEADING_CASE", $"H{level} '{title}' must use Title Case");
+            }
+        }
+    }
+
+    // A required section with nothing to say holds exactly `None.`. These are
+    // the placeholder phrasings that mean the same thing in other words.
+    static bool EmptySectionVariant(string body)
+    {
+        var text = body.Trim();
+        if (text is "None" or "N/A" or "n/a")
+        {
+            return true;
+        }
+
+        if (text.StartsWith("None.", StringComparison.Ordinal) && text != "None.")
+        {
+            return true;
+        }
+
+        return AddsNoContentPattern().IsMatch(text);
     }
 
     static HashSet<string> AnchorsFor(string raw)
@@ -479,15 +543,26 @@ static partial class StandardsValidator
 
         CheckSectionOrder(relative, kind, sections, add);
         CheckIndexAndGlossary(relative, kind, raw, sections, add);
+        CheckHeadingCase(relative, kind, clean, add);
         var contract = ExpectedSections(kind, relative);
         if (contract is not null)
         {
             var allowed = new HashSet<string>(contract.Required.Concat(contract.Optional), StringComparer.Ordinal);
             foreach (var section in sections)
             {
-                if (allowed.Contains(section.Name) && SectionBody(lines, section.Name).Length == 0)
+                if (!allowed.Contains(section.Name))
+                {
+                    continue;
+                }
+
+                var body = SectionBody(lines, section.Name);
+                if (body.Length == 0)
                 {
                     add(relative, section.Line, "PAGE_EMPTY_SECTION", $"H2 '{section.Name}' must contain content or 'None.'");
+                }
+                else if (EmptySectionVariant(body))
+                {
+                    add(relative, section.Line, "PAGE_EMPTY_SECTION_TEXT", $"H2 '{section.Name}' must contain exactly 'None.' when it has nothing to say");
                 }
             }
         }
@@ -543,6 +618,12 @@ static partial class StandardsValidator
     [GeneratedRegex(@"^(#{2,4})\s+(.+?)\s*$")]
     private static partial Regex H24Pattern();
 
+    [GeneratedRegex(@"^(#{2,6})\s+(.+?)\s*$")]
+    private static partial Regex HeadingCasePattern();
+
+    [GeneratedRegex(@"^This [A-Za-z]+ adds no [A-Za-z]+\.$")]
+    private static partial Regex AddsNoContentPattern();
+
     [GeneratedRegex(@"\s+\{#[^}]+\}\s*$")]
     private static partial Regex PageAnchorSuffixPattern();
 
@@ -555,7 +636,7 @@ static partial class StandardsValidator
     [GeneratedRegex(@"^\s*(?:[-*+] |\d+\.\s+)")]
     private static partial Regex ListMarkerPattern();
 
-    [GeneratedRegex(@"[A-Za-z0-9][A-Za-z0-9./+-]*")]
+    [GeneratedRegex(@"[A-Za-z0-9][A-Za-z0-9'./+-]*")]
     private static partial Regex TitleTokenPattern();
 
     [GeneratedRegex(@"^(?:v?\d|[A-Z0-9.]+$)")]

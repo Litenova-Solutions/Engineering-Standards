@@ -421,6 +421,11 @@
         },
         "measure": { "$ref": "#/$defs/nonEmptyString" },
         "by": { "$ref": "#/$defs/nonEmptyString" },
+        "target": { "$ref": "#/$defs/nonEmptyString" },
+        "conditions": { "$ref": "#/$defs/nonEmptyString" },
+        "check": { "$ref": "#/$defs/nonEmptyString" },
+        "runsOn": { "enum": ["pull-request", "nightly", "pre-release", "production"] },
+        "evidence": { "$ref": "#/$defs/nonEmptyString" },
         "feature": { "$ref": "#/$defs/featureIdArray" },
         "basedOn": { "$ref": "#/$defs/basedOnArray" }
       },

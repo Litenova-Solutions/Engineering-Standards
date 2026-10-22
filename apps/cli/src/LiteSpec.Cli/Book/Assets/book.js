@@ -45,6 +45,18 @@
     store.set("review", on);
   });
 
+  // Developer view: reveals identifiers, codes, file paths and check names.
+  const devToggle = document.getElementById("devToggle");
+  const devOn = store.get("dev", false);
+  document.body.classList.toggle("dev", devOn);
+  devToggle?.setAttribute("aria-pressed", String(devOn));
+  devToggle?.addEventListener("click", () => {
+    const on = !document.body.classList.contains("dev");
+    document.body.classList.toggle("dev", on);
+    devToggle.setAttribute("aria-pressed", String(on));
+    store.set("dev", on);
+  });
+
   // Mobile navigation.
   const navToggle = document.getElementById("navToggle");
   navToggle?.addEventListener("click", () => {
@@ -83,7 +95,19 @@
     });
   });
 
-  // Search page: filter the generated index over titles and ids. The index
+  // Lifecycle diagrams: render Mermaid blocks client-side, once, in the stored
+  // theme. Without Mermaid the diagram source stays readable as text.
+  if (document.querySelector("pre.mermaid") && window.mermaid) {
+    try {
+      window.mermaid.initialize({ startOnLoad: false, theme: root.dataset.theme === "dark" ? "dark" : "default", securityLevel: "strict" });
+      const rendered = window.mermaid.run({ querySelector: "pre.mermaid" });
+      if (rendered && typeof rendered.catch === "function") rendered.catch(() => {});
+    } catch {
+      // The page keeps working: the table beneath the diagram carries the meaning.
+    }
+  }
+
+  // Search page: filter the generated index over titles, statements, meanings and scenario text. The index
   // is embedded in the page, so search works when the site opens as files;
   // over http the page falls back to search.json when no embed is present.
   const searchBox = document.getElementById("search-results");
@@ -108,7 +132,7 @@
       }
       const words = query.split(/\s+/);
       const matches = entries.filter((entry) => {
-        const haystack = `${entry.title} ${entry.id} ${entry.type}`.toLowerCase();
+        const haystack = `${entry.title} ${entry.id} ${entry.type} ${entry.text || ""}`.toLowerCase();
         return words.every((word) => haystack.includes(word));
       }).slice(0, 100);
       if (matches.length === 0) {
@@ -118,7 +142,8 @@
       searchBox.innerHTML = `<p>${matches.length} match${matches.length === 1 ? "" : "es"}.</p>` +
         matches.map((entry) =>
           `<div class="result"><a href="${escapeHtml(entry.url)}">${escapeHtml(entry.title)}</a> ` +
-          `<span class="mono dim">${escapeHtml(entry.id)}</span></div>`).join("");
+          `<span class="dim">${escapeHtml(entry.type)}</span> ` +
+          `<span class="mono dim dev-only">${escapeHtml(entry.id)}</span></div>`).join("");
     };
     if (entries === null) {
       fetch("search.json")

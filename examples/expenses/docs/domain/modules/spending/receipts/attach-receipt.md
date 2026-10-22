@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.attach-receipt",
-  "title": "Attach receipt",
+  "title": "Attach Receipt",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -52,6 +52,12 @@
 }
 ---
 
-# Attach receipt
+# Attach Receipt
 
-An employee attaches a receipt to a submitted expense.
+## Goal
+
+An employee adds a receipt to a submitted expense so it can be decided.
+
+## What Happens
+
+The employee sends the receipt for a submitted expense. Spending refuses the receipt when the expense is already decided. Otherwise the receipt sits on the expense and `event/receipt.receipt-attached` is raised.

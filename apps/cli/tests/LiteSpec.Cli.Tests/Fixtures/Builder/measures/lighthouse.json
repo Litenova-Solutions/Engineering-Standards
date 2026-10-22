@@ -1,0 +1,10 @@
+{
+  "categories": {
+    "performance": { "score": 0.92 },
+    "accessibility": { "score": 1 }
+  },
+  "audits": {
+    "first-contentful-paint": { "score": 0.95, "numericValue": 1234, "numericUnit": "millisecond" },
+    "uses-rel-preconnect": { "score": null }
+  }
+}

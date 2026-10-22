@@ -1,0 +1,39 @@
+{
+  "$schema": "../litespec/schemas/glossary.schema.json",
+  "schemaVersion": 2,
+  "terms": [
+    {
+      "id": "term/<name>",
+      "term": "<English label>",
+      "meaning": "<Meaning in at most 25 words>",
+      "labels": {
+        "nl": "<Dutch label>",
+        "de": "<German label>"
+      },
+      "rejected": [
+        {
+          "word": "<rejected word>",
+          "reason": "<Why it is wrong here>",
+          "scope": "<path scope, or remove this line>",
+          "except": ["<compound that reuses the word, or remove this line>"]
+        }
+      ],
+      "broader": "<term id, or remove this line>",
+      "narrower": ["<term id>"],
+      "values": [
+        {
+          "code": "<code>",
+          "label": "<label>"
+        }
+      ],
+      "owner": "<owner>",
+      "status": "draft"
+    }
+  ],
+  "mannered": [
+    { "term": "load-bearing", "instead": "required" },
+    { "term": "one-way door", "instead": "irreversible" },
+    { "term": "earns its keep", "instead": "still matters" },
+    { "term": "a dial worth turning", "instead": "a parameter worth varying" }
+  ]
+}

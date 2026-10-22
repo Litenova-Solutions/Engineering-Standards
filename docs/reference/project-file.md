@@ -8,7 +8,7 @@
 
 The [supported scope](../core/scope.md) page states which sizes, shapes, stacks, and extensions a project can select. The [stacks](../core/stacks.md) page states what selecting a stack applies. The [init](../tools/init.md) page states how a new file is written, the [consumer](../tools/consumer.md) page states how it is validated, and the [model](../tools/model.md) page states how paths feed the project model. Terms such as stack, shape, size, extension, and preset follow the [glossary](glossary.md).
 
-### File location and schema
+### File Location and Schema
 
 | Item | Value |
 |:---|:---|
@@ -17,9 +17,9 @@ The [supported scope](../core/scope.md) page states which sizes, shapes, stacks,
 | Template | `templates/consumer/litespec.project.json` in the LiteSpec checkout |
 | Presets | `templates/presets/blazor-client.json`, `templates/presets/dotnet-react.json`, `templates/presets/dotnet-svelte.json` |
 
-`litespec init` merges the template with one preset and stamps the size, name, and reviewed release. `litespec consumer` validates the written file against the schema and then runs the selection checks below. The model builder reads the paths, size, shape, stacks, and owners from the same file.
+`litespec init` merges the template with one preset and stamps the size, name, and reviewed release. `litespec consumer` validates the written file against the schema and then runs the selection checks below. The model builder reads the paths, stack config, size, shape, stacks, and owners from the same file.
 
-### Top-level fields
+### Top-Level Fields
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -34,28 +34,30 @@ The [supported scope](../core/scope.md) page states which sizes, shapes, stacks,
 | `owners` | array of string | no | none |
 | `reviewedLiteSpecVersion` | string | yes | none |
 | `paths` | object | yes | none |
-| `scenarioWordLimit` | integer | no | `120` |
+| `exampleWordLimit` | integer | no | `120` |
 | `prohibitedKinds` | array of string | no | none |
 | `selectedExtensions` | array of object | yes | none |
+| `stackConfig` | object | no | none |
 
 What each field means and what reads it:
 
 - `$schema` holds the editor hint that points at the project schema. Only the editor reads it.
 - `project` names the project and its identifier sources. `litespec consumer` checks it against the schema. See the `project` object below.
-- `size` is `small` or `large`. Small requires the core record types with Architecture and Integration test projects, and large adds problems, features, journeys, and cases with the Acceptance project. `litespec consumer` checks the value, and the model builder sizes the record set it expects.
+- `size` is `small` or `large`. Small requires the core record types with Architecture and Integration test projects, and large adds problems, features, journeys, and scenarios with the Acceptance project. `litespec consumer` checks the value, and the model builder sizes the record set it expects.
 - `shape` is `server` or `client-only`. A server names exactly one backend stack, and a client-only project names no backend stack. `litespec init` writes it from the preset, `litespec consumer` checks the backend count, and the model builder applies the shape.
 - `stacks` lists the selected stack ids: `dotnet` for the backend and one entry per frontend from its platform. `litespec consumer` refuses an id the pinned release does not ship.
-- `optionalTypes` lists the extra record types written beside what the size requires: `constraint`, `research`, `limit`, and `runbook`. The model builder reads the list when it collects records.
+- `optionalTypes` lists the extra record types written beside what the size requires: `goal`, `constraint`, `research`, `external-system`, `limit`, and `runbook`. The model builder reads the list when it collects records.
 - `proof` tunes how the model builder confirms proof claims for the project. See the `proof` object below.
 - `constraints` records whether any outside constraint applies to the project. See the `constraints` object below.
 - `owners` is the closed list of names a record owner comes from, such as `["shop-team"]`. The model builder reads the list and reports whether one is declared.
 - `reviewedLiteSpecVersion` records the LiteSpec release whose complete contract the project last reviewed, such as `"2.0.0"`. `litespec consumer` compares it with the version in the pinned `litespec.manifest.json` and fails the run when the two differ.
 - `paths` declares every location the tools read. See the `paths` object below.
-- `scenarioWordLimit` bounds the words in a Scenario section. When omitted, the recorded default of `120` applies, and the validator refuses a value below `40`.
+- `exampleWordLimit` bounds the words in an Example section. When omitted, the recorded default of `120` applies, and the validator refuses a value below `40`.
 - `prohibitedKinds` lists the record types or page styles the consumer does not use. A page that declares one is refused.
 - `selectedExtensions` lists the extensions the project selected, each with its criterion and review date. See the extension entry below.
+- `stackConfig` holds per-stack configuration keyed by stack id. See the `stackConfig.dotnet` object below.
 
-### The `project` object
+### The `project` Object
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -69,7 +71,7 @@ What each field means and what reads it:
 - `identifierSource` is the source segment the project's own identifiers carry in a cross-source citation. It matches `^[a-z][a-z0-9-]*$`.
 - `citedSources` lists the other sources a citation in the project can name, beside `owasp`, `rfc`, and `litespec`. Each entry matches `^[a-z][a-z0-9-]*$`.
 
-### The `proof` object
+### The `proof` Object
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -82,7 +84,7 @@ What each field means and what reads it:
 - `outcomeOnlySteps` names the steps classes whose `then` steps state only that a request succeeded or was refused. Each entry matches `^[A-Z][A-Za-z0-9]*$`.
 - The model builder reads both lists when it confirms proof claims for the project.
 
-### The `constraints` object
+### The `constraints` Object
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -90,23 +92,18 @@ What each field means and what reads it:
 
 This object is included once the project states which outside constraints apply to it, possibly none. `litespec/core/scope#answer-the-constraints-question` requires the statement, and an empty answer records that no outside rule binds the project.
 
-### The `paths` object
+### The `paths` Object
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
-| `application` | string | no | `apps/api/src/*.Application` |
-| `domain` | string | no | `apps/api/src/*.Domain` |
-| `infrastructure` | string | no | `apps/api/src/*.Infrastructure` |
-| `webapi` | string | no | `apps/api/src/*.WebApi` |
-| `apiSolution` | string | no | none |
 | `docs` | string | no | none |
-| `language` | string | no | `docs/language.json` under the documentation root |
-| `languageScan` | array of string | no | none |
+| `glossary` | string | no | `docs/glossary.json` under the documentation root |
+| `glossaryScan` | array of string | no | none |
 | `unstructuredDocs` | array of string | no | none |
 | `domainDocs` | string | yes | none |
 | `records` | object | no | none |
 | `testRoots` | array of string | no | none |
-| `testResults` | string | no | the test result files under the test roots |
+| `testResults` | string | no | `TestResults` |
 | `apiClient` | string | no | `packages/api` |
 | `surfaces` | array of object | no | none |
 | `uiDocs` | string | yes | none |
@@ -117,13 +114,12 @@ This object is included once the project states which outside constraints apply 
 
 What each field means and what reads it:
 
-- `application`, `domain`, `infrastructure`, and `webapi` name the backend projects the model builder reads. A `*` in one segment expands to the first matching folder. A consumer with no backend omits `apiSolution` and records the decision that it has none.
 - `docs` is the root of the specification tree. Every Markdown file under it carries a metadata block unless its path is listed in `unstructuredDocs`. When `docs` is omitted, the tools use `docs`.
-- `language` names the project language record. `litespec consumer` validates it and scans the pages and every `languageScan` surface against its rejected words and mannered terms.
-- `languageScan` holds glob patterns that name the non-Markdown surfaces the vocabulary reaches: source, interface copy, the API contract, and acceptance tests. Each pattern matches repository-relative paths and matches at least one file, or `litespec consumer` reports that the check over that surface did not run.
+- `glossary` names the project glossary. `litespec consumer` validates it and scans the pages and every `glossaryScan` surface against its rejected words and mannered terms.
+- `glossaryScan` holds glob patterns that name the non-Markdown surfaces the vocabulary reaches: source, interface copy, the API contract, and acceptance tests. Each pattern matches repository-relative paths and matches at least one file, or `litespec consumer` reports that the check over that surface did not run.
 - `unstructuredDocs` lists the paths whose Markdown is navigation or prose rather than specification.
 - `domainDocs` and `uiDocs` name the domain and UI documentation roots. Both are required.
-- `records` maps a record type to its home folder where it differs from the default the model states. Keys come from the closed list `product`, `constraint`, `research`, `decision`, `requirement`, `problem`, `feature`, `actor`, `role`, `permission`, `journey`, `module`, `business-record`, `rule`, `use-case`, `result`, `case`, `event`, `entry-point`, `limit`, `runbook`, `exception`, `known-gap`, and `term`.
+- `records` maps a record type to its home folder where it differs from the default the model states. Keys come from the closed list `product`, `goal`, `constraint`, `research`, `decision`, `requirement`, `problem`, `feature`, `actor`, `role`, `permission`, `journey`, `module`, `aggregate`, `rule`, `use-case`, `result`, `scenario`, `event`, `entry-point`, `external-system`, `limit`, `runbook`, `deviation`, `known-gap`, and `term`.
 - `testRoots` lists the directories that hold automated test source. The model builder reads scenarios from these roots.
 - `testResults` names where the latest test run results live, so passing and failing proof is read from them.
 - `apiClient` names the generated API client the frontends import, so route calls resolve to the use cases they reach. The model builder appends `src` to the configured path.
@@ -133,7 +129,22 @@ What each field means and what reads it:
 - `frontends` lists every browser frontend the project ships. See the frontend entry below.
 - `sites` lists the static public websites the consumer ships beside its application. Each entry holds `name`, `path`, and `generator`, and the only generator is `astro`.
 
-### The `uiPackage` object
+### The `stackConfig.dotnet` Object
+
+| Field | Type | Required | Default |
+|:---|:---|:---|:---|
+| `application` | string | no | `apps/api/src/*.Application` |
+| `domain` | string | no | `apps/api/src/*.Domain` |
+| `infrastructure` | string | no | `apps/api/src/*.Infrastructure` |
+| `webapi` | string | no | `apps/api/src/*.WebApi` |
+| `apiSolution` | string | no | none |
+
+What each field means and what reads it:
+
+- `application`, `domain`, `infrastructure`, and `webapi` name the backend projects the model builder reads. A `*` in one segment expands to the first matching folder.
+- `apiSolution` names the API solution the model builder reads. A consumer with no backend omits `apiSolution` and records the decision that it has none.
+
+### The `uiPackage` Object
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -153,7 +164,7 @@ What each field means and what reads it:
 - `publicExports` lists the entry points applications import, with at least one entry. A primitive the composites are built from is not one of them.
 - `litespec consumer` reports a missing `paths.uiPackage` when a controlled frontend is declared without one, and `litespec ui` validates every listed file. A controlled frontend is one whose platform is `react` or `svelte`.
 
-### A `frontends` entry
+### A `frontends` Entry
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -169,7 +180,7 @@ What each field means and what reads it:
 - `platform` is `react`, `svelte`, or `blazor`. Every entry declares it, so a frontend outside the controlled UI contract still declares that position instead of omitting the field. A `react` or `svelte` frontend is controlled and requires a `ui` block and the shared package. A `blazor` frontend is skipped by the controlled UI check.
 - `ui` holds `profile`, which is required, and `globalCss`, which is optional. The profile is one of `public-light`, `application-balanced`, or `admin-dense`. The `globalCss` value is the one stylesheet the frontend declares, and it imports the shared package tokens. `litespec ui` checks the profile value and the stylesheet path.
 
-### A `sites` entry
+### A `sites` Entry
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -179,7 +190,7 @@ What each field means and what reads it:
 
 The generator is `astro`. The [site extension](../ext/site.md) states when a public static website ships beside the application.
 
-### A `selectedExtensions` entry
+### A `selectedExtensions` Entry
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -197,7 +208,7 @@ What each field means and what reads it:
 - `releaseStage` belongs to the `stage` extension only. It is `pre-production` or `production`.
 - `deferredProvisions` belongs to the `stage` extension only. Each entry holds `provision`, which is the deferred provision ID, and `until`, which is the date the deferral ends in `YYYY-MM-DD` form. A production project defers nothing.
 
-### Placeholders and the init fill
+### Placeholders and the Init Fill
 
 The template names the project as `__PROJECT__` in paths and package names, and the first owner as `__OWNER__`. `litespec init` fills every `__PROJECT__` value with the `--name` value, or with the root folder name when `--name` is omitted; in an npm package scope such as `@__PROJECT__/ui` it writes that name in lowercase kebab case, because npm names are lowercase. It leaves every other placeholder to fill. After it writes the file it prints the unfilled placeholders:
 
@@ -213,7 +224,7 @@ litespec.project.json: template placeholder '__OWNER__' is not filled [litespec/
 
 A preset without a controlled web frontend, such as `blazor-client`, declares no package that a frontend uses, so `litespec init` removes `paths.uiPackage` and `paths.uiPatterns` from the written file.
 
-### A complete example
+### A Complete Example
 
 This example shows the file `litespec init --preset dotnet-react --size small --name shop` writes from the template and the `dotnet-react` preset, after replacing `__OWNER__` with the owner name. It ran against release `2.0.0`. The preset selects shape `server`, stacks `dotnet` and `react`, and one `react` frontend `web` at `apps/web`.
 
@@ -238,7 +249,6 @@ This example shows the file `litespec init --preset dotnet-react --size small --
     "shop-team"
   ],
   "paths": {
-    "apiSolution": "apps/api/shop.slnx",
     "docs": "docs",
     "domainDocs": "docs/domain",
     "uiDocs": "docs/ui",
@@ -246,7 +256,6 @@ This example shows the file `litespec init --preset dotnet-react --size small --
     "testRoots": [
       "apps/api/tests"
     ],
-    "languageScan": [],
     "uiPackage": {
       "name": "@shop/ui",
       "path": "packages/ui",
@@ -264,14 +273,16 @@ This example shows the file `litespec init --preset dotnet-react --size small --
       {
         "name": "web",
         "path": "apps/web",
-        "platform": "react",
-        "ui": {
-          "profile": "application-balanced",
-          "globalCss": "apps/web/src/styles.css"
-        }
+        "platform": "react"
       }
     ],
-    "sites": []
+    "sites": [],
+    "glossaryScan": []
+  },
+  "stackConfig": {
+    "dotnet": {
+      "apiSolution": "apps/api/shop.slnx"
+    }
   },
   "selectedExtensions": []
 }
@@ -279,7 +290,7 @@ This example shows the file `litespec init --preset dotnet-react --size small --
 
 The other two presets differ only in shape, stacks, frontends, and the shared package. `dotnet-svelte` selects shape `server`, stacks `dotnet` and `svelte`, and one `svelte` frontend `web` at `apps/web`. `blazor-client` selects shape `client-only`, stack `blazor`, and one `blazor` frontend `app` at `apps/app`, with no `uiPackage` and no `uiPatterns`. The [init](../tools/init.md) page states all three presets.
 
-### Validation errors
+### Validation Errors
 
 `litespec consumer` validates the project record, the pinned release, the stacks, the extensions, and the frontends. The messages below are quoted from the validator. The schema check runs first, so a wrong type or an unknown field reports a schema problem before these messages appear.
 
@@ -298,8 +309,8 @@ The other two presets differ only in shape, stacks, frontends, and the shared pa
 | A controlled frontend has no shared package | `litespec.project.json: 1 controlled frontend(s) and no 'paths.uiPackage'; the shared UI package every controlled web frontend composes is undeclared` |
 | A configured path does not exist | `litespec.project.json: paths.docs 'docs' does not exist; the page scan finds no record to check` |
 
-The last row stands for every configured path: the message names the field, the missing path, and the check that goes quiet. The docs root, the language record, each frontend directory, each `uiPackage` file, and each frontend stylesheet follow this shape.
+The last row stands for every configured path: the message names the field, the missing path, and the check that goes quiet. The docs root, the glossary, each frontend directory, each `uiPackage` file, and each frontend stylesheet follow this shape.
 
 ## Notes
 
-The field lists follow `schemas/litespec-project.schema.json` and the consumer template. The init behavior follows `apps/cli/src/LiteSpec.Cli/Init/InitCommand.cs`. The validation messages follow `apps/cli/src/LiteSpec.Cli/Consumer/ConsumerValidator.Project.cs` and `apps/cli/src/LiteSpec.Cli/Consumer/ConsumerValidator.Language.cs`. The path defaults follow `apps/cli/src/LiteSpec.Cli/Model/ConsumerConfig.cs`. The presets are `templates/presets/dotnet-react.json`, `templates/presets/dotnet-svelte.json`, and `templates/presets/blazor-client.json`, read with `templates/consumer/litespec.project.json`.
+The field lists follow `schemas/litespec-project.schema.json` and the consumer template. The init behavior follows `apps/cli/src/LiteSpec.Cli/Init/InitCommand.cs`. The validation messages follow `apps/cli/src/LiteSpec.Cli/Consumer/ConsumerValidator.Project.cs` and `apps/cli/src/LiteSpec.Cli/Consumer/ConsumerValidator.Glossary.cs`. The path defaults follow `apps/cli/src/LiteSpec.Cli/Model/ConsumerConfig.cs`. The presets are `templates/presets/dotnet-react.json`, `templates/presets/dotnet-svelte.json`, and `templates/presets/blazor-client.json`, read with `templates/consumer/litespec.project.json`.

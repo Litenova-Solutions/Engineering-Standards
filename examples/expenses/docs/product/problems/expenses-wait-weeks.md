@@ -2,7 +2,7 @@
 {
   "type": "problem",
   "id": "problem/expenses-wait-weeks",
-  "title": "Expenses wait weeks",
+  "title": "Expenses Wait Weeks",
   "owner": "expenses-team",
   "status": "approved",
   "affects": [
@@ -12,6 +12,12 @@
 }
 ---
 
-# Expenses wait weeks
+# Expenses Wait Weeks
 
-Decisions arrive late without notice.
+## Situation
+
+Submitted expenses wait weeks for a decision, so employees chase managers by email. Decisions arrive late without notice.
+
+## Evidence
+
+The benchmark in research/approval-time-benchmarks shows small companies decide within one week, while Expenses averages three.

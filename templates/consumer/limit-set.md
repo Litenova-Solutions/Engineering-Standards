@@ -19,7 +19,3 @@
 }
 ---
 # <Limits display title>
-
-## Summary
-
-State the bounds the product runs within and who watches them.

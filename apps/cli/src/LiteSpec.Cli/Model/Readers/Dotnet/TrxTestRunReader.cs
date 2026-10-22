@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Linq;
 
 namespace LiteSpec.Model.Readers.Dotnet;
@@ -35,6 +36,12 @@ sealed class TrxTestRunReader : ITestRunReader
 
             run.Files.Add(config.Relative(file));
 
+            if (RunDateOf(document, file) is { } day
+                && (run.Date is null || string.CompareOrdinal(day, run.Date) > 0))
+            {
+                run.Date = day;
+            }
+
             var results = document.Descendants().Where(element => element.Name.LocalName == "UnitTestResult");
 
             foreach (var result in results)
@@ -50,9 +57,7 @@ sealed class TrxTestRunReader : ITestRunReader
                 run.OutcomeByTest[name] = outcome;
                 counts[outcome] = counts.TryGetValue(outcome, out var seen) ? seen + 1 : 1;
 
-                var method = MethodOf(name);
-
-                if (method.Length > 0)
+                foreach (var method in NamesOf(name))
                 {
                     if (!run.OutcomeByMethod.TryGetValue(method, out var kept) || kept != "Failed")
                     {
@@ -81,7 +86,11 @@ sealed class TrxTestRunReader : ITestRunReader
         return run;
     }
 
-    private static string MethodOf(string testName)
+    /// <summary>
+    ///     The fully qualified names a result answers to: its test name without any
+    ///     data-row arguments, plus the dotted form when nested types join with a plus.
+    /// </summary>
+    private static IReadOnlyList<string> NamesOf(string testName)
     {
         var bare = testName;
 
@@ -89,14 +98,65 @@ sealed class TrxTestRunReader : ITestRunReader
 
         if (paren >= 0)
         {
-            bare = bare[..paren];
+            bare = bare[..paren].Trim();
         }
 
-        var dot = bare.LastIndexOf('.');
+        if (bare.Length == 0)
+        {
+            return [];
+        }
 
-        return dot >= 0 ? bare[(dot + 1)..] : bare;
+        var dotted = bare.Replace('+', '.');
+
+        return dotted == bare ? [bare] : [bare, dotted];
     }
 
     private static int IntOf(XElement element, string attribute) =>
         element.Attribute(attribute) is { } value && int.TryParse(value.Value, out var parsed) ? parsed : 0;
+
+    /// <summary>The file's run date, yyyy-MM-dd: the Times finish, else the latest result end, else the file date.</summary>
+    private static string? RunDateOf(XDocument document, string file)
+    {
+        var times = document.Descendants().FirstOrDefault(element => element.Name.LocalName == "Times");
+        var stamp = times?.Attribute("finish")?.Value ?? times?.Attribute("start")?.Value;
+
+        if (DateOf(stamp) is { } finished)
+        {
+            return finished;
+        }
+
+        string? latest = null;
+
+        foreach (var result in document.Descendants().Where(element => element.Name.LocalName == "UnitTestResult"))
+        {
+            foreach (var name in new[] { "endTime", "startTime" })
+            {
+                if (DateOf(result.Attribute(name)?.Value) is { } day
+                    && (latest is null || string.CompareOrdinal(day, latest) > 0))
+                {
+                    latest = day;
+                }
+            }
+        }
+
+        return latest ?? FileDate(file);
+    }
+
+    /// <summary>The yyyy-MM-dd day the timestamp starts with, or null when it names none.</summary>
+    private static string? DateOf(string? stamp)
+    {
+        if (stamp is not { Length: >= 10 })
+        {
+            return null;
+        }
+
+        var day = stamp[..10];
+
+        return DateOnly.TryParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
+            ? day
+            : null;
+    }
+
+    private static string FileDate(string file) =>
+        File.GetLastWriteTimeUtc(file).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 }

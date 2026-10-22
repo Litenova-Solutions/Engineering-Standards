@@ -2,7 +2,7 @@
 {
   "type": "decision",
   "id": "decision/0001-receipt-threshold",
-  "title": "Receipt threshold",
+  "title": "Receipt Threshold",
   "owner": "expenses-team",
   "status": "approved",
   "decided": "2026-03-01",
@@ -32,15 +32,11 @@
 }
 ---
 
-# Receipt threshold
+# Receipt Threshold
 
 ## Context
 
 Small expenses need no proof, large ones do.
-
-## Options
-
-Zero, 25, or 75 EUR.
 
 ## Decision
 
@@ -50,6 +46,6 @@ Expenses above 25 EUR need a receipt.
 
 Small expenses stay light to submit.
 
-## Evidence
+## Evidence with Confidence
 
-Finance review, February 2026.
+Finance reviewed the filing cost against the fraud risk in February 2026 and stands behind 25 EUR.

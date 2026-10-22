@@ -6,7 +6,7 @@ Query the model builder for the records a task touches, with their links and the
 
 `litespec model query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further. (litespec/core/agent#select-task-context)
 
-A project Exception record overrides a Standard only when it names the provision ID, with reason and review date. (litespec/core/agent#apply-guidance-precedence)
+A project Deviation record overrides a Standard only when it names the provision ID, with reason and review date. (litespec/core/agent#apply-guidance-precedence)
 
 An explicit project convention can replace a baseline Convention when local documentation cites its ID. (litespec/core/agent#apply-guidance-precedence)
 
@@ -37,4 +37,4 @@ Cite every path of every use case a route calls in a test title, or record an ex
 
 Run `litespec ui` after changing UI configuration, vocabulary, the design contract, source locks, CSS, or primitives. Run the route suite after changing a route. (litespec/frontend/web/ui#prove-ui-behavior-and-appearance, litespec/frontend/web/ui#check-every-route-in-a-browser)
 
-Record an exception before selecting another visual system or component base. (litespec/frontend/ui#select-one-visual-authority)
+Record a deviation before selecting another visual system or component base. (litespec/frontend/ui#select-one-visual-authority)

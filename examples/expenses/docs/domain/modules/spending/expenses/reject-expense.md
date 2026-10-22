@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.reject-expense",
-  "title": "Reject expense",
+  "title": "Reject Expense",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -52,6 +52,12 @@
 }
 ---
 
-# Reject expense
+# Reject Expense
 
-A manager rejects a submitted expense.
+## Goal
+
+A manager turns down a submitted expense that falls outside the policy.
+
+## What Happens
+
+The manager opens a submitted expense and gives a reason. Spending refuses the decision when the expense is already decided. Otherwise the expense moves to Rejected and `event/expense.expense-rejected` is raised.

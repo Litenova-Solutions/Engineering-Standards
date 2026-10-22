@@ -5,6 +5,7 @@
   "title": "Policy",
   "owner": "expenses-team",
   "status": "approved",
+  "summary": "The policy is the company spending policy and its receipt threshold.",
   "states": [
     {
       "name": "Active",
@@ -40,3 +41,11 @@
 # Policy
 
 The policy is the company spending policy and its receipt threshold.
+
+## Transitions
+
+None.
+
+## Data
+
+None.

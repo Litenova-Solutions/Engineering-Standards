@@ -1,0 +1,18 @@
+{
+  "metrics": {
+    "http_req_duration": {
+      "type": "trend",
+      "values": { "p(95)": 187.3, "avg": 120.5 },
+      "thresholds": { "p(95)<200": { "ok": true } }
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "values": { "rate": 0.07 },
+      "thresholds": { "rate<0.05": { "ok": false } }
+    },
+    "vus": {
+      "type": "gauge",
+      "values": { "value": 10 }
+    }
+  }
+}

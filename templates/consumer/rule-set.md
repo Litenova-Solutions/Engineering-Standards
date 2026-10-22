@@ -11,11 +11,10 @@
       "type": "rule",
       "id": "rule/<home>.<name>",
       "title": "<Rule display title>",
-      "kind": "<always-true|checked-before|across-records>",
-      "enforcedBy": "<validator|aggregate|store|guard|reaction>",
+      "kind": "cross-aggregate",
       "statement": "<The rule in one sentence>",
-      "governs": ["<business-record or use-case id>"],
-      "refusal": "<result id or failure code, or remove this line>",
+      "governs": ["<aggregate or use-case id>"],
+      "refusal": "<result id or refusal code, or remove this line>",
       "basedOn": ["<constraint or research id, or remove this line>"],
       "fulfills": ["requirement/<topic>.<name>"]
     }
@@ -26,4 +25,8 @@
 
 ## Summary
 
-State which records these rules govern and why they sit together on one page.
+State why these rules sit together on one page.
+
+## Notes
+
+Optional. Record anything a reader needs that fits no section above, under free `###` headings. Notes are informative and never authoritative. Remove this section when there is nothing to note.

@@ -9,11 +9,14 @@
   "allows": [
     "permission/reimburse-expense",
     "permission/list-expenses",
-    "permission/export-expenses"
+    "permission/export-expenses",
+    "permission/erase-personal-data"
   ]
 }
 ---
 
 # Finance
+
+## Summary
 
 Finance moves money for approved expenses.

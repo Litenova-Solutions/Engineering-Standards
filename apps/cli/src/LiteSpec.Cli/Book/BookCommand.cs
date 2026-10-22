@@ -11,7 +11,8 @@ namespace LiteSpec.Book;
 /// <param name="Active">The navigation item marked current.</param>
 /// <param name="Wide">Whether the page uses the wide layout.</param>
 /// <param name="BodyClass">The body element's class.</param>
-sealed record BookPage(string Url, string Title, string Main, string Active, bool Wide, string BodyClass);
+/// <param name="Mermaid">Whether the page holds a lifecycle diagram and needs the Mermaid script.</param>
+sealed record BookPage(string Url, string Title, string Main, string Active, bool Wide, string BodyClass, bool Mermaid);
 
 /// <summary>
 ///     The <c>litespec book</c> command: generate the project book, a static site
@@ -90,18 +91,19 @@ static class BookCommand
 
         var pages = new List<BookPage>();
         var searchEntries = BookPages.SearchIndexPayload(index);
-        pages.Add(new BookPage("index.html", "Project book", BookPages.RenderHome(index, ""), "home", true, ""));
-        pages.Add(new BookPage("search.html", "Search · Project book", BookPages.RenderSearch("", searchEntries), "search", false, ""));
-        pages.Add(new BookPage("glossary.html", "Glossary · Project book", BookPages.RenderGlossary(index, ""), "glossary", false, ""));
+        pages.Add(new BookPage("index.html", "Project book", BookPages.RenderHome(index, ""), "home", true, "", false));
+        pages.Add(new BookPage("search.html", "Search · Project book", BookPages.RenderSearch("", searchEntries), "search", false, "", false));
+        pages.Add(new BookPage("glossary.html", "Glossary · Project book", BookPages.RenderGlossary(index, ""), "glossary", false, "", false));
         pages.Add(new BookPage("review/index.html", "Review · Project book",
-            BookPages.RenderReview(index, "../", review, generatedDate), "review", true, "review-always"));
-        pages.Add(new BookPage("lens/index.html", "Lenses · Project book", BookPages.RenderLensIndex(index, "../"), "lens-index", false, ""));
+            BookPages.RenderReview(index, "../", review, generatedDate), "review", true, "review-always", false));
+        pages.Add(new BookPage("lens/index.html", "Lenses · Project book", BookPages.RenderLensIndex(index, "../"), "lens-index", false, "", false));
+        pages.Add(new BookPage("goals/index.html", "Goals · Project book", BookPages.RenderGoalIndex(index, "../"), "goal-index", false, "", false));
 
         foreach (var type in index.ByType.Keys.OrderBy(key => key, StringComparer.Ordinal))
         {
             var url = BookModel.TypeIndexUrl(type);
             pages.Add(new BookPage(url, $"{BookModel.TypeLabel(type, true)} · Project book",
-                BookPages.RenderTypeIndex(index, BookModel.RelFor(url), type), $"type:{type}", true, ""));
+                BookPages.RenderTypeIndex(index, BookModel.RelFor(url), type), $"type:{type}", true, "", false));
         }
 
         foreach (var record in index.Records.OfType<JsonObject>())
@@ -113,7 +115,8 @@ static class BookCommand
 
             var url = BookModel.RecordUrl(id);
             pages.Add(new BookPage(url, $"{BookModel.SortTitle(record)} · Project book",
-                BookPages.RenderRecord(index, BookModel.RelFor(url), record, review), $"type:{BookRender.PropText(record, "type")}", false, ""));
+                BookPages.RenderRecord(index, BookModel.RelFor(url), record, review), $"type:{BookRender.PropText(record, "type")}", false, "",
+                BookRender.StrProp(record, "type") == "aggregate"));
         }
 
         var actors = index.ByType.TryGetValue("actor", out var found) ? found : [];
@@ -126,7 +129,20 @@ static class BookCommand
 
             var url = BookModel.LensUrl(actorId);
             pages.Add(new BookPage(url, $"{BookRender.PropText(actor, "title")} · Lens · Project book",
-                BookPages.RenderLens(index, BookModel.RelFor(url), actor), actorId, false, ""));
+                BookPages.RenderLens(index, BookModel.RelFor(url), actor), actorId, false, "", false));
+        }
+
+        var goals = index.ByType.TryGetValue("goal", out var goalList) ? goalList : [];
+        foreach (var goal in goals)
+        {
+            if (BookRender.StrProp(goal, "id") is not { } goalId)
+            {
+                continue;
+            }
+
+            var url = BookModel.GoalUrl(goalId);
+            pages.Add(new BookPage(url, $"{BookRender.PropText(goal, "title")} · Goal · Project book",
+                BookPages.RenderGoalLens(index, BookModel.RelFor(url), goal), goalId, false, "", false));
         }
 
         try
@@ -135,7 +151,7 @@ static class BookCommand
             {
                 var rel = BookModel.RelFor(page.Url);
                 var nav = BookRender.RenderNav(index, review, page.Active, rel);
-                var html = BookRender.Shell(rel, page.Title, nav, page.Main, page.Wide, page.BodyClass);
+                var html = BookRender.Shell(rel, page.Title, nav, page.Main, page.Wide, page.BodyClass, "", page.Mermaid);
                 var file = Path.Combine(parsed.Out!, page.Url.Replace('/', Path.DirectorySeparatorChar));
                 Directory.CreateDirectory(Path.GetDirectoryName(file)!);
                 File.WriteAllText(file, html + "\n", Utf8NoBom);
@@ -144,6 +160,8 @@ static class BookCommand
             Directory.CreateDirectory(Path.Combine(parsed.Out!, "assets"));
             WriteAsset(parsed.Out!, "book.css");
             WriteAsset(parsed.Out!, "book.js");
+            WriteAsset(parsed.Out!, "mermaid.min.js");
+            WriteAsset(parsed.Out!, "mermaid.version");
             File.WriteAllText(Path.Combine(parsed.Out!, "search.json"), BookRender.JsonIndented(searchEntries) + "\n", Utf8NoBom);
         }
         catch (Exception exception)

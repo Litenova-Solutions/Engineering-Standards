@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.export-expenses",
-  "title": "Export expenses",
+  "title": "Export Expenses",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -50,6 +50,12 @@
 }
 ---
 
-# Export expenses
+# Export Expenses
 
-Finance exports the approved expenses.
+## Goal
+
+Finance collects the approved expenses so the payout batch can run.
+
+## What Happens
+
+Finance asks for every approved expense since the last export. Spending refuses the export when no approved expense awaits it. Otherwise the approved expenses are handed over as one batch.

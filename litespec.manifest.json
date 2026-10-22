@@ -133,6 +133,12 @@
       "replaces": [],
       "switchesOn": []
     },
+    "plans": {
+      "path": "docs/ext/plans.md",
+      "activationScope": "project",
+      "replaces": [],
+      "switchesOn": []
+    },
     "outbox": {
       "path": "docs/ext/outbox.md",
       "activationScope": "local",

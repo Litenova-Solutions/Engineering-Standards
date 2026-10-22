@@ -125,21 +125,21 @@ static partial class ConsumerValidator
         // the smallest. A project's source, its interface copy, its API contract and
         // its tests carry the same vocabulary to a developer, a customer and a
         // reviewer, and a check that reads only Markdown holds the vocabulary where
-        // nobody reads it. `paths.languageScan` names those surfaces.
+        // nobody reads it. `paths.glossaryScan` names those surfaces.
         //
         // A scope in the glossary is written against the documentation root
         // for a page under it, and against the repository root for one of these
         // files, because there is no other root the two have in common.
         var scannedSurfaces = 0;
-        var languageScan = paths?["languageScan"] is JsonArray patterns ? patterns.ToList() : new List<JsonNode?>();
+        var glossaryScan = paths?["glossaryScan"] is JsonArray patterns ? patterns.ToList() : new List<JsonNode?>();
 
-        foreach (var entry in languageScan)
+        foreach (var entry in glossaryScan)
         {
             var pattern = AsString(entry);
 
             if (pattern is null)
             {
-                run.Err($"litespec.project.json: paths.languageScan '{JsText(entry)}' could not be read (pattern is not a string)");
+                run.Err($"litespec.project.json: paths.glossaryScan '{JsText(entry)}' could not be read (pattern is not a string)");
                 continue;
             }
 
@@ -151,7 +151,7 @@ static partial class ConsumerValidator
             }
             catch (Exception cause)
             {
-                run.Err($"litespec.project.json: paths.languageScan '{pattern}' could not be read ({cause.Message})");
+                run.Err($"litespec.project.json: paths.glossaryScan '{pattern}' could not be read ({cause.Message})");
                 continue;
             }
 
@@ -159,7 +159,7 @@ static partial class ConsumerValidator
             // is the shape this validator refuses everywhere else.
             if (matched.Count == 0)
             {
-                run.Err($"litespec.project.json: paths.languageScan '{pattern}' matches no file; the vocabulary check over that surface did not run");
+                run.Err($"litespec.project.json: paths.glossaryScan '{pattern}' matches no file; the vocabulary check over that surface did not run");
                 continue;
             }
 

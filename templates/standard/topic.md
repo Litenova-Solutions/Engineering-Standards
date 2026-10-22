@@ -6,7 +6,7 @@ State the page scope and the boundary it owns.
 
 ## Standards
 
-### State one action
+### State One Action
 
 **Statement:** The named actor MUST perform one testable action.
 
@@ -16,11 +16,11 @@ State the page scope and the boundary it owns.
 
 ## Conventions
 
-### Use one default
+### Use One Default
 
 **Default:** State one replaceable default.
 
-**Replacement:** Name the local convention or decision that can replace this default.
+**Replacement:** Name the local convention that replaces this default, and where the project records it.
 
 ## Verification
 

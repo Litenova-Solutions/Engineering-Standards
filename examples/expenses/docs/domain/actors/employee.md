@@ -17,4 +17,6 @@
 
 # Employee
 
+## Summary
+
 An employee submits expenses and attaches receipts.

@@ -13,7 +13,7 @@ static partial class StandardsValidator
         ["validate", "provisions", "consumer", "ui", "model", "book", "patterns", "init"],
         StringComparer.Ordinal);
 
-    // A claim is the comparable core of a heading, a Requirement, a Default, or a
+    // A claim is the comparable core of a heading, a Statement, a Default, or a
     // summary bullet: lowercase words with punctuation, code marks, and any leading
     // actor and normative modal removed.
     static string Claim(string text)
@@ -28,7 +28,7 @@ static partial class StandardsValidator
         {
             var nonblank = provision.Body.Where(item => item.Line.Trim().Length > 0).ToList();
             string[] allowedLabels = provision.Section == "Standards"
-                ? ["Requirement", "Deviation", "Rationale", "Example"]
+                ? ["Statement", "Deviation", "Rationale", "Example"]
                 : ["Default", "Replacement", "Rationale", "Example"];
             var labels = new List<(string Name, int Line)>();
             var activeLabel = "";
@@ -48,10 +48,18 @@ static partial class StandardsValidator
 
                     if (name is "Rationale" or "Example")
                     {
-                        var informative = Prose.VisibleText(item.Line);
-                        if (ModalsPattern().Matches(informative).Count > 0 || OtherNormativePattern().IsMatch(informative))
+                        if (HasNormativeVocabulary(item.Line))
                         {
                             add(relative, item.Number, "STANDARD_INFORMATIVE_NORMATIVE", $"informative content in '{provision.Id}' contains normative vocabulary");
+                        }
+                    }
+                    else if (name == "Deviation" && provision.Section == "Standards")
+                    {
+                        // The modal lives in the Statement; the Deviation states the
+                        // bounded reason that permits a departure, in plain words.
+                        if (HasNormativeVocabulary(item.Line))
+                        {
+                            add(relative, item.Number, "STANDARD_DEVIATION_NORMATIVE", $"Deviation for '{provision.Id}' contains normative vocabulary");
                         }
                     }
 
@@ -74,15 +82,14 @@ static partial class StandardsValidator
                     continue;
                 }
 
-                if (activeLabel == "" || activeLabel is "Requirement" or "Deviation" or "Default" or "Replacement")
+                if (activeLabel == "" || activeLabel is "Statement" or "Deviation" or "Default" or "Replacement")
                 {
                     add(relative, item.Number, "STANDARD_UNLABELED_CONTENT", $"content in '{provision.Id}' must follow a Rationale or Example label");
                 }
 
                 if (activeLabel is "Rationale" or "Example")
                 {
-                    var informative = Prose.VisibleText(item.Line);
-                    if (ModalsPattern().Matches(informative).Count > 0 || OtherNormativePattern().IsMatch(informative))
+                    if (HasNormativeVocabulary(item.Line))
                     {
                         add(relative, item.Number, "STANDARD_INFORMATIVE_NORMATIVE", $"informative content in '{provision.Id}' contains normative vocabulary");
                     }
@@ -125,36 +132,42 @@ static partial class StandardsValidator
         }
     }
 
+    static bool HasNormativeVocabulary(string line)
+    {
+        var visible = Prose.VisibleText(line);
+        return ModalsPattern().Matches(visible).Count > 0 || OtherNormativePattern().IsMatch(visible);
+    }
+
     static void CheckStandardAssertion(string relative, Provision provision, List<LineItem> nonblank, Action<string, int, string, string> add)
     {
-        var requirements = nonblank.Where(item => item.Line.StartsWith("**Requirement:**", StringComparison.Ordinal)).ToList();
-        if (requirements.Count == 0)
+        var statements = nonblank.Where(item => item.Line.StartsWith("**Statement:**", StringComparison.Ordinal)).ToList();
+        if (statements.Count == 0)
         {
-            add(relative, provision.Line, "STANDARD_MISSING_REQUIREMENT", $"Standard '{provision.Id}' has no Requirement statement");
+            add(relative, provision.Line, "STANDARD_MISSING_REQUIREMENT", $"Standard '{provision.Id}' has no Statement");
             return;
         }
 
-        if (requirements.Count > 1)
+        if (statements.Count > 1)
         {
-            add(relative, provision.Line, "STANDARD_REQUIREMENT_COUNT", $"Standard '{provision.Id}' has {requirements.Count} Requirement statements");
+            add(relative, provision.Line, "STANDARD_REQUIREMENT_COUNT", $"Standard '{provision.Id}' has {statements.Count} Statements");
         }
 
-        var requirement = requirements[0];
-        var statement = requirement.Line["**Requirement:**".Length..].Trim();
+        var assertion = statements[0];
+        var statement = assertion.Line["**Statement:**".Length..].Trim();
         var modalCount = ModalsPattern().Matches(Prose.VisibleText(statement)).Count;
         if (modalCount != 1)
         {
-            add(relative, requirement.Number, "STANDARD_MODAL_COUNT", $"Requirement for '{provision.Id}' has {modalCount} normative modals");
+            add(relative, assertion.Number, "STANDARD_MODAL_COUNT", $"Statement for '{provision.Id}' has {modalCount} normative modals");
         }
 
         if (OtherNormativePattern().IsMatch(Prose.VisibleText(statement)))
         {
-            add(relative, requirement.Number, "STANDARD_MODAL_VOCABULARY", $"Requirement for '{provision.Id}' uses an unsupported normative term");
+            add(relative, assertion.Number, "STANDARD_MODAL_VOCABULARY", $"Statement for '{provision.Id}' uses an unsupported normative term");
         }
 
         if (Prose.Sentences(statement).Count != 1)
         {
-            add(relative, requirement.Number, "STANDARD_SENTENCE_COUNT", $"Requirement for '{provision.Id}' must contain one sentence");
+            add(relative, assertion.Number, "STANDARD_SENTENCE_COUNT", $"Statement for '{provision.Id}' must contain one sentence");
         }
 
         var should = ShouldPattern().IsMatch(Prose.VisibleText(statement));
@@ -199,21 +212,22 @@ static partial class StandardsValidator
             add(relative, replacements[0].Number, "CONVENTION_REPLACEMENT_SENTENCE", $"Replacement for '{provision.Id}' must contain one sentence");
         }
 
-        var bodyText = string.Join(' ', nonblank.Select(item => Prose.VisibleText(item.Line)));
-        if (ModalsPattern().Matches(bodyText).Count > 0 || OtherNormativePattern().IsMatch(bodyText))
+        // A Replacement names the local convention that takes the default's
+        // place. A departure instrument belongs to a Standard, never here.
+        if (replacements.Count > 0 && DeviationMentionPattern().IsMatch(Prose.VisibleText(replacements[0].Line["**Replacement:**".Length..])))
         {
-            add(relative, provision.Line, "CONVENTION_NORMATIVE", $"convention '{provision.Id}' contains normative vocabulary");
+            add(relative, replacements[0].Number, "CONVENTION_REPLACEMENT_DEVIATION", $"Replacement for '{provision.Id}' names an exception or deviation; name the local convention instead");
         }
     }
 
     static void CheckProvisionClaims(string relative, List<Provision> provisions, Action<string, int, string, string> add)
     {
-        // A provision whose Requirement or Default only repeats its own heading
+        // A provision whose Statement or Default only repeats its own heading
         // states no obligation. The heading is a label; the assertion belongs in the
         // labeled block. (litespec/core/authoring#write-atomic-standards-provisions, litespec/core/authoring#identify-actionable-conventions)
         foreach (var provision in provisions)
         {
-            var label = provision.Section == "Standards" ? "Requirement" : "Default";
+            var label = provision.Section == "Standards" ? "Statement" : "Default";
             var prefix = $"**{label}:**";
             var assertion = provision.Body.FirstOrDefault(item => item.Line.StartsWith(prefix, StringComparison.Ordinal));
             if (assertion is null)
@@ -242,7 +256,7 @@ static partial class StandardsValidator
             var text = Prose.VisibleText(item.Line);
             if (ModalsPattern().Matches(text).Count > 0 || OtherNormativePattern().IsMatch(text))
             {
-                add(relative, item.Number, "PROSE_NORMATIVE_LOCATION", "normative vocabulary is outside a Standards Requirement");
+                add(relative, item.Number, "PROSE_NORMATIVE_LOCATION", "normative vocabulary is outside a Statement, Default, or Replacement");
             }
         }
     }
@@ -267,6 +281,9 @@ static partial class StandardsValidator
             add(relative, verification.Line, "VERIFY_HEADER", "Verification must use a table with the header row | ID | Mark | Evidence |");
         }
 
+        // Evidence shared word for word across rows is one check written by
+        // hand N times. The owning tool generates such rows instead.
+        var seenEvidence = new HashSet<string>(StringComparer.Ordinal);
         for (var index = verification.Line; index < end; index++)
         {
             var match = VerificationRowPattern.Match(clean[index].Line);
@@ -295,6 +312,12 @@ static partial class StandardsValidator
             if (ownerClaim.Length > 0 && Claim(evidence).Contains(ownerClaim, StringComparison.Ordinal))
             {
                 add(relative, index + 1, "VERIFY_TEMPLATED_EVIDENCE", $"Verification for '{rowId}' repeats its provision heading instead of naming evidence");
+            }
+
+            var normalized = evidence.Trim();
+            if (normalized.Length > 0 && !seenEvidence.Add(normalized))
+            {
+                add(relative, index + 1, "VERIFY_DUPLICATE_EVIDENCE", $"Verification for '{rowId}' repeats evidence used by another row on this page");
             }
 
             if (mark == "checkable")
@@ -408,8 +431,11 @@ static partial class StandardsValidator
     [GeneratedRegex(@"\b(?:REQUIRED|FORBIDDEN|SHALL)\b")]
     private static partial Regex OtherNormativePattern();
 
-    [GeneratedRegex(@"^\*\*(Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*")]
+    [GeneratedRegex(@"^\*\*(Statement|Deviation|Rationale|Example|Default|Replacement):\*\*")]
     private static partial Regex ProvisionLabelPattern();
+
+    [GeneratedRegex(@"\b(?:exceptions?|deviations?)\b", RegexOptions.IgnoreCase)]
+    private static partial Regex DeviationMentionPattern();
 
     [GeneratedRegex(@"\b(?:verify compliance|check compliance|inspect evidence|verify evidence)\b", RegexOptions.IgnoreCase)]
     private static partial Regex GenericEvidencePattern();

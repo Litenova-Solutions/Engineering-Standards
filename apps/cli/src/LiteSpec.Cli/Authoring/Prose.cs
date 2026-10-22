@@ -32,7 +32,7 @@ static partial class Prose
     // is a builder defect rather than prose a page author can fix.
     static readonly Regex GeneratedRegion = new(@"<!--\s*generated:[^>]*-->[\s\S]*?<!--\s*/generated:[^>]*-->");
 
-    static readonly Regex LabelPrefix = new(@"^\s*\*\*(?:Requirement|Deviation|Rationale|Example|Default|Replacement):\*\*\s*", WordOptions);
+    static readonly Regex LabelPrefix = new(@"^\s*\*\*(?:Statement|Deviation|Rationale|Example|Default|Replacement):\*\*\s*", WordOptions);
     static readonly Regex InlineCode = new(@"`[^`]*`");
     static readonly Regex Image = new(@"!\[([^\]]*)\]\([^)]+\)");
     static readonly Regex Link = new(@"\[([^\]]+)\]\([^)]+\)");

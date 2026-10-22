@@ -8,7 +8,7 @@ Every JSON file a LiteSpec tool reads has one schema (a contract stating its exa
 
 Every schema lives in `schemas/` at the repository root and uses JSON Schema draft 2020-12. Each schema carries an `$id` that equals its published URL, so the copy at `https://litespec.dev/2.0.0/schemas/<file>` and the file in `schemas/` state the same contract. The [validate](../tools/validate.md), [consumer](../tools/consumer.md), and [ui](../tools/ui.md) pages state the commands that check each file. The release ships seven schemas, one per section below.
 
-### Manifest schema
+### Manifest Schema
 
 | Item | Value |
 |:---|:---|
@@ -31,7 +31,7 @@ The release manifest opens with these fields:
 }
 ```
 
-### Consumer project schema
+### Consumer Project Schema
 
 | Item | Value |
 |:---|:---|
@@ -40,7 +40,7 @@ The release manifest opens with these fields:
 | Checked by | `litespec consumer`, and `litespec validate` for the template copy |
 | Published URL | `https://litespec.dev/2.0.0/schemas/litespec-project.schema.json` |
 
-The top-level properties describe the project. `project` holds the project name. `size` is `small` or `large`. `shape` is `server` or `client-only`. `stacks` lists the selected stacks. `reviewedLiteSpecVersion` records the LiteSpec release the project last reviewed. `paths` locates the specification tree, the language record, the UI package, and the frontends. `selectedExtensions` lists the active extensions with their criterion and review date. `optionalTypes`, `proof`, `constraints`, `owners`, `scenarioWordLimit`, and `prohibitedKinds` carry further project choices.
+The top-level properties describe the project. `project` holds the project name. `size` is `small` or `large`. `shape` is `server` or `client-only`. `stacks` lists the selected stacks. `reviewedLiteSpecVersion` records the LiteSpec release the project last reviewed. `paths` locates the specification tree, the glossary, the UI package, and the frontends. `stackConfig` holds per-stack configuration, such as the .NET backend paths. `selectedExtensions` lists the active extensions with their criterion and review date. `optionalTypes`, `proof`, `constraints`, `owners`, `exampleWordLimit`, and `prohibitedKinds` carry further project choices.
 
 The consumer template opens with these fields:
 
@@ -55,7 +55,7 @@ The consumer template opens with these fields:
 }
 ```
 
-### Record schema
+### Record Schema
 
 | Item | Value |
 |:---|:---|
@@ -64,9 +64,9 @@ The consumer template opens with these fields:
 | Checked by | `litespec consumer` |
 | Published URL | `https://litespec.dev/2.0.0/schemas/record.schema.json` |
 
-The schema holds no single property list. Instead it carries a `oneOf` across 28 page variants, one per record type and page style, so each opening block matches exactly one variant: `productPage`, `constraintPage`, `researchPage`, `decisionPage`, `problemPage`, `featurePage`, `actorPage`, `rolePage`, `journeyPage`, `modulePage`, `businessRecordPage`, `useCasePage`, `runbookPage`, `exceptionPage`, `knownGapPage`, `productTopicPage`, `permissionListPage`, `entryPointListPage`, `limitSetPage`, `ruleSetPage`, `indexPage`, `tutorialPage`, `howToPage`, `referencePage`, `commandPage`, `configurationPage`, `glossaryPage`, and `scenarioCastPage`. Each variant requires `type` plus its own fields, such as `id`, `title`, `owner`, and `status`. The identifier patterns sit beside the variants in `$defs`, such as `useCaseId` for `use-case/<module>.<name>`.
+The schema holds no single property list. Instead it carries a `oneOf` across 30 page variants, one per record type and page style, so each opening block matches exactly one variant: `productPage`, `goalPage`, `constraintPage`, `researchPage`, `decisionPage`, `problemPage`, `featurePage`, `actorPage`, `rolePage`, `journeyPage`, `modulePage`, `aggregatePage`, `useCasePage`, `externalSystemPage`, `runbookPage`, `deviationPage`, `knownGapPage`, `requirementPage`, `permissionListPage`, `entryPointListPage`, `limitSetPage`, `ruleSetPage`, `indexPage`, `tutorialPage`, `howToPage`, `referencePage`, `commandPage`, `configurationPage`, `glossaryPage`, and `exampleCastPage`. Each variant requires `type` plus its own fields, such as `id`, `title`, `owner`, and `status`. The identifier patterns sit beside the variants in `$defs`, such as `useCaseId` for `use-case/<module>.<name>`.
 
-A use case page in `templates/consumer/use-case.md` opens with this block:
+A use case page opens with this block:
 
 ```json
 {
@@ -74,22 +74,23 @@ A use case page in `templates/consumer/use-case.md` opens with this block:
   "id": "use-case/<module>.<name>",
   "title": "<Use case display title>",
   "owner": "<owner>",
-  "status": "draft"
+  "status": "draft",
+  "kind": "command"
 }
 ```
 
-### Language schema
+### Glossary Schema
 
 | Item | Value |
 |:---|:---|
-| File | `schemas/language.schema.json` |
-| Validates | The project language record, by default `language.json` under the documentation root |
+| File | `schemas/glossary.schema.json` |
+| Validates | The project glossary, by default `glossary.json` under the documentation root |
 | Checked by | `litespec consumer` |
-| Published URL | `https://litespec.dev/2.0.0/schemas/language.schema.json` |
+| Published URL | `https://litespec.dev/2.0.0/schemas/glossary.schema.json` |
 
 The top-level properties hold the closed vocabulary. `schemaVersion` is the constant `2`. `terms` holds one entry per concept, each with its `id`, `term`, `meaning`, `labels`, `rejected` synonyms, `broader` and `narrower` terms, closed-set `values`, `owner`, and `status`. `mannered` holds the metaphor terms the project rejects everywhere, each with its `term` and its `instead`.
 
-The consumer template carries real mannered entries:
+The consumer glossary template carries real mannered entries:
 
 ```json
 "mannered": [
@@ -98,7 +99,7 @@ The consumer template carries real mannered entries:
 ]
 ```
 
-### Design contract schema
+### Design Contract Schema
 
 | Item | Value |
 |:---|:---|
@@ -122,7 +123,7 @@ The consumer template opens its design contract with these fields:
 }
 ```
 
-### UI pattern catalog schema
+### UI Pattern Catalog Schema
 
 | Item | Value |
 |:---|:---|
@@ -144,7 +145,7 @@ The consumer template catalog opens with these fields:
 }
 ```
 
-### UI source lock schema
+### UI Source Lock Schema
 
 | Item | Value |
 |:---|:---|

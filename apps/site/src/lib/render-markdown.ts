@@ -248,16 +248,16 @@ function rewriteLinks(html: string, page: Page): string {
 // The labels a provision paragraph can open with. A rule or convention card
 // sorts them into its parts: the statement, Why, Example and Check.
 const labelSplit =
-  /(?=<p><strong>(?:Requirement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>)/;
+  /(?=<p><strong>(?:Statement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>)/;
 const labelLead = /^<p><strong>([A-Z][a-z]+):<\/strong>\s*/;
 
 // Pattern cards keep their body in order, with each label as a small tag.
 const labelPattern =
-  /<p><strong>(Requirement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>/g;
+  /<p><strong>(Statement|Default|Replacement|Deviation|Rationale|Cost|Reference|Evidence|Question|Compact|Example):<\/strong>/g;
 
 function styleLabels(body: string): string {
   return body.replace(labelPattern, (_match, label: string) =>
-    label === "Requirement" || label === "Default" || label === "Question" || label === "Compact"
+    label === "Statement" || label === "Default" || label === "Question" || label === "Compact"
       ? `<p class="note"><span class="lbl" data-pagefind-ignore>${label}</span>`
       : `<p class="note note-muted"><span class="lbl" data-pagefind-ignore>${label}</span>`);
 }
@@ -296,8 +296,8 @@ function provisionParts(body: string, provision: Page["provisions"][number]): st
   const take = (...labels: string[]) => labels.flatMap((label) => parts.get(label) ?? []);
   const tagged = (label: string) =>
     (parts.get(label) ?? []).map((html) => html.replace(/^<p>/, `<p><span class="lbl" data-pagefind-ignore>${label}</span>`));
-  const lead = provision.kind === "convention" ? "Default" : "Requirement";
-  const statement = take("Requirement", "Default").join("");
+  const lead = provision.kind === "convention" ? "Default" : "Statement";
+  const statement = take("Statement", "Default").join("");
   const subs = [...tagged("Replacement"), ...tagged("Deviation")].map((html) => html.replace(/^<p>/, `<p class="provision-sub">`));
   let out =
     `<div class="provision-statement"><span class="provision-eyebrow" data-pagefind-ignore>${lead}</span>` +

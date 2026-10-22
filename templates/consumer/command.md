@@ -38,7 +38,7 @@ Name the tutorial or how-to page a reader arrives from.
 |:---|:---|:---|
 | `--<option>` | `<default>` | State what the option changes. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|

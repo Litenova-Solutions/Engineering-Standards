@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml.Linq;
 
 namespace LiteSpec.Model.Readers.JUnit;
@@ -36,6 +37,12 @@ sealed class JUnitRunReader : ITestRunReader
             run ??= new TestRun();
             run.Files.Add(config.Relative(file));
 
+            if (RunDateOf(document, file) is { } day
+                && (run.Date is null || string.CompareOrdinal(day, run.Date) > 0))
+            {
+                run.Date = day;
+            }
+
             var cases = document.Descendants().Where(element => element.Name.LocalName == "testcase");
 
             foreach (var testcase in cases)
@@ -57,9 +64,7 @@ sealed class JUnitRunReader : ITestRunReader
 
                 run.OutcomeByTest[testName] = outcome;
 
-                var method = MethodOf(testName);
-
-                if (method.Length > 0)
+                foreach (var method in NamesOf(testName))
                 {
                     if (!run.OutcomeByMethod.TryGetValue(method, out var kept) || kept != "Failed")
                     {
@@ -79,7 +84,11 @@ sealed class JUnitRunReader : ITestRunReader
         return run;
     }
 
-    private static string MethodOf(string testName)
+    /// <summary>
+    ///     The fully qualified names a case answers to: its class and name without any
+    ///     data-row arguments, plus the dotted form when nested types join with a plus.
+    /// </summary>
+    private static IReadOnlyList<string> NamesOf(string testName)
     {
         var bare = testName;
 
@@ -87,11 +96,52 @@ sealed class JUnitRunReader : ITestRunReader
 
         if (paren >= 0)
         {
-            bare = bare[..paren];
+            bare = bare[..paren].Trim();
         }
 
-        var dot = bare.LastIndexOf('.');
+        if (bare.Length == 0)
+        {
+            return [];
+        }
 
-        return dot >= 0 ? bare[(dot + 1)..] : bare;
+        var dotted = bare.Replace('+', '.');
+
+        return dotted == bare ? [bare] : [bare, dotted];
     }
+
+    /// <summary>The file's run date, yyyy-MM-dd: the latest suite timestamp, else the file date.</summary>
+    private static string? RunDateOf(XDocument document, string file)
+    {
+        string? latest = null;
+
+        foreach (var suite in document.Descendants().Where(element =>
+                     element.Name.LocalName is "testsuite" or "testsuites"))
+        {
+            if (DateOf(suite.Attribute("timestamp")?.Value) is { } day
+                && (latest is null || string.CompareOrdinal(day, latest) > 0))
+            {
+                latest = day;
+            }
+        }
+
+        return latest ?? FileDate(file);
+    }
+
+    /// <summary>The yyyy-MM-dd day the timestamp starts with, or null when it names none.</summary>
+    private static string? DateOf(string? stamp)
+    {
+        if (stamp is not { Length: >= 10 })
+        {
+            return null;
+        }
+
+        var day = stamp[..10];
+
+        return DateOnly.TryParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _)
+            ? day
+            : null;
+    }
+
+    private static string FileDate(string file) =>
+        File.GetLastWriteTimeUtc(file).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 }

@@ -10,7 +10,9 @@
     "constraint",
     "research",
     "limit",
-    "runbook"
+    "runbook",
+    "goal",
+    "external-system"
   ],
   "constraints": {
     "answered": true

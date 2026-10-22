@@ -2,7 +2,7 @@
 
 Read this file before you change the LiteSpec repository or a consumer application. It summarizes the provisions that govern agent work. Each section ends with the provisions it draws on, and the provision wins wherever this file is shorter.
 
-## What LiteSpec covers
+## What LiteSpec Covers
 
 LiteSpec 2.0.0 is the contract for one bounded-context business application. A project names one size (small or large), one shape (server or client-only) and its stacks: one backend stack for a server project, and one stack per frontend.
 
@@ -12,7 +12,7 @@ A stack is a folder with a `stack.md` page: `docs/backend/dotnet/`, `docs/fronte
 
 Sources: `litespec/core/scope#keep-one-bounded-context`, `litespec/core/scope#select-a-size-a-shape-and-stacks`, `litespec/core/stacks#apply-the-complete-stack`, `litespec/core/scope#select-conditional-extensions-explicitly`, `litespec/core/authoring#use-the-declared-identifier-grammar`.
 
-## Which repository you are in
+## Which Repository You Are In
 
 | Repository | You change | You run |
 |:---|:---|:---|
@@ -21,7 +21,7 @@ Sources: `litespec/core/scope#keep-one-bounded-context`, `litespec/core/scope#se
 
 In this repository, run the CLI with `dotnet run --project apps/cli/src/LiteSpec.Cli -- <command>`. The [command index](docs/tools/README.md) shows how to run it from a consumer.
 
-## Loading context
+## Loading Context
 
 In a consumer:
 
@@ -39,13 +39,13 @@ Sources: `litespec/core/agent#select-task-context`, `litespec/core/agent#read-th
 
 ## Precedence
 
-When guidance overlaps, apply it in this order: a project Exception record, a selected extension's replacement, a deeper page, then a shallower page. An Exception record carries a reason and a review date.
+When guidance overlaps, apply it in this order: a project deviation, a selected extension's replacement, a deeper page, then a shallower page. A deviation carries a reason and a review date.
 
 If two requirements conflict and nothing above decides, stop. Quote both provision IDs and their paths, and ask for a decision.
 
 Sources: `litespec/core/agent#apply-guidance-precedence`, `litespec/core/agent#stop-on-unresolved-conflict`.
 
-## Making a change
+## Making a Change
 
 1. Confirm the scope of the request and which repositories it touches.
 2. Read `git status` and leave unrelated work alone.
@@ -59,7 +59,7 @@ Sources: `litespec/core/agent#make-coherent-scoped-changes`, `litespec/core/agen
 
 ## Writing
 
-Write prose by your own documentation guide. LiteSpec adds only what its validators check and what its page contract needs, all stated in the [authoring standard](docs/core/authoring.md): ASCII only, one term per concept from the glossary, capitalized modal words only inside a Standard's Requirement, Title Case page titles with sentence-case headings, an `Overview` title on every section index, and nothing about earlier releases.
+Write prose by your own documentation guide. LiteSpec adds only what its validators check and what its page contract needs, all stated in the [authoring standard](docs/core/authoring.md): ASCII only, one term per concept from the glossary, capitalized modal words only inside a Statement, Title Case on every heading, an `Overview` title on every section index, and nothing about earlier releases.
 
 Each page uses the sections of its page style. A Standard states one testable obligation. When you rename a provision, replace every citation of the old ID in the same change.
 
@@ -73,7 +73,7 @@ The highest git tag is the current release. The manifest, `CHANGELOG.md` and the
 
 Sources: `litespec/core/authoring#publish-each-release-as-a-complete-contract`, `litespec/core/authoring#exclude-cross-release-compatibility-work`, `litespec/core/authoring#exclude-historical-transition-material`, `litespec/core/maintaining#publish-a-litespec-release-from-a-tag`, `litespec/core/authoring#record-the-reviewed-litespec-release`.
 
-## High-risk boundaries
+## High-Risk Boundaries
 
 Read the full provision before you apply any of these:
 
@@ -81,21 +81,21 @@ Read the full provision before you apply any of these:
 - Put a type in the lowest folder that holds every consumer naming it. (`litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers`)
 - Keep Domain free of persistence, web, mediator, logging and dependency injection. (`litespec/backend/architecture#point-dependencies-inward`)
 - Model each aggregate lifecycle with an abstract state and sealed state records. (`litespec/backend/dotnet/domain#model-every-aggregate-lifecycle-with-state-records`)
-- Model each closed set in Domain as a record hierarchy, never an enum. (`litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums`)
+- Model each closed set in Domain as a record hierarchy instead of an enum. (`litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums`)
 - Give each layer its own messages, results and transport models. (`litespec/backend/architecture#own-each-layers-contract-types`)
-- Give each rejected Domain rule its own exception type and stable failure code. (`litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions`)
+- Give each rejected Domain rule its own exception type and stable refusal code. (`litespec/backend/dotnet/domain#reject-business-violations-with-domain-exceptions`)
 - Organize every layer by the same modules, aggregates and use cases. (`litespec/backend/architecture#organize-every-layer-by-module-and-use-case`)
 - Write commands through repositories, and commit once in the command pipeline. (`litespec/backend/application#keep-command-handlers-narrow`, `litespec/backend/persistence#commit-each-command-pipeline-once`)
 - Derive the actor from verified claims, and authorize each target from declared permissions. (`litespec/backend/application#enforce-target-authorization-in-the-pipeline`)
 - Use the controlled shadcn/ui baseline for React and the shadcn-svelte baseline for Svelte. (`litespec/frontend/ui#select-one-visual-authority`, `litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package`)
 
-## UI patterns
+## UI Patterns
 
 A consumer keeps one pattern catalog. Each entry starts from a LiteSpec pattern in `docs/frontend/patterns/`, cites it by ID, and records the chosen option and who chose it.
 
 To help an owner choose, show the options with `litespec patterns preview <group>` and recommend one. Then build the chosen option from its wireframe text with the project's own components, style and design system.
 
-If you see how a pattern could be better, finish the task on the chosen option and put the proposal in your completion report. Never change a decision yourself, and never stop mid-task to ask. A proposal that isn't specific to one product goes to the LiteSpec pattern page once the owner accepts it.
+If you see how a pattern could be better, finish the task on the chosen option and put the proposal in your completion report. Leave the decision unchanged, and ask nothing mid-task. A proposal that isn't specific to one product goes to the LiteSpec pattern page once the owner accepts it.
 
 Sources: `litespec/frontend/patterns#keep-one-pattern-catalog`, `litespec/frontend/patterns#start-from-a-litespec-pattern`, `litespec/frontend/patterns#record-who-chose`, `litespec/frontend/patterns#keep-a-visual-registry`, `litespec/frontend/patterns#report-pattern-feedback-after-the-work`, `litespec/frontend/patterns#promote-pattern-improvements`.
 

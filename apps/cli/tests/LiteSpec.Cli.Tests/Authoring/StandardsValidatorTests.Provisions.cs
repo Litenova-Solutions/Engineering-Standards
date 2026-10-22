@@ -5,12 +5,12 @@ public sealed partial class StandardsValidatorTests
 {
     [Fact(DisplayName = "duplicate slug on one page")]
     public void DuplicateId() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Conventions", "### Keep the topic bounded\n\n**Requirement:** Consumers MUST keep the topic inside its declared boundary.\n\n## Conventions")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Conventions", "### Keep the Topic Bounded\n\n**Statement:** Consumers MUST keep the topic inside its declared boundary.\n\n## Conventions")),
         ["ID_DUPLICATE"]);
 
     [Fact(DisplayName = "identifier text in a provision heading")]
     public void IdInHeading() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Keep the topic bounded (litespec/core/topic#keep-the-topic-bounded)")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the Topic Bounded", "### Keep the Topic Bounded (litespec/core/topic#keep-the-topic-bounded)")),
         ["ID_IN_HEADING"]);
 
     [Fact(DisplayName = "page file name that is not kebab case")]
@@ -18,9 +18,9 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/TwoWords.md", StandardsFixture.TopicPage),
         ["ID_PAGE_FILENAME"]);
 
-    [Fact(DisplayName = "missing requirement")]
-    public void MissingRequirement() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Requirement:** Consumers MUST keep the topic inside its declared boundary.\n\n", "")),
+    [Fact(DisplayName = "missing statement")]
+    public void MissingStatement() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Statement:** Consumers MUST keep the topic inside its declared boundary.\n\n", "")),
         ["STANDARD_MISSING_REQUIREMENT"]);
 
     [Fact(DisplayName = "multiple modals")]
@@ -38,10 +38,20 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Default:** Store the topic in its owning documentation area.\n\n", "")),
         ["CONVENTION_MISSING_DEFAULT"]);
 
-    [Fact(DisplayName = "normative convention")]
-    public void NormativeConvention() => Check(
+    [Fact(DisplayName = "normative convention rationale")]
+    public void NormativeConventionRationale() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Replacement:** A consumer can name another location through an explicit local convention.", "**Replacement:** A consumer can name another location through an explicit local convention.\n\n**Rationale:** Consumers MUST record the replacement.")),
+        ["STANDARD_INFORMATIVE_NORMATIVE"]);
+
+    [Fact(DisplayName = "modal in a convention Default is allowed")]
+    public void ModalInConventionDefaultAllowed() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Store the topic in its owning documentation area.", "Consumers MUST store the topic in its owning documentation area.")),
-        ["CONVENTION_NORMATIVE"]);
+        []);
+
+    [Fact(DisplayName = "modal in a convention Replacement is allowed")]
+    public void ModalInConventionReplacementAllowed() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "A consumer can name another location through an explicit local convention.", "A consumer MUST name another location through an explicit local convention.")),
+        []);
 
     [Fact(DisplayName = "missing evidence row")]
     public void MissingEvidenceRow() => Check(
@@ -68,14 +78,14 @@ public sealed partial class StandardsValidatorTests
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Consumers MUST keep the topic inside its declared boundary.", "Consumers MUST keep the topic bounded and SHALL record its owner.")),
         ["STANDARD_MODAL_VOCABULARY"]);
 
-    [Fact(DisplayName = "multiple requirement sentences")]
-    public void MultipleRequirementSentences() => Check(
+    [Fact(DisplayName = "multiple statement sentences")]
+    public void MultipleStatementSentences() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Consumers MUST keep the topic inside its declared boundary.", "Consumers MUST keep the topic inside its boundary. Reviewers inspect the result.")),
         ["STANDARD_SENTENCE_COUNT"]);
 
-    [Fact(DisplayName = "duplicate Requirement")]
-    public void DuplicateRequirement() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Rationale:** The boundary gives reviewers one testable result.", "**Requirement:** Consumers MUST name the topic owner.\n\n**Rationale:** The boundary gives reviewers one testable result.")),
+    [Fact(DisplayName = "duplicate Statement")]
+    public void DuplicateStatement() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Rationale:** The boundary gives reviewers one testable result.", "**Statement:** Consumers MUST name the topic owner.\n\n**Rationale:** The boundary gives reviewers one testable result.")),
         ["STANDARD_REQUIREMENT_COUNT"]);
 
     [Fact(DisplayName = "unexpected deviation")]
@@ -137,4 +147,24 @@ public sealed partial class StandardsValidatorTests
     public void ReplacementSentenceCount() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "A consumer can name another location through an explicit local convention.", "A consumer can name another location. The local convention records it.")),
         ["CONVENTION_REPLACEMENT_SENTENCE"]);
+
+    [Fact(DisplayName = "normative deviation")]
+    public void NormativeDeviation() => Check(
+        root =>
+        {
+            var page = StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Consumers MUST keep", "Consumers SHOULD keep");
+            page = StandardsFixture.ReplaceFirst(page, "**Rationale:** The boundary gives reviewers one testable result.", "**Deviation:** Consumers MAY keep another boundary.\n\n**Rationale:** The boundary gives reviewers one testable result.");
+            StandardsFixture.Write(root, "docs/core/topic.md", page);
+        },
+        ["STANDARD_DEVIATION_NORMATIVE"]);
+
+    [Fact(DisplayName = "replacement naming an exception")]
+    public void ReplacementNamingAnException() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "A consumer can name another location through an explicit local convention.", "A consumer replaces this default by recording an Exception for this provision.")),
+        ["CONVENTION_REPLACEMENT_DEVIATION"]);
+
+    [Fact(DisplayName = "replacement naming a deviation")]
+    public void ReplacementNamingADeviation() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "A consumer can name another location through an explicit local convention.", "A consumer replaces this default by recording a deviation with its reason.")),
+        ["CONVENTION_REPLACEMENT_DEVIATION"]);
 }

@@ -6,7 +6,7 @@ namespace LiteSpec.Model.Readers.Dotnet;
 
 /// <summary>
 ///     Reads acceptance scenarios: the case each claims, the steps it runs,
-///     and the failure codes it asserts.
+///     the failure codes it asserts, and whether it asserts anything at all.
 /// </summary>
 sealed class DotnetScenarioReader : IScenarioReader
 {
@@ -162,26 +162,28 @@ sealed class DotnetScenarioReader : IScenarioReader
 
             var steps = new List<ScenarioStep>();
             var statuses = new List<int>();
+            var thenBodies = new List<SyntaxNode>();
             var body = (SyntaxNode?)method.Body ?? method.ExpressionBody;
 
             if (body is not null)
             {
                 foreach (var lambda in body.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>())
                 {
-                    AddStep(lambda.Parameter.Identifier.ValueText, lambda.Body, types, steps, statuses);
+                    AddStep(lambda.Parameter.Identifier.ValueText, lambda.Body, types, steps, statuses, thenBodies);
                 }
 
                 foreach (var lambda in body.DescendantNodes().OfType<ParenthesizedLambdaExpressionSyntax>())
                 {
                     if (lambda.ParameterList.Parameters is [{ Identifier.ValueText: var phase }])
                     {
-                        AddStep(phase, lambda.Body, types, steps, statuses);
+                        AddStep(phase, lambda.Body, types, steps, statuses, thenBodies);
                     }
                 }
             }
 
             var codes = new SortedSet<string>(StringComparer.Ordinal);
             var identifiers = new HashSet<string>(StringComparer.Ordinal);
+            var created = new HashSet<string>(StringComparer.Ordinal);
             var scope = body ?? (SyntaxNode)method;
 
             foreach (var literal in scope.DescendantTokens())
@@ -198,21 +200,28 @@ sealed class DotnetScenarioReader : IScenarioReader
 
             // An integration test often sends its message from a helper declared in the same file, on its own
             // class or on a world type nested beside it, so what those helpers name counts for the test.
-            foreach (var reached in ReachedInFile(scope, root))
+            var reached = ReachedInFile(scope, root);
+
+            foreach (var node in reached)
             {
-                foreach (var name in reached.DescendantNodes().OfType<IdentifierNameSyntax>())
+                foreach (var name in node.DescendantNodes().OfType<IdentifierNameSyntax>())
                 {
                     identifiers.Add(name.Identifier.ValueText);
                 }
 
-                foreach (var created in reached.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
+                foreach (var construction in node.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
                 {
-                    identifiers.Add(created.Type.ToString().Split('<', '.').Last());
+                    identifiers.Add(construction.Type.ToString().Split('<', '.').Last());
+
+                    if (TypeName(construction.Type) is { Length: > 0 } built)
+                    {
+                        created.Add(built);
+                    }
                 }
             }
 
             scenarios.Add(new ScenarioInfo(
-                method.Identifier.ValueText,
+                FullNameOf(method),
                 containing?.Identifier.ValueText ?? "",
                 file,
                 tree.GetLineSpan(method.Span).StartLinePosition.Line + 1,
@@ -221,9 +230,133 @@ sealed class DotnetScenarioReader : IScenarioReader
                 [.. codes],
                 [.. statuses.Distinct().Order()],
                 identifiers,
-                RoutesIn(scope, containing)));
+                RoutesIn(scope, containing),
+                AssertedCodes(thenBodies, reached),
+                HasAssertion(reached),
+                created));
         }
     }
+
+    /// <summary>
+    ///     The test's fully qualified name: its namespace, its containing types
+    ///     joined with dots, and its method. Test runs are matched on this name,
+    ///     so a renamed test matches nothing instead of another test's method.
+    /// </summary>
+    private static string FullNameOf(MethodDeclarationSyntax method)
+    {
+        var space = method.Ancestors().OfType<BaseNamespaceDeclarationSyntax>().FirstOrDefault()?.Name.ToString() ?? "";
+        var holders = method.Ancestors().OfType<TypeDeclarationSyntax>().Reverse().Select(type => type.Identifier.ValueText);
+        var parts = (space.Length > 0 ? new[] { space } : []).Concat(holders).Concat([method.Identifier.ValueText]);
+
+        return string.Join('.', parts);
+    }
+
+    /// <summary>
+    ///     The refusal codes the test asserts: codes inside its then steps, and codes
+    ///     passed to an assertion call. A code mentioned anywhere else, such as in
+    ///     setup or in an unused helper, proves no refusal.
+    /// </summary>
+    private static List<string> AssertedCodes(IReadOnlyList<SyntaxNode> thenBodies, IReadOnlyList<SyntaxNode> reached)
+    {
+        var asserted = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var body in thenBodies)
+        {
+            foreach (var token in body.DescendantTokens())
+            {
+                AddCodes(token, asserted);
+            }
+        }
+
+        foreach (var node in reached)
+        {
+            foreach (var invocation in node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
+            {
+                if (!AssertsThrough(invocation))
+                {
+                    continue;
+                }
+
+                foreach (var token in invocation.ArgumentList.DescendantTokens())
+                {
+                    AddCodes(token, asserted);
+                }
+            }
+        }
+
+        return [.. asserted];
+    }
+
+    private static void AddCodes(SyntaxToken token, SortedSet<string> asserted)
+    {
+        if (token.IsKind(SyntaxKind.StringLiteralToken) && token.Value is string text)
+        {
+            foreach (System.Text.RegularExpressions.Match match in Identifiers.RefusalCode().Matches(text))
+            {
+                asserted.Add(match.Value);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Whether the test asserts anything: an assertion call in its own body or in
+    ///     a helper declared in the same file. Assertion presence in other files, such
+    ///     as inside a steps class, is the analyzer's check, not the reader's.
+    /// </summary>
+    private static bool HasAssertion(IReadOnlyList<SyntaxNode> reached) =>
+        reached.Any(node => node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>().Any(AssertsThrough));
+
+    /// <summary>
+    ///     Whether the call asserts: an <c>Assert</c> or <c>Should</c> call, a bare
+    ///     <c>Expect</c> or <c>Verify</c> call, a call on an assert holder such as
+    ///     <c>ClassicAssert</c>, or a call chained onto an assertion such as
+    ///     <c>value.Should().Be(expected)</c>.
+    /// </summary>
+    private static bool AssertsThrough(InvocationExpressionSyntax invocation)
+    {
+        if (IsAssertion(invocation))
+        {
+            return true;
+        }
+
+        return invocation.Expression is MemberAccessExpressionSyntax member
+            && member.Expression is InvocationExpressionSyntax inner
+            && IsAssertion(inner);
+    }
+
+    private static bool IsAssertion(InvocationExpressionSyntax invocation)
+    {
+        var name = invocation.Expression switch
+        {
+            MemberAccessExpressionSyntax member => member.Name.Identifier.ValueText,
+            IdentifierNameSyntax plain => plain.Identifier.ValueText,
+            _ => null,
+        };
+
+        if (name is not null
+            && (name.StartsWith("Assert", StringComparison.Ordinal)
+                || name.StartsWith("Should", StringComparison.Ordinal)
+                || name is "Expect" or "Verify"))
+        {
+            return true;
+        }
+
+        return invocation.Expression is MemberAccessExpressionSyntax access
+            && access.Expression is IdentifierNameSyntax receiver
+            && (receiver.Identifier.ValueText is "Assert"
+                || receiver.Identifier.ValueText.EndsWith("Assert", StringComparison.Ordinal));
+    }
+
+    /// <summary>The constructed type's simple name, without arguments or qualification.</summary>
+    private static string TypeName(TypeSyntax type) => type switch
+    {
+        GenericNameSyntax generic => generic.Identifier.ValueText,
+        IdentifierNameSyntax plain => plain.Identifier.ValueText,
+        QualifiedNameSyntax qualified => TypeName(qualified.Right),
+        NullableTypeSyntax nullable => TypeName(nullable.ElementType),
+        ArrayTypeSyntax array => TypeName(array.ElementType),
+        _ => "",
+    };
 
     /// <summary>
     ///     The test's own body and the body of every method declared in the same file that it calls,
@@ -275,7 +408,8 @@ sealed class DotnetScenarioReader : IScenarioReader
         CSharpSyntaxNode lambdaBody,
         IReadOnlyDictionary<string, string> types,
         List<ScenarioStep> steps,
-        List<int> statuses)
+        List<int> statuses,
+        List<SyntaxNode> thenBodies)
     {
         if (phase is not ("given" or "when" or "then"))
         {
@@ -288,6 +422,8 @@ sealed class DotnetScenarioReader : IScenarioReader
 
             if (phase == "then")
             {
+                thenBodies.Add(lambdaBody);
+
                 foreach (var argument in invocation.ArgumentList.Arguments)
                 {
                     if (argument.Expression is LiteralExpressionSyntax literal

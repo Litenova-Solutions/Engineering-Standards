@@ -26,7 +26,7 @@ State why the command exists and the moment a reader reaches for it.
 |:---|:---|:---|
 | `--{option}` | `{default}` | State what the option changes. |
 
-## Exit codes
+## Exit Codes
 
 | Code | Meaning |
 |:---|:---|
@@ -42,4 +42,4 @@ State why the command exists and the moment a reader reaches for it.
 
 ## Underneath
 
-State what the command runs on the reader's behalf, and how to run those steps directly. Write `None.` when nothing beneath the command is separately runnable.
+State what the command runs on the reader's behalf, and how to run those steps directly. Write `Nothing beneath this command is separately runnable.` when nothing beneath the command is separately runnable.

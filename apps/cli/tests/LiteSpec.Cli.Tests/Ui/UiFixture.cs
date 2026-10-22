@@ -59,6 +59,9 @@ sealed class UiFixture : IDisposable
     /// <summary>The default application route case file.</summary>
     public const string DefaultAppCase = "export function Case() {\n  return <main>Orders</main>;\n}\n";
 
+    /// <summary>The route suite stub that visits every discovered route.</summary>
+    public const string RouteSuiteSource = "import { test } from \"@playwright/test\";\n\ntest(\"every route passes the route suite checks\", async () => {});\n";
+
     /// <summary>The copied primitive sources the lock seals.</summary>
     public const string ButtonSource = "export function Button() {\n  return null;\n}\n";
 
@@ -94,6 +97,9 @@ sealed class UiFixture : IDisposable
 
     /// <summary>The application route case file.</summary>
     public string AppCase => Join("apps/web/src/routes/case.tsx");
+
+    /// <summary>The route suite specification.</summary>
+    public string SuiteFile => Join("apps/web/tests/routes/every-route.spec.ts");
 
     /// <summary>The token stylesheet.</summary>
     public string TokensCss => Join("packages/ui/src/styles/tokens.css");
@@ -338,6 +344,7 @@ sealed class UiFixture : IDisposable
             "packages/ui/src/styles",
             "apps/web/src/routes",
             "apps/web/src/modules",
+            "apps/web/tests/routes",
             "docs/deviations",
             "litespec/schemas",
             "litespec/docs/frontend/patterns",
@@ -373,6 +380,7 @@ sealed class UiFixture : IDisposable
         File.WriteAllText(TokensCss, CleanCss);
         File.WriteAllText(AppStyles, CleanAppStyles);
         File.WriteAllText(AppCase, DefaultAppCase);
+        File.WriteAllText(SuiteFile, RouteSuiteSource);
 
         WriteJson(ComponentsFile, ComponentsJson());
 

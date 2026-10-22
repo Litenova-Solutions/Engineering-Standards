@@ -19,15 +19,15 @@ static class StandardsFixture
 
         ## Standards
 
-        ### Keep the topic bounded
+        ### Keep the Topic Bounded
 
-        **Requirement:** Consumers MUST keep the topic inside its declared boundary.
+        **Statement:** Consumers MUST keep the topic inside its declared boundary.
 
         **Rationale:** The boundary gives reviewers one testable result.
 
         ## Conventions
 
-        ### Use the default location
+        ### Use the Default Location
 
         **Default:** Store the topic in its owning documentation area.
 
@@ -51,7 +51,7 @@ static class StandardsFixture
 
         ## Patterns
 
-        ### Record header
+        ### Record Header
 
         **Question:** How does the top of a record read?
 
@@ -59,7 +59,7 @@ static class StandardsFixture
 
         **Rationale:** One primary action answers what comes next.
 
-        #### `one-primary`: One primary action
+        #### `one-primary`: One Primary Action
 
         ```wireframe
         page
@@ -72,7 +72,7 @@ static class StandardsFixture
 
         **Cost:** Other commands wait in a menu.
 
-        #### `two-equal`: Two equal actions
+        #### `two-equal`: Two Equal Actions
 
         ```wireframe
         page
@@ -115,9 +115,9 @@ static class StandardsFixture
 
         ## Standards
 
-        ### Record extension activation
+        ### Record Extension Activation
 
-        **Requirement:** Consumers MUST record activation on each applicable specification.
+        **Statement:** Consumers MUST record activation on each applicable specification.
 
         ## Conventions
 
@@ -144,9 +144,9 @@ static class StandardsFixture
 
         ## Standards
 
-        ### Apply the complete stack
+        ### Apply the Complete Stack
 
-        **Requirement:** Consumers MUST apply every document in the selected stack composition.
+        **Statement:** Consumers MUST apply every document in the selected stack composition.
 
         ## Conventions
 

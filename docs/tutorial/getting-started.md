@@ -2,14 +2,14 @@
 
 ## Purpose
 
-A LiteSpec consumer is a project built against the LiteSpec standard, and this tutorial turns an empty folder into one: its configuration, its first written records, one working use case, and a passing model check. A use case names what the product does for an actor, a person or system using it, and the model check confirms the records, code, and tests agree. A developer follows these steps once, when creating the consumer. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
+A LiteSpec consumer is a project built against the LiteSpec standard, and this tutorial turns an empty folder into one: its configuration, its first written records, one working use case, and a passing model check. A use case names what the product does for an actor, a person or system using it, and the model check confirms the records, code, and tests agree. This tutorial follows one backend stack and one frontend stack, the `dotnet` backend with a React frontend, so every step runs the same way for every reader. A developer follows these steps once, when creating the consumer. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
 
 ## Prerequisites
 
 - Read the [agent protocol](../core/agent.md), the [authoring standard](../core/authoring.md), and the [supported scope](../core/scope.md) to learn how agents work, how pages are written, and what one project covers.
 - Read the [extension catalog](../ext/README.md) to learn which capabilities stay inactive at the start.
 - Install the .NET SDK and Node.js releases pinned in `litespec.manifest.json` at the LiteSpec root.
-- Decide which stacks the product ships: the `dotnet` backend plus one platform per frontend.
+- Ship the `dotnet` backend with a React frontend: this tutorial follows that pair from the `dotnet-react` preset. When the product ships another frontend, follow this tutorial first, then declare that frontend with its own how-to, [Add a Svelte Frontend](../guide/add-a-svelte-frontend.md) or [Add a Blazor Frontend](../guide/add-a-blazor-frontend.md).
 
 ## Lesson
 
@@ -20,30 +20,23 @@ A LiteSpec consumer is a project built against the LiteSpec standard, and this t
 5. Add only the packages the manifest already pins. Record each new package approval explicitly. This satisfies `litespec/backend/dotnet/packages#pin-every-dependency-centrally` and `litespec/workspace/dependencies#approve-new-packages-explicitly`.
 6. Create the API solution. Add the five application projects, the AppHost, the ServiceDefaults, and the Architecture and Integration test projects. Add the Acceptance project when the product needs executable specifications. This satisfies `litespec/backend/dotnet/architecture#use-five-application-projects` and `litespec/backend/dotnet/testing#keep-the-test-projects-the-size-requires`.
 7. Apply the naming rules: match each C# file to its primary type and each namespace to its folder. This satisfies `litespec/backend/dotnet/naming#match-c-files-and-primary-types` and `litespec/workspace/naming#keep-namespaces-aligned-with-folders`.
-8. Write the product brief. Copy `product-brief.md` from the template index to `docs/product/brief.md`. State the boundary, the refusals, and the audience. This satisfies `litespec/core/product#keep-business-intent-under-product`.
-9. Write one topic page with its requirements. Copy `product-topic.md` from the template index to `docs/product/<area>/<topic>.md`. State each commitment as one requirement with its kind. This satisfies `litespec/core/product#state-each-topic-in-one-page-shape` and `litespec/core/product#identify-every-requirement`.
-10. State which constraints apply. Write one constraint record per outside rule, or record that none applies, and set `constraints.answered` to `true`. The `litespec.project.json` template defines the fields.
-11. Record the first decision. Copy `decision.md` from the template index to `docs/product/decisions/<number>-<name>.md`. Name the options, the decider, and what would change the choice. This satisfies `litespec/core/product#record-each-product-choice-as-a-decision` and `litespec/core/product#trace-every-choice-to-a-decision`.
-12. Write the people records. Add one actor page per party, one role page per grantable set, and the permission entries on the permissions page. Each use case later names the permissions it needs. The `actor.md`, `role.md`, and `permission-list.md` templates define the fields.
-13. Write the module and its business records. Follow [Model a domain module](model-domain.md) for the module, the rules, the use cases, the events, and the permissions. This satisfies `litespec/core/system#group-language-and-use-cases-by-module`.
+8. Write the product brief. Copy `product-brief.md` from the template index to `docs/product/brief.md`. State the boundary, the refusals, and the audience. This satisfies `litespec/core/product#keep-product-intent-in-its-homes`.
+9. Write one requirement page. Copy `requirement-page.md` from the template index to `docs/product/<area>/<topic>.md`. State each commitment as one requirement with its kind, `functional`, `quality`, or `business`. This satisfies `litespec/core/product#shape-each-requirement-page` and `litespec/core/product#identify-every-requirement`.
+10. State which constraints apply. Write one constraint record per outside rule, with its source and category, or record that none applies, and set `constraints.answered` to `true`. The `litespec.project.json` template defines the fields.
+11. Record the first decision. Copy `decision.md` from the template index to `docs/product/decisions/<number>-<name>.md`. Name the options with what speaks for and against each, the decider, and what would change the choice. This satisfies `litespec/core/product#record-each-choice-as-a-decision` and `litespec/core/product#trace-every-choice-to-a-decision`.
+12. Write the people records. Add one actor page per party, one role page per grantable set, and the permission entries on the permissions page. Each use case later names the permissions it needs. The `actor.md`, `role.md`, and `permission-list.md` templates define the fields. When the slice exchanges anything with an outside system, add an external system page for it.
+13. Write the module and its aggregates. Follow [Model a Domain Module](model-domain.md) for the module, the aggregates, the rules, the use cases, the scenarios, the events, and the permissions. This satisfies `litespec/core/system#group-module-use-case-files-by-aggregate`.
 14. Implement one use case. Move the transition into a business method, keep the handler narrow, commit once, expose one endpoint, and authorize the target. This satisfies `litespec/backend/domain#express-transitions-through-business-methods`, `litespec/backend/application#keep-command-handlers-narrow`, `litespec/backend/dotnet/persistence#commit-once-in-the-command-pipeline`, `litespec/backend/dotnet/api#use-one-endpoint-per-operation`, and `litespec/quality/security#authorize-each-target-resource`.
-15. Declare each frontend by running the row that matches its platform in `litespec.project.json`.
-
-    | Platform | Structure step | UI step |
-    |:---|:---|:---|
-    | `react` | Declare the application tree and mirror the backend use case path (`litespec/frontend/web/structure#use-the-frontend-application-tree`) | Compose each route from one floorplan (`litespec/frontend/web/ui#compose-each-route-from-one-floorplan`) |
-    | `svelte` | Declare the application tree and mirror the backend use case path (`litespec/frontend/web/structure#use-the-frontend-application-tree`) | Compose each route from one floorplan (`litespec/frontend/web/ui#compose-each-route-from-one-floorplan`) |
-    | `blazor` | Declare the client solution tree and organize features by module and use case (`litespec/frontend/blazor/structure#use-the-client-solution-tree`) | No UI contract step; Blazor stays outside the controlled UI contract |
-
+15. Declare the React frontend. Declare the application tree and mirror the backend use case path. This satisfies `litespec/frontend/web/structure#use-the-frontend-application-tree`. Compose each route from one floorplan. This satisfies `litespec/frontend/web/ui#compose-each-route-from-one-floorplan`.
 16. Deliver one complete slice. Ship source, tests, contracts, and operating evidence for one use case. This satisfies `litespec/core/system#deliver-one-complete-use-case`.
 17. Add the operating records. Write the limits and runbooks, add deployment, backup, restore, and rollback, and configure the pipeline gates. This satisfies `litespec/quality/operations#start-the-stack-with-one-local-command` and `litespec/quality/ci#run-applicable-gates-on-every-pull-request`.
 18. Build the model. Run `litespec model build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
-19. Check the model. Run `litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved case. Fix every finding before continuing.
+19. Check the model. Run `litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved scenario. Fix every finding before continuing.
 20. Render the generated regions: run `litespec model render`, then commit what it wrote.
 21. Run the remaining validators. Run `litespec consumer` and `litespec ui` from the consumer root. Both exit `0` on a clean tree. This satisfies `litespec/core/release#run-consistency-checks`.
 
-## What you built
+## What You Built
 
 - A consumer repository at small size that the model check accepts.
 - One implemented use case with records, code, tests, and generated contracts.
-- The checks are documented on [Validate Consumer](../tools/consumer.md) and [Validate Controlled UI](../tools/ui.md); all commands are listed on the [command index](../tools/README.md).
+- When the product ships another frontend, [Add a Svelte Frontend](../guide/add-a-svelte-frontend.md) and [Add a Blazor Frontend](../guide/add-a-blazor-frontend.md) declare it. The checks are documented on [Validate Consumer](../tools/consumer.md) and [Validate Controlled UI](../tools/ui.md); all commands are listed on the [command index](../tools/README.md).

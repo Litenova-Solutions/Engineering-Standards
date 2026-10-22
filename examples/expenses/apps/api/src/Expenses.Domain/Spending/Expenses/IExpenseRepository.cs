@@ -8,4 +8,7 @@ public interface IExpenseRepository
 
     /// <summary>Stages a new or changed expense for the pipeline's one commit.</summary>
     void Store(Expense expense);
+
+    /// <summary>Deletes one expense with the personal data it holds.</summary>
+    void Delete(Guid id);
 }

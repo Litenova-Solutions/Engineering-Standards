@@ -2,9 +2,9 @@
 
 ## Intent
 
-These files are starting points for consumer records. Copy only the files the current work needs, replace every `<placeholder>` and every `__NAME__` placeholder before committing, and remove any optional line left unused. `litespec init` fills `__PROJECT__` in `litespec.project.json` and lists the placeholders it leaves, and `litespec consumer` refuses a project file that still holds one. The other JSON templates carry working example values; adjust them to the project.
+These files are starting points for consumer records. `litespec init` copies the project setup files to their targets; copy only the record files the current work needs, replace every `<placeholder>` and every `__NAME__` placeholder before committing, and remove any optional line left unused. A section whose starter text opens with `Optional.` may be removed when it has nothing to say; every other section is required. `litespec init` fills `__PROJECT__` in `litespec.project.json` and lists the placeholders it leaves, and `litespec consumer` refuses a project file that still holds one. The other JSON templates carry working example values; adjust them to the project.
 
-A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a product topic page. Rules and events sit on a business record page, and results and cases on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the language record instead of on a page.
+A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a requirement page. Rules and events sit on an aggregate page, and results and scenarios on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the glossary at `docs/glossary.json` instead of on a page.
 
 ## Project setup
 
@@ -12,39 +12,41 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 |:---|:---|:---|
 | `litespec.project.json` | `litespec.project.json` | Selects the size, stacks, reviewed LiteSpec release, paths, owners, optional types, and selected extensions. |
 | `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
-| `language.json` | `docs/language.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
-| `scenario-cast.md` | `docs/domain/scenarios.md` | Fixes the people, place, dates, and amounts every `Scenario` section draws from. |
+| `glossary.json` | `docs/glossary.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
+| `example-cast.md` | `docs/domain/example-cast.md` | Fixes the people, place, dates, and amounts every `Example` section draws from. |
 
 ## Page records
 
 | Template | Target | Purpose |
 |:---|:---|:---|
 | `product-brief.md` | `docs/product/brief.md` | Defines the product boundary, what it never does, and its audience. |
+| `goal.md` | `docs/product/goals/<name>.md` | States one measurable outcome the product serves. |
 | `constraint.md` | `docs/product/constraints/<name>.md` | Records one outside rule and whether it applies. |
 | `research.md` | `docs/research/<name>.md` | Records one outside fact that informs a choice. |
 | `decision.md` | `docs/product/decisions/<number>-<name>.md` | Records one dated choice with its options and evidence. |
 | `problem.md` | `docs/product/problems/<name>.md` | Records one pain someone has today. |
 | `feature.md` | `docs/product/features/<name>.md` | Records what is offered against a problem. |
-| `actor.md` | `docs/domain/actors/<name>.md` | Records one person, company, provider, system, or guest. |
+| `actor.md` | `docs/domain/actors/<name>.md` | Records one person, organization, or system. |
 | `role.md` | `docs/domain/roles/<name>.md` | Records one named set of permissions at a scope. |
+| `external-system.md` | `docs/domain/systems/<name>.md` | Records one outside system, what crosses its boundary, and its failure behavior. |
 | `journey.md` | `docs/product/journeys/<name>.md` | Records the ordered steps an actor takes toward one goal. |
 | `module.md` | `docs/domain/modules/<module>/README.md` | Defines one business area and its boundaries. |
-| `business-record.md` | `docs/domain/modules/<module>/<records>/README.md` | Defines one record changed in one step, with its rule and event entries. |
-| `use-case.md` | `docs/domain/modules/<module>/<records>/<use-case>.md` | Defines one command or query, with its result and case entries. |
+| `aggregate.md` | `docs/domain/modules/<module>/<aggregate>/README.md` | Defines one aggregate changed in one step, with its states and its rule and event entries. |
+| `use-case.md` | `docs/domain/modules/<module>/<aggregate>/<use-case>.md` | Defines one command, query, or reaction, with its result and scenario entries. |
 | `runbook.md` | `docs/runbooks/<name>.md` | Gives one repeatable recovery or operating procedure. |
-| `exception.md` | `docs/exceptions/<name>.md` | Records one departure from a standard, with reason and review date. |
+| `deviation.md` | `docs/deviations/<name>.md` | Records one departure from a provision, with reason and review date. |
 | `known-gap.md` | `docs/known-gaps/<name>.md` | Records one accepted gap whose check stays red. |
 
 ## Entry lists and page styles
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `product-topic.md` | `docs/product/<area>/<topic>.md` | States one area of business intent, with its requirement entries. |
+| `requirement-page.md` | `docs/product/<area>/<topic>.md` | States one area of business intent, with its requirement entries. |
 | `permission-list.md` | `docs/domain/permissions.md` | Holds the permission entries roles allow. |
 | `entry-point-list.md` | `docs/domain/entry-points.md` | Holds the entry point entries use cases are reached through. |
 | `limit-set.md` | `docs/operations/limits.md` | Holds the limit entries the product runs within. |
-| `rule-set.md` | `docs/domain/rules/<name>.md` | Holds rule entries that sit together outside one record. |
-| `glossary.md` | `docs/domain/glossary.md` | Renders the Term entries from the language record. |
+| `rule-set.md` | `docs/domain/rules/<name>.md` | Holds rule entries that sit together outside one aggregate. |
+| `glossary.md` | `docs/domain/glossary.md` | Renders the Term entries from the glossary. |
 | `index.md` | `docs/<section>/README.md` | Lists what one directory holds and what lives elsewhere. |
 | `tutorial.md` | `docs/guide/<tutorial>.md` | Gives a newcomer one path to a first working result. |
 | `how-to.md` | `docs/guide/<how-to>.md` | Solves one stated goal for a reader who is already running. |

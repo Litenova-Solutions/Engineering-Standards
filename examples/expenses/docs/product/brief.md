@@ -20,6 +20,8 @@
 
 # Expenses
 
+## Summary
+
 The company submits work expenses with receipts.
 
 Employees submit and attach. Managers approve and reject. Finance reimburses.

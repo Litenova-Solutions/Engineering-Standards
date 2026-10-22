@@ -16,6 +16,8 @@ State the one problem this page solves, for a reader who already has a working r
 
 ## Prerequisites
 
+Optional. Remove this section when the procedure needs no setup.
+
 - Link the tutorial a reader finishes before starting here.
 - Name each input the procedure needs.
 
@@ -25,6 +27,6 @@ State the one problem this page solves, for a reader who already has a working r
 2. Name the repository command that performs the step.
 3. State the condition where the procedure branches, and what each branch does.
 
-## Verification
+## Check
 
 - Name the exact command, artifact, or observable result that proves completion.

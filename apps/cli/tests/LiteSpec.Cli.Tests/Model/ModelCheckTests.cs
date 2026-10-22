@@ -35,6 +35,14 @@ public sealed class ModelCheckTests
         "aggregate-name-clash",
         "decision-decides-nothing",
         "link-unresolved",
+        "behavior-unrecorded",
+        "state-unreachable",
+        "transition-unresolved",
+        "personal-data-uncovered",
+        "calculation-without-table",
+        "reaction-without-trigger",
+        "requirement-unmeasured",
+        "open-questions",
     ];
 
     /// <summary>The finding codes as theory rows, one row per broken overlay.</summary>

@@ -14,7 +14,14 @@
       "read": "<YYYY-MM-DD>"
     }
   ],
-  "terms": ["term/<term-name>"]
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Research display title>
@@ -23,6 +30,6 @@
 
 State the finding in one paragraph, with the confidence behind it.
 
-## Notes on sources
+## Notes on Sources
 
-State what each source covers and where one source disagrees with another.
+Optional. State what each source covers and where one source disagrees with another. Remove this section when the answer stands on one source alone.

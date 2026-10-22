@@ -2,7 +2,7 @@
 {
   "type": "known-gap",
   "id": "known-gap/export-expenses-unimplemented",
-  "title": "Export expenses unimplemented",
+  "title": "Export Expenses Unimplemented",
   "owner": "expenses-team",
   "status": "approved",
   "check": "use-case-unimplemented",
@@ -14,6 +14,8 @@
 }
 ---
 
-# Export expenses unimplemented
+# Export Expenses Unimplemented
 
-Exporting expenses has no handler yet.
+## Exit
+
+Exporting expenses has no handler yet. The gap closes when the finance file format lands and the export use case gains its handler.

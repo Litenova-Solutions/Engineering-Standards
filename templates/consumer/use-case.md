@@ -7,12 +7,16 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
-  "operation": "<command|query>",
+  "kind": "<command|query|reaction>",
   "needs": ["permission/<name, or empty with anonymous true>"],
   "anonymous": false,
   "reachedThrough": ["entry-point/<name>"],
-  "raises": ["event/<record>.<past-tense>"],
-  "reactsTo": ["<event id, or remove this line>"],
+  "raises": ["event/<aggregate>.<past-tense>"],
+  "trigger": {
+    "events": ["event/<aggregate>.<past-tense>"],
+    "schedule": "<schedule in words, or remove this line>",
+    "deadline": "<deadline in words; remove this object when the kind is not reaction>"
+  },
   "fulfills": ["requirement/<topic>.<name>"],
   "input": [
     {
@@ -21,13 +25,18 @@
       "rules": ["<The shape each value obeys>"]
     }
   ],
+  "output": [
+    {
+      "name": "<field>",
+      "meaning": "<What this returned field means>"
+    }
+  ],
   "records": [
     {
       "type": "result",
       "id": "result/<use-case>.<name>",
       "title": "<Success display title>",
       "outcome": "success",
-      "httpStatus": "<HTTP status, or remove this line when no HTTP entry point reaches this use case>",
       "meaning": "<The observable result in one sentence>"
     },
     {
@@ -35,29 +44,52 @@
       "id": "result/<use-case>.<name>",
       "title": "<Refusal display title>",
       "outcome": "refusal",
-      "code": "failure/<module>.<reason>",
-      "httpStatus": "<HTTP status, or remove this line when no HTTP entry point reaches this use case>",
+      "code": "<module>.<reason>",
       "meaning": "<What the caller sees in one sentence>"
     },
     {
-      "type": "case",
-      "id": "case/<use-case>.<name>",
-      "title": "<Case display title>",
-      "situation": "<The starting state>",
-      "action": "<What the actor does>",
+      "type": "scenario",
+      "id": "scenario/<use-case>.<name>",
+      "title": "<Scenario display title>",
+      "given": "<The starting state>",
+      "when": "<What the actor does>",
+      "then": "<The observable result>",
       "result": "result/<use-case>.<name>",
-      "expect": "<The observable result>"
+      "examples": [
+        {
+          "<column>": "<value>"
+        }
+      ]
     }
   ],
-  "terms": ["term/<term-name>"]
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Use case display title>
 
 ## Goal
 
-State the actor goal and its observable result.
+State the actor goal in one sentence.
 
-## Trigger
+## What Happens
 
-State the actor action, event, schedule, or system condition that starts this use case.
+State the behavior in order, in plain sentences. Remove this section when the kind is query.
+
+## Risk
+
+Optional. State what money, personal data, or concurrency this use case touches. Remove this section when it touches none.
+
+## Example
+
+Optional. Show one realistic run of this use case, drawing people, place, dates, and amounts from the example cast. Remove this section when no run adds to the scenarios.
+
+## Notes
+
+Optional. Record anything a reader needs that fits no section above, under free `###` headings. Notes are informative and never authoritative. Remove this section when there is nothing to note.

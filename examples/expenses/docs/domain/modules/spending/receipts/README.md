@@ -5,6 +5,7 @@
   "title": "Receipt",
   "owner": "expenses-team",
   "status": "approved",
+  "summary": "A receipt is proof of payment attached to an expense.",
   "states": [
     {
       "name": "Attached",
@@ -52,3 +53,11 @@
 # Receipt
 
 A receipt is proof of payment attached to an expense.
+
+## Transitions
+
+None.
+
+## Data
+
+None.

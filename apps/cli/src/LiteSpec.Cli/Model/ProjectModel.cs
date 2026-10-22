@@ -101,6 +101,13 @@ sealed class ProjectModel
 
             writer.WriteStartArray("records");
 
+            var bodies = new Dictionary<(string File, string? PageId), string>(Records.Count);
+
+            foreach (var page in Bodies)
+            {
+                bodies[(page.File, page.PageId)] = PageText(page.Body);
+            }
+
             foreach (var record in Records.OrderBy(left => left.Id, StringComparer.Ordinal))
             {
                 writer.WriteStartObject();
@@ -120,6 +127,11 @@ sealed class ProjectModel
 
                 writer.WriteString("file", Config.Relative(record.File));
                 writer.WriteNumber("line", record.Line);
+
+                if (bodies.TryGetValue((record.File, record.Id), out var text))
+                {
+                    writer.WriteString("body", text);
+                }
                 writer.WritePropertyName("fields");
                 record.Raw.WriteTo(writer);
                 writer.WritePropertyName("links");
@@ -302,6 +314,7 @@ sealed class ProjectModel
                 writer.WriteNumber("total", TestRun.Total);
                 writer.WriteNumber("passed", TestRun.Passed);
                 writer.WriteNumber("failed", TestRun.Failed);
+                writer.WriteString("date", TestRun.Date);
                 writer.WriteEndObject();
             }
 
@@ -458,6 +471,32 @@ sealed class ProjectModel
         }
 
         return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    /// <summary>The page text the book shows: the body without its H1 title, trimmed.</summary>
+    private static string PageText(string body)
+    {
+        var lines = body.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        var first = 0;
+
+        while (first < lines.Length && lines[first].Trim().Length == 0)
+        {
+            first++;
+        }
+
+        if (first < lines.Length && IsTitle(lines[first]))
+        {
+            first++;
+        }
+
+        return string.Join('\n', lines[first..]).Trim();
+    }
+
+    private static bool IsTitle(string line)
+    {
+        var text = line.TrimStart();
+
+        return text.StartsWith("# ", StringComparison.Ordinal) || text == "#";
     }
 
     private static void WriteNullable(Utf8JsonWriter writer, string name, string? value)

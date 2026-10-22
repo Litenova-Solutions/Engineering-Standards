@@ -73,11 +73,16 @@ public sealed partial class StandardsValidatorTests
 
     [Fact(DisplayName = "provision restates its heading")]
     public void ProvisionRestatesHeading() => Check(
-        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Requirement:** Consumers MUST keep the topic inside its declared boundary.", "**Requirement:** Consumers MUST keep the topic bounded.")),
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "**Statement:** Consumers MUST keep the topic inside its declared boundary.", "**Statement:** Consumers MUST keep the topic bounded.")),
         ["PROVISION_RESTATES_HEADING"]);
 
     [Fact(DisplayName = "evidence repeats its provision heading")]
     public void EvidenceRepeatsHeading() => Check(
         root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "| litespec/core/topic#keep-the-topic-bounded | checkable | `litespec validate` confirms the topic stays inside its declared boundary. |", "| litespec/core/topic#keep-the-topic-bounded | checkable | Pull request review asserts `keep the topic bounded` in the owning specification. |")),
         ["VERIFY_TEMPLATED_EVIDENCE"]);
+
+    [Fact(DisplayName = "verification rows sharing evidence")]
+    public void VerificationRowsSharingEvidence() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "Does the topic live in its owning documentation area?", "`litespec validate` confirms the topic stays inside its declared boundary.")),
+        ["VERIFY_DUPLICATE_EVIDENCE"]);
 }

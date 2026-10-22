@@ -53,6 +53,62 @@ public sealed class InitCommandTests
         Assert.Contains("\"apps/api/Team Expenses.slnx\"", text, StringComparison.Ordinal);
     }
 
+    [Fact(DisplayName = "init copies the agent context, glossary, and example cast beside the project file")]
+    public void CopiesScaffoldFilesBesideTheProjectFile()
+    {
+        using var consumer = Cli.Temp("init-scaffold");
+
+        var result = Cli.Run("init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path);
+
+        Assert.Equal(0, result.Status);
+        var agents = Path.Combine(consumer.Path, "AGENTS.md");
+        var glossary = Path.Combine(consumer.Path, "docs", "glossary.json");
+        var cast = Path.Combine(consumer.Path, "docs", "domain", "example-cast.md");
+        Assert.Contains("litespec.project.json", File.ReadAllText(agents), StringComparison.Ordinal);
+        Assert.Contains("glossary.schema.json", File.ReadAllText(glossary), StringComparison.Ordinal);
+        Assert.Contains("\"example-cast\"", File.ReadAllText(cast), StringComparison.Ordinal);
+        Assert.Contains($"Wrote {agents}.", result.Stdout, StringComparison.Ordinal);
+        Assert.Contains($"Wrote {glossary}.", result.Stdout, StringComparison.Ordinal);
+        Assert.Contains($"Wrote {cast}.", result.Stdout, StringComparison.Ordinal);
+        Assert.Contains("Fill every <placeholder> in the copied files before validating.", result.Stdout, StringComparison.Ordinal);
+    }
+
+    [Fact(DisplayName = "init leaves existing scaffold files alone and still exits zero")]
+    public void LeavesExistingScaffoldFilesAlone()
+    {
+        using var home = Cli.Temp("init-home");
+        using var consumer = Cli.Temp("init-consumer");
+        FixtureHome(home.Path);
+
+        var agents = Path.Combine(consumer.Path, "AGENTS.md");
+        File.WriteAllText(agents, "# Ours\n");
+
+        var result = Cli.Run(
+            ["init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path],
+            environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+
+        Assert.Equal(0, result.Status);
+        Assert.Equal("# Ours\n", File.ReadAllText(agents));
+        Assert.Contains($"'{agents}' already exists; left alone.", result.Stdout, StringComparison.Ordinal);
+        Assert.True(File.Exists(Path.Combine(consumer.Path, "docs", "glossary.json")));
+    }
+
+    [Fact(DisplayName = "init with a missing scaffold template names the checkout file and writes nothing")]
+    public void MissingScaffoldTemplateNamesTheCheckoutFile()
+    {
+        using var home = Cli.Temp("init-home");
+        using var consumer = Cli.Temp("init-consumer");
+        FixtureHome(home.Path, scaffold: false);
+
+        var result = Cli.Run(
+            ["init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path],
+            environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+
+        Assert.Equal(1, result.Status);
+        Assert.Contains("holds no readable templates/consumer/project-agents.md", result.Stderr, StringComparison.Ordinal);
+        Assert.False(File.Exists(Path.Combine(consumer.Path, "litespec.project.json")));
+    }
+
     [Theory(DisplayName = "init writes a project file from each preset")]
     [InlineData("dotnet-react", "small", "server", "dotnet,react", "web", "apps/web", "react")]
     [InlineData("dotnet-react", "large", "server", "dotnet,react", "web", "apps/web", "react")]
@@ -126,6 +182,7 @@ public sealed class InitCommandTests
         Assert.Equal(2, result.Status);
         Assert.Contains("already exists", result.Stderr);
         Assert.Equal("{\"sentinel\": true}\n", File.ReadAllText(target));
+        Assert.False(File.Exists(Path.Combine(consumer.Path, "AGENTS.md")));
     }
 
     [Fact(DisplayName = "init with an unknown preset lists the known ones")]
@@ -201,9 +258,10 @@ public sealed class InitCommandTests
 
     /// <summary>
     ///     Builds a self-contained LiteSpec checkout: a manifest with a version no
-    ///     release ships, a minimal consumer template, and the repository's presets.
+    ///     release ships, a minimal consumer template, the repository's scaffold
+    ///     templates, and the repository's presets.
     /// </summary>
-    static void FixtureHome(string home)
+    static void FixtureHome(string home, bool scaffold = true)
     {
         File.WriteAllText(Path.Combine(home, "litespec.manifest.json"), $$"""
             {
@@ -228,6 +286,16 @@ public sealed class InitCommandTests
               "selectedExtensions": []
             }
             """);
+
+        if (scaffold)
+        {
+            foreach (var name in new[] { "project-agents.md", "glossary.json", "example-cast.md" })
+            {
+                File.Copy(
+                    Path.Combine(Cli.Repository, "templates", "consumer", name),
+                    Path.Combine(templateDir, name));
+            }
+        }
 
         var presetDir = Path.Combine(home, "templates", "presets");
         Directory.CreateDirectory(presetDir);

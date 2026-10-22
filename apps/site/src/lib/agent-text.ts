@@ -219,7 +219,7 @@ export function selectionLine(selection: Selection): string {
 /** The /<version>/select/<key>/llms.txt index of one selection. */
 export function selectionLlmsText(selection: Selection): string {
   const key = selectionKey(selection);
-  const lines = [`# LiteSpec selection: ${selectionTitle(selection)}`, ""];
+  const lines = [`# LiteSpec Selection: ${selectionTitle(selection)}`, ""];
   lines.push(
     `> ${selectionLine(selection)}`,
     "",
@@ -240,7 +240,7 @@ export function selectionLlmsText(selection: Selection): string {
     }
     lines.push("");
   }
-  lines.push("## Extensions this selection may add", "");
+  lines.push("## Extensions This Selection May Add", "");
   const addable = Object.entries(manifest.extensions).filter(([id]) => {
     const owner = extensionStack(id);
     return owner === null || selection.stacks.includes(owner);
@@ -253,7 +253,7 @@ export function selectionLlmsText(selection: Selection): string {
   }
   lines.push("");
   if (selection.stacks.some((stack) => frontendStacks.includes(stack))) {
-    lines.push("## UI pattern groups", "");
+    lines.push("## UI Pattern Groups", "");
     for (const layer of layers().filter((entry) => entry.key.startsWith("patterns/"))) {
       const page = pageByFile(layer.files[0]);
       lines.push(
@@ -263,7 +263,7 @@ export function selectionLlmsText(selection: Selection): string {
     lines.push("");
   }
   lines.push(
-    "## How to read this",
+    "## How to Read This",
     "",
     "Fetch the pages a task touches, not all of them. Start with the page that owns the decision, then follow its links. When a task spans a whole layer, each section heading links the layer bundle that carries the same text in fewer requests.",
     "",
@@ -277,7 +277,7 @@ export function rootLlmsText(agentProtocol: string): string {
   lines.push(
     "> LiteSpec is the contract for one bounded-context business application. A project names one size, one shape, and its stacks, and the standard states every provision those choices apply.",
     "",
-    "## How to use this site",
+    "## How to Use This Site",
     "",
     "1. Pick the selection index below that matches the project's shape and stacks.",
     "2. Paste the AGENTS.md block under Agent protocol into the working context.",
@@ -295,13 +295,13 @@ export function rootLlmsText(agentProtocol: string): string {
       `- [${selectionTitle(selection)}](${absoluteUrl(selectionIndexUrl(selection))}): ${selectionLine(selection)}`,
     );
   }
-  lines.push("", "## Layer bundles", "");
+  lines.push("", "## Layer Bundles", "");
   for (const layer of layers()) {
     lines.push(
       `- [${layer.title}](${absoluteUrl(layerUrl(layer.key))}): ${layer.files.length} pages, concatenated in reading order.`,
     );
   }
-  lines.push("", "## Agent protocol", "", "Paste the block below into the working context. It is the repository AGENTS.md.", "", agentProtocol.trim(), "");
+  lines.push("", "## Agent Protocol", "", "Paste the block below into the working context. It is the repository AGENTS.md.", "", agentProtocol.trim(), "");
   return finish(lines);
 }
 

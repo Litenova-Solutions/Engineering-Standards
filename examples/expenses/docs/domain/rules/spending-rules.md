@@ -1,7 +1,7 @@
 ---
 {
   "type": "rule-set",
-  "title": "Spending rules",
+  "title": "Spending Rules",
   "owner": "expenses-team",
   "status": "approved",
   "records": [
@@ -25,6 +25,8 @@
 }
 ---
 
-# Spending rules
+# Spending Rules
+
+## Summary
 
 Receipt files are filed once across spending.

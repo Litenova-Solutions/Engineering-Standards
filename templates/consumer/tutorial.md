@@ -28,7 +28,7 @@ Name nothing the reader has to decide. Every option belongs on a command page.
 3. Show the output the reader sees after the step.
 4. Offer no option, no alternative, and no branch.
 
-## What you built
+## What You Built
 
 - Name what now runs, and where the reader observes it.
 - Link the command page that documents each command the reader ran.

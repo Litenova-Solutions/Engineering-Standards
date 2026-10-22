@@ -4,21 +4,32 @@ namespace LiteSpec.Init;
 
 /// <summary>
 ///     The <c>litespec init</c> command: writes a consumer's <c>litespec.project.json</c>
-///     from one of the ready-made presets in <c>templates/presets/</c>.
+///     from one of the ready-made presets in <c>templates/presets/</c>, and copies the
+///     starting agent context, glossary, and example cast from <c>templates/consumer/</c>.
 /// </summary>
 static class InitCommand
 {
     /// <summary>The preset names <c>litespec init</c> accepts, in list order.</summary>
     static readonly string[] Presets = ["blazor-client", "dotnet-react", "dotnet-svelte"];
 
+    /// <summary>The setup templates copied beside the project file: the checkout file and its consumer path.</summary>
+    static readonly (string Template, string Target)[] Scaffold =
+    [
+        ("project-agents.md", "AGENTS.md"),
+        ("glossary.json", "docs/glossary.json"),
+        ("example-cast.md", "docs/domain/example-cast.md"),
+    ];
+
     /// <summary>The command's usage text.</summary>
     public const string Usage = """
         Usage: litespec init --preset <name> --size <small|large> [--root <path>] [--name <project>] [--help]
 
         Writes litespec.project.json into root from the named preset, stamped with the
-        LiteSpec release this tool belongs to. The preset selects the shape, the stacks
+        LiteSpec release this tool belongs to, and copies the starting agent context,
+        glossary, and example cast beside it. The preset selects the shape, the stacks
         and the frontends; --size and --name complete the project record. The command
-        never overwrites an existing project file.
+        never overwrites an existing file: it writes each missing file and leaves
+        existing ones alone.
 
           --preset   One of: blazor-client, dotnet-react, dotnet-svelte.
           --size     The project size: small or large.
@@ -26,7 +37,7 @@ static class InitCommand
           --name     The project name. Defaults to the root folder's name.
           --help     Print this text and exit.
 
-        Exit codes: 0 written, 1 the checkout's template or preset is unreadable, 2 the file exists or an option is invalid.
+        Exit codes: 0 written, 1 the checkout's template, preset, or scaffold file is unreadable, 2 the project file exists or an option is invalid.
         """;
 
     /// <summary>Runs the command and returns its exit code.</summary>
@@ -113,6 +124,7 @@ static class InitCommand
 
         JsonObject project;
         JsonObject overlay;
+        Dictionary<string, string> scaffold;
 
         try
         {
@@ -128,6 +140,23 @@ static class InitCommand
             {
                 Console.Error.WriteLine($"The LiteSpec checkout holds no readable templates/presets/{preset}.json.");
                 return 1;
+            }
+
+            // The scaffold sources are read before anything is written, so a broken
+            // checkout fails before the project file exists without its companions.
+            scaffold = [];
+
+            foreach (var (file, _) in Scaffold)
+            {
+                var source = Path.Combine(home, "templates", "consumer", file);
+
+                if (!File.Exists(source))
+                {
+                    Console.Error.WriteLine($"The LiteSpec checkout holds no readable templates/consumer/{file}.");
+                    return 1;
+                }
+
+                scaffold[file] = File.ReadAllText(source);
             }
 
             project = template;
@@ -200,9 +229,41 @@ static class InitCommand
 
         Console.WriteLine($"Wrote {target}.");
 
+        var copied = 0;
+
+        foreach (var (file, relative) in Scaffold)
+        {
+            var destination = Path.GetFullPath(Path.Combine(root, relative.Replace('/', Path.DirectorySeparatorChar)));
+
+            if (File.Exists(destination))
+            {
+                Console.WriteLine($"'{destination}' already exists; left alone.");
+                continue;
+            }
+
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                File.WriteAllText(destination, scaffold[file]);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                Console.Error.WriteLine($"Failed to write '{destination}': {exception.Message}");
+                return 1;
+            }
+
+            Console.WriteLine($"Wrote {destination}.");
+            copied += 1;
+        }
+
         if (unfilled.Count > 0)
         {
             Console.WriteLine($"Fill these placeholders before validating: {string.Join(", ", unfilled)}.");
+        }
+
+        if (copied > 0)
+        {
+            Console.WriteLine("Fill every <placeholder> in the copied files before validating.");
         }
 
         Console.WriteLine("Next step: litespec consumer");

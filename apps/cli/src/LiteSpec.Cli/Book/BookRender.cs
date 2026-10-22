@@ -134,7 +134,7 @@ static class BookRender
     }
 
     /// <summary>Wraps a page's navigation and main content in the site shell.</summary>
-    public static string Shell(string rel, string title, string nav, string main, bool wide = false, string bodyClass = "", string searchQuery = "")
+    public static string Shell(string rel, string title, string nav, string main, bool wide = false, string bodyClass = "", string searchQuery = "", bool withMermaid = false)
     {
         return "<!doctype html>\n"
             + "<html lang=\"en\" data-theme=\"light\">\n"
@@ -152,9 +152,10 @@ static class BookRender
             + $"<a class=\"brand\" href=\"{rel}index.html\"><span class=\"logo\">B</span> Project book</a>\n"
             + $"<form class=\"search\" action=\"{rel}search.html\" method=\"get\" role=\"search\">\n"
             + "<label class=\"visually-hidden\" for=\"q\">Search records</label>\n"
-            + $"<input id=\"q\" name=\"q\" type=\"search\" placeholder=\"Search titles and ids\" value=\"{Esc(searchQuery)}\" autocomplete=\"off\">\n"
+            + $"<input id=\"q\" name=\"q\" type=\"search\" placeholder=\"Search the specification\" value=\"{Esc(searchQuery)}\" autocomplete=\"off\">\n"
             + "</form>\n"
             + "<div class=\"topbtns\">\n"
+            + "<button class=\"segbtn\" id=\"devToggle\" aria-pressed=\"false\" title=\"Show identifiers, codes, file paths and check names\">Developer</button>\n"
             + "<button class=\"segbtn\" id=\"reviewToggle\" aria-pressed=\"false\" title=\"Show review notes on every page\">Review</button>\n"
             + "<button class=\"iconbtn\" id=\"themeToggle\" title=\"Light or dark\" aria-label=\"Toggle light or dark\">&#9681;</button>\n"
             + "</div>\n"
@@ -163,6 +164,7 @@ static class BookRender
             + $"<nav class=\"nav\" id=\"nav\" aria-label=\"Book\">{nav}</nav>\n"
             + $"<main class=\"main\" id=\"main\"><div class=\"page{(wide ? " wide" : "")}\">{main}</div></main>\n"
             + "</div>\n"
+            + (withMermaid ? $"<script src=\"{rel}assets/mermaid.min.js\" defer></script>\n" : "")
             + $"<script src=\"{rel}assets/book.js\" defer></script>\n"
             + "</body>\n"
             + "</html>\n";
@@ -172,7 +174,7 @@ static class BookRender
     public static string RenderNav(BookIndex index, ReviewBundle review, string active, string rel)
     {
         var parts = new List<string>();
-        var reviewCount = review.Gaps.Count + review.WithDecider.Count + review.WithoutDecider.Count + review.Findings.Count;
+        var reviewCount = review.Gaps.Count + review.WithDecider.Count + review.WithoutDecider.Count + review.Questions.Count + review.Findings.Count;
         parts.Add("<h2>Book</h2>");
         parts.Add($"<a class=\"navitem{(active == "home" ? " on" : "")}\" href=\"{rel}index.html\">Home</a>");
         parts.Add($"<a class=\"navitem{(active == "search" ? " on" : "")}\" href=\"{rel}search.html\">Search</a>");
@@ -185,6 +187,18 @@ static class BookRender
         {
             var url = $"{rel}{BookModel.LensUrl(StrProp(actor, "id") ?? "")}";
             parts.Add($"<a class=\"navitem{(active == StrProp(actor, "id") ? " on" : "")}\" href=\"{url}\">{Esc(actor["title"])}</a>");
+        }
+
+        var goals = index.ByType.TryGetValue("goal", out var goalList) ? goalList : [];
+        if (goals.Count > 0)
+        {
+            parts.Add("<h2>Goals</h2>");
+            parts.Add($"<a class=\"navitem{(active == "goal-index" ? " on" : "")}\" href=\"{rel}goals/index.html\">All goals</a>");
+            foreach (var goal in goals)
+            {
+                var url = $"{rel}{BookModel.GoalUrl(StrProp(goal, "id") ?? "")}";
+                parts.Add($"<a class=\"navitem{(active == StrProp(goal, "id") ? " on" : "")}\" href=\"{url}\">{Esc(goal["title"])}</a>");
+            }
         }
 
         foreach (var layer in BookModel.Layers)
@@ -229,15 +243,18 @@ static class BookRender
         return "<span class=\"chip\">No status</span>";
     }
 
-    /// <summary>Renders a link to a record, or a code span when the id resolves to nothing.</summary>
+    /// <summary>
+    ///     Renders a link to a record: its title for every reader, its id for developers only.
+    ///     An id that resolves to nothing shows words to reviewers and the id to developers.
+    /// </summary>
     public static string RecordLink(BookIndex index, string rel, string id)
     {
         if (index.ById.TryGetValue(id, out var record))
         {
-            return $"<a href=\"{rel}{BookModel.RecordUrl(id)}\">{Esc(record["title"])}</a> <span class=\"mono dim\">{Esc(id)}</span>";
+            return $"<a href=\"{rel}{BookModel.RecordUrl(id)}\">{Esc(record["title"])}</a> <span class=\"mono dim dev-only\">{Esc(id)}</span>";
         }
 
-        return $"<code>{Esc(id)}</code>";
+        return $"<span class=\"dev-only\"><code>{Esc(id)}</code></span><span class=\"reviewer-only\">a missing record</span>";
     }
 
     /// <summary>Renders a link to a record id held in a JSON value.</summary>
@@ -245,6 +262,20 @@ static class BookRender
         id is JsonValue scalar && scalar.TryGetValue<string>(out var text) && text is not null
             ? RecordLink(index, rel, text)
             : $"<code>{Esc(id)}</code>";
+
+    /// <summary>
+    ///     Renders a value that may name a record or state words: a link when it resolves
+    ///     to a record, words as written otherwise.
+    /// </summary>
+    public static string MaybeRecordLink(BookIndex index, string rel, string text)
+    {
+        if (text.Contains('/') || index.ById.ContainsKey(text))
+        {
+            return RecordLink(index, rel, text);
+        }
+
+        return Esc(text);
+    }
 
     /// <summary>Renders a page header: kind line, title, optional lede, chips and facts.</summary>
     public static string PageHeader(string kind, string title, string lede = "", IReadOnlyList<(string Term, string Value)>? facts = null, IReadOnlyList<string>? chips = null)

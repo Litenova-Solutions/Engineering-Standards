@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using LiteSpec.Authoring;
 
 namespace LiteSpec.Model;
@@ -109,10 +110,12 @@ static class RecordReader
             && typeValue.ValueKind == JsonValueKind.String
             && typeValue.GetString() is { } type)
         {
+            var tables = TablesOf(parsed.Body);
+
             if (RecordTypes.All.Contains(type))
             {
                 var record = BuildRecord(
-                    parsed.Root, file, LineOf(text, "\"type\""), false, null,
+                    PatchedPage(parsed.Root, tables), file, LineOf(text, "\"type\""), false, null,
                     null, null, null, null);
 
                 pageId = record.Id;
@@ -166,13 +169,538 @@ static class RecordReader
                     }
 
                     records.Add(BuildRecord(
-                        entry, file, line, true, pageId,
+                        PatchedEntry(entry, entries, tables), file, line, true, pageId,
                         pageOwner, pageStatus, pageDecider, pageDecideBy));
                 }
             }
         }
 
         bodies.Add(new PageBody(file, parsed.Body, parsed.BodyStartLine, pageId));
+    }
+
+    /// <summary>One Markdown table and the heading above it.</summary>
+    sealed record MarkdownTable(
+        IReadOnlyList<string> Headers,
+        IReadOnlyList<IReadOnlyList<string>> Rows,
+        string Heading);
+
+    static readonly Regex TableDelimiter = new(
+        @"^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>
+    ///     The page element with table fields added: transitions and data on an
+    ///     aggregate, examples on a scenario. A front-matter field wins over a table.
+    /// </summary>
+    private static JsonElement PatchedPage(JsonElement element, IReadOnlyList<MarkdownTable> tables)
+    {
+        if (StringField(element, "type") == "aggregate")
+        {
+            var transitions = TransitionsOf(tables);
+
+            if (transitions.Count > 0 && FieldMissing(element, "transitions"))
+            {
+                element = WithField(element, "transitions", writer => WriteTransitions(writer, transitions));
+            }
+
+            var data = DataOf(tables);
+
+            if (data.Count > 0 && FieldMissing(element, "data"))
+            {
+                element = WithField(element, "data", writer => WriteData(writer, data));
+            }
+        }
+        else if (StringField(element, "type") == "scenario")
+        {
+            var examples = FirstExamples(tables);
+
+            if (examples.Count > 0 && FieldMissing(element, "examples"))
+            {
+                element = WithField(element, "examples", writer => WriteExamples(writer, examples));
+            }
+        }
+
+        return element;
+    }
+
+    /// <summary>
+    ///     A scenario entry with its examples table added. On a page with one
+    ///     scenario the first plain table wins; with several, a table belongs to the
+    ///     scenario its heading names. A front-matter field wins over a table.
+    /// </summary>
+    private static JsonElement PatchedEntry(
+        JsonElement entry,
+        JsonElement siblings,
+        IReadOnlyList<MarkdownTable> tables)
+    {
+        if (StringField(entry, "type") != "scenario" || !FieldMissing(entry, "examples"))
+        {
+            return entry;
+        }
+
+        var examples = ExamplesFor(entry, siblings, tables);
+
+        return examples.Count > 0
+            ? WithField(entry, "examples", writer => WriteExamples(writer, examples))
+            : entry;
+    }
+
+    private static bool FieldMissing(JsonElement element, string field) =>
+        !element.TryGetProperty(field, out var value) || value.ValueKind == JsonValueKind.Null;
+
+    private static IReadOnlyList<IReadOnlyDictionary<string, string>> ExamplesFor(
+        JsonElement entry,
+        JsonElement siblings,
+        IReadOnlyList<MarkdownTable> tables)
+    {
+        var scenarios = 0;
+
+        foreach (var sibling in siblings.EnumerateArray())
+        {
+            if (sibling.ValueKind == JsonValueKind.Object && StringField(sibling, "type") == "scenario")
+            {
+                scenarios++;
+            }
+        }
+
+        if (scenarios <= 1)
+        {
+            return FirstExamples(tables);
+        }
+
+        var id = StringField(entry, "id") ?? "";
+        var title = StringField(entry, "title") ?? "";
+        var rows = new List<IReadOnlyDictionary<string, string>>();
+
+        foreach (var table in tables)
+        {
+            if (!IsTransitions(table.Headers)
+                && !IsData(table.Headers)
+                && HeadingNames(table.Heading, id, title))
+            {
+                rows.AddRange(ExamplesOf(table));
+            }
+        }
+
+        return rows;
+    }
+
+    private static IReadOnlyList<IReadOnlyDictionary<string, string>> FirstExamples(
+        IReadOnlyList<MarkdownTable> tables)
+    {
+        foreach (var table in tables)
+        {
+            if (!IsTransitions(table.Headers) && !IsData(table.Headers))
+            {
+                return ExamplesOf(table);
+            }
+        }
+
+        return [];
+    }
+
+    /// <summary>Every From and To row of every transitions table, in order; By aliases Triggered By.</summary>
+    private static IReadOnlyList<(string From, string To, string? By)> TransitionsOf(
+        IReadOnlyList<MarkdownTable> tables)
+    {
+        var rows = new List<(string From, string To, string? By)>();
+
+        foreach (var table in tables)
+        {
+            var from = ColumnOf(table.Headers, "from");
+            var to = ColumnOf(table.Headers, "to");
+
+            if (from < 0 || to < 0)
+            {
+                continue;
+            }
+
+            var by = ColumnOf(table.Headers, "triggeredby");
+
+            if (by < 0)
+            {
+                by = ColumnOf(table.Headers, "by");
+            }
+
+            foreach (var cells in table.Rows)
+            {
+                var start = CleanCell(CellOf(cells, from), false);
+                var end = CleanCell(CellOf(cells, to), false);
+
+                if (IsEmptyCell(start) || IsEmptyCell(end))
+                {
+                    continue;
+                }
+
+                string? trigger = null;
+
+                if (by >= 0)
+                {
+                    var cause = CleanCell(CellOf(cells, by), true);
+                    trigger = IsEmptyCell(cause) ? null : cause;
+                }
+
+                rows.Add((start, end, trigger));
+            }
+        }
+
+        return rows;
+    }
+
+    /// <summary>Every named row of every data table, in order.</summary>
+    private static IReadOnlyList<(string Name, string Meaning, string Classification)> DataOf(
+        IReadOnlyList<MarkdownTable> tables)
+    {
+        var rows = new List<(string Name, string Meaning, string Classification)>();
+
+        foreach (var table in tables)
+        {
+            var name = ColumnOf(table.Headers, "name");
+            var meaning = ColumnOf(table.Headers, "meaning");
+            var classification = ColumnOf(table.Headers, "classification");
+
+            if (name < 0 || meaning < 0 || classification < 0)
+            {
+                continue;
+            }
+
+            foreach (var cells in table.Rows)
+            {
+                var item = CleanCell(CellOf(cells, name), false);
+
+                if (IsEmptyCell(item))
+                {
+                    continue;
+                }
+
+                var sense = CleanCell(CellOf(cells, meaning), false);
+                var level = CleanCell(CellOf(cells, classification), false);
+
+                rows.Add((item, IsEmptyCell(sense) ? "" : sense, IsEmptyCell(level) ? "" : level.ToLowerInvariant()));
+            }
+        }
+
+        return rows;
+    }
+
+    /// <summary>
+    ///     The table rows as examples: headers become the keys verbatim, a blank
+    ///     header becomes column plus its 1-based position, and a repeated header
+    ///     keeps its last value.
+    /// </summary>
+    private static IReadOnlyList<IReadOnlyDictionary<string, string>> ExamplesOf(MarkdownTable table)
+    {
+        var rows = new List<IReadOnlyDictionary<string, string>>();
+
+        foreach (var cells in table.Rows)
+        {
+            var row = new Dictionary<string, string>(StringComparer.Ordinal);
+
+            for (var index = 0; index < table.Headers.Count; index++)
+            {
+                var header = CleanCell(table.Headers[index], false);
+                var key = header.Length == 0 ? $"column{index + 1}" : header;
+                var value = CleanCell(CellOf(cells, index), false);
+                row[key] = IsEmptyCell(value) ? "" : value;
+            }
+
+            if (row.Count > 0)
+            {
+                rows.Add(row);
+            }
+        }
+
+        return rows;
+    }
+
+    private static bool IsTransitions(IReadOnlyList<string> headers) =>
+        ColumnOf(headers, "from") >= 0 && ColumnOf(headers, "to") >= 0;
+
+    private static bool IsData(IReadOnlyList<string> headers) =>
+        ColumnOf(headers, "name") >= 0
+        && ColumnOf(headers, "meaning") >= 0
+        && ColumnOf(headers, "classification") >= 0;
+
+    private static int ColumnOf(IReadOnlyList<string> headers, string target)
+    {
+        for (var index = 0; index < headers.Count; index++)
+        {
+            if (Norm(headers[index]) == target)
+            {
+                return index;
+            }
+        }
+
+        return -1;
+    }
+
+    private static string CellOf(IReadOnlyList<string> cells, int index) =>
+        index < cells.Count ? cells[index] : "";
+
+    /// <summary>Headers compare case-insensitively, ignoring spaces, dashes and underscores.</summary>
+    private static string Norm(string value) =>
+        value.Replace(" ", "").Replace("-", "").Replace("_", "").Replace("\t", "").ToLowerInvariant();
+
+    /// <summary>Whether the heading names the scenario by id, title or kebab name.</summary>
+    private static bool HeadingNames(string heading, string id, string title)
+    {
+        if (heading.Length == 0)
+        {
+            return false;
+        }
+
+        var text = heading.ToLowerInvariant();
+
+        if (id.Length > 0 && text.Contains(id.ToLowerInvariant(), StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (title.Length > 0 && text.Contains(title.ToLowerInvariant(), StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        var name = id.Contains('.') ? id[(id.LastIndexOf('.') + 1)..] : id;
+        name = name.Contains('/') ? name[(name.LastIndexOf('/') + 1)..] : name;
+        var words = name.Replace('-', ' ').Replace('_', ' ').ToLowerInvariant();
+
+        return words.Length > 0 && text.Contains(words, StringComparison.Ordinal);
+    }
+
+    /// <summary>Trimmed text: code ticks stripped, a lone link reduced to its label, or its target for an id.</summary>
+    private static string CleanCell(string cell, bool preferTarget)
+    {
+        var text = cell.Trim();
+
+        while (text.Length >= 2 && text.StartsWith('`') && text.EndsWith('`'))
+        {
+            text = text[1..^1].Trim();
+        }
+
+        if (LinkOf(text) is { } link)
+        {
+            if (preferTarget && link.Target.Contains('/'))
+            {
+                return link.Target.Trim();
+            }
+
+            return link.Label.Trim();
+        }
+
+        return text;
+    }
+
+    private static (string Label, string Target)? LinkOf(string text)
+    {
+        if (!text.StartsWith('['))
+        {
+            return null;
+        }
+
+        var labelEnd = text.IndexOf("](", StringComparison.Ordinal);
+
+        if (labelEnd < 0)
+        {
+            return null;
+        }
+
+        var targetEnd = text.IndexOf(')', labelEnd + 2);
+
+        if (targetEnd != text.Length - 1)
+        {
+            return null;
+        }
+
+        var target = text[(labelEnd + 2)..targetEnd];
+        var space = target.IndexOfAny([' ', '\t', '"', '\'']);
+
+        return (text[1..labelEnd], space < 0 ? target : target[..space]);
+    }
+
+    private static bool IsEmptyCell(string text) =>
+        text.Length == 0
+        || text is "-" or "--" or "—"
+        || text.Equals("n/a", StringComparison.OrdinalIgnoreCase)
+        || text.Equals("none", StringComparison.OrdinalIgnoreCase)
+        || text.Equals("none.", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Every Markdown table outside fenced code, each with the heading above it.</summary>
+    private static IReadOnlyList<MarkdownTable> TablesOf(string body)
+    {
+        var lines = body.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        var tables = new List<MarkdownTable>();
+        var heading = "";
+        var inFence = false;
+        var index = 0;
+
+        while (index < lines.Length)
+        {
+            var line = lines[index];
+            var trimmed = line.Trim();
+
+            if (trimmed.StartsWith("```", StringComparison.Ordinal)
+                || trimmed.StartsWith("~~~", StringComparison.Ordinal))
+            {
+                inFence = !inFence;
+                index++;
+                continue;
+            }
+
+            if (inFence)
+            {
+                index++;
+                continue;
+            }
+
+            if (HeadingText(trimmed) is { } text)
+            {
+                heading = text;
+                index++;
+                continue;
+            }
+
+            if (index + 1 < lines.Length
+                && line.Contains('|')
+                && trimmed.Length > 0
+                && TableDelimiter.IsMatch(lines[index + 1]))
+            {
+                var headers = Cells(line);
+                var rows = new List<IReadOnlyList<string>>();
+                var row = index + 2;
+
+                while (row < lines.Length
+                       && lines[row].Contains('|')
+                       && lines[row].Trim().Length > 0
+                       && HeadingText(lines[row].Trim()) is null
+                       && !lines[row].Trim().StartsWith("```", StringComparison.Ordinal)
+                       && !lines[row].Trim().StartsWith("~~~", StringComparison.Ordinal))
+                {
+                    rows.Add(Cells(lines[row]));
+                    row++;
+                }
+
+                if (headers.Count > 0)
+                {
+                    tables.Add(new MarkdownTable(headers, rows, heading));
+                }
+
+                index = row;
+                continue;
+            }
+
+            index++;
+        }
+
+        return tables;
+    }
+
+    private static string? HeadingText(string trimmed)
+    {
+        if (!trimmed.StartsWith('#'))
+        {
+            return null;
+        }
+
+        var hashes = 0;
+
+        while (hashes < trimmed.Length && trimmed[hashes] == '#')
+        {
+            hashes++;
+        }
+
+        if (hashes > 6 || (hashes < trimmed.Length && trimmed[hashes] != ' ' && trimmed[hashes] != '\t'))
+        {
+            return null;
+        }
+
+        return trimmed[hashes..].Trim().TrimEnd('#').Trim();
+    }
+
+    private static IReadOnlyList<string> Cells(string line)
+    {
+        var cells = line.Trim().Trim('|').Split('|').Select(cell => cell.Trim()).ToList();
+
+        return cells is [{ Length: 0 }] ? [] : cells;
+    }
+
+    private static JsonElement WithField(JsonElement element, string field, Action<Utf8JsonWriter> writeValue)
+    {
+        using var stream = new MemoryStream();
+
+        using (var writer = new Utf8JsonWriter(stream))
+        {
+            writer.WriteStartObject();
+
+            foreach (var property in element.EnumerateObject())
+            {
+                property.WriteTo(writer);
+            }
+
+            writer.WritePropertyName(field);
+            writeValue(writer);
+            writer.WriteEndObject();
+        }
+
+        using var document = JsonDocument.Parse(stream.ToArray());
+
+        return document.RootElement.Clone();
+    }
+
+    private static void WriteTransitions(Utf8JsonWriter writer, IReadOnlyList<(string From, string To, string? By)> rows)
+    {
+        writer.WriteStartArray();
+
+        foreach (var (from, to, by) in rows)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("from", from);
+            writer.WriteString("to", to);
+
+            if (by is not null)
+            {
+                writer.WriteString("by", by);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteData(Utf8JsonWriter writer, IReadOnlyList<(string Name, string Meaning, string Classification)> rows)
+    {
+        writer.WriteStartArray();
+
+        foreach (var (name, meaning, classification) in rows)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("name", name);
+            writer.WriteString("meaning", meaning);
+            writer.WriteString("classification", classification);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private static void WriteExamples(Utf8JsonWriter writer, IReadOnlyList<IReadOnlyDictionary<string, string>> rows)
+    {
+        writer.WriteStartArray();
+
+        foreach (var row in rows)
+        {
+            writer.WriteStartObject();
+
+            foreach (var (key, value) in row)
+            {
+                writer.WriteString(key, value);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
     }
 
     private static Record BuildRecord(

@@ -42,6 +42,8 @@ static class ConsumerFixture
             """
             # Fixture Shop
 
+            ## Summary
+
             The shop sells printed books to readers in one city.
 
             """),
@@ -52,7 +54,41 @@ static class ConsumerFixture
             """
             # Pricing
 
+            ## Summary
+
             Every order carries a flat fee of one euro.
+
+            ## The Situation
+
+            Customers wait weeks to learn what delivery costs.
+
+            ## What We Do
+
+            The shop charges one flat fee on every order.
+
+            ## Why It Is Better
+
+            One fee keeps every receipt readable at a glance.
+
+            ## Example
+
+            Alex orders two books on Monday and pays one fee at checkout.
+
+            ## Costs and Risks
+
+            Large orders pay too little for their delivery cost.
+
+            ## How Sure We Are
+
+            The launch plan states the fee with high confidence.
+
+            ## Position
+
+            The shop holds the flat fee until delivery costs move.
+
+            ## Refusals
+
+            The shop refuses a percentage fee on every order.
 
             """),
         new("docs/product/decisions/0001-launch.md",
@@ -60,15 +96,11 @@ static class ConsumerFixture
             {"type":"decision","id":"decision/0001-launch","title":"Launch with a flat fee","owner":"fixture","status":"approved","decided":"2026-01-01","options":[{"name":"Flat fee","for":"Every receipt shows the same fee line.","against":"Large orders pay too little for delivery."},{"name":"Percentage","for":"Large orders carry their delivery cost.","against":"Every receipt needs its own math."}],"chosen":"Flat fee","changeWhen":"The fee changes when delivery costs move.","decides":["requirement/pricing.flat-fee"],"basedOn":[]}
             """,
             """
-            # Launch with a flat fee
+            # Launch with a Flat Fee
 
             ## Context
 
             The shop opens with one fee it can state on every page.
-
-            ## Options
-
-            The choice stood between a flat fee and a percentage.
 
             ## Decision
 
@@ -78,7 +110,7 @@ static class ConsumerFixture
 
             Every receipt shows the same fee line.
 
-            ## Evidence
+            ## Evidence with Confidence
 
             The launch plan states the fee on its first page.
 
@@ -90,6 +122,8 @@ static class ConsumerFixture
             """
             # Customer
 
+            ## Summary
+
             A customer buys books from the shop.
 
             """),
@@ -99,6 +133,8 @@ static class ConsumerFixture
             """,
             """
             # Customer
+
+            ## Summary
 
             A customer holds this role on their own orders.
 
@@ -118,7 +154,7 @@ static class ConsumerFixture
             {"type":"entry-point-list","id":"entry-points","title":"Entry points","owner":"fixture","status":"approved","records":[{"type":"entry-point","id":"entry-point/web","title":"Web shop","kind":"app","path":"apps/web"}]}
             """,
             """
-            # Entry points
+            # Entry Points
 
             Customers reach the shop through the web shop.
 
@@ -138,9 +174,19 @@ static class ConsumerFixture
             {"type":"aggregate","id":"aggregate/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","states":[{"name":"Draft","meaning":"The claim is open for changes."},{"name":"Canceled","meaning":"The customer canceled the claim."}],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"precondition","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","meaning":"An order claim was canceled.","carries":["orderId"]}]}
             """,
             """
-            # Order claim
+            # Order Claim
 
-            An order claim states what a customer ordered.
+            ## Transitions
+
+            | From | To | Triggered By |
+            |:---|:---|:---|
+            | Draft | Canceled | Cancel order |
+
+            ## Data
+
+            | Name | Meaning | Classification |
+            |:---|:---|:---|
+            | orderId | The order this claim states. | internal |
 
             """),
         new("docs/domain/modules/orders/cancel-order.md",
@@ -148,9 +194,15 @@ static class ConsumerFixture
             {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","kind":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","outcome":"success","meaning":"The order claim was canceled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"orders.cancel-refused","meaning":"The shipment already left, so the cancel is refused."}]}
             """,
             """
-            # Cancel order
+            # Cancel Order
+
+            ## Goal
 
             A customer cancels an order claim before shipment.
+
+            ## What Happens
+
+            The customer asks to cancel the claim. The shop refuses the cancel when the shipment already left.
 
             """),
         new("docs/guide/first-run.md",
@@ -158,7 +210,7 @@ static class ConsumerFixture
             {"type":"tutorial","id":"first-run","title":"Run It For The First Time","owner":"fixture","status":"approved"}
             """,
             """
-            # Run It For The First Time
+            # Run It for the First Time
 
             ## Purpose
 
@@ -172,7 +224,7 @@ static class ConsumerFixture
 
             Run the start command and open the shop page.
 
-            ## What you built
+            ## What You Built
 
             The shop answers on the reader machine now.
 
@@ -182,7 +234,7 @@ static class ConsumerFixture
             {"type":"how-to","id":"add-a-pack","title":"Add A Seed Pack","owner":"fixture","status":"approved"}
             """,
             """
-            # Add A Seed Pack
+            # Add a Seed Pack
 
             ## Purpose
 
@@ -193,7 +245,7 @@ static class ConsumerFixture
             1. Copy the pack file into the packs folder.
             2. Run the seed command the README names.
 
-            ## Verification
+            ## Check
 
             The shop lists the pack on its packs page.
 
@@ -231,7 +283,7 @@ static class ConsumerFixture
             |:---|:---|:---|
             | `--detach` | off | Starts the shop behind the terminal. |
 
-            ## Exit codes
+            ## Exit Codes
 
             | Code | Meaning |
             |:---|:---|

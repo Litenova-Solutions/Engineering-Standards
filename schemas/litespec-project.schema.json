@@ -141,8 +141,8 @@
           "description": "The project glossary, validated against schemas/glossary.schema.json. Defaults to glossary.json under the documentation root.",
           "$ref": "#/$defs/projectPath"
         },
-        "languageScan": {
-          "description": "Glob patterns naming the non-Markdown surfaces the vocabulary is checked over: source, interface copy, the API contract, acceptance tests. Repository-relative. A scope in the language record is matched against the repository-relative path for these files. Each pattern must match at least one file.",
+        "glossaryScan": {
+          "description": "Glob patterns naming the non-Markdown surfaces the vocabulary is checked over: source, interface copy, the API contract, acceptance tests. Repository-relative. A scope in the glossary record is matched against the repository-relative path for these files. Each pattern must match at least one file.",
           "type": "array",
           "items": {
             "type": "string",

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace LiteSpec.Consumer;
 
 /// <summary>
-///     The glob walker of the consumer validator: resolves the <c>paths.languageScan</c>
+///     The glob walker of the consumer validator: resolves the <c>paths.glossaryScan</c>
 ///     patterns to repository-relative files.
 /// </summary>
 static partial class ConsumerValidator

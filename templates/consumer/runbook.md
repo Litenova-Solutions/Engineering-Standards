@@ -7,14 +7,23 @@
   "status": "draft",
   "decider": "<owner>",
   "decideBy": "<YYYY-MM-DD>",
-  "limit": "<limit id, or remove this line>",
-  "trigger": "<alert or request, or remove this line>",
-  "terms": ["term/<term-name>"]
+  "trigger": "<alert or request>",
+  "severity": "<How bad this is when it fires>",
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Runbook display title>
 
-Keep either `limit` or `trigger` in the frontmatter, and remove the other line.
+## Impact
+
+State what breaks and who feels it.
 
 ## Prerequisites
 
@@ -36,7 +45,7 @@ Keep either `limit` or `trigger` in the frontmatter, and remove the other line.
 
 State the health checks, data checks, or metrics that prove recovery.
 
-## Rollback or recovery
+## Rollback or Recovery
 
 State the rollback command, restore condition, and data compatibility limit.
 

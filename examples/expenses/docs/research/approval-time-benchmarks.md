@@ -2,7 +2,7 @@
 {
   "type": "research",
   "id": "research/approval-time-benchmarks",
-  "title": "Approval time benchmarks",
+  "title": "Approval Time Benchmarks",
   "owner": "expenses-team",
   "status": "approved",
   "sources": [
@@ -15,6 +15,12 @@
 }
 ---
 
-# Approval time benchmarks
+# Approval Time Benchmarks
 
-Small companies decide expenses within one week.
+## Answer
+
+Small companies decide expenses within one week. The study behind this answer is small but recent, so the five-day target carries medium confidence.
+
+## Notes on Sources
+
+One industry study, read in February 2026.

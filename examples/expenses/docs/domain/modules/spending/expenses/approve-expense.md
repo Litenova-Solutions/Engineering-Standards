@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.approve-expense",
-  "title": "Approve expense",
+  "title": "Approve Expense",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -52,6 +52,12 @@
 }
 ---
 
-# Approve expense
+# Approve Expense
 
-A manager approves a submitted expense.
+## Goal
+
+A manager decides a submitted expense so the employee learns the outcome.
+
+## What Happens
+
+The manager opens a submitted expense. Spending refuses the decision when the approver submitted the expense. Otherwise the expense moves to Approved and `event/expense.expense-approved` is raised.

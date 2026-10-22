@@ -73,7 +73,7 @@ public sealed partial class StandardsValidatorTests
     public void NonActionHeading() => Check(
         root =>
         {
-            var page = StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the topic bounded", "### Topic boundary");
+            var page = StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the Topic Bounded", "### Topic boundary");
             page = page.Replace("litespec/core/topic#keep-the-topic-bounded", "litespec/core/topic#topic-boundary");
             StandardsFixture.Write(root, "docs/core/topic.md", page);
         },
@@ -88,4 +88,34 @@ public sealed partial class StandardsValidatorTests
     public void NumberedProcedureInsideIndex() => Check(
         root => StandardsFixture.Write(root, "docs/README.md", string.Join("\n", ["# Documentation", "", "## Intent", "", "Use this page to find repository documentation.", "", "## Activation", "", "1. Select the applicable document.", ""])),
         ["INDEX_CONTAINS_PROCEDURE"]);
+
+    [Fact(DisplayName = "provision heading in sentence case")]
+    public void ProvisionHeadingSentenceCase() => Check(
+        root =>
+        {
+            var page = StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "### Keep the Topic Bounded", "### Keep the topic boundary small");
+            page = page.Replace("litespec/core/topic#keep-the-topic-bounded", "litespec/core/topic#keep-the-topic-boundary-small");
+            StandardsFixture.Write(root, "docs/core/topic.md", page);
+        },
+        ["PAGE_HEADING_CASE"]);
+
+    [Fact(DisplayName = "concept heading in sentence case")]
+    public void ConceptHeadingSentenceCase() => Check(
+        root => StandardsFixture.Write(root, "docs/core/topic.md", StandardsFixture.ReplaceFirst(StandardsFixture.TopicPage, "## Standards", "## Concepts\n\n### Topic boundary rule\n\nThe boundary rule is one sentence.\n\n## Standards")),
+        ["PAGE_HEADING_CASE"]);
+
+    [Fact(DisplayName = "empty section variant naming no content")]
+    public void EmptySectionVariant() => Check(
+        root => StandardsFixture.Write(root, "docs/backend/sample/stack.md", StandardsFixture.ReplaceFirst(StandardsFixture.StackPage, "## Conventions\n\nNone.", "## Conventions\n\nThis stack adds no conventions.")),
+        ["PAGE_EMPTY_SECTION_TEXT"]);
+
+    [Fact(DisplayName = "empty section holding bare None")]
+    public void EmptySectionBareNone() => Check(
+        root => StandardsFixture.Write(root, "docs/backend/sample/stack.md", StandardsFixture.ReplaceFirst(StandardsFixture.StackPage, "## Conventions\n\nNone.", "## Conventions\n\nNone")),
+        ["PAGE_EMPTY_SECTION_TEXT"]);
+
+    [Fact(DisplayName = "empty section holding None with more")]
+    public void EmptySectionNoneWithMore() => Check(
+        root => StandardsFixture.Write(root, "docs/tools/sample.md", StandardsFixture.ReplaceFirst(StandardsFixture.CommandPage, "## Options\n\nNone.", "## Options\n\nNone. Everything passes through arguments.")),
+        ["PAGE_EMPTY_SECTION_TEXT"]);
 }

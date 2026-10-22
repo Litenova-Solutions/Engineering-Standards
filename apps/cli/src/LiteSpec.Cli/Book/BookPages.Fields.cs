@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
@@ -15,11 +16,12 @@ static partial class BookPages
             ["options"] = "Options", ["chosen"] = "Chosen", ["changeWhen"] = "Change when",
             ["kind"] = "Kind", ["statement"] = "Statement", ["rationale"] = "Rationale",
             ["measure"] = "Measure", ["target"] = "Target", ["by"] = "By", ["values"] = "Values",
+            ["conditions"] = "Conditions", ["check"] = "Check", ["runsOn"] = "Runs on", ["evidence"] = "Evidence",
             ["state"] = "State", ["refusedBecause"] = "Why refused",
             ["scope"] = "Scope", ["code"] = "Code", ["meaning"] = "Meaning",
             ["goal"] = "Goal", ["actor"] = "Actor", ["dependsOn"] = "Depends on",
             ["summary"] = "Summary", ["states"] = "States", ["transitions"] = "Transitions", ["data"] = "Data",
-            ["refusal"] = "Refusal",
+            ["refusal"] = "Refusal", ["questions"] = "Open questions",
             ["anonymous"] = "Anonymous", ["input"] = "Input", ["output"] = "Output",
             ["outcome"] = "Outcome",
             ["given"] = "Given", ["when"] = "When", ["then"] = "Then", ["examples"] = "Examples",
@@ -27,7 +29,7 @@ static partial class BookPages
             ["sends"] = "Sends", ["receives"] = "Receives", ["failure"] = "On failure",
             ["bound"] = "Bound", ["value"] = "Value", ["trigger"] = "Trigger", ["severity"] = "Severity",
             ["reason"] = "Reason", ["reviewBy"] = "Review by", ["removeWhen"] = "Remove when",
-            ["check"] = "Check", ["endsBy"] = "Ends by",
+            ["endsBy"] = "Ends by",
             ["term"] = "English", ["labels"] = "Labels", ["rejected"] = "Rejected words",
             ["broader"] = "Broader", ["narrower"] = "Narrower", ["mannered"] = "Mannered",
             ["decider"] = "Decider", ["decideBy"] = "Decide by", ["owner"] = "Owner",
@@ -41,7 +43,7 @@ static partial class BookPages
             ["constraint"] = ["source", "category", "applies", "appliesBecause"],
             ["research"] = ["question", "sources"],
             ["decision"] = ["decided", "options", "chosen", "changeWhen"],
-            ["requirement"] = ["kind", "statement", "rationale", "measure", "by", "values"],
+            ["requirement"] = ["kind", "statement", "rationale", "measure", "target", "by", "conditions", "check", "runsOn", "evidence", "values"],
             ["problem"] = ["statement"],
             ["feature"] = ["state", "by", "refusedBecause"],
             ["actor"] = ["kind", "holds"],
@@ -51,7 +53,7 @@ static partial class BookPages
             ["module"] = ["summary"],
             ["aggregate"] = ["summary", "states", "transitions", "data"],
             ["rule"] = ["kind", "statement"],
-            ["use-case"] = ["kind", "anonymous", "input", "output"],
+            ["use-case"] = ["kind", "anonymous", "trigger", "input", "output"],
             ["result"] = ["outcome", "code", "meaning"],
             ["scenario"] = ["given", "when", "then", "examples"],
             ["event"] = ["meaning", "carries"],
@@ -69,8 +71,22 @@ static partial class BookPages
         "type", "id", "title", "owner", "status", "records",
         "decides", "basedOn", "affects", "solves", "serves", "feature", "fulfills", "governs", "raises",
         "allows", "needs", "reachedThrough", "dependsOn", "terms",
-        "result", "runbook", "subject", "replaces", "provision",
-        "actor", "trigger",
+        "result", "runbook", "subject", "replaces", "provision", "refusal",
+        "actor",
+    };
+
+    /// <summary>Fields a dedicated page section renders instead of the generic field table.</summary>
+    static readonly IReadOnlyDictionary<string, IReadOnlySet<string>> SectionFields =
+        new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal)
+        {
+            ["aggregate"] = new HashSet<string>(StringComparer.Ordinal) { "states", "transitions", "data" },
+            ["scenario"] = new HashSet<string>(StringComparer.Ordinal) { "given", "when", "then", "examples" },
+        };
+
+    /// <summary>Fields holding check names and codes, shown to developers only.</summary>
+    static readonly IReadOnlySet<string> DevOnlyFields = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "code", "check",
     };
 
     static readonly IReadOnlySet<string> IdFields = new HashSet<string>(StringComparer.Ordinal)
@@ -119,10 +135,25 @@ static partial class BookPages
             return BookRender.Esc(value);
         }
 
+        if (field == "trigger")
+        {
+            return RenderTrigger(index, rel, value);
+        }
+
+        if (field == "examples")
+        {
+            return RenderExamples(value);
+        }
+
+        if (field == "questions")
+        {
+            return RenderQuestions(value);
+        }
+
         if (value is JsonValue text && text.TryGetValue<string>(out var str))
         {
             var content = str ?? "";
-            if (field == "source" && (content.StartsWith("http://", StringComparison.Ordinal) || content.StartsWith("https://", StringComparison.Ordinal)))
+            if ((field == "source" || field == "evidence") && (content.StartsWith("http://", StringComparison.Ordinal) || content.StartsWith("https://", StringComparison.Ordinal)))
             {
                 return $"<a href=\"{BookRender.Esc(content)}\">{BookRender.Esc(content)}</a>";
             }
@@ -132,7 +163,7 @@ static partial class BookPages
                 return BookRender.RecordLink(index, rel, content);
             }
 
-            return BookRender.Esc(content);
+            return field == "code" ? $"<code>{BookRender.Esc(content)}</code>" : BookRender.Esc(content);
         }
 
         if (value is JsonArray list)
@@ -160,12 +191,7 @@ static partial class BookPages
 
             if (field == "states" && hasObjects)
             {
-                var rows = string.Concat(list.Select(entry =>
-                {
-                    var obj = entry as JsonObject;
-                    return $"<tr><td><code>{BookRender.EscOr(obj?["name"], "")}</code></td><td>{BookRender.EscOr(obj?["meaning"], "")}</td></tr>";
-                }));
-                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>State</th><th>Meaning</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                return StatesTable(list);
             }
 
             if (field == "transitions" && hasObjects)
@@ -174,31 +200,26 @@ static partial class BookPages
                 {
                     var obj = entry as JsonObject;
                     var by = BookRender.StrProp(obj, "by") is { } byId ? BookRender.RecordLink(index, rel, byId) : "";
-                    return $"<tr><td><code>{BookRender.EscOr(obj?["from"], "")}</code></td><td><code>{BookRender.EscOr(obj?["to"], "")}</code></td><td>{by}</td></tr>";
+                    return $"<tr><td>{BookRender.EscOr(obj?["from"], "")}</td><td>{BookRender.EscOr(obj?["to"], "")}</td><td>{by}</td></tr>";
                 }));
-                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>From</th><th>To</th><th>By</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>From</th><th>To</th><th>Triggered By</th></tr></thead><tbody>{rows}</tbody></table></div>";
             }
 
             if (field == "data" && hasObjects)
             {
-                var rows = string.Concat(list.Select(entry =>
-                {
-                    var obj = entry as JsonObject;
-                    return $"<tr><td><code>{BookRender.EscOr(obj?["name"], "")}</code></td><td>{BookRender.EscOr(obj?["meaning"], "")}</td><td>{BookRender.EscOr(obj?["classification"], "")}</td></tr>";
-                }));
-                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Name</th><th>Meaning</th><th>Classification</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                return DataTable(list);
             }
 
             if (field == "sources" && hasObjects)
             {
-                return $"<ul class=\"links\">{string.Concat(list.Select(entry => RenderSource(index, entry)))}</ul>";
+                return $"<ul class=\"links\">{string.Concat(list.Select(entry => RenderSource(entry)))}</ul>";
             }
 
             if (field == "values" && hasObjects)
             {
                 var rows = string.Concat(list.Select(RenderValueRow));
                 var head = list.Any(entry => entry is JsonObject obj && obj.ContainsKey("value"))
-                    ? "<tr><th>Value</th><th>Effective from</th></tr>"
+                    ? "<tr><th>Value</th><th>Effective From</th></tr>"
                     : "<tr><th>Code</th><th>Label</th></tr>";
                 return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead>{head}</thead><tbody>{rows}</tbody></table></div>";
             }
@@ -253,7 +274,7 @@ static partial class BookPages
                         : BookRender.EscOr(obj?["requires"], "");
                     return $"<tr><td class=\"num\">{position + 1}</td><td>{useCase}</td><td>{actor}</td><td>{requires}</td><td>{BookRender.EscOr(obj?["gives"], "")}</td></tr>";
                 }));
-                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th></th><th>Use case</th><th>Actor</th><th>Requires</th><th>Gives</th></tr></thead><tbody>{rows}</tbody></table></div>";
+                return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th></th><th>Use Case</th><th>Actor</th><th>Requires</th><th>Gives</th></tr></thead><tbody>{rows}</tbody></table></div>";
             }
 
             if (field == "labels" && list.Count > 0 && !(list[0] is JsonValue candidate && candidate.TryGetValue<string>(out _)))
@@ -276,7 +297,7 @@ static partial class BookPages
                 return $"<ul class=\"plain\">{string.Concat(list.Select(item => $"<li>{BookRender.Esc(item)}</li>"))}</ul>";
             }
 
-            return $"<pre class=\"json\">{BookRender.Esc(BookRender.JsonIndented(value))}</pre>";
+            return PlainBlock(value);
         }
 
         if (value is JsonObject objValue)
@@ -292,13 +313,292 @@ static partial class BookPages
                 return "";
             }
 
-            return $"<pre class=\"json\">{BookRender.Esc(BookRender.JsonIndented(value))}</pre>";
+            return PlainBlock(value);
         }
 
         return "";
     }
 
-    static string RenderSource(BookIndex index, JsonNode? entry)
+    /// <summary>Renders a reaction or runbook trigger: event links plus schedule words.</summary>
+    static string RenderTrigger(BookIndex index, string rel, JsonNode? value)
+    {
+        var entries = value is JsonArray list ? list.ToList() : [value];
+        var parts = new List<string>();
+        foreach (var entry in entries)
+        {
+            if (entry is JsonObject trigger)
+            {
+                var words = new List<string>();
+                if (BookRender.StrProp(trigger, "event") is { } eventId)
+                {
+                    words.Add(BookRender.RecordLink(index, rel, eventId));
+                }
+
+                foreach (var key in new[] { "schedule", "deadline", "every", "at", "when" })
+                {
+                    if (BookRender.IsTruthy(trigger[key]))
+                    {
+                        words.Add(BookRender.Esc(trigger[key]));
+                    }
+                }
+
+                if (words.Count > 0)
+                {
+                    parts.Add(string.Join(" ", words));
+                }
+                else
+                {
+                    parts.Add(PlainCell(entry));
+                }
+
+                continue;
+            }
+
+            var text = BookRender.Str(entry);
+            if (text.Length == 0)
+            {
+                continue;
+            }
+
+            parts.Add(index.ById.ContainsKey(text) ? BookRender.RecordLink(index, rel, text) : BookRender.MaybeRecordLink(index, rel, text));
+        }
+
+        if (parts.Count == 0)
+        {
+            return "";
+        }
+
+        if (parts.Count == 1)
+        {
+            return parts[0];
+        }
+
+        return $"<ul class=\"plain\">{string.Concat(parts.Select(part => $"<li>{part}</li>"))}</ul>";
+    }
+
+    /// <summary>Renders a scenario examples table: one row per example, one column per field.</summary>
+    static string RenderExamples(JsonNode? value, int maxRows = -1)
+    {
+        if (value is JsonArray list && list.Count > 0 && list.All(entry => entry is JsonArray))
+        {
+            var rows = list.Select(entry => (entry as JsonArray ?? []).Select(BookRender.Str).ToList()).ToList();
+            return GridTable(rows[0], rows.Skip(1).ToList(), maxRows);
+        }
+
+        if (value is JsonArray objects && objects.Count > 0 && objects.All(entry => entry is JsonObject))
+        {
+            var columns = new List<string>();
+            foreach (var entry in objects.OfType<JsonObject>())
+            {
+                foreach (var pair in entry)
+                {
+                    if (!columns.Contains(pair.Key, StringComparer.Ordinal))
+                    {
+                        columns.Add(pair.Key);
+                    }
+                }
+            }
+
+            var table = new StringBuilder();
+            table.Append("<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr>");
+            foreach (var column in columns)
+            {
+                table.Append($"<th>{BookRender.Esc(FieldLabel(column))}</th>");
+            }
+
+            table.Append("</tr></thead><tbody>");
+            var shown = 0;
+            foreach (var entry in objects.OfType<JsonObject>())
+            {
+                if (maxRows >= 0 && shown >= maxRows)
+                {
+                    break;
+                }
+
+                shown += 1;
+                table.Append("<tr>");
+                foreach (var column in columns)
+                {
+                    table.Append($"<td>{PlainCell(entry[column])}</td>");
+                }
+
+                table.Append("</tr>");
+            }
+
+            table.Append("</tbody></table></div>");
+            return table.ToString();
+        }
+
+        return PlainBlock(value);
+    }
+
+    static string GridTable(IReadOnlyList<string> head, IReadOnlyList<IReadOnlyList<string>> rows, int maxRows)
+    {
+        var table = new StringBuilder();
+        table.Append("<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr>");
+        foreach (var cell in head)
+        {
+            table.Append($"<th>{BookRender.Esc(cell)}</th>");
+        }
+
+        table.Append("</tr></thead><tbody>");
+        var shown = 0;
+        foreach (var row in rows)
+        {
+            if (maxRows >= 0 && shown >= maxRows)
+            {
+                break;
+            }
+
+            shown += 1;
+            table.Append("<tr>");
+            for (var column = 0; column < head.Count; column++)
+            {
+                table.Append($"<td>{BookRender.Esc(column < row.Count ? row[column] : "")}</td>");
+            }
+
+            table.Append("</tr>");
+        }
+
+        table.Append("</tbody></table></div>");
+        return table.ToString();
+    }
+
+    /// <summary>Renders open questions: the question with its decider and decide-by date.</summary>
+    static string RenderQuestions(JsonNode? value)
+    {
+        var entries = (value as JsonArray ?? []).OfType<JsonObject>().ToList();
+        if (entries.Count == 0)
+        {
+            return PlainBlock(value);
+        }
+
+        var rows = string.Concat(entries.Select(entry =>
+            $"<tr><td>{BookRender.EscOr(entry["question"], "")}</td><td>{BookRender.EscOr(entry["decider"], "")}</td>"
+            + $"<td>{BookRender.EscOr(entry["decideBy"], "")}</td></tr>"));
+        return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Question</th><th>Decider</th><th>Decide By</th></tr></thead><tbody>{rows}</tbody></table></div>";
+    }
+
+    /// <summary>Renders aggregate states: each name with its meaning, bare words allowed.</summary>
+    static string StatesTable(JsonArray list)
+    {
+        var rows = string.Concat(list.Select(entry =>
+        {
+            var obj = entry as JsonObject;
+            var name = obj is null ? BookRender.Str(entry) : BookRender.Str(obj["name"]);
+            var meaning = obj is null ? "" : BookRender.Str(obj["meaning"]);
+            return $"<tr><td>{BookRender.Esc(name)}</td><td>{BookRender.Esc(meaning)}</td></tr>";
+        }));
+        return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>State</th><th>Meaning</th></tr></thead><tbody>{rows}</tbody></table></div>";
+    }
+
+    /// <summary>Renders aggregate data: each field with its meaning and handling in words.</summary>
+    static string DataTable(JsonArray list)
+    {
+        var rows = string.Concat(list.Select(entry =>
+        {
+            var obj = entry as JsonObject;
+            if (obj is null)
+            {
+                return $"<tr><td>{BookRender.Esc(entry)}</td><td></td><td></td></tr>";
+            }
+
+            var classification = BookRender.StrProp(obj, "classification");
+            var handling = BookModel.HandlingWords(classification);
+            var raw = classification is { Length: > 0 } ? $" <span class=\"mono dim dev-only\">{BookRender.Esc(classification)}</span>" : "";
+            return $"<tr><td><code>{BookRender.EscOr(obj["name"], "")}</code></td><td>{BookRender.EscOr(obj["meaning"], "")}</td>"
+                + $"<td>{BookRender.Esc(handling)}{raw}</td></tr>";
+        }));
+        return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Name</th><th>Meaning</th><th>Handling</th></tr></thead><tbody>{rows}</tbody></table></div>";
+    }
+
+    /// <summary>Renders any value as words and tables, so raw JSON never reaches a reviewer.</summary>
+    static string PlainBlock(JsonNode? value)
+    {
+        if (value is JsonArray list)
+        {
+            var entries = list.ToList();
+            if (entries.Count == 0)
+            {
+                return "";
+            }
+
+            if (entries.All(entry => entry is JsonValue))
+            {
+                var items = entries.Select(PlainCell).ToList();
+                if (items.Count <= 3)
+                {
+                    return string.Join(", ", items);
+                }
+
+                return $"<ul class=\"plain\">{string.Concat(items.Select(item => $"<li>{item}</li>"))}</ul>";
+            }
+
+            if (entries.All(entry => entry is JsonObject))
+            {
+                var columns = new List<string>();
+                foreach (var entry in entries.OfType<JsonObject>())
+                {
+                    foreach (var pair in entry)
+                    {
+                        if (!columns.Contains(pair.Key, StringComparer.Ordinal))
+                        {
+                            columns.Add(pair.Key);
+                        }
+                    }
+                }
+
+                var table = new StringBuilder();
+                table.Append("<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr>");
+                foreach (var column in columns)
+                {
+                    table.Append($"<th>{BookRender.Esc(FieldLabel(column))}</th>");
+                }
+
+                table.Append("</tr></thead><tbody>");
+                foreach (var entry in entries.OfType<JsonObject>())
+                {
+                    table.Append("<tr>");
+                    foreach (var column in columns)
+                    {
+                        table.Append($"<td>{PlainCell(entry[column])}</td>");
+                    }
+
+                    table.Append("</tr>");
+                }
+
+                table.Append("</tbody></table></div>");
+                return table.ToString();
+            }
+
+            return $"<ul class=\"plain\">{string.Concat(entries.Select(entry => $"<li>{PlainCell(entry)}</li>"))}</ul>";
+        }
+
+        if (value is JsonObject obj)
+        {
+            var rows = string.Concat(obj.Select(pair => $"<tr><td>{BookRender.Esc(FieldLabel(pair.Key))}</td><td>{PlainCell(pair.Value)}</td></tr>"));
+            return $"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>{rows}</tbody></table></div>";
+        }
+
+        return PlainCell(value);
+    }
+
+    /// <summary>Renders one value inline: scalars as text, deeper values joined in words.</summary>
+    static string PlainCell(JsonNode? value) =>
+        value switch
+        {
+            null => "",
+            JsonValue => BookRender.Esc(value),
+            JsonArray items => string.Join("; ", items.Select(PlainCell).Where(part => part.Length > 0)),
+            JsonObject obj => string.Join("; ", obj.Select(pair =>
+            {
+                var cell = PlainCell(pair.Value);
+                return cell.Length > 0 ? $"{FieldLabel(pair.Key)}: {cell}" : "";
+            }).Where(part => part.Length > 0)),
+            _ => "",
+        };
+
+    static string RenderSource(JsonNode? entry)
     {
         if (entry is JsonObject source && BookRender.IsTruthy(source["url"]))
         {
@@ -306,12 +606,7 @@ static partial class BookPages
             return $"<li><a href=\"{BookRender.Esc(source["url"])}\">{BookRender.Esc(source["url"])}</a>{read}</li>";
         }
 
-        if (entry is JsonObject or JsonArray)
-        {
-            return $"<li><code>{BookRender.Esc(BookRender.JsonCompact(entry))}</code></li>";
-        }
-
-        return $"<li>{BookRender.Esc(entry)}</li>";
+        return $"<li>{PlainCell(entry)}</li>";
     }
 
     static string RenderValueRow(JsonNode? entry)
@@ -344,12 +639,14 @@ static partial class BookPages
     static string RenderFields(BookIndex index, string rel, JsonObject record)
     {
         var fields = BookRender.Fields(record) ?? new JsonObject();
-        var order = BookRender.StrProp(record, "type") is { } type && FieldOrder.TryGetValue(type, out var found) ? found : [];
+        var type = BookRender.StrProp(record, "type");
+        var order = type is not null && FieldOrder.TryGetValue(type, out var found) ? found : [];
+        var dedicated = type is not null && SectionFields.TryGetValue(type, out var skipped) ? skipped : new HashSet<string>(StringComparer.Ordinal);
         var rows = new List<string>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         void Push(string field)
         {
-            if (!fields.ContainsKey(field) || !seen.Add(field))
+            if (!fields.ContainsKey(field) || !seen.Add(field) || dedicated.Contains(field))
             {
                 return;
             }
@@ -360,7 +657,8 @@ static partial class BookPages
                 : RenderFieldValue(index, rel, field, fields[field]);
             if (html != "")
             {
-                rows.Add($"<div><dt>{BookRender.Esc(FieldLabel(field))}</dt><dd>{html}</dd></div>");
+                var dev = DevOnlyFields.Contains(field) ? " class=\"dev-only\"" : "";
+                rows.Add($"<div{dev}><dt>{BookRender.Esc(FieldLabel(field))}</dt><dd>{html}</dd></div>");
             }
         }
 

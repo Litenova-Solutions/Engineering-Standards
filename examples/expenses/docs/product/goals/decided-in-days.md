@@ -1,0 +1,19 @@
+---
+{
+  "type": "goal",
+  "id": "goal/decided-in-days",
+  "title": "Decided in Days",
+  "owner": "expenses-team",
+  "status": "approved",
+  "statement": "Every submitted expense is decided within five business days.",
+  "measure": "Median hours from submission to decision.",
+  "target": "Under 120 hours.",
+  "by": "2026-12-31"
+}
+---
+
+# Decided in Days
+
+## Why It Matters
+
+Employees plan around reimbursements, and a late decision holds their money. A fast decision keeps trust in the whole flow.

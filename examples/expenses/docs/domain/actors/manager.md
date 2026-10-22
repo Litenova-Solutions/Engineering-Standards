@@ -17,4 +17,6 @@
 
 # Manager
 
+## Summary
+
 A manager approves or rejects expenses.

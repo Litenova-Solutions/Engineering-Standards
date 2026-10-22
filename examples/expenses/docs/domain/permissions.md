@@ -52,6 +52,14 @@
       "owner": "expenses-team",
       "status": "approved",
       "meaning": "Export approved expenses for finance."
+    },
+    {
+      "type": "permission",
+      "id": "permission/erase-personal-data",
+      "title": "Erase personal data",
+      "owner": "expenses-team",
+      "status": "approved",
+      "meaning": "Erase the personal data of a decided expense."
     }
   ]
 }

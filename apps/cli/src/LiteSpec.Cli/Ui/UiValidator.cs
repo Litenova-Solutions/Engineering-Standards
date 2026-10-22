@@ -20,8 +20,9 @@ static partial class UiValidator
 
         Checks the shared package configuration, source lock, design contract,
         token stylesheet, shared stylesheets, class strings, application imports,
-        the dependency boundary, and the pattern catalog. Nothing else: no route,
-        environment, naming, secret, storage, or HTML sink scan.
+        the dependency boundary, the pattern catalog, and the route suite
+        coverage. Nothing else: no environment, naming, secret, storage, or HTML
+        sink scan.
 
           --root <path>   The consumer root. Defaults to the current directory.
           --format json   Write one JSON object on stdout instead of human-readable lines.
@@ -123,7 +124,7 @@ static partial class UiValidator
             return report.ExitCode;
         }
 
-        Console.WriteLine("\nPASS: the shared package, its source lock, its design contract, its stylesheets, and each frontend boundary are valid.");
+        Console.WriteLine("\nPASS: the shared package, its source lock, its design contract, its stylesheets, each frontend boundary, and each route suite are valid.");
         return report.ExitCode;
     }
 
@@ -577,6 +578,8 @@ static partial class UiValidator
                             Errors.Add($"[litespec/frontend/web/ui#restrict-css-decisions] {relative}: an inline style belongs in a shared component");
                         }
                     }
+
+                    ValidateRouteSuites(label, frontendRoot, platform);
                 }
             }
 

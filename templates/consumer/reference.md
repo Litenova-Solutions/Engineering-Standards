@@ -24,4 +24,6 @@ Name the source each value is read from, so a reader can check it.
 
 ## Notes
 
+Optional. Remove this section when the table needs no note.
+
 Record anything a reader needs beside the table, such as the command that prints these values.

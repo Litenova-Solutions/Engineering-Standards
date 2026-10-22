@@ -41,7 +41,7 @@ static partial class StandardsValidator
         "CONVENTION_DEFAULT_SENTENCE",
         "CONVENTION_MISSING_DEFAULT",
         "CONVENTION_MISSING_REPLACEMENT",
-        "CONVENTION_NORMATIVE",
+        "CONVENTION_REPLACEMENT_DEVIATION",
         "CONVENTION_REPLACEMENT_SENTENCE",
         "EXTENSION_ACTIVATION",
         "EXTENSION_BASELINE",
@@ -73,6 +73,8 @@ static partial class StandardsValidator
         "MANIFEST_JSON",
         "MANIFEST_PATH",
         "PAGE_EMPTY_SECTION",
+        "PAGE_EMPTY_SECTION_TEXT",
+        "PAGE_HEADING_CASE",
         "PAGE_MISSING_SECTION",
         "PAGE_SECTION_ORDER",
         "PAGE_TITLE_CASE",
@@ -90,6 +92,7 @@ static partial class StandardsValidator
         "SCHEMA_UNSUPPORTED_KEYWORD",
         "STACK_COMPOSITION_EXTRA",
         "STACK_COMPOSITION_MISSING",
+        "STANDARD_DEVIATION_NORMATIVE",
         "STANDARD_DEVIATION_SENTENCE",
         "STANDARD_EXAMPLE_LABEL",
         "STANDARD_INFORMATIVE_NORMATIVE",
@@ -105,6 +108,7 @@ static partial class StandardsValidator
         "STANDARD_UNEXPECTED_DEVIATION",
         "STANDARD_UNLABELED_CONTENT",
         "VERIFY_COMMAND",
+        "VERIFY_DUPLICATE_EVIDENCE",
         "VERIFY_DUPLICATE_ID",
         "VERIFY_GENERIC_EVIDENCE",
         "VERIFY_HEADER",
@@ -121,10 +125,17 @@ static partial class StandardsValidator
     ];
 
     /// <summary>
-    ///     Codes reported as warnings, which never fail the build. Empty unless a new rule
-    ///     lands against existing content and burns its count down.
+    ///     Codes reported as warnings, which never fail the build. Each new rule lands
+    ///     here while existing content still carries the old form, and burns its count
+    ///     down as the pages are rewritten.
     /// </summary>
-    public static readonly IReadOnlyList<string> WarningDiagnosticCodes = [];
+    public static readonly IReadOnlyList<string> WarningDiagnosticCodes =
+    [
+        "CONVENTION_REPLACEMENT_DEVIATION",
+        "PAGE_EMPTY_SECTION_TEXT",
+        "PAGE_HEADING_CASE",
+        "VERIFY_DUPLICATE_EVIDENCE",
+    ];
 
     /// <summary>
     ///     Validates the repository at <paramref name="root"/> and returns its sorted diagnostics.

@@ -11,15 +11,9 @@
       "type": "entry-point",
       "id": "entry-point/<name>",
       "title": "<Entry point display title>",
-      "kind": "<web-app|public-api|cli|mcp-server|site|reaction|job>",
-      "path": "<repository path, or remove this line>",
-      "offers": ["<permission id, or remove this line>"]
+      "kind": "<app|api|cli|job|reaction>"
     }
   ]
 }
 ---
 # <Entry points display title>
-
-## Summary
-
-State how people and systems reach the product through these entry points.

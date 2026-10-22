@@ -13,9 +13,8 @@ State the outcome that this page helps the reader produce.
 
 1. Start each step with one imperative verb.
 2. Name the repository command that performs the step.
-3. Keep each procedure sentence within 20 words.
-4. Link to canonical provisions instead of copying them.
+3. Link to canonical provisions instead of copying them.
 
-## Verification
+## Check
 
 - Name the exact command, artifact, or observable result that proves completion.

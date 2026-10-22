@@ -16,7 +16,7 @@ State the one working result the reader holds at the end of this page.
 3. Offer no option, no alternative, and no branch.
 4. Show the output the reader sees after the step.
 
-## What you built
+## What You Built
 
 - Name what now runs, and where the reader observes it.
 - Link the how-to page that answers the next question.

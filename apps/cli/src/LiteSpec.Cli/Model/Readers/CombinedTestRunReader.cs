@@ -38,6 +38,12 @@ sealed class CombinedTestRunReader(params ITestRunReader[] readers) : ITestRunRe
             merged.Total += run.Total;
             merged.Passed += run.Passed;
             merged.Failed += run.Failed;
+
+            if (run.Date is not null
+                && (merged.Date is null || string.CompareOrdinal(run.Date, merged.Date) > 0))
+            {
+                merged.Date = run.Date;
+            }
         }
 
         return merged;

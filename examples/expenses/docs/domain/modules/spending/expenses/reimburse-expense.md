@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.reimburse-expense",
-  "title": "Reimburse expense",
+  "title": "Reimburse Expense",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -61,6 +61,16 @@
 }
 ---
 
-# Reimburse expense
+# Reimburse Expense
 
-Finance reimburses an approved expense.
+## Goal
+
+Finance pays an approved expense so the employee gets the money back.
+
+## What Happens
+
+Finance picks an approved expense. Spending refuses the payment when the expense is not approved or is already reimbursed. Otherwise the expense moves to Reimbursed, `event/expense.expense-reimbursed` is raised, and the payout batch carries it to `external-system/payout-bank`.
+
+## Risk
+
+Money moves here: a double payment reaches the employee twice. The `rule/expense.reimbursed-once` rule guards it, and the payout bank settles each batch once.

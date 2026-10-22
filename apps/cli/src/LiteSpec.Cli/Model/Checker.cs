@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -21,6 +22,9 @@ static partial class Checker
         "journey-reach", "use-case-access", "region-unknown",
         "use-case-without-scenario", "requirement-unfulfilled",
         "aggregate-name-clash", "decision-decides-nothing", "link-unresolved",
+        "behavior-unrecorded", "state-unreachable", "transition-unresolved",
+        "personal-data-uncovered", "calculation-without-table",
+        "reaction-without-trigger", "requirement-unmeasured", "open-questions",
     };
 
     /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfills them.</summary>
@@ -39,8 +43,9 @@ static partial class Checker
     public static (IReadOnlyList<Finding> Findings, IReadOnlyList<Finding> Known) Check(ProjectModel model)
     {
         var findings = new List<Finding>(model.Problems);
+        var owners = Codeowners.Load(model.Config.Root);
 
-        Time("schema", () => CheckSchema(model, findings));
+        Time("schema", () => CheckSchema(model, findings, owners));
         Time("identifiers", () => CheckIdentifiers(model, findings));
         Time("citations", () => CheckCitations(model, findings));
         Time("gates", () => CheckGates(model, findings));
@@ -51,6 +56,13 @@ static partial class Checker
         Time("regions", () => CheckRegions(model, findings));
         Time("profile", () => CheckSizeTypes(model, findings));
         Time("reach", () => CheckJourneyReach(model, findings));
+        Time("behavior", () => CheckBehaviorUnrecorded(model, findings));
+        Time("lifecycle", () => CheckLifecycle(model, findings));
+        Time("data", () => CheckPersonalData(model, findings));
+        Time("calculations", () => CheckCalculations(model, findings));
+        Time("reactions", () => CheckReactions(model, findings));
+        Time("measured", () => CheckMeasured(model, findings));
+        Time("questions", () => CheckQuestions(model, findings));
 
         findings.Sort((left, right) =>
         {
@@ -127,7 +139,7 @@ static partial class Checker
         return (kept, known);
     }
 
-    private static void CheckSchema(ProjectModel model, List<Finding> findings)
+    private static void CheckSchema(ProjectModel model, List<Finding> findings, Codeowners owners)
     {
         foreach (var record in model.Records)
         {
@@ -159,6 +171,10 @@ static partial class Checker
             else if (model.Config.HasOwners && !model.Config.Owners.Contains(record.Owner, StringComparer.Ordinal))
             {
                 findings.Add(new Finding("owner-unknown", $"Record '{record.Id}' names owner '{record.Owner}', which the owner list does not hold.", record.File, record.Line, SubjectOf(record)));
+            }
+            else if (record.Owner is { } owner && !owners.Covers(model.Config.Root, record.File, owner))
+            {
+                findings.Add(new Finding("owner-unknown", $"Record '{record.Id}' names owner '{owner}', which belongs to no team owning its path.", record.File, record.Line, SubjectOf(record)));
             }
 
             if (record.Status is null)
@@ -1038,6 +1054,606 @@ static partial class Checker
             {
                 findings.Add(new Finding("journey-reach", $"Use case '{useCase.Id}' sits in no journey.", useCase.File, useCase.Line, SubjectOf(useCase)));
             }
+        }
+    }
+
+    private static void CheckBehaviorUnrecorded(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var handler in model.Code.Handlers)
+        {
+            if (!IsUseCase(model, handler.UseCaseId))
+            {
+                findings.Add(new Finding("behavior-unrecorded", $"Handler for '{handler.UseCaseId}' has no use case record.", handler.File, 1, handler.UseCaseId));
+            }
+        }
+
+        foreach (var endpoint in model.Code.Endpoints)
+        {
+            if (!IsUseCase(model, endpoint.UseCaseId))
+            {
+                findings.Add(new Finding("behavior-unrecorded", $"Endpoint for '{endpoint.UseCaseId}' has no use case record.", endpoint.File, 1, endpoint.UseCaseId));
+            }
+        }
+
+        foreach (var reaction in model.Code.Reactions)
+        {
+            var kind = reaction.Kind == "job" ? "Job" : "Reaction";
+
+            if (reaction.UseCaseId is null)
+            {
+                if (!HasImplements(model, reaction))
+                {
+                    findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names no use case.", reaction.File, reaction.Line, null));
+                }
+            }
+            else if (!IsUseCase(model, reaction.UseCaseId))
+            {
+                findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names '{reaction.UseCaseId}', which no use case record holds.", reaction.File, reaction.Line, reaction.UseCaseId));
+            }
+        }
+
+        foreach (var domainEvent in model.Code.Events)
+        {
+            if (domainEvent.EventId is null)
+            {
+                findings.Add(new Finding("behavior-unrecorded", $"Domain event '{domainEvent.Class}' is named by no event record.", domainEvent.File, domainEvent.Line, null));
+            }
+        }
+
+        var declared = model.Records
+            .Where(record => record.Type == "result" && record.Field("outcome") == "refusal")
+            .Select(record => record.Field("code"))
+            .OfType<string>()
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var literal in model.Code.Literals)
+        {
+            if (!declared.Contains(literal.Value))
+            {
+                findings.Add(new Finding("behavior-unrecorded", $"Code '{literal.Value}' in code is declared by no refusal result.", literal.File, literal.Line, null));
+            }
+        }
+
+        CheckUnmatchedCalls(model, findings);
+    }
+
+    /// <summary>Whether the id names a use case record.</summary>
+    /// <summary>Whether the reaction or job already links to a use case record.</summary>
+    private static bool HasImplements(ProjectModel model, ReactionInfo reaction)
+    {
+        var relative = Path.IsPathRooted(reaction.File)
+            ? model.Config.Relative(reaction.File)
+            : reaction.File.Replace(Path.DirectorySeparatorChar, '/');
+
+        return model.Implements.Any(link =>
+            string.Equals(link.Kind, reaction.Kind, StringComparison.Ordinal)
+            && string.Equals(link.Path, relative, StringComparison.Ordinal)
+            && IsUseCase(model, link.To));
+    }
+
+    private static bool IsUseCase(ProjectModel model, string id) =>
+        model.ById.TryGetValue(id, out var record) && record.Type == "use-case";
+
+    private static void CheckUnmatchedCalls(ProjectModel model, List<Finding> findings)
+    {
+        if (model.Screens.Count == 0 || model.Config.Shape == "client-only")
+        {
+            return;
+        }
+
+        var byRoute = new Dictionary<string, string>(StringComparer.Ordinal);
+        var byOperation = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        foreach (var endpoint in model.Code.Endpoints)
+        {
+            if (endpoint.Operation.Length > 0)
+            {
+                byOperation.TryAdd(endpoint.Operation, endpoint.UseCaseId);
+            }
+
+            if (endpoint.Method.Length > 0 && endpoint.Route.Length > 0)
+            {
+                byRoute.TryAdd($"{endpoint.Method} {Template(endpoint.Route)}", endpoint.UseCaseId);
+            }
+        }
+
+        foreach (var screen in model.Screens.OrderBy(left => left.File, StringComparer.Ordinal))
+        {
+            foreach (var operation in screen.Operations.OrderBy(left => left.Name, StringComparer.Ordinal))
+            {
+                if (byRoute.ContainsKey($"{operation.Method} {Template(operation.Path)}")
+                    || byOperation.ContainsKey(Naming.Pascal(operation.Name)))
+                {
+                    continue;
+                }
+
+                findings.Add(new Finding(
+                    "behavior-unrecorded",
+                    $"Screen '{screen.Frontend} {screen.Route}' calls '{operation.Name}', which matches no endpoint.",
+                    ScreenFile(model, screen.File),
+                    1,
+                    null));
+            }
+        }
+    }
+
+    /// <summary>The route template with parameter constraints removed, so `{id:guid}` reads `{id}`.</summary>
+    private static string Template(string route) => TemplateConstraint().Replace(route, "{$1}");
+
+    [GeneratedRegex(@"\{(?<name>[^}:]+):[^}]+\}")]
+    private static partial Regex TemplateConstraint();
+
+    /// <summary>The screen's absolute file: screens keep the path relative to the consumer root.</summary>
+    private static string ScreenFile(ProjectModel model, string file) =>
+        Path.IsPathRooted(file)
+            ? file
+            : Path.GetFullPath(Path.Combine(model.Config.Root, file.Replace('/', Path.DirectorySeparatorChar)));
+
+    private static void CheckLifecycle(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var aggregate in model.Records.Where(record => record.Type == "aggregate"))
+        {
+            var states = StateNames(aggregate);
+            var transitions = TransitionsOf(aggregate);
+
+            if (transitions.Count == 0)
+            {
+                continue;
+            }
+
+            foreach (var transition in transitions)
+            {
+                if (!states.Contains(transition.From))
+                {
+                    findings.Add(new Finding("transition-unresolved", $"Transition on aggregate '{aggregate.Id}' leads from '{transition.From}', which is not a state of the aggregate.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+                }
+
+                if (!states.Contains(transition.To))
+                {
+                    findings.Add(new Finding("transition-unresolved", $"Transition on aggregate '{aggregate.Id}' leads to '{transition.To}', which is not a state of the aggregate.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+                }
+
+                if (transition.By is not null && !IsUseCase(model, transition.By))
+                {
+                    findings.Add(new Finding("transition-unresolved", $"Transition on aggregate '{aggregate.Id}' is by '{transition.By}', which no use case record holds.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+                }
+            }
+
+            var targets = transitions.Select(transition => transition.To).ToHashSet(StringComparer.Ordinal);
+            var sources = transitions.Select(transition => transition.From).ToHashSet(StringComparer.Ordinal);
+
+            foreach (var state in states.Order(StringComparer.Ordinal))
+            {
+                if (!targets.Contains(state) && !sources.Contains(state))
+                {
+                    findings.Add(new Finding("state-unreachable", $"State '{state}' of aggregate '{aggregate.Id}' is reached by no transition.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+                }
+            }
+        }
+    }
+
+    /// <summary>One aggregate transition: the states it leaves and enters, and the use case behind it.</summary>
+    sealed record AggregateTransition(string From, string To, string? By);
+
+    /// <summary>The aggregate's transitions; entries without both states are left to the shape check.</summary>
+    private static IReadOnlyList<AggregateTransition> TransitionsOf(Record aggregate)
+    {
+        if (aggregate.Raw.ValueKind != JsonValueKind.Object
+            || !aggregate.Raw.TryGetProperty("transitions", out var value)
+            || value.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        var found = new List<AggregateTransition>();
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind == JsonValueKind.Object
+                && entry.TryGetProperty("from", out var from)
+                && from.ValueKind == JsonValueKind.String
+                && from.GetString() is { Length: > 0 } leave
+                && entry.TryGetProperty("to", out var to)
+                && to.ValueKind == JsonValueKind.String
+                && to.GetString() is { Length: > 0 } enter)
+            {
+                found.Add(new AggregateTransition(
+                    leave,
+                    enter,
+                    entry.TryGetProperty("by", out var by) && by.ValueKind == JsonValueKind.String ? by.GetString() : null));
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>The aggregate's state names.</summary>
+    private static IReadOnlySet<string> StateNames(Record aggregate)
+    {
+        if (aggregate.Raw.ValueKind != JsonValueKind.Object
+            || !aggregate.Raw.TryGetProperty("states", out var value)
+            || value.ValueKind != JsonValueKind.Array)
+        {
+            return new HashSet<string>(StringComparer.Ordinal);
+        }
+
+        return value.EnumerateArray()
+            .Where(entry => entry.ValueKind == JsonValueKind.Object
+                && entry.TryGetProperty("name", out var name)
+                && name.ValueKind == JsonValueKind.String
+                && name.GetString() is { Length: > 0 })
+            .Select(entry => entry.GetProperty("name").GetString()!)
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    /// <summary>Words in a use case name that erase personal data.</summary>
+    private static readonly string[] ErasureWords =
+        ["erase", "erasure", "delete", "deletion", "remove", "removal", "forget", "anonymize", "anonymise"];
+
+    /// <summary>Words in a use case name that export personal data.</summary>
+    private static readonly string[] ExportWords = ["export", "download", "extract", "portability"];
+
+    private static void CheckPersonalData(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var aggregate in model.Records.Where(record => record.Type == "aggregate"))
+        {
+            var personal = DataOf(aggregate)
+                .Where(field => field.Classification is "personal" or "sensitive")
+                .Select(field => field.Name)
+                .Order(StringComparer.Ordinal)
+                .ToList();
+
+            if (personal.Count == 0)
+            {
+                continue;
+            }
+
+            var home = Identifiers.TrySplit(aggregate.Id, out _, out var module, out _) ? module : null;
+            var moduleCases = model.Records
+                .Where(record => record.Type == "use-case"
+                    && record.Status != "retired"
+                    && home is not null
+                    && Identifiers.TrySplit(record.Id, out _, out var useCaseHome, out _)
+                    && useCaseHome == home)
+                .Select(record => Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : "")
+                .ToList();
+
+            if (!moduleCases.Any(name => ContainsWord(name, ErasureWords)))
+            {
+                findings.Add(new Finding("personal-data-uncovered", $"Aggregate '{aggregate.Id}' holds personal data no erasure use case covers: {string.Join(", ", personal)}.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+            }
+
+            if (!moduleCases.Any(name => ContainsWord(name, ExportWords)))
+            {
+                findings.Add(new Finding("personal-data-uncovered", $"Aggregate '{aggregate.Id}' holds personal data no export use case covers: {string.Join(", ", personal)}.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
+            }
+        }
+    }
+
+    /// <summary>One aggregate data field: its name and classification.</summary>
+    sealed record AggregateField(string Name, string Classification);
+
+    /// <summary>The aggregate's data fields; entries without a name and classification are left to the shape check.</summary>
+    private static IReadOnlyList<AggregateField> DataOf(Record aggregate)
+    {
+        if (aggregate.Raw.ValueKind != JsonValueKind.Object
+            || !aggregate.Raw.TryGetProperty("data", out var value)
+            || value.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        var found = new List<AggregateField>();
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind == JsonValueKind.Object
+                && entry.TryGetProperty("name", out var name)
+                && name.ValueKind == JsonValueKind.String
+                && name.GetString() is { Length: > 0 } field
+                && entry.TryGetProperty("classification", out var classification)
+                && classification.ValueKind == JsonValueKind.String
+                && classification.GetString() is { Length: > 0 } level)
+            {
+                found.Add(new AggregateField(field, level));
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>Whether the kebab-case name holds one of the words.</summary>
+    private static bool ContainsWord(string name, string[] words) =>
+        words.Any(word => name.Contains(word, StringComparison.OrdinalIgnoreCase));
+
+    private static void CheckCalculations(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var rule in model.Records.Where(record => record.Type == "rule" && record.Field("kind") == "calculation"))
+        {
+            var covered = GovernedUseCases(model, rule)
+                .SelectMany(useCase => ScenariosOf(model, useCase))
+                .Any(scenario => scenario.Status != "retired" && HasExamples(scenario));
+
+            if (!covered)
+            {
+                findings.Add(new Finding("calculation-without-table", $"Rule '{rule.Id}' is a calculation with no scenario examples table.", rule.File, rule.Line, SubjectOf(rule)));
+            }
+        }
+    }
+
+    /// <summary>The use cases a rule governs: directly, or through the aggregate that holds them.</summary>
+    private static IReadOnlyList<Record> GovernedUseCases(ProjectModel model, Record rule)
+    {
+        var found = new List<Record>();
+
+        foreach (var target in rule.Ids("governs"))
+        {
+            if (!model.ById.TryGetValue(target, out var governed))
+            {
+                continue;
+            }
+
+            if (governed.Type == "use-case")
+            {
+                found.Add(governed);
+            }
+            else if (governed.Type == "aggregate")
+            {
+                found.AddRange(model.Records.Where(record =>
+                    record.Type == "use-case" && ModelBuilder.AggregateOf(model, record)?.Id == governed.Id));
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>The scenarios on a use case page.</summary>
+    private static IReadOnlyList<Record> ScenariosOf(ProjectModel model, Record useCase)
+    {
+        if (!Identifiers.TrySplit(useCase.Id, out _, out _, out var name))
+        {
+            return [];
+        }
+
+        return model.Records
+            .Where(record => record.Type == "scenario"
+                && Identifiers.TrySplit(record.Id, out _, out var home, out _)
+                && home == name)
+            .ToList();
+    }
+
+    /// <summary>Whether the scenario carries a non-empty examples table.</summary>
+    private static bool HasExamples(Record scenario) =>
+        scenario.Raw.ValueKind == JsonValueKind.Object
+        && scenario.Raw.TryGetProperty("examples", out var value)
+        && value.ValueKind == JsonValueKind.Array
+        && value.GetArrayLength() > 0;
+
+    private static void CheckReactions(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var useCase in model.Records.Where(record => record.Type == "use-case" && record.Field("kind") == "reaction"))
+        {
+            if (!HasTrigger(useCase))
+            {
+                findings.Add(new Finding("reaction-without-trigger", $"Reaction '{useCase.Id}' names no trigger.", useCase.File, useCase.Line, SubjectOf(useCase)));
+            }
+        }
+    }
+
+    /// <summary>Whether the reaction names what sets it off: events, a schedule or a deadline, in any trigger shape.</summary>
+    private static bool HasTrigger(Record useCase)
+    {
+        if (useCase.Raw.ValueKind != JsonValueKind.Object
+            || !useCase.Raw.TryGetProperty("trigger", out var trigger))
+        {
+            return false;
+        }
+
+        return trigger.ValueKind switch
+        {
+            JsonValueKind.String => trigger.GetString() is { Length: > 0 },
+            JsonValueKind.Array => trigger.GetArrayLength() > 0,
+            JsonValueKind.Object => HasTriggerEvents(trigger) || HasTriggerText(trigger, "schedule") || HasTriggerText(trigger, "deadline"),
+            _ => false,
+        };
+    }
+
+    private static bool HasTriggerEvents(JsonElement trigger) =>
+        trigger.TryGetProperty("events", out var events)
+        && events.ValueKind == JsonValueKind.Array
+        && events.GetArrayLength() > 0;
+
+    private static bool HasTriggerText(JsonElement trigger, string field) =>
+        trigger.TryGetProperty(field, out var value)
+        && value.ValueKind == JsonValueKind.String
+        && value.GetString() is { Length: > 0 };
+
+    private static void CheckMeasured(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var requirement in model.Records.Where(record => record.Type == "requirement" && record.Field("measure") is { Length: > 0 }))
+        {
+            var check = requirement.Field("check");
+
+            if (check is not { Length: > 0 })
+            {
+                findings.Add(new Finding("requirement-unmeasured", $"Requirement '{requirement.Id}' is measured but names no check.", requirement.File, requirement.Line, SubjectOf(requirement)));
+            }
+            else if (!model.Measures.Any(measure => measure.Passed && MeasureMatches(measure, check)))
+            {
+                findings.Add(new Finding("requirement-unmeasured", $"Requirement '{requirement.Id}' names check '{check}' with no passing run.", requirement.File, requirement.Line, SubjectOf(requirement)));
+            }
+        }
+    }
+
+    /// <summary>Whether the tool result is the requirement's check: the check alone, or the tool and the check.</summary>
+    private static bool MeasureMatches(MeasureResult measure, string check) =>
+        measure.Check.Equals(check, StringComparison.Ordinal)
+        || $"{measure.Tool} {measure.Check}".Equals(check, StringComparison.Ordinal);
+
+    private static void CheckQuestions(ProjectModel model, List<Finding> findings)
+    {
+        foreach (var record in model.Records)
+        {
+            if (record.Status == "approved" && HasQuestions(record))
+            {
+                findings.Add(new Finding("open-questions", $"Record '{record.Id}' is approved with open questions.", record.File, record.Line, SubjectOf(record)));
+            }
+        }
+    }
+
+    /// <summary>Whether the record carries open questions.</summary>
+    private static bool HasQuestions(Record record) =>
+        record.Raw.ValueKind == JsonValueKind.Object
+        && record.Raw.TryGetProperty("questions", out var value)
+        && value.ValueKind == JsonValueKind.Array
+        && value.GetArrayLength() > 0;
+
+    /// <summary>One CODEOWNERS line: the paths it owns and the owners it names.</summary>
+    sealed record CodeownerRule(Regex Matcher, IReadOnlyList<string> Owners);
+
+    /// <summary>
+    ///     The consumer CODEOWNERS file, when one exists: a record's owner matches an owner
+    ///     of the last pattern its path matches. Basename patterns match in any folder,
+    ///     directory patterns own everything beneath, and `*`, `**` and `?` span as usual.
+    /// </summary>
+    sealed class Codeowners
+    {
+        private readonly IReadOnlyList<CodeownerRule> _rules;
+
+        private Codeowners(IReadOnlyList<CodeownerRule> rules) => _rules = rules;
+
+        /// <summary>Reads the CODEOWNERS file from its usual homes, or no rules when none exists.</summary>
+        public static Codeowners Load(string root)
+        {
+            foreach (var candidate in new[] { ".github/CODEOWNERS", "CODEOWNERS", "docs/CODEOWNERS" })
+            {
+                var file = Path.Combine(root, candidate.Replace('/', Path.DirectorySeparatorChar));
+
+                if (File.Exists(file))
+                {
+                    return new Codeowners(Parse(SourceTree.Read(file)));
+                }
+            }
+
+            return new Codeowners([]);
+        }
+
+        /// <summary>Whether the owner matches an owner of the file's path, or no rule constrains the path.</summary>
+        public bool Covers(string root, string file, string owner)
+        {
+            if (_rules.Count == 0)
+            {
+                return true;
+            }
+
+            var relative = Path.GetRelativePath(root, file).Replace(Path.DirectorySeparatorChar, '/');
+            IReadOnlyList<string>? hit = null;
+
+            foreach (var rule in _rules)
+            {
+                if (rule.Matcher.IsMatch(relative))
+                {
+                    hit = rule.Owners;
+                }
+            }
+
+            return hit is null || hit.Any(entry => OwnerMatches(entry, owner));
+        }
+
+        private static IReadOnlyList<CodeownerRule> Parse(string text)
+        {
+            var rules = new List<CodeownerRule>();
+
+            foreach (var line in text.Split('\n'))
+            {
+                var trimmed = line.Trim();
+
+                if (trimmed.Length == 0 || trimmed.StartsWith('#'))
+                {
+                    continue;
+                }
+
+                var parts = trimmed.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length < 2)
+                {
+                    continue;
+                }
+
+                rules.Add(new CodeownerRule(RuleMatcher(parts[0]), parts[1..]));
+            }
+
+            return rules;
+        }
+
+        private static bool OwnerMatches(string entry, string owner)
+        {
+            var named = entry.StartsWith('@') ? entry[1..] : entry;
+
+            return named.Equals(owner, StringComparison.OrdinalIgnoreCase)
+                || named.EndsWith("/" + owner, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static Regex RuleMatcher(string pattern)
+        {
+            var mine = pattern.StartsWith('/') ? pattern[1..] : pattern;
+            string full;
+
+            if (mine.EndsWith('/'))
+            {
+                full = $"^(?:{GlobBody(mine.TrimEnd('/'))})/";
+            }
+            else if (!mine.Contains('/'))
+            {
+                full = $"^(?:.*/)?(?:{GlobBody(mine)})$";
+            }
+            else if (mine.IndexOfAny(['*', '?']) < 0)
+            {
+                full = $"^(?:{GlobBody(mine)})(?:/.*)?$";
+            }
+            else
+            {
+                full = $"^(?:{GlobBody(mine)})$";
+            }
+
+            return new Regex(full, RegexOptions.Compiled);
+        }
+
+        /// <summary>Turns a CODEOWNERS pattern into its regex body: `**` spans folders, `*` and `?` stay inside one.</summary>
+        private static string GlobBody(string pattern)
+        {
+            var built = new StringBuilder();
+
+            for (var index = 0; index < pattern.Length; index++)
+            {
+                if (pattern[index] == '*' && index + 1 < pattern.Length && pattern[index + 1] == '*')
+                {
+                    if (index + 2 < pattern.Length && pattern[index + 2] == '/')
+                    {
+                        built.Append("(?:.*/)?");
+                        index += 2;
+                    }
+                    else
+                    {
+                        built.Append(".*");
+                        index += 1;
+                    }
+                }
+                else if (pattern[index] == '*')
+                {
+                    built.Append("[^/]*");
+                }
+                else if (pattern[index] == '?')
+                {
+                    built.Append("[^/]");
+                }
+                else
+                {
+                    built.Append(Regex.Escape(pattern[index].ToString()));
+                }
+            }
+
+            return built.ToString();
         }
     }
 

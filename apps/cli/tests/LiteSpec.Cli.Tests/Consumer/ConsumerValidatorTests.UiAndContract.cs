@@ -87,14 +87,14 @@ public sealed partial class ConsumerValidatorTests
         ConsumerFixture.MutateBody(
             folder.Path,
             "docs/product/decisions/0001-launch.md",
-            raw => ReplaceFirst(raw, "## Evidence", "## Notes"));
+            raw => ReplaceFirst(raw, "## Decision", "## Notes"));
         var result = RunConsumer(folder.Path, "--format", "json");
         Assert.Equal(1, result.Status);
         var parsed = (JsonObject)JsonNode.Parse(result.Stdout)!;
         Assert.Equal(false, (bool?)parsed["ok"]);
         Assert.Equal("consumer", (string?)parsed["tool"]);
         var problems = parsed["problems"]!.AsArray().Select(problem => (string?)problem ?? string.Empty);
-        Assert.Contains(problems, problem => problem.Contains("requires an H2 'Evidence'", StringComparison.Ordinal));
+        Assert.Contains(problems, problem => problem.Contains("requires an H2 'Decision'", StringComparison.Ordinal));
     }
 
     [Fact(DisplayName = "page with a leading byte-order mark")]
@@ -105,9 +105,9 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/domain/modules/orders/bom-page.md",
             char.ConvertFromUtf32(0xFEFF) + ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"reference","id":"bom-page","title":"BOM page","owner":"fixture","status":"approved"}"""),
+                ConsumerFixture.Meta("""{"type":"reference","id":"bom-page","title":"BOM Page","owner":"fixture","status":"approved"}"""),
                 """
-                # BOM page
+                # BOM Page
 
                 ## Intent
 

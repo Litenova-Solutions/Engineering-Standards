@@ -5,6 +5,7 @@
   "title": "Spending",
   "owner": "expenses-team",
   "status": "approved",
+  "summary": "Spending submits, decides, reimburses and exports work expenses.",
   "dependsOn": []
 }
 ---

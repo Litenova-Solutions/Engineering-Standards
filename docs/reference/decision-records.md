@@ -6,7 +6,9 @@ A decision record pins one expensive-to-reverse choice (a data model, a provider
 
 ## Reference
 
-### Where a record lives
+The [product page](../core/product.md) states what a decision record means; this page states where it lives and what it holds.
+
+### Where a Record Lives
 
 Each record is one Markdown file in the consumer repository. Start it by copying the template, then fill in the opening metadata block and the sections below.
 
@@ -16,31 +18,30 @@ Each record is one Markdown file in the consumer repository. Start it by copying
 | Template | `templates/consumer/decision.md` |
 | Metadata type | `decision` |
 
-### Identifier form
+### Identifier Form
 
 The identifier is `decision/<number>-<name>`, such as `decision/0001-receipt-threshold`. The name states the choice in words, in at most six words, and the number counts as one of those words. The number keeps proposal order only: it orders records by when they were proposed and carries no other meaning.
 
-### What a record contains
+### What a Record Contains
 
-The body carries five sections:
+The body carries four sections:
 
 | Section | What it states |
 |:---|:---|
 | Context | The concrete constraint or conflict forcing a choice. |
-| Options | Each option weighed, with its cost. |
 | Decision | The selected behavior and its decider. |
 | Consequences | The required work and the accepted cost. |
-| Evidence | The research and constraints the choice rests on. |
+| Evidence | The research and constraints the choice rests on, each with its confidence. |
 
-The metadata block carries the fields tools read: `decided` with the approval date, `decidedBy` with the decider, and `changeWhen` with what would overturn the choice. It also carries `options` with the weighed options, `decides` with the records this choice sets, and `basedOn` with the constraints and research behind it.
+The metadata block carries the fields tools read: `options` with one entry per weighed option (`name`, `for`, `against`), `chosen` with the selected option once approved, `decided` with the approval date, and `changeWhen` with what would overturn the choice. It also carries `decides` with the records this choice sets, `basedOn` with the constraints and research behind it, and `replaces` with the record this choice overturns. A draft carries `decider` with the decider and `decideBy` with the date the choice is due.
 
-### Replaced, never edited
+### Replaced, Never Edited
 
-An approved record never changes, so its bytes stay a faithful history of the reasoning. A later choice is a new record naming the old one in `replaces`, and the old record stands retired beside the new one. A departure from a shared standard is an exception record rather than a decision.
+An approved record never changes, so its bytes stay a faithful history of the reasoning. A later choice is a new record naming the old one in `replaces`, and the old record stands retired beside the new one. A departure from a shared standard is a deviation rather than a decision.
 
-### The draft gate
+### The Draft Gate
 
-A record stays unapproved while a decision it depends on stays draft, because approving it would fix a choice on ground that can still move. Approval records the decider in `decidedBy` and the date in `decided`.
+A record stays unapproved while a decision it depends on stays draft, because approving it would fix a choice on ground that can still move. Approval records the date in `decided` and the selected option in `chosen`.
 
 ## Notes
 

@@ -52,6 +52,14 @@ The builder and the suite use these codes:
 - `aggregate-name-clash`
 - `decision-decides-nothing`
 - `link-unresolved`
+- `behavior-unrecorded`
+- `state-unreachable`
+- `transition-unresolved`
+- `personal-data-uncovered`
+- `calculation-without-table`
+- `reaction-without-trigger`
+- `requirement-unmeasured`
+- `open-questions`
 
 ## Broken overlays
 

@@ -1,7 +1,7 @@
 ---
 {
   "type": "entry-point-list",
-  "title": "Entry points",
+  "title": "Entry Points",
   "owner": "expenses-team",
   "status": "approved",
   "records": [
@@ -12,11 +12,19 @@
       "owner": "expenses-team",
       "status": "approved",
       "kind": "app"
+    },
+    {
+      "type": "entry-point",
+      "id": "entry-point/reminder-job",
+      "title": "Reminder job",
+      "owner": "expenses-team",
+      "status": "approved",
+      "kind": "job"
     }
   ]
 }
 ---
 
-# Entry points
+# Entry Points
 
-Employees reach spending through the expenses app.
+Employees reach spending through the expenses app. A nightly job runs the approval reminders.

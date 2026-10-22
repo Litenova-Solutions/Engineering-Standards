@@ -66,13 +66,13 @@ public sealed partial class ConsumerValidatorTests
         AssertClean(RunConsumer(folder.Path));
     }
 
-    [Fact(DisplayName = "language scan pattern that matches nothing")]
-    public void LanguageScanPatternThatMatchesNothing()
+    [Fact(DisplayName = "glossary scan pattern that matches nothing")]
+    public void GlossaryScanPatternThatMatchesNothing()
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateProject(
             folder.Path,
-            project => PathsOf(project)["languageScan"] = new JsonArray("src/**/*.cs"));
+            project => PathsOf(project)["glossaryScan"] = new JsonArray("src/**/*.cs"));
         AssertProblem(RunConsumer(folder.Path), "matches no file");
     }
 
@@ -82,7 +82,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateProject(
             folder.Path,
-            project => PathsOf(project)["languageScan"] = new JsonArray("src/**/*.cs"));
+            project => PathsOf(project)["glossaryScan"] = new JsonArray("src/**/*.cs"));
         ConsumerFixture.WriteFile(folder.Path, "src/order-claims.cs", "// the orderclaim handling lives here\n");
         AssertProblem(RunConsumer(folder.Path), "LANGUAGE_REJECTED_SYNONYM");
     }

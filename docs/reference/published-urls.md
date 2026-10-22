@@ -17,7 +17,7 @@ The site is generated from the standard at the repository root, so the site and 
 
 `<path>` is the page path under `docs/` without the extension, such as `backend/domain`. A folder index is served at its folder, so `docs/learn/README.md` is served at `https://litespec.dev/2.0.0/learn/`. Raw Markdown answers with `Content-Type: text/markdown`. Relative links between pages are rewritten to absolute raw URLs, so an agent that fetches one page follows its links without a browser. Fenced code blocks keep every byte.
 
-### Release indexes
+### Release Indexes
 
 | Pattern | Example | Returns |
 |:---|:---|:---|
@@ -27,7 +27,7 @@ The site is generated from the standard at the repository root, so the site and 
 
 Each index answers with `Content-Type: text/plain`. The root index explains how to use the site, lists every selection index and every layer bundle, and ends with the repository `AGENTS.md` as the agent protocol block. The release index groups every page by area with its raw Markdown URL and a one-line description. The full text concatenates every page except the UI pattern pages in index order: each page opens with a comment naming its raw source URL, and pages are separated by a line holding `---`.
 
-### Selection indexes
+### Selection Indexes
 
 | Pattern | Example | Returns |
 |:---|:---|:---|
@@ -50,7 +50,7 @@ UI work: the pattern pages listed in that index.
 
 The page derives the matching project record and the `litespec init` command beside it. With the `dotnet-react` preset and size `small`, the command is `litespec init --preset dotnet-react --size small`. [Work with agents](../learn/working-with-agents.md) shows the same block in use.
 
-### Layer bundles
+### Layer Bundles
 
 | Pattern | Example | Returns |
 |:---|:---|:---|
@@ -67,7 +67,7 @@ A layer is one folder's pages, concatenated in the same format as the full text.
 
 The layers a selection applies, without extensions and pattern groups and in reading order, decide the groups of its selection index.
 
-### Schema files
+### Schema Files
 
 | Pattern | Example | Returns |
 |:---|:---|:---|
@@ -75,7 +75,7 @@ The layers a selection applies, without extensions and pattern groups and in rea
 
 The seven files are the ones the [Schemas](schemas.md) page lists. Each answers with `Content-Type: application/json`. Each schema `$id` equals its published URL.
 
-### Latest redirect
+### Latest Redirect
 
 | Pattern | Example | Result |
 |:---|:---|:---|

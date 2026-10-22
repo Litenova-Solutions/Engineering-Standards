@@ -10,7 +10,7 @@
 ---
 # <Project> glossary
 
-This page renders from the Term entries in `docs/language.json`. Edit terms there, never here.
+This page renders from the Term entries in `docs/glossary.json`. Edit terms there, never here.
 
 <!-- generated:glossary -->
 <!-- /generated:glossary -->

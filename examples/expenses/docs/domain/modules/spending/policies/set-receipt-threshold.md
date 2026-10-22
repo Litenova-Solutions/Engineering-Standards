@@ -2,7 +2,7 @@
 {
   "type": "use-case",
   "id": "use-case/spending.set-receipt-threshold",
-  "title": "Set receipt threshold",
+  "title": "Set Receipt Threshold",
   "owner": "expenses-team",
   "status": "approved",
   "kind": "command",
@@ -50,6 +50,12 @@
 }
 ---
 
-# Set receipt threshold
+# Set Receipt Threshold
 
-A manager sets the policy receipt threshold.
+## Goal
+
+A manager sets the receipt threshold so small expenses stay light to submit.
+
+## What Happens
+
+The manager sends the new threshold with its currency. Spending refuses a negative threshold. Otherwise the policy carries the new threshold from now on.

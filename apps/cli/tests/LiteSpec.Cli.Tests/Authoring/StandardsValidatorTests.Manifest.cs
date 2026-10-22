@@ -31,9 +31,9 @@ public sealed partial class StandardsValidatorTests
 
         ## Standards
 
-        ### Record extension activation
+        ### Record Extension Activation
 
-        **Requirement:** Consumers MUST record activation on each applicable specification.
+        **Statement:** Consumers MUST record activation on each applicable specification.
 
         ## Conventions
 
@@ -59,9 +59,9 @@ public sealed partial class StandardsValidatorTests
 
         ## Standards
 
-        ### Keep the topic bounded
+        ### Keep the Topic Bounded
 
-        **Requirement:** Consumers MUST keep the topic inside its declared boundary.
+        **Statement:** Consumers MUST keep the topic inside its declared boundary.
 
         ## Conventions
 

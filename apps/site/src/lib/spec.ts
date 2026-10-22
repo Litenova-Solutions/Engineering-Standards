@@ -330,7 +330,7 @@ export interface Layer {
   files: string[];
 }
 
-const stackLayerTitle = (id: string) => `${id[0].toUpperCase()}${id.slice(1)} stack`;
+const stackLayerTitle = (id: string) => `${id[0].toUpperCase()}${id.slice(1)} Stack`;
 
 /**
  * Every layer the site publishes. A layer is one folder's pages: the always-applied
@@ -340,9 +340,9 @@ const stackLayerTitle = (id: string) => `${id[0].toUpperCase()}${id.slice(1)} st
  */
 export function layers(): Layer[] {
   const out: Layer[] = [
-    { key: "core", title: "Core, workspace and quality", files: ["docs/core", "docs/workspace", "docs/quality"].flatMap(directPages) },
-    { key: "backend", title: "Backend principles", files: directPages("docs/backend") },
-    { key: "frontend", title: "Frontend principles", files: directPages("docs/frontend") },
+    { key: "core", title: "Core, Workspace and Quality", files: ["docs/core", "docs/workspace", "docs/quality"].flatMap(directPages) },
+    { key: "backend", title: "Backend Principles", files: directPages("docs/backend") },
+    { key: "frontend", title: "Frontend Principles", files: directPages("docs/frontend") },
   ];
   const groups = new Set<string>();
   for (const [id, stack] of Object.entries(manifest.stacks)) {
@@ -351,7 +351,7 @@ export function layers(): Layer[] {
       const key = folder.slice("docs/".length);
       if (key === "backend" || key === "frontend" || groups.has(key)) continue;
       groups.add(key);
-      out.push({ key, title: `${key.split("/").at(-1)!.replace(/^./, (c) => c.toUpperCase())} shared pages`, files: directPages(folder) });
+      out.push({ key, title: `${key.split("/").at(-1)!.replace(/^./, (c) => c.toUpperCase())} Shared Pages`, files: directPages(folder) });
     }
     out.push({ key: stack.folder.slice("docs/".length), title: stackLayerTitle(id), files: [stack.folder, ...companionFolders(stack.folder)].flatMap(directPages) });
   }

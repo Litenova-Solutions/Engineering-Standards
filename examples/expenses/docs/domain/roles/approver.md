@@ -16,4 +16,6 @@
 
 # Approver
 
+## Summary
+
 Approvers decide their team expenses.

@@ -55,7 +55,7 @@ static partial class BookPages
             var neverDoes = fields["neverDoes"] as JsonArray ?? [];
             if (neverDoes.Count > 0)
             {
-                parts.Add(BookRender.SectionHeading(2, "never-does", "Never does"));
+                parts.Add(BookRender.SectionHeading(2, "never-does", "Never Does"));
                 parts.Add($"<ul class=\"plain\">{string.Concat(neverDoes.Select(item => $"<li>{BookRender.Esc(item)}</li>"))}</ul>");
             }
 
@@ -67,7 +67,7 @@ static partial class BookPages
             }
         }
 
-        parts.Add(BookRender.SectionHeading(2, "counts", "Record counts"));
+        parts.Add(BookRender.SectionHeading(2, "counts", "Record Counts"));
         var rows = new List<string>();
         foreach (var layer in BookModel.Layers)
         {
@@ -95,7 +95,7 @@ static partial class BookPages
         if (BookRender.IsTruthy(index.TestRun))
         {
             var run = index.TestRun as JsonObject;
-            parts.Add(BookRender.SectionHeading(2, "test-run", "Latest test run"));
+            parts.Add(BookRender.SectionHeading(2, "test-run", "Latest Test Run"));
             parts.Add($"<p>{BookRender.Esc(run?["passed"])} of {BookRender.Esc(run?["total"])} tests passed, "
                 + $"{BookRender.Esc(run?["failed"])} failed.</p>");
         }
@@ -136,10 +136,28 @@ static partial class BookPages
                 ["title"] = title?.DeepClone(),
                 ["type"] = obj?["type"]?.DeepClone(),
                 ["url"] = BookModel.RecordUrl(idText),
+                ["text"] = SearchText(obj),
             };
             payload.Add(entry);
         }
 
         return payload;
+    }
+
+    /// <summary>The searchable words of one record: its statement, meaning and scenario text.</summary>
+    static string SearchText(JsonObject? record)
+    {
+        var fields = BookRender.Fields(record) ?? new JsonObject();
+        var words = new List<string>();
+        foreach (var field in new[] { "statement", "meaning", "given", "when", "then", "summary", "question" })
+        {
+            var text = BookRender.Str(fields[field]);
+            if (text.Length > 0)
+            {
+                words.Add(text);
+            }
+        }
+
+        return string.Join(" ", words);
     }
 }

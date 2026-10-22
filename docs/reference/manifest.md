@@ -8,7 +8,7 @@
 
 A consumer selects from this manifest: the [supported scope](../core/scope.md) page states how a selection is made, and the [stacks](../core/stacks.md) page states what a selection applies. The [project file](project-file.md) page states what a consumer records, the [init](../tools/init.md) page states how a new project starts from a preset, the [consumer](../tools/consumer.md) page states how a selection is validated, and the [validate](../tools/validate.md) page states how the manifest itself is checked.
 
-### File location and schema
+### File Location and Schema
 
 | Item | Value |
 |:---|:---|
@@ -19,7 +19,7 @@ A consumer selects from this manifest: the [supported scope](../core/scope.md) p
 
 The current release is `2.0.0`. Each release is a complete contract that states every active provision, so a consumer pins one release and adopts a later one by accepting that release as a whole.
 
-### Top-level fields
+### Top-Level Fields
 
 | Field | Type | Required | Default |
 |:---|:---|:---|:---|
@@ -86,7 +86,7 @@ What the field drives:
 
 | Extension | Path | Scope | Switches on |
 |:---|:---|:---|:---|
-| `bdd` | `docs/backend/dotnet/ext/bdd.md` | `local` | `case` |
+| `bdd` | `docs/backend/dotnet/ext/bdd.md` | `local` | `scenario` |
 | `compat` | `docs/ext/compat.md` | `project` | none |
 | `cache` | `docs/ext/cache.md` | `local` | `limit` |
 | `concurrency` | `docs/ext/concurrency.md` | `local` | `limit` |
@@ -100,13 +100,13 @@ What the field drives:
 | `outbox` | `docs/ext/outbox.md` | `local` | `event`, `limit`, `runbook` |
 | `efcore` | `docs/backend/dotnet/ext/efcore.md` | `local` | none |
 | `realtime` | `docs/ext/realtime.md` | `local` | `event`, `limit` |
-| `report` | `docs/ext/report.md` | `local` | none |
+| `report` | `docs/ext/report.md` | `local` | `limit` |
 | `jobs` | `docs/ext/jobs.md` | `local` | `limit`, `runbook` |
 | `stage` | `docs/ext/stage.md` | `project` | none |
 | `delegation` | `docs/ext/delegation.md` | `project` | none |
 | `site` | `docs/ext/site.md` | `project` | none |
 
-Each entry holds `path`, which is required, and the optional `activationScope`, `applicableKinds`, `replaces`, and `switchesOn`. The path is the extension page: `docs/ext/<id>.md` for an extension that supports every stack, or `<stack folder>/ext/<id>.md` for one that supports a single stack, such as `bdd` and `efcore` under `docs/backend/dotnet/`. The file name is the extension id. The scope is `project` or `local`. The kinds name the record types the extension applies to, such as `use-case` and `journey` for `bdd`. `switchesOn` names the record types a selection requires, such as `case` for `bdd` and `event`, `limit`, and `runbook` for `outbox`. The [extensions index](../ext/README.md) states each extension with its activation criterion.
+Each entry holds `path`, which is required, and the optional `activationScope`, `applicableKinds`, `replaces`, and `switchesOn`. The path is the extension page: `docs/ext/<id>.md` for an extension that supports every stack, or `<stack folder>/ext/<id>.md` for one that supports a single stack, such as `bdd` and `efcore` under `docs/backend/dotnet/`. The file name is the extension id. The scope is `project` or `local`. The kinds name the record types the extension applies to, such as `use-case` and `journey` for `bdd`. `switchesOn` names the record types a selection requires, such as `scenario` for `bdd` and `event`, `limit`, and `runbook` for `outbox`. The [extensions index](../ext/README.md) states each extension with its activation criterion.
 
 Three extensions replace baseline provisions, and the manifest repeats the list where checks read it:
 
@@ -119,7 +119,7 @@ What the field drives:
 - Selection: naming an extension id in `selectedExtensions` applies its page. `litespec/core/scope#select-conditional-extensions-explicitly` requires selecting every extension whose criteria apply and none whose do not.
 - Validation: `litespec consumer` refuses an id the manifest does not ship, rejects a selection whose stack does not support the extension, and expires review dates and stage deferrals. The authoring validator checks each path, scope, kind list, and replacement id.
 
-### Version pins
+### Version Pins
 
 The `stack` object pins the toolchain this release builds with:
 
@@ -137,7 +137,7 @@ What the pins drive:
 - Resolution: every SDK, framework, and package version resolves from the manifest. `litespec/core/stacks#use-manifest-version-pins` requires the pins over prose, examples, and agent memory.
 - UI validation: `litespec ui` reads the pinned npm packages and the baselines below when it checks the shared package and the stylesheets.
 
-### UI baselines
+### UI Baselines
 
 The `uiBaseline` object pins the controlled React baseline, and `uiBaselineSvelte` pins the controlled Svelte baseline with the same fields. The values below are the real values of the current release.
 
@@ -173,7 +173,7 @@ The `registry` block names the component source:
 
 `litespec ui` selects the baseline by the shared package platform: a Svelte package reads `uiBaselineSvelte`, and any other package reads `uiBaseline`. It checks the registry configuration, the source lock, the design contract, the token stylesheet, and each frontend boundary against the baseline. `litespec/frontend/ui#select-one-visual-authority` requires the one shared package, and `litespec/frontend/web/ui#pin-the-baseline-in-the-shared-package` requires the pin.
 
-### How to add a stack
+### How to Add a Stack
 
 A stack is added in three steps:
 
@@ -181,7 +181,7 @@ A stack is added in three steps:
 2. Add the manifest entry with the stack id and its `folder`, plus `requires` when a project also selects another stack with this one and `pairsWith` when a frontend stack works beside only some backend stacks.
 3. Run `litespec validate` and fix what it reports: a folder outside the two areas, a missing folder, a missing `stack.md`, an unknown `requires` or `pairsWith` name, and any backend or frontend page no selection reaches.
 
-### How to add an extension
+### How to Add an Extension
 
 An extension is added in three steps:
 

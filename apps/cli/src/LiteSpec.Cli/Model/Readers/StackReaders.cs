@@ -25,7 +25,7 @@ interface IScenarioReader
     TestRead Read(ConsumerConfig config);
 }
 
-/// <summary>Reads test outcomes by test name and by scenario method name.</summary>
+/// <summary>Reads test outcomes by test name and by fully qualified test name.</summary>
 interface ITestRunReader
 {
     /// <summary>Reads the run, or null when no result file exists.</summary>

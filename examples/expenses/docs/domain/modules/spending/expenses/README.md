@@ -5,6 +5,7 @@
   "title": "Expense",
   "owner": "expenses-team",
   "status": "approved",
+  "summary": "An expense is one work cost an employee submitted.",
   "states": [
     {
       "name": "Submitted",
@@ -21,6 +22,45 @@
     {
       "name": "Reimbursed",
       "meaning": "Finance reimbursed the expense."
+    }
+  ],
+  "transitions": [
+    {
+      "from": "Submitted",
+      "to": "Approved",
+      "by": "use-case/spending.approve-expense"
+    },
+    {
+      "from": "Submitted",
+      "to": "Rejected",
+      "by": "use-case/spending.reject-expense"
+    },
+    {
+      "from": "Approved",
+      "to": "Reimbursed",
+      "by": "use-case/spending.reimburse-expense"
+    }
+  ],
+  "data": [
+    {
+      "name": "employee",
+      "meaning": "The employee who submitted the expense.",
+      "classification": "personal"
+    },
+    {
+      "name": "amount",
+      "meaning": "The exact amount with its currency.",
+      "classification": "internal"
+    },
+    {
+      "name": "receipt",
+      "meaning": "The proof of payment, when one is attached.",
+      "classification": "internal"
+    },
+    {
+      "name": "state",
+      "meaning": "The lifecycle state of the expense.",
+      "classification": "internal"
     }
   ],
   "records": [
@@ -153,3 +193,20 @@
 # Expense
 
 An expense is one work cost an employee submitted.
+
+## Transitions
+
+| From | To | By |
+|:--|:--|:--|
+| Submitted | Approved | `use-case/spending.approve-expense` |
+| Submitted | Rejected | `use-case/spending.reject-expense` |
+| Approved | Reimbursed | `use-case/spending.reimburse-expense` |
+
+## Data
+
+| Name | Meaning | Classification |
+|:--|:--|:--|
+| employee | The employee who submitted the expense. | personal |
+| amount | The exact amount with its currency. | internal |
+| receipt | The proof of payment, when one is attached. | internal |
+| state | The lifecycle state of the expense. | internal |

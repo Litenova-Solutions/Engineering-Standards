@@ -33,4 +33,6 @@ State which source wins when two of them set one value. List the sources from st
 
 ## Notes
 
+Optional. Remove this section when the settings need no note.
+
 Record anything a reader needs beside the table, such as a setting that takes effect only after a restart.

@@ -1,13 +1,17 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using LiteSpec.Model.Readers;
+using LiteSpec.Model.Readers.Coverage;
+using LiteSpec.Model.Readers.Measures;
 
 namespace LiteSpec.Model;
 
 /// <summary>
-///     Builds the project model: reads records, code, screens, tests and the test
-///     run, then computes the implements, calls and proves links and the status.
+///     Builds the project model: reads records, code, screens, tests, the test run,
+///     scenario coverage and measured-check results, then computes the implements,
+///     calls and proves links and the status.
 /// </summary>
-static class ModelBuilder
+static partial class ModelBuilder
 {
     /// <summary>Builds the model for the consumer.</summary>
     public static ProjectModel Build(ConsumerConfig config)
@@ -35,6 +39,12 @@ static class ModelBuilder
         model.StepCalls = tests.StepCalls;
         model.TestComments.AddRange(tests.Comments);
         model.TestRun = Timed("testrun", () => stacks.TestRuns.Read(config));
+
+        var coverage = Timed("coverage", () => CoverageReader.Read(config));
+
+        model.UnreachedCode.AddRange(coverage.Gaps);
+        model.CoverageRead = coverage.Read;
+        model.Measures.AddRange(Timed("measures", () => MeasureReader.Read(config)));
 
         Timed("compute", () =>
         {
@@ -268,6 +278,11 @@ static class ModelBuilder
                 model.Implements.Add(new ImplementsLink(
                     model.Config.Relative(reaction.File), reaction.UseCaseId, reaction.Kind));
             }
+            else if (TriggeredUseCase(model, reaction.Class) is { } target)
+            {
+                model.Implements.Add(new ImplementsLink(
+                    model.Config.Relative(reaction.File), target, reaction.Kind));
+            }
         }
 
         var codes = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -298,7 +313,54 @@ static class ModelBuilder
                     $"{screen.Frontend} {screen.Route}", useCase, operation));
             }
         }
+
+        var byRoute = new HashSet<string>(StringComparer.Ordinal);
+        var byOperation = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var endpoint in model.Code.Endpoints)
+        {
+            if (endpoint.Operation.Length > 0)
+            {
+                byOperation.Add(endpoint.Operation);
+            }
+
+            if (endpoint.Method.Length > 0 && endpoint.Route.Length > 0)
+            {
+                byRoute.Add($"{endpoint.Method} {Template(endpoint.Route)}");
+            }
+        }
+
+        foreach (var screen in model.Screens)
+        {
+            foreach (var operation in screen.Operations)
+            {
+                if (!byRoute.Contains($"{operation.Method} {Template(operation.Path)}")
+                    && !byOperation.Contains(Naming.Pascal(operation.Name)))
+                {
+                    model.UnmatchedCalls.Add(new UnmatchedCall(
+                        $"{screen.Frontend} {screen.Route}", operation.Name, screen.File));
+                }
+            }
+        }
+
+        model.UnmatchedCalls.Sort((left, right) =>
+        {
+            var screen = string.Compare(left.Screen, right.Screen, StringComparison.Ordinal);
+
+            return screen != 0
+                ? screen
+                : string.Compare(left.Operation, right.Operation, StringComparison.Ordinal);
+        });
     }
+
+    /// <summary>
+    ///     The route template with parameter constraints removed, mirroring the frontend
+    ///     reader's join so unmatched calls are exactly the operations it drops.
+    /// </summary>
+    private static string Template(string route) => TemplateConstraint().Replace(route, "{$1}");
+
+    [GeneratedRegex(@"\{(?<name>[^}:]+):[^}]+\}")]
+    private static partial Regex TemplateConstraint();
 
     /// <summary>Whether the use case lets anonymous callers in.</summary>
     public static bool Anonymous(Record useCase) =>
@@ -392,11 +454,13 @@ static class ModelBuilder
     }
 
     /// <summary>
-    ///     Confirms a proves claim. A test proves a scenario through a when step of
-    ///     the use case's steps class, asserting the result's code for a
-    ///     refusal; a reaction or job scenario through a then step; an integration test
-    ///     by naming the message type; and a rule test by naming the governed
-    ///     record's code type.
+    ///     Confirms a proves claim. A steps test proves through the public boundary: a
+    ///     when step of the use case's steps class or generated-client operation plus a
+    ///     then step, asserting the refusal code for a refusal. An integration test
+    ///     proves by constructing the message it sends or requesting the use case's own
+    ///     endpoint, plus an assertion. No test constructs a handler, an aggregate, or a
+    ///     repository directly. A rule claim confirms only through a scenario the same
+    ///     test proves.
     /// </summary>
     public static bool Confirm(ProjectModel model, ScenarioInfo test, string claim)
     {
@@ -422,6 +486,11 @@ static class ModelBuilder
             return false;
         }
 
+        if (ConstructsInside(test, model))
+        {
+            return false;
+        }
+
         var refusal = RefusalOf(model, claimed);
 
         if (test.Steps.Count > 0)
@@ -441,19 +510,29 @@ static class ModelBuilder
                 return false;
             }
 
+            if (!test.Steps.Any(step => step.Phase == "then"))
+            {
+                return false;
+            }
+
             return refusal is null || Asserts(test, refusal);
         }
 
         var pascal = Naming.Pascal(home);
 
-        // An integration test names the message it sends, or requests the use case's own endpoint.
-        var namesMessage = test.Identifiers.Contains(pascal + "Command", StringComparer.Ordinal)
-            || test.Identifiers.Contains(pascal + "Query", StringComparer.Ordinal);
+        // An integration test constructs the message it sends, or requests the use case's own endpoint.
+        var sendsMessage = test.CreatedTypes.Contains(pascal + "Command", StringComparer.Ordinal)
+            || test.CreatedTypes.Contains(pascal + "Query", StringComparer.Ordinal);
         var requestsEndpoint = model.Code.Endpoints
             .Where(endpoint => endpoint.UseCaseId == useCase.Id && endpoint.Route.Length > 0)
             .Any(endpoint => test.Routes.Any(route => RouteMatches(endpoint.Route, route)));
 
-        if (!namesMessage && !requestsEndpoint)
+        if (!sendsMessage && !requestsEndpoint)
+        {
+            return false;
+        }
+
+        if (!test.HasAssertion)
         {
             return false;
         }
@@ -463,14 +542,33 @@ static class ModelBuilder
             return true;
         }
 
-        if (refusal.Field("code") is not { } code)
+        return Asserts(test, refusal);
+    }
+
+    /// <summary>
+    ///     Whether the test reaches past the public boundary: it constructs a handler,
+    ///     an aggregate, or a repository directly instead of driving the use case through
+    ///     its steps, its message, or its endpoint.
+    /// </summary>
+    private static bool ConstructsInside(ScenarioInfo test, ProjectModel model)
+    {
+        if (test.CreatedTypes.Count == 0)
         {
             return false;
         }
 
-        return test.Codes.Contains(code)
-            || model.RefusalCodes.Any(entry =>
-                entry.Value.Contains(code) && test.Identifiers.Contains(entry.Key));
+        if (test.CreatedTypes.Any(type =>
+            type.EndsWith("Handler", StringComparison.Ordinal)
+            || type.EndsWith("Repository", StringComparison.Ordinal)))
+        {
+            return true;
+        }
+
+        return model.Records.Any(record =>
+            record.Type == "aggregate"
+            && Identifiers.TrySplit(record.Id, out _, out _, out var aggregate)
+            && aggregate is not null
+            && test.CreatedTypes.Contains(Naming.Pascal(aggregate), StringComparer.Ordinal));
     }
 
     /// <summary>
@@ -508,37 +606,44 @@ static class ModelBuilder
         return route.Any(segment => !segment.StartsWith('{'));
     }
 
+    /// <summary>
+    ///     Confirms a rule claim through the test's own scenarios: the test proves the
+    ///     rule only when it also proves a scenario of a use case the rule governs.
+    /// </summary>
     private static bool ConfirmRule(ProjectModel model, ScenarioInfo test, Record rule)
     {
-        var typeNames = new HashSet<string>(StringComparer.Ordinal);
+        var governed = rule.Ids("governs");
 
-        foreach (var target in rule.Ids("governs"))
+        if (governed.Count == 0)
         {
-            if (!model.ById.TryGetValue(target, out var governed))
+            return false;
+        }
+
+        foreach (var claim in test.Claims)
+        {
+            if (!model.ById.TryGetValue(claim, out var claimed)
+                || claimed.Type != "scenario"
+                || !Identifiers.TrySplit(claim, out _, out var home, out _)
+                || home is null
+                || UseCaseOf(model, home) is not { } useCase
+                || !Confirm(model, test, claim))
             {
                 continue;
             }
 
-            if (governed.Type == "aggregate"
-                && Identifiers.TrySplit(governed.Id, out _, out _, out var aggregate)
-                && aggregate is not null)
+            if (governed.Contains(useCase.Id, StringComparer.Ordinal))
             {
-                typeNames.Add(Naming.Pascal(aggregate));
+                return true;
             }
-            else if (governed.Type == "use-case"
-                && AggregateOf(model, governed) is { } holder
-                && Identifiers.TrySplit(holder.Id, out _, out _, out var held)
-                && held is not null)
+
+            if (AggregateOf(model, useCase) is { } holder
+                && governed.Contains(holder.Id, StringComparer.Ordinal))
             {
-                typeNames.Add(Naming.Pascal(held));
+                return true;
             }
         }
 
-        return typeNames.Count > 0
-            && test.Identifiers.Any(identifier =>
-                typeNames.Any(typeName =>
-                    identifier.Equals(typeName, StringComparison.Ordinal)
-                    || identifier.StartsWith(typeName, StringComparison.Ordinal)));
+        return false;
     }
 
     private static Record? RefusalOf(ProjectModel model, Record scenario)
@@ -567,14 +672,84 @@ static class ModelBuilder
     ///     Whether a when step sets a background use case off: it drives a use case that raises
     ///     an event the reaction reacts to, or it is a step of a declared job trigger.
     /// </summary>
+    /// <summary>The events a use case's trigger names, in every trigger shape the schema allows.</summary>
+    private static HashSet<string> TriggerEvents(ProjectModel model, Record useCase)
+    {
+        if (useCase.Raw.ValueKind != JsonValueKind.Object
+            || !useCase.Raw.TryGetProperty("trigger", out var value))
+        {
+            return [];
+        }
+
+        return TargetsOf(value)
+            .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "event")
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    ///     The use case a reaction or job without an implements tag answers: the one
+    ///     use case it names when its class names an event its trigger holds, or else
+    ///     the one use case its class names. Null when nothing or more than one matches.
+    /// </summary>
+    private static string? TriggeredUseCase(ProjectModel model, string className)
+    {
+        var stem = className;
+
+        foreach (var suffix in new[] { "BackgroundService", "HostedService", "Reaction", "Worker", "Job" })
+        {
+            if (stem.EndsWith(suffix, StringComparison.Ordinal) && stem.Length > suffix.Length)
+            {
+                stem = stem[..^suffix.Length];
+                break;
+            }
+        }
+
+        if (stem.StartsWith("Recurring", StringComparison.Ordinal) && stem.Length > "Recurring".Length)
+        {
+            stem = stem["Recurring".Length..];
+        }
+
+        var kebab = Naming.Kebab(stem);
+
+        if (kebab.Length == 0)
+        {
+            return null;
+        }
+
+        var handled = model.ById.Values.FirstOrDefault(record =>
+            record.Type == "event"
+            && Identifiers.TrySplit(record.Id, out _, out _, out var name)
+            && name == kebab);
+
+        if (handled is not null)
+        {
+            var triggered = model.Records
+                .Where(record => record.Type == "use-case" && TriggerEvents(model, record).Contains(handled.Id))
+                .ToList();
+
+            if (triggered.Count == 1)
+            {
+                return triggered[0].Id;
+            }
+
+            if (triggered.Count > 1)
+            {
+                return null;
+            }
+        }
+
+        var named = model.Records
+            .Where(record => record.Type == "use-case"
+                && Identifiers.TrySplit(record.Id, out _, out _, out var operation)
+                && operation == kebab)
+            .ToList();
+
+        return named.Count == 1 ? named[0].Id : null;
+    }
+
     private static bool Triggers(ProjectModel model, ScenarioInfo test, Record useCase)
     {
-        var trigger = useCase.Raw.ValueKind == JsonValueKind.Object
-            && useCase.Raw.TryGetProperty("trigger", out var value)
-            ? TargetsOf(value)
-                .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "event")
-                .ToHashSet(StringComparer.Ordinal)
-            : [];
+        var trigger = TriggerEvents(model, useCase);
 
         if (trigger.Count > 0)
         {
@@ -622,7 +797,7 @@ static class ModelBuilder
     }
 
     private static bool Asserts(ScenarioInfo test, Record refusal) =>
-        refusal.Field("code") is { } code && test.Codes.Contains(code);
+        refusal.Field("code") is { } code && test.AssertedCodes.Contains(code);
 
     private static void ComputeStatus(ProjectModel model)
     {
@@ -663,6 +838,112 @@ static class ModelBuilder
 
             model.Status[useCase.Id] = new UseCaseStatus(
                 implemented.Contains(useCase.Id), verified);
+        }
+
+        ComputeRequirementStatus(model);
+        ComputeReachableStates(model);
+    }
+
+    /// <summary>
+    ///     Computes each requirement's status: verified when everything fulfilling it is
+    ///     verified and, for a measured requirement, when its check has a passing result.
+    /// </summary>
+    private static void ComputeRequirementStatus(ProjectModel model)
+    {
+        foreach (var requirement in model.Records.Where(record => record.Type == "requirement"))
+        {
+            var fulfillers = model.Records
+                .Where(record => record.Type is "rule" or "use-case" or "journey"
+                    && record.Ids("fulfills").Contains(requirement.Id, StringComparer.Ordinal))
+                .ToList();
+
+            var satisfied = fulfillers.Count > 0 && fulfillers.All(record => FulfillerVerified(model, record));
+            bool? passed = null;
+
+            if (requirement.Has("measure"))
+            {
+                passed = requirement.Field("check") is { Length: > 0 } check
+                    && model.Measures.Any(measure => measure.Passed && CheckMatches(check, measure));
+            }
+
+            model.RequirementStatus[requirement.Id] = new RequirementStatus(
+                satisfied && (passed is null || passed.Value),
+                passed);
+        }
+    }
+
+    private static bool FulfillerVerified(ProjectModel model, Record fulfiller) => fulfiller.Type switch
+    {
+        "use-case" => model.Status.TryGetValue(fulfiller.Id, out var status) && status.Verified,
+        "rule" => model.Proves.Any(link => link.Claim == fulfiller.Id && link.Confirmed && link.Passing == true),
+        "journey" => JourneyVerified(model, fulfiller),
+        _ => false,
+    };
+
+    private static bool JourneyVerified(ProjectModel model, Record journey)
+    {
+        if (journey.Raw.ValueKind != JsonValueKind.Object
+            || !journey.Raw.TryGetProperty("steps", out var steps))
+        {
+            return false;
+        }
+
+        var stepped = TargetsOf(steps)
+            .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "use-case")
+            .ToList();
+
+        return stepped.Count > 0
+            && stepped.All(id => model.Status.TryGetValue(id, out var status) && status.Verified);
+    }
+
+    /// <summary>Whether a measure result answers the requirement's check.</summary>
+    private static bool CheckMatches(string check, MeasureResult measure) =>
+        string.Equals(check, measure.Check, StringComparison.Ordinal)
+        || string.Equals(check, $"{measure.Tool} {measure.Check}", StringComparison.Ordinal)
+        || check.Contains(measure.Check, StringComparison.Ordinal);
+
+    /// <summary>
+    ///     Computes each aggregate's reachable states: every state a transition leads
+    ///     into, plus every state a transition leaves that nothing leads into, which
+    ///     starts its lifecycle.
+    /// </summary>
+    private static void ComputeReachableStates(ProjectModel model)
+    {
+        foreach (var aggregate in model.Records.Where(record => record.Type == "aggregate"))
+        {
+            var entered = new HashSet<string>(StringComparer.Ordinal);
+            var left = new HashSet<string>(StringComparer.Ordinal);
+
+            if (aggregate.Raw.ValueKind == JsonValueKind.Object
+                && aggregate.Raw.TryGetProperty("transitions", out var transitions)
+                && transitions.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var transition in transitions.EnumerateArray())
+                {
+                    if (transition.ValueKind != JsonValueKind.Object)
+                    {
+                        continue;
+                    }
+
+                    if (transition.TryGetProperty("from", out var from)
+                        && from.ValueKind == JsonValueKind.String
+                        && from.GetString() is { Length: > 0 } start)
+                    {
+                        left.Add(start);
+                    }
+
+                    if (transition.TryGetProperty("to", out var to)
+                        && to.ValueKind == JsonValueKind.String
+                        && to.GetString() is { Length: > 0 } end)
+                    {
+                        entered.Add(end);
+                    }
+                }
+            }
+
+            left.ExceptWith(entered);
+            entered.UnionWith(left);
+            model.ReachableStates[aggregate.Id] = entered;
         }
     }
 }

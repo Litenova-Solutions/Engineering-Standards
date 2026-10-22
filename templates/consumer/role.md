@@ -9,7 +9,14 @@
   "decideBy": "<YYYY-MM-DD>",
   "scope": "<scope, such as platform, tenant or self>",
   "allows": ["permission/<name>"],
-  "terms": ["term/<term-name>"]
+  "terms": ["term/<term-name>"],
+  "questions": [
+    {
+      "question": "<The open question, or remove the questions block>",
+      "decider": "<owner>",
+      "decideBy": "<YYYY-MM-DD>"
+    }
+  ]
 }
 ---
 # <Role display title>
