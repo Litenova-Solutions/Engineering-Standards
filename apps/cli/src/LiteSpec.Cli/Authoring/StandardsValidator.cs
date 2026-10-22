@@ -130,12 +130,7 @@ static partial class StandardsValidator
     ///     down as the pages are rewritten.
     /// </summary>
     public static readonly IReadOnlyList<string> WarningDiagnosticCodes =
-    [
-        "CONVENTION_REPLACEMENT_DEVIATION",
-        "PAGE_EMPTY_SECTION_TEXT",
-        "PAGE_HEADING_CASE",
-        "VERIFY_DUPLICATE_EVIDENCE",
-    ];
+    [];
 
     /// <summary>
     ///     Validates the repository at <paramref name="root"/> and returns its sorted diagnostics.
