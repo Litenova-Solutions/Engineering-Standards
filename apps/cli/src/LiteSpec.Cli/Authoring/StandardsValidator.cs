@@ -403,7 +403,8 @@ static partial class StandardsValidator
         "Register Reject Reload Release Remove Render Replay Replace Report Represent Require Renew Requeue Resolve " +
         "Restrict Retain Retire Retry Return Revalidate Review Rotate Route Run Scan Scope Select Separate Serialize Set Shape " +
         "Show Signal Simulate Specify Split Stage Start State Stop Store Subscribe Supply Support Tabulate Tag Test Tolerate Trace " +
-        "Track Translate Treat Trigger Update Use Validate Verify Version Wait Write").Split(' '),
+        "Track Translate Treat Trigger Update Use Validate Verify Version Wait Write " +
+        "Advise Carry Close Confine Enter File Flag Freeze Guard Honor Issue Justify Leave Qualify Resume Rewrite Sample Scaffold Schedule Send Serve Trust").Split(' '),
         StringComparer.Ordinal);
 
     // Naming the codepoint tells an author which character to hunt for. Naming the
