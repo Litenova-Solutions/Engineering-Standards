@@ -193,12 +193,14 @@ Pattern pages render each option as a card with `Preview` and `Wireframe` tabs a
 
 The site runs on Cloudflare Workers as a static-assets-only Worker named `litespec` on the LiteNova Solutions account, so no script runs and requests cost nothing on the free plan. `wrangler.jsonc` names the Worker, serves `dist/` with trailing-slash HTML handling and `404.html` for unknown paths, and attaches the custom domain `litespec.dev`; the `workers.dev` address is off, so search engines see one copy. A second Worker, `litespec-www` (`wrangler.www.jsonc` and `workers/www-redirect.js`), answers `www.litespec.dev` with a 301 to the same path and query on `litespec.dev`.
 
-To deploy, build and then run Wrangler from `apps/site/`:
+Workers Builds deploys the `litespec` Worker on every push to `main`. The Worker is connected to this repository with root directory `apps/site`, build command `pnpm build`, and the default deploy command `npx wrangler deploy`, which runs the wrangler version `package.json` pins. The build reads Node from `.node-version` and pnpm from `packageManager` in `package.json`, and `wrangler.jsonc` turns on observability with full log sampling. Non-production branch builds stay off. Each build reports its result as a check on the commit.
+
+To deploy by hand, build and run Wrangler from `apps/site/`:
 
 ```bash
 pnpm --dir apps/site build
-cd apps/site && wrangler deploy
-wrangler deploy --config wrangler.www.jsonc   # only when the redirect Worker changes
+cd apps/site && pnpm run deploy
+pnpm exec wrangler deploy --config wrangler.www.jsonc   # only when the redirect Worker changes
 ```
 
 The build writes `dist/_redirects` (`/latest` to the manifest version) and copies `public/_headers`, which sets the security headers, long-lived caching for `/_astro/*` and `/fonts/*`, and `X-Robots-Tag: noindex` on the raw Markdown pages and the agent index files so search shows the HTML page. The zone sets Always Use HTTPS, SSL Full (strict), and TLS 1.2 or later.

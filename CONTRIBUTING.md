@@ -147,7 +147,7 @@ To prepare a release:
 2. Move the rows of `AnalyzerReleases.Unshipped.md` under a `## Release <version>` heading in `AnalyzerReleases.Shipped.md`.
 3. Merge to `main`, then push the tag `v<version>` on that commit. The highest git tag is the current release, as [docs/core/maintaining.md](docs/core/maintaining.md) states.
 
-The tag runs [.github/workflows/release.yml](.github/workflows/release.yml). It checks that the tag names the manifest version, builds, tests, validates, packs both packages, and runs the packed tool against a copy of the Claimwick example with [.github/scripts/smoke-tool.sh](.github/scripts/smoke-tool.sh). Then it publishes `LiteSpec.Cli` and `LiteSpec.Analyzers` to nuget.org, creates the GitHub release with the changelog section for the version as its notes, and deploys the site. Nothing is published unless every check passes.
+The tag runs [.github/workflows/release.yml](.github/workflows/release.yml). It checks that the tag names the manifest version, builds, tests, validates, packs both packages, and runs the packed tool against a copy of the Claimwick example with [.github/scripts/smoke-tool.sh](.github/scripts/smoke-tool.sh). Then it publishes `LiteSpec.Cli` and `LiteSpec.Analyzers` to nuget.org, and creates the GitHub release with the changelog section for the version as its notes. Nothing is published unless every check passes. The site deploys separately: Cloudflare Workers Builds deploys `litespec.dev` on every push to `main`, as [apps/site/README.md](apps/site/README.md) describes.
 
 The workflow needs this setup once, in the repository settings and on nuget.org:
 
@@ -156,4 +156,3 @@ The workflow needs this setup once, in the repository settings and on nuget.org:
 | `release` environment | GitHub, Settings > Environments | The environment the publishing jobs run in. Add a required reviewer to hold each release for approval. |
 | Trusted publishing policy | nuget.org, Account > Trusted Publishing | Repository `Litenova-Solutions/LiteSpec`, workflow `release.yml`, environment `release`. No API key is stored. |
 | `NUGET_USER` secret | The `release` environment | The nuget.org account name that owns both packages. |
-| `CLOUDFLARE_API_TOKEN` secret | The `release` environment | A Cloudflare API token allowed to edit the `litespec` Worker named in [apps/site/wrangler.jsonc](apps/site/wrangler.jsonc). |
