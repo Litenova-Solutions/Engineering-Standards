@@ -52,8 +52,8 @@ The project references `Microsoft.CodeAnalysis.CSharp` at version `4.14.0` throu
 |:---|:---|
 | `src/LiteSpec.Analyzers/LiteSpec.Analyzers.csproj` | Target framework, Roslyn version, analyzer packaging, release-tracking files, and warning suppressions. |
 | `src/LiteSpec.Analyzers/README.md` | Package README that ships on NuGet. Its Rules table is the user-facing rule list. |
-| `src/LiteSpec.Analyzers/AnalyzerReleases.Unshipped.md` | All 25 rule IDs with category and severity, awaiting the first shipment. |
-| `src/LiteSpec.Analyzers/AnalyzerReleases.Shipped.md` | Shipped releases. It holds no release yet. |
+| `src/LiteSpec.Analyzers/AnalyzerReleases.Unshipped.md` | Rules added since the last shipped release. It is empty after 2.0.0. |
+| `src/LiteSpec.Analyzers/AnalyzerReleases.Shipped.md` | Shipped releases: all 25 rules under Release 2.0.0. |
 | `src/LiteSpec.Analyzers/build/LiteSpec.Analyzers.props` | Makes the `LiteSpecLayer` MSBuild property visible to the analyzers through `CompilerVisibleProperty`. |
 | `src/LiteSpec.Analyzers/Layers/Layer.cs` | The `Layer` enum: `None`, `Domain`, `ApplicationAbstractions`, `Application`, `Infrastructure`, `WebApi`, `Test`. |
 | `src/LiteSpec.Analyzers/Layers/LayerResolver.cs` | Reads the layer from `LiteSpecLayer` or from the assembly name suffix. |
@@ -106,7 +106,7 @@ Each analyzer registers the narrowest action its rule allows: a symbol action fo
 
 `Descriptors.Create` builds every descriptor the same way: severity `Error`, enabled by default, the provision ID in the description as `Provision: litespec/<page>#<slug>` and in the custom tags, and the help link as `https://litespec.dev/2.0.0/<page>/#<slug>` from `Provision.HelpLink`. To cite a rule you quote its descriptor line and its `Provision.Of` line, which together name the category, the message, and the provision.
 
-Release tracking follows the Roslyn convention. `AnalyzerReleases.Unshipped.md` lists all 25 rules under New Rules with category `LiteSpec.Domain`, `LiteSpec.Layers`, `LiteSpec.Style`, or `LiteSpec.Tests` and severity `Error`. `AnalyzerReleases.Shipped.md` holds no release yet. When you ship, you move the rows to the shipped file under a release heading, as the release-tracking help linked at the top of each file describes.
+Release tracking follows the Roslyn convention. `AnalyzerReleases.Shipped.md` lists all 25 rules under Release 2.0.0 with category `LiteSpec.Domain`, `LiteSpec.Layers`, `LiteSpec.Style`, or `LiteSpec.Tests` and severity `Error`. `AnalyzerReleases.Unshipped.md` lists the rules added since. When you ship, you move its rows to the shipped file under a release heading, as the release-tracking help linked at the top of each file describes.
 
 The project sets `EnforceExtendedAnalyzerRules` to `true`, so the Roslyn meta-analyzers check the rules themselves. It suppresses `RS1012` and `RS1013` in `NoWarn` because `LayerAnalyzer` registers each rule from its compilation-start action and hands that context to `Register`, which the meta-analyzer cannot see. It also suppresses `NU5128` because the package ships an analyzer with no `lib` folder. `TreatWarningsAsErrors` and `GenerateDocumentationFile` stay on, so analyzer code ships with XML documentation and a warning fails the build.
 
@@ -153,7 +153,7 @@ public Task ReportsAnEnumInDomain() =>
 
 Follow these steps in order. Each step names the file you change.
 
-1. Pick the next free ID in the range the layers define: `LS1xxx` for a Domain rule, `LS2xxx` for an outer-layer rule, `LS3xxx` for a style rule in the five production projects, `LS4xxx` for a test rule. Check `AnalyzerReleases.Unshipped.md` and `Descriptors.cs` so the ID is unused.
+1. Pick the next free ID in the range the layers define: `LS1xxx` for a Domain rule, `LS2xxx` for an outer-layer rule, `LS3xxx` for a style rule in the five production projects, `LS4xxx` for a test rule. Check both release files and `Descriptors.cs` so the ID is unused.
 2. Add the `Provision.Of` line and the descriptor in `Rules/Descriptors.cs`, next to the rules of the same category. Name the category `LiteSpec.Domain`, `LiteSpec.Layers`, `LiteSpec.Style`, or `LiteSpec.Tests`, write the title, message, and description from the provision, and pass `compilationEnd: true` only when the rule needs the whole compilation, as `LS1003`, `LS1004`, and `LS3004` do.
 3. Add one line to `AnalyzerReleases.Unshipped.md` under New Rules with the ID, the category, `Error`, and `Descriptors` in the Notes column, matching the existing rows.
 4. Write the analyzer as a `sealed` class that extends `LayerAnalyzer`, in the `Domain`, `Layers`, `Style`, or `Tests` folder. Declare the `[DiagnosticAnalyzer(LanguageNames.CSharp)]` attribute, expose the descriptor through `SupportedDiagnostics`, accept the layer in `AppliesTo`, and register the narrowest action in `Register`. Resolve well-known types once from `context.Compilation` inside `Register` and close over them, as `AsyncMethodAnalyzer` and `NondeterministicReadAnalyzer` do.

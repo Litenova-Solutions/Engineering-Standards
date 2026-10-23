@@ -2,14 +2,14 @@
 
 ## Intent
 
-The example pages show LiteSpec applied instead of described, following Expenses, one small product in which employees submit work expenses with receipts, managers approve or reject them, and finance reimburses the approved ones, from its first written record to the check that confirms the code matches it. A record is a short page stating one piece of product intent, and every product fact on these pages comes from the records of the Expenses product in `examples/expenses/`, a real LiteSpec project that `litespec consumer`, `litespec ui`, and `litespec model check` pass. The pages carry no rules of their own: each rule lives on the standards page the text cites.
+The example pages show LiteSpec applied instead of described, following Claimwick, one small product in which employees submit work expenses with receipts, managers approve or reject them, and finance reimburses the approved ones, from its first written record to the check that confirms the code matches it. A record is a short page stating one piece of product intent, and every product fact on these pages comes from the records of the Claimwick product in `examples/claimwick/`, a real LiteSpec project that `litespec consumer`, `litespec ui`, and `litespec model check` pass. The pages carry no rules of their own: each rule lives on the standards page the text cites.
 
 ## How to Read the Example
 
-Employees submit work expenses with receipts. Managers approve or reject them, and finance reimburses the approved ones. Its records live under `examples/expenses/docs/`, and the example shows each record as the project writes it, shaped as `schemas/record.schema.json` defines. The pages follow one thread down the specification tree, and each page opens with its slice of it:
+Employees submit work expenses with receipts. Managers approve or reject them, and finance reimburses the approved ones. Its records live under `examples/claimwick/docs/`, and the example shows each record as the project writes it, shaped as `schemas/record.schema.json` defines. The pages follow one thread down the specification tree, and each page opens with its slice of it:
 
 ```text
-PRODUCT  Expenses: submit, approve, reimburse
+PRODUCT  Claimwick: submit, approve, reimburse
 |
 +-- goal            Decided in days
 +-- problem         Expenses wait weeks
@@ -35,8 +35,8 @@ Read the pages in the order below: the product first, then its modules and recor
 
 ## Reading Order
 
-- [The Expenses Product](the-product.md): the product brief, goal, problem, feature, requirements, research, decision, constraint, and journey records.
+- [The Claimwick Product](the-product.md): the product brief, goal, problem, feature, requirements, research, decision, constraint, and journey records.
 - [Modules and Records](modules-and-records.md): the spending module, its aggregates with transitions and data, rules, access chain, external system, and the Submit expense, Remind approvers, and List expenses use cases.
 - [A Use Case in Code](a-use-case-in-code.md): Submit expense from its record into .NET code and tests.
-- [The Expenses Screen](the-screen.md): the expenses list screen, the generated client it reads through, and the UI pattern it starts from.
+- [The Claimwick Screen](the-screen.md): the expenses list screen, the generated client it reads through, and the UI pattern it starts from.
 - [The Model and Its Checks](model-and-checks.md): model build, check, and query runs, the known gap, and the CI jobs that run the checks.

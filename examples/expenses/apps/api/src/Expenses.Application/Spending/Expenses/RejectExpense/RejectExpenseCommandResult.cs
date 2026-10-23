@@ -1,3 +1,0 @@
-namespace Expenses.Application.Spending.Expenses.RejectExpense;
-
-public sealed record RejectExpenseCommandResult(Guid ExpenseId);

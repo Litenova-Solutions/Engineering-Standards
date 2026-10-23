@@ -17,7 +17,7 @@ The user-facing contract of each command lives in `docs/tools/`. Read those page
 
 ## Quick Start
 
-Run every command in this section from the repository root, `D:/Personal-Projects/LiteSpec`.
+Run every command in this section from the repository root.
 
 Build the solution:
 

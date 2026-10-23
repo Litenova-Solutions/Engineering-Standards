@@ -251,7 +251,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Statement:** A glossary rejection MUST list, in `except`, every compound in which a rejected word names a concept other than the one the rejection is about.
 
-**Rationale:** A rejection matches a word, and a word can belong to more than one term: Expenses rejects `docket` in favor of `receipt` for payment proof while a docket still names the shipping list. Without the `except` list, the check would force the project to rename an unrelated concept or drop a sound rejection.
+**Rationale:** A rejection matches a word, and a word can belong to more than one term: Claimwick rejects `docket` in favor of `receipt` for payment proof while a docket still names the shipping list. Without the `except` list, the check would force the project to rename an unrelated concept or drop a sound rejection.
 
 **Example:** The exemption covers the compound only, so the bare word stays rejected.
 

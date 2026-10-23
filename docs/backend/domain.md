@@ -12,7 +12,7 @@ In code, the [aggregate root](../reference/glossary.md) is the single type throu
 
 ### Lifecycles as State Types
 
-Every aggregate exposes its lifecycle as state types from its first implementation: one state property backed by one closed hierarchy with one type per state. A one-state hierarchy gives later states and state-specific facts a defined home, so adding a state extends the hierarchy instead of replacing an enumeration, status string, or flag-based lifecycle. In the Expenses product, an expense is `Submitted`, `Approved`, `Rejected`, or `Reimbursed`, and each state carries its own facts, such as the approver or the reimbursed time.
+Every aggregate exposes its lifecycle as state types from its first implementation: one state property backed by one closed hierarchy with one type per state. A one-state hierarchy gives later states and state-specific facts a defined home, so adding a state extends the hierarchy instead of replacing an enumeration, status string, or flag-based lifecycle. In the Claimwick product, an expense is `Submitted`, `Approved`, `Rejected`, or `Reimbursed`, and each state carries its own facts, such as the approver or the reimbursed time.
 
 ### Closed Sets
 
@@ -52,7 +52,7 @@ A closed set is a fixed menu of values where the type system knows every case, s
 
 **Example:** A post defines one abstract post state with draft and published cases, where the published case carries its publication time. Even an aggregate with one current state defines its hierarchy.
 
-In the Expenses product, `aggregate/spending.expense` records the `Submitted`, `Approved`, `Rejected`, and `Reimbursed` states with their transitions: Submit from `use-case/spending.submit-expense` creates Submitted, Approve from `use-case/spending.approve-expense` moves Submitted to Approved, Reject from `use-case/spending.reject-expense` moves Submitted to Rejected, and Reimburse from `use-case/spending.reimburse-expense` moves Approved to Reimbursed. The approved case carries the approver and the decided time, and the reimbursed case carries the reimbursed time.
+In the Claimwick product, `aggregate/spending.expense` records the `Submitted`, `Approved`, `Rejected`, and `Reimbursed` states with their transitions: Submit from `use-case/spending.submit-expense` creates Submitted, Approve from `use-case/spending.approve-expense` moves Submitted to Approved, Reject from `use-case/spending.reject-expense` moves Submitted to Rejected, and Reimburse from `use-case/spending.reimburse-expense` moves Approved to Reimbursed. The approved case carries the approver and the decided time, and the reimbursed case carries the reimbursed time.
 
 ![Submit from submit-expense creates a Submitted expense, Approve from approve-expense moves it to Approved carrying the approver and the decided time, Reject from reject-expense moves it to Rejected carrying the reason, and Reimburse from reimburse-expense moves an Approved expense to Reimbursed carrying the reimbursed time.](../assets/diagrams/backend-aggregate-lifecycle.svg)
 
@@ -74,7 +74,7 @@ This provision owns the Domain form. The same set is mirrored in Application und
 
 A root created with its children composes them inside the same factory call. The children are built from typed values the caller supplies: a caller holding an already constructed child could mutate it after the invariant was checked, so the factory builds the children itself from those values.
 
-**Example:** In the Expenses product, `use-case/spending.submit-expense` creates its expense through a factory named for submitting: the factory takes the expense and employee identifiers, rejects an empty identity, selects the submitted state, and records the submitted event.
+**Example:** In the Claimwick product, `use-case/spending.submit-expense` creates its expense through a factory named for submitting: the factory takes the expense and employee identifiers, rejects an empty identity, selects the submitted state, and records the submitted event.
 
 ### Express Transitions Through Business Methods
 
@@ -84,7 +84,7 @@ A root created with its children composes them inside the same factory call. The
 
 Checks run before replacement, and replacement runs before recording. A method that replaces state before checking an invariant leaves a rejected aggregate holding the new state.
 
-**Example:** In the Expenses product, `use-case/spending.reimburse-expense` ends with `result/reimburse-expense.reimbursed` when the expense is approved, and with `result/reimburse-expense.not-approved` when it is not. The handler calls one business method, and the method checks the state, replaces it, and records `event/expense.expense-reimbursed`.
+**Example:** In the Claimwick product, `use-case/spending.reimburse-expense` ends with `result/reimburse-expense.reimbursed` when the expense is approved, and with `result/reimburse-expense.not-approved` when it is not. The handler calls one business method, and the method checks the state, replaces it, and records `event/expense.expense-reimbursed`.
 
 An unapproved expense keeps its state, and the refusal carries the stable code `spending.not-approved`.
 

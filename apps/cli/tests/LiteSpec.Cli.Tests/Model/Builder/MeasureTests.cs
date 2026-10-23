@@ -26,8 +26,8 @@ public sealed class MeasureTests
         Assert.False(failed.GetProperty("passed").GetBoolean());
         Assert.Equal("0.07", failed.GetProperty("value").GetString());
 
-        Assert.Empty(root.GetProperty("measures").EnumerateArray()
-            .Where(measure => measure.GetProperty("check").GetString() == "vus"));
+        Assert.DoesNotContain(root.GetProperty("measures").EnumerateArray(),
+            measure => measure.GetProperty("check").GetString() == "vus");
 
         var performance = Measure(root, "lighthouse", "categories:performance");
         Assert.True(performance.GetProperty("passed").GetBoolean());

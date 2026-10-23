@@ -18,6 +18,7 @@ LiteSpec 2.0.0 is the standards contract for one bounded-context business applic
 
 - A project names a size, a shape, and its stacks in `litespec.project.json`. Size is `small` or `large` and decides the record types and test projects. Shape is `server`, with one backend stack, or `client-only`, with none, which applies the backend architecture, domain, application and identifier principles.
 - `litespec init --preset dotnet-react|dotnet-svelte|blazor-client --size small|large` writes a starting `litespec.project.json`. A preset adds no rule.
+- The `LiteSpec.Cli` package carries the whole release beside its binary: the manifest, schemas, docs, and templates, so a consumer needs no checkout of this repository. `litespec init` writes `.config/dotnet-tools.json` pinning the tool at the release and fills the `## LiteSpec` block of `AGENTS.md` with the release, size, shape, stacks, and selection index of the new project.
 - A departure from a rule is a deviation record with its reason and review date. A finding the project accepts for now is a known gap record with an owner and an end date.
 
 ### Records and the Model
@@ -28,6 +29,10 @@ LiteSpec 2.0.0 is the standards contract for one bounded-context business applic
 - An aggregate names its states, the transitions between them, and its classified data. A rule is an invariant, a precondition, a calculation or a cross-aggregate rule. A use case is a command, a query or a reaction, and carries its input and output. A result is a success or a refusal with a stable code. A scenario states its given, when and then, with an optional examples table.
 - A requirement is functional, quality or business, and names the feature that delivers it. A measured quality requirement carries its measure, target, conditions, check and evidence.
 - The builder computes implemented, verified and reachable over the records, and the effective status of each record. `docs/core/product.md` places business intent in a product brief and requirement pages, `docs/core/domain.md` states the domain records, and `docs/core/access.md` states who may act and how each use case is reached.
+- An `owners` entry maps a readable owner name to its CODEOWNERS handles, and `litespec model check` reports `owner-unknown` for a record whose owner, directly or through its mapped handles, belongs to no team owning its path.
+- The model builder reads a refusal code where code declares one: a `Code` member of an exception, failure, or refusal type, an exception constructor argument, or a value named `code`. Any literal counts as evidence that a recorded code is thrown, and a rule's bare `refusal` code declares a guard no caller reaches because an earlier check refuses first.
+- A rule that governs an aggregate and an erasure or export use case in another module covers that aggregate's personal data.
+- Events link by their natural name (`AccessCodeIssuedEvent` is `event/access-code.issued`) or by the record id the event class states. Reactions and jobs link through an `<implements>` tag or the use-case folder that holds them, an endpoint that holds its behavior implements its use case, and a creation row (`-` in From) reaches its state.
 
 ### The Command Line
 
@@ -35,6 +40,7 @@ LiteSpec 2.0.0 is the standards contract for one bounded-context business applic
 - `litespec model build` writes `model.json` with the computed `implements`, `calls` and `proves` links; `check` reports open findings and expired known gaps; `render` writes the generated page regions; `query` prints one record with its links both ways; `diff` reports the records a change adds, changes and removes for review. It reads C# through Roslyn, React and Svelte routes, and TRX or JUnit XML test results, each stack through its own reader.
 - `litespec book` generates the project book, a static site with one page per record, an index per type, a lens per actor, a review page, a glossary and search.
 - `litespec consumer` checks the project file, the selection of size, shape, stacks and extensions, every record page against `schemas/record.schema.json`, and the project vocabulary. `litespec ui` checks the controlled web UI contract.
+- `litespec consumer` validates a large consumer in seconds: it reads pages and source surfaces in parallel and reports findings in a fixed order.
 - `litespec validate` and `litespec provisions` check this repository's own pages, schemas, manifest and provision index.
 - `litespec patterns` draws the UI pattern wireframes for a person to choose from. `preview` writes one offline page with every option at desktop and phone width, `svg` prints one option, and `check` reports broken wireframes.
 
@@ -60,3 +66,7 @@ LiteSpec 2.0.0 is the standards contract for one bounded-context business applic
 
 - `litespec.manifest.json` pins the .NET 10 workspace (ASP.NET Core 10.0.13, Marten 9.50.1, Aspire 13.6.1, OpenTelemetry 1.19, Testcontainers 4.16.0, LiteBus `7.0.0-preview.6`), xUnit v3 on Microsoft.Testing.Platform with Reqnroll and LightBDD, and the web toolchain (Node 24.22.0, pnpm 11.28.5, Vite 8.3.4, TypeScript 6.0.3).
 - Every schema's `$id` is its address on the published site: `https://litespec.dev/2.0.0/schemas/<file>`.
+
+### Releases
+
+- A `v<version>` tag publishes `LiteSpec.Cli` and `LiteSpec.Analyzers` to nuget.org, creates the GitHub release from this section, and deploys the site.

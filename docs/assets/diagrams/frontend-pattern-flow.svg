@@ -27,7 +27,7 @@
   <g style="fill: var(--muted-fg, #77706a)" font-size="12" text-anchor="middle">
     <text x="360" y="68">3 options; default title-state-breadcrumb-one-primary-action</text>
     <text x="360" y="86">litespec/frontend/patterns/record-detail#record-header</text>
-    <text x="360" y="184">Expenses cites the pattern ID</text>
+    <text x="360" y="184">Claimwick cites the pattern ID</text>
     <text x="360" y="202">decision: the default option, source owner</text>
     <text x="360" y="220">compact: the header stacks under the title</text>
     <text x="360" y="314">expense detail in the web app</text>

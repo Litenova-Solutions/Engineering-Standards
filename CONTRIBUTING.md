@@ -111,7 +111,7 @@ git diff --check
 Run the further checks your area selects, as [.github/workflows/litespec.yml](.github/workflows/litespec.yml) runs them:
 
 ```bash
-dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+dotnet pack apps/analyzers/src/LiteSpec.Analyzers --output artifacts
 dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- provisions --check
 ```
 
@@ -143,5 +143,17 @@ Each release states its complete contract. Add no compatibility guarantee, migra
 
 To prepare a release:
 
-1. Name the version in [litespec.manifest.json](litespec.manifest.json), in the topmost [CHANGELOG.md](CHANGELOG.md) entry, in `reviewedLiteSpecVersion` in [templates/consumer/litespec.project.json](templates/consumer/litespec.project.json), and in `<Version>` in [apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj](apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj). Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`. The release publishes the `LiteSpec.Cli` tool package and the site at that version together.
-2. Tag the commit with the version number. The highest git tag is the current release, as [docs/core/maintaining.md](docs/core/maintaining.md) states.
+1. Name the version in [litespec.manifest.json](litespec.manifest.json), in the topmost [CHANGELOG.md](CHANGELOG.md) entry, in `reviewedLiteSpecVersion` in [templates/consumer/litespec.project.json](templates/consumer/litespec.project.json), and in `<Version>` in [apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj](apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj) and [apps/analyzers/src/LiteSpec.Analyzers/LiteSpec.Analyzers.csproj](apps/analyzers/src/LiteSpec.Analyzers/LiteSpec.Analyzers.csproj). Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`. `ReleaseVersionTests` fails while any of these disagree.
+2. Move the rows of `AnalyzerReleases.Unshipped.md` under a `## Release <version>` heading in `AnalyzerReleases.Shipped.md`.
+3. Merge to `main`, then push the tag `v<version>` on that commit. The highest git tag is the current release, as [docs/core/maintaining.md](docs/core/maintaining.md) states.
+
+The tag runs [.github/workflows/release.yml](.github/workflows/release.yml). It checks that the tag names the manifest version, builds, tests, validates, packs both packages, and runs the packed tool against a copy of the Claimwick example with [.github/scripts/smoke-tool.sh](.github/scripts/smoke-tool.sh). Then it publishes `LiteSpec.Cli` and `LiteSpec.Analyzers` to nuget.org, creates the GitHub release with the changelog section for the version as its notes, and deploys the site. Nothing is published unless every check passes.
+
+The workflow needs this setup once, in the repository settings and on nuget.org:
+
+| Setting | Where | What it holds |
+|:---|:---|:---|
+| `release` environment | GitHub, Settings > Environments | The environment the publishing jobs run in. Add a required reviewer to hold each release for approval. |
+| Trusted publishing policy | nuget.org, Account > Trusted Publishing | Repository `Litenova-Solutions/LiteSpec`, workflow `release.yml`, environment `release`. No API key is stored. |
+| `NUGET_USER` secret | The `release` environment | The nuget.org account name that owns both packages. |
+| `CLOUDFLARE_API_TOKEN` secret | The `release` environment | A Cloudflare API token allowed to edit the `litespec` Worker named in [apps/site/wrangler.jsonc](apps/site/wrangler.jsonc). |

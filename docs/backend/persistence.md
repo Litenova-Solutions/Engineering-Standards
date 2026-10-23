@@ -10,7 +10,7 @@ Commands change aggregates and queries read them, with neither touching the data
 
 A command handler reaches persistence only through Domain repositories. It loads aggregates through their Domain repositories, calls Domain behavior, and stages the changed aggregates back through those repositories. Exactly one command post-handler then commits the scoped session. A query handler projects its result through the read session instead of loading an aggregate, with filtering, scope, ordering, and limit applied before materialization.
 
-In the Expenses product, `use-case/spending.submit-expense` stages the new expense through its repository, and one post-handler commits once after the handler returns. A failed submission leaves the session uncommitted, so no partial expense is stored.
+In the Claimwick product, `use-case/spending.submit-expense` stages the new expense through its repository, and one post-handler commits once after the handler returns. A failed submission leaves the session uncommitted, so no partial expense is stored.
 
 ### Provider-Neutral and Provider-Specific Rules
 
@@ -44,7 +44,7 @@ The manifest pins both providers' packages, because the extension is part of thi
 
 **Rationale:** One commit point makes the transaction boundary visible: everything the handler staged succeeds or fails together, and a failed command leaves the session uncommitted. If handlers or repositories committed, a later failure in the same pipeline leaves a partial write behind. Handlers, repositories, validators, reactions, and endpoints commit nothing.
 
-**Example:** In the Expenses product, `use-case/spending.submit-expense` stages the expense through its Domain repository, and one post-handler commits once after the handler returns:
+**Example:** In the Claimwick product, `use-case/spending.submit-expense` stages the expense through its Domain repository, and one post-handler commits once after the handler returns:
 
 ```text
 handler stages the expense through its repository
@@ -187,7 +187,7 @@ The module folders follow the same module rule as every layer. Aggregate-specifi
 
 The example registers every concrete aggregate state object in Infrastructure.
 
-For example, a reimbursed expense in the Expenses product stores its state the same way, with the `Reimbursed` case from `aggregate/spending.expense`:
+For example, a reimbursed expense in the Claimwick product stores its state the same way, with the `Reimbursed` case from `aggregate/spending.expense`:
 
 ```json
 {

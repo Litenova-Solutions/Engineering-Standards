@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A domain module gathers one business area's glossary terms, aggregates, rules, use cases, events, and permissions into pages that the model builder, the tool that checks the project, reads. This tutorial works through one kind of page at a time, using the spending module of the Expenses product as the worked example. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
+A domain module gathers one business area's glossary terms, aggregates, rules, use cases, events, and permissions into pages that the model builder, the tool that checks the project, reads. This tutorial works through one kind of page at a time, using the spending module of the Claimwick product as the worked example. Each step names the standard it satisfies, and the tutorial adds no rule of its own.
 
 ## Prerequisites
 
@@ -136,7 +136,7 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
 15. Map the model to folders. Mirror the module, aggregate, and use case path in every layer. This satisfies `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
 
     ```text
-    apps/api/src/Expenses.Domain/
+    apps/api/src/Claimwick.Domain/
       Spending/
         Expenses/
           Expense.cs
@@ -146,7 +146,7 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
           Exceptions/
             ExpenseReceiptMissingException.cs
 
-    apps/api/src/Expenses.Application/
+    apps/api/src/Claimwick.Application/
       Spending/
         Expenses/
           SubmitExpense/

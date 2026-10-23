@@ -2,7 +2,7 @@
 
 ## Intent
 
-LiteSpec connects what a team writes down about a product with the code that implements it, and checks that the two still agree. This page shows that connection on Expenses, the example product in `examples/expenses/` where employees submit work expenses with receipts, following the Submit expense use case from its written record to the code that implements it and the check that confirms they match.
+LiteSpec connects what a team writes down about a product with the code that implements it, and checks that the two still agree. This page shows that connection on Claimwick, the example product in `examples/claimwick/` where employees submit work expenses with receipts, following the Submit expense use case from its written record to the code that implements it and the check that confirms they match.
 
 ## The Parts
 
@@ -23,7 +23,7 @@ The diagram below shows how the four parts connect in a loop, with the checks se
 
 ## A Use Case from Record to Code
 
-Expenses lets employees submit work expenses with receipts. In LiteSpec, that behavior is a use case: one command, query, or reaction with its permissions, results, and scenarios.
+Claimwick lets employees submit work expenses with receipts. In LiteSpec, that behavior is a use case: one command, query, or reaction with its permissions, results, and scenarios.
 
 ### 1. the Written Record
 
@@ -34,12 +34,12 @@ The record lives in the project at `docs/domain/modules/spending/expenses/submit
   "type": "use-case",
   "id": "use-case/spending.submit-expense",
   "title": "Submit expense",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "kind": "command",
   "needs": ["permission/submit-expense"],
   "anonymous": false,
-  "reachedThrough": ["entry-point/expenses-app"],
+  "reachedThrough": ["entry-point/claimwick-app"],
   "raises": ["event/expense.expense-submitted"],
   "fulfills": ["requirement/approval.receipt-over-threshold"]
 }
@@ -81,7 +81,7 @@ Read it as one proven path: given the situation, when the employee acts, the use
 The standard states where the code goes and what shape it takes. A use case is implemented by one command handler in the Application project, in a folder that mirrors the record's module and aggregate:
 
 ```text
-apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
+apps/api/src/Claimwick.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
 ```
 
 The handler refuses an expense above the threshold that carries no receipt with the refusal code the result entry names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
@@ -113,7 +113,7 @@ Alongside the record's own fields, the answer holds what the builder worked out 
   "implemented": true,
   "verified": false,
   "implements": [
-    "apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs"
+    "apps/api/src/Claimwick.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs"
   ],
   "calls": [],
   "proves": [

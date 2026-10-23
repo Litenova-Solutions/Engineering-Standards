@@ -190,7 +190,7 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfills` link, then the code.
 
-The running Expenses example lands its receipt threshold in the same order: research `research/approval-time-benchmarks` asks how fast small companies decide expenses, decision `decision/0001-receipt-threshold` chooses 25 EUR and names `requirement/approval.receipt-over-threshold` in `decides`, use case `use-case/spending.submit-expense` names that requirement in `fulfills`, and only then does the submit-expense handler carry it. A decision written after that code would be a defect.
+The running Claimwick example lands its receipt threshold in the same order: research `research/approval-time-benchmarks` asks how fast small companies decide expenses, decision `decision/0001-receipt-threshold` chooses 25 EUR and names `requirement/approval.receipt-over-threshold` in `decides`, use case `use-case/spending.submit-expense` names that requirement in `fulfills`, and only then does the submit-expense handler carry it. A decision written after that code would be a defect.
 
 The order of work: intent, then the choice and its commitment, then specification records, then code and tests.
 
