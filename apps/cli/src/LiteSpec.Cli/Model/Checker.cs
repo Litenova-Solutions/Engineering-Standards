@@ -1100,9 +1100,15 @@ static partial class Checker
             }
         }
 
+        // A refusal result declares the code a caller sees. A rule whose refusal is a bare code
+        // declares a domain guard that no caller reaches, such as one a validator pre-empts.
         var declared = model.Records
             .Where(record => record.Type == "result" && record.Field("outcome") == "refusal")
             .Select(record => record.Field("code"))
+            .Concat(model.Records
+                .Where(record => record.Type == "rule")
+                .Select(record => record.Field("refusal"))
+                .Where(refusal => refusal is not null && !refusal.StartsWith("result/", StringComparison.Ordinal)))
             .OfType<string>()
             .ToHashSet(StringComparer.Ordinal);
 

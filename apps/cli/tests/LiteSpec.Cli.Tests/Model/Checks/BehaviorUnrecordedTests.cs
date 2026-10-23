@@ -128,6 +128,23 @@ public sealed class BehaviorUnrecordedTests
     }
 
     [Fact]
+    public void Rule_Refusal_Code_Declares_A_Guard()
+    {
+        using var temp = Cli.Temp("checks");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record(
+                "rule",
+                "rule/loan.due-date-required",
+                Path.Combine(temp.Path, "loan.md"),
+                """{"kind": "invariant", "statement": "A loan has a due date.", "refusal": "lending.due-date-required"}"""));
+        model.Code.Literals.Add(new CodeLiteral(
+            "lending.due-date-required", Path.Combine(temp.Path, "Loan.cs"), 8, "Loan"));
+
+        Assert.DoesNotContain("behavior-unrecorded", TestModel.Codes(model));
+    }
+
+    [Fact]
     public void Declared_Literal_Passes()
     {
         using var temp = Cli.Temp("checks");

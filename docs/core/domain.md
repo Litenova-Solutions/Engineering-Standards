@@ -41,7 +41,7 @@ Each aggregate declares its lifecycle as `states` entries with a `name` and a `m
 
 ### Rules and Events
 
-A rule states what holds, with its `kind` and its `statement`. An invariant holds after every change; a precondition guards the behavior before it runs; a calculation derives a value; a cross-aggregate rule spans aggregates and lives on a rule page at `docs/domain/rules/<name>.md`, while each other rule lives as an entry on its aggregate page. A rule names what it constrains in `governs`, the refusal its breach produces in `refusal`, the requirements it carries in `fulfills`, and the constraints and research behind it in `basedOn`. The [product page](product.md) states requirements.
+A rule states what holds, with its `kind` and its `statement`. An invariant holds after every change; a precondition guards the behavior before it runs; a calculation derives a value; a cross-aggregate rule spans aggregates and lives on a rule page at `docs/domain/rules/<name>.md`, while each other rule lives as an entry on its aggregate page. A rule names what it constrains in `governs`, the refusal its breach produces in `refusal` (the result a caller sees, or a bare refusal code for a guard no caller reaches because an earlier check refuses first), the requirements it carries in `fulfills`, and the constraints and research behind it in `basedOn`. The [product page](product.md) states requirements.
 
 An event is an immutable statement that a business fact completed, named in the past tense, with its `meaning` and the facts it `carries`. Each event is raised through the root of its aggregate, and each event stays inside the product: published events belong to the [API compatibility extension](../ext/compat.md).
 
