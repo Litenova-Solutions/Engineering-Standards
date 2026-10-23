@@ -38,7 +38,7 @@ jobs:
       - name: Pack the tool and the analyzers
         run: |
           dotnet pack apps/cli/src/LiteSpec.Cli --output artifacts
-          dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+          dotnet pack apps/analyzers/src/LiteSpec.Analyzers --output artifacts
 
       # A consumer installs the tool from a package and runs it outside this repository,
       # where nothing but the release inside the package can answer.

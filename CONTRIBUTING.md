@@ -111,7 +111,7 @@ git diff --check
 Run the further checks your area selects, as [.github/workflows/litespec.yml](.github/workflows/litespec.yml) runs them:
 
 ```bash
-dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+dotnet pack apps/analyzers/src/LiteSpec.Analyzers --output artifacts
 dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- provisions --check
 ```
 
