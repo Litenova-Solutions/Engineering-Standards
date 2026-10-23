@@ -92,5 +92,5 @@ The analyzer does not check that a `Guid` inside an identifier is a version 7 va
 
 ## Pages in This Section
 
-- [Check .NET Code with the Analyzers](check-dotnet-code-with-the-analyzers.md): install the package once, read the first findings, and raise enforced rules to build errors.
+- [Check .NET Code with the Analyzers](check-dotnet-code-with-the-analyzers.md): install the package once, read the first findings, keep them as build errors, and lower one only where a deviation allows it.
 - [Analyzer rules overview](rules/README.md): find the reference page for each of the 25 rules, grouped by layer.

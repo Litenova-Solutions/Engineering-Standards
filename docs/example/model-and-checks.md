@@ -2,7 +2,7 @@
 
 ## Intent
 
-The project model is the computed join between a project's written records and its code, screens, and tests: it proves they agree, and its checks report every gap as a finding. This page shows that model at work on the Expenses product, the example product these pages follow, with real output from `litespec model build`, `check`, and `query`: how a known gap (a missing piece the team accepts until an end date) covers the still-missing handler for Export expenses, what the check reports when the Approve expense handler is removed, and which continuous integration jobs run these checks.
+The project model is the computed join between a project's written records and its code, screens, and tests: it proves they agree, and its checks report every gap as a finding. This page shows that model at work on the Claimwick product, the example product these pages follow, with real output from `litespec model build`, `check`, and `query`: how a known gap (a missing piece the team accepts until an end date) covers the still-missing handler for Export expenses, what the check reports when the Approve expense handler is removed, and which continuous integration jobs run these checks.
 
 ## Where This Page Sits
 
@@ -16,7 +16,7 @@ computed by the builder: implemented, verified, reachable, effective status
 
 ## Building the Model
 
-`litespec model build` reads the written records, the code anchors, the routes, the tests, and the latest test run, and writes `model.json` with every record and its resolved links. [Model Builder](../tools/model.md) states the five subcommands, and [Project Model](../core/model.md) states the records they read. The run below is against the Expenses example:
+`litespec model build` reads the written records, the code anchors, the routes, the tests, and the latest test run, and writes `model.json` with every record and its resolved links. [Model Builder](../tools/model.md) states the five subcommands, and [Project Model](../core/model.md) states the records they read. The run below is against the Claimwick example:
 
 ```text
 .model/model.json: 90 records, 8 handlers, 1 screens, 9 scenarios.
@@ -44,7 +44,7 @@ The team accepts that exporting expenses has no handler yet, so the gap lives as
   "type": "known-gap",
   "id": "known-gap/export-expenses-unimplemented",
   "title": "Export Expenses Unimplemented",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "check": "use-case-unimplemented",
   "subject": ["use-case/spending.export-expenses"],
@@ -57,7 +57,7 @@ The gap covers the finding because its `check` equals the finding code and its `
 
 ## The Run with the Approve Expense Handler Removed
 
-Removing `apps/api/src/Expenses.Application/Spending/Expenses/ApproveExpense/ApproveExpenseCommandHandler.cs` and running the check again gives one open finding:
+Removing `apps/api/src/Claimwick.Application/Spending/Expenses/ApproveExpense/ApproveExpenseCommandHandler.cs` and running the check again gives one open finding:
 
 ```text
 docs/domain/modules/spending/expenses/approve-expense.md:3 [use-case-unimplemented] Use case 'use-case/spending.approve-expense' has no handler, reaction or job.
@@ -66,7 +66,7 @@ docs/domain/modules/spending/expenses/export-expenses.md:3 [known use-case-unimp
 exit 1
 ```
 
-The finding says no code implements the Approve expense use case. The fix is to restore the handler at its path under `Expenses.Application/Spending/Expenses/ApproveExpense/`, which the computed `implemented` state then picks up on the next run. The Export expenses line stays known, because its gap still covers it. The run exits 1, because one open finding remains.
+The finding says no code implements the Approve expense use case. The fix is to restore the handler at its path under `Claimwick.Application/Spending/Expenses/ApproveExpense/`, which the computed `implemented` state then picks up on the next run. The Export expenses line stays known, because its gap still covers it. The run exits 1, because one open finding remains.
 
 ## Querying One Record
 
@@ -77,7 +77,7 @@ The finding says no code implements the Approve expense use case. The fix is to 
   "type": "aggregate",
   "id": "aggregate/spending.expense",
   "title": "Expense",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "file": "docs/domain/modules/spending/expenses/README.md",
   "line": 3,
@@ -110,7 +110,7 @@ Querying the Submit expense use case adds the computed links the builder derived
     "implemented": true,
     "verified": false,
     "implements": [
-      "apps/api/src/Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs"
+      "apps/api/src/Claimwick.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs"
     ],
     "calls": [],
     "proves": [
@@ -130,7 +130,7 @@ The record reads `implemented` because its handler exists, and `proves` names th
 
 ## The Consumer Check
 
-`litespec consumer` checks the project configuration, the page frontmatter, and the language of a consumer repository, per [Validate Consumer](../tools/consumer.md). Against the Expenses example it reports this, and exits zero:
+`litespec consumer` checks the project configuration, the page frontmatter, and the language of a consumer repository, per [Validate Consumer](../tools/consumer.md). Against the Claimwick example it reports this, and exits zero:
 
 ```text
 Consumer: D:\Personal-Projects\LiteSpec\examples\expenses

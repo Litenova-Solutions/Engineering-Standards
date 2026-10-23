@@ -197,7 +197,7 @@ Every page-frame pattern therefore resolves to one floorplan, and every floorpla
 
 **Rationale:** The source tells the reader whether the choice is settled. A recommended choice stands until an owner confirms or changes it; an agent leaves its own choice marked as recommended, so no automated choice poses as a human decision. The catalog then shows at a glance which choices are settled and which still await review.
 
-**Example:** For example, the Expenses catalog starts its expense header entry from `litespec/frontend/patterns/record-detail#record-header`, keeps the pattern option IDs, and records the owner choice.
+**Example:** For example, the Claimwick catalog starts its expense header entry from `litespec/frontend/patterns/record-detail#record-header`, keeps the pattern option IDs, and records the owner choice.
 
 ```json
 {

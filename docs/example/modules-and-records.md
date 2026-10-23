@@ -2,7 +2,7 @@
 
 ## Intent
 
-The spending module is the Expenses example's one business area: it turns product intent into operations by organizing the business state the company tracks, the rules that bind it, and who may act on it. This page shows each piece as the project writes it: the module record, 3 aggregates (one unit of consistent state each) for expenses, receipts, and the policy with their states, transitions, and data, the rules that bind them, the access chain of actors, roles, permissions, and entry points with the outside system for payouts, and the Submit expense, Remind approvers, and List expenses use cases with their results and scenarios.
+The spending module is the Claimwick example's one business area: it turns product intent into operations by organizing the business state the company tracks, the rules that bind it, and who may act on it. This page shows each piece as the project writes it: the module record, 3 aggregates (one unit of consistent state each) for expenses, receipts, and the policy with their states, transitions, and data, the rules that bind them, the access chain of actors, roles, permissions, and entry points with the outside system for payouts, and the Submit expense, Remind approvers, and List expenses use cases with their results and scenarios.
 
 ## Where This Page Sits
 
@@ -21,14 +21,14 @@ HOW IT IS REACHED  expenses app, reminder job; payout bank outside
 
 ## The Spending Module
 
-A module is one business area that organizes language, records, use cases, and ownership. Expenses keeps one module, spending, which tracks expenses, receipts, and the policy. Its record lives at `docs/domain/modules/spending/README.md`, and its empty `dependsOn` list states that it depends on no other module, which applies `litespec/core/domain#state-every-module-dependency` on the [Domain Model](../core/domain.md).
+A module is one business area that organizes language, records, use cases, and ownership. Claimwick keeps one module, spending, which tracks expenses, receipts, and the policy. Its record lives at `docs/domain/modules/spending/README.md`, and its empty `dependsOn` list states that it depends on no other module, which applies `litespec/core/domain#state-every-module-dependency` on the [Domain Model](../core/domain.md).
 
 ```json
 {
   "type": "module",
   "id": "module/spending",
   "title": "Spending",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "summary": "Spending submits, decides, reimburses and exports work expenses.",
   "dependsOn": []
@@ -79,7 +79,7 @@ The expense page below shows the full shape, with its states, transitions, and d
   "type": "aggregate",
   "id": "aggregate/spending.expense",
   "title": "Expense",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "summary": "An expense is one work cost an employee submitted.",
   "states": [
@@ -144,7 +144,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "rule",
       "id": "rule/expense.receipt-required-above-threshold",
       "title": "Receipt required above threshold",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "kind": "precondition",
       "statement": "An expense above the policy threshold needs a receipt.",
@@ -161,7 +161,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "rule",
       "id": "rule/expense.approver-is-not-submitter",
       "title": "Approver is not submitter",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "kind": "precondition",
       "statement": "An approver is not the submitter.",
@@ -178,7 +178,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "rule",
       "id": "rule/expense.reimbursed-once",
       "title": "Reimbursed once",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "kind": "invariant",
       "statement": "An expense is reimbursed at most once.",
@@ -195,7 +195,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "rule",
       "id": "rule/expense.approved-before-reimbursement",
       "title": "Approved before reimbursement",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "kind": "precondition",
       "statement": "An expense is reimbursed only after approval.",
@@ -212,7 +212,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "event",
       "id": "event/expense.expense-submitted",
       "title": "Expense submitted",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "meaning": "An expense was submitted.",
       "carries": [
@@ -226,7 +226,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "event",
       "id": "event/expense.expense-approved",
       "title": "Expense approved",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "meaning": "An expense was approved.",
       "carries": [
@@ -239,7 +239,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "event",
       "id": "event/expense.expense-rejected",
       "title": "Expense rejected",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "meaning": "An expense was rejected.",
       "carries": [
@@ -252,7 +252,7 @@ The expense page below shows the full shape, with its states, transitions, and d
       "type": "event",
       "id": "event/expense.expense-reimbursed",
       "title": "Expense reimbursed",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "meaning": "An expense was reimbursed.",
       "carries": [
@@ -298,7 +298,7 @@ Each rule names the refusal its use case returns when the rule fails: `rule/expe
 
 ## Actors, Roles, and Permissions
 
-Access runs one chain: an actor has a role at a scope, the role allows permissions, and the use case names the permissions it needs. Expenses keeps 3 actors, each with one role:
+Access runs one chain: an actor has a role at a scope, the role allows permissions, and the use case names the permissions it needs. Claimwick keeps 3 actors, each with one role:
 
 | Actor | Kind | Role |
 |:--|:--|:--|
@@ -330,25 +330,25 @@ Submit expense names `permission/submit-expense` in its `needs` field: a use cas
 
 ## Entry Points
 
-An entry point is one way people or systems reach the product. Expenses lists 2 on one page at `docs/domain/entry-points.md`:
+An entry point is one way people or systems reach the product. Claimwick lists 2 on one page at `docs/domain/entry-points.md`:
 
 | Entry point | Kind |
 |:--|:--|
-| `entry-point/expenses-app` | app |
+| `entry-point/claimwick-app` | app |
 | `entry-point/reminder-job` | job |
 
 Employees reach spending through the expenses app, and every spending use case but one names it in `reachedThrough`. The reminder reaction runs through the nightly reminder job instead.
 
 ## The External System
 
-An external system is one outside system the product exchanges data with. Expenses keeps one: the payout bank moves reimbursed money to employees. Its record lives at `docs/domain/systems/payout-bank.md`, names the finance actor, states what it sends and receives, and states what happens when a payout file fails, which applies `litespec/core/access#name-what-an-external-system-sends`, `litespec/core/access#name-what-an-external-system-receives`, and `litespec/core/access#state-the-failure-behavior-of-every-external-system`.
+An external system is one outside system the product exchanges data with. Claimwick keeps one: the payout bank moves reimbursed money to employees. Its record lives at `docs/domain/systems/payout-bank.md`, names the finance actor, states what it sends and receives, and states what happens when a payout file fails, which applies `litespec/core/access#name-what-an-external-system-sends`, `litespec/core/access#name-what-an-external-system-receives`, and `litespec/core/access#state-the-failure-behavior-of-every-external-system`.
 
 ```json
 {
   "type": "external-system",
   "id": "external-system/payout-bank",
   "title": "Payout Bank",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "actor": "actor/finance",
   "sends": [
@@ -372,7 +372,7 @@ A use case is one command, query, or reaction with its permissions, results, and
   "type": "use-case",
   "id": "use-case/spending.submit-expense",
   "title": "Submit Expense",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "kind": "command",
   "needs": [
@@ -380,7 +380,7 @@ A use case is one command, query, or reaction with its permissions, results, and
   ],
   "anonymous": false,
   "reachedThrough": [
-    "entry-point/expenses-app"
+    "entry-point/claimwick-app"
   ],
   "raises": [
     "event/expense.expense-submitted"
@@ -407,7 +407,7 @@ A use case is one command, query, or reaction with its permissions, results, and
       "type": "result",
       "id": "result/submit-expense.submitted",
       "title": "Submitted",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "outcome": "success",
       "meaning": "The expense is submitted."
     },
@@ -415,7 +415,7 @@ A use case is one command, query, or reaction with its permissions, results, and
       "type": "result",
       "id": "result/submit-expense.receipt-missing",
       "title": "Receipt missing",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.receipt-missing",
       "meaning": "The expense is above the receipt threshold and carries no receipt."
@@ -424,7 +424,7 @@ A use case is one command, query, or reaction with its permissions, results, and
       "type": "scenario",
       "id": "scenario/submit-expense.submitting-with-a-receipt-succeeds",
       "title": "Submitting with a receipt succeeds",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "given": "An employee paid for a train ticket and kept the receipt.",
       "when": "The employee submits the expense with the receipt.",
@@ -446,7 +446,7 @@ Remind approvers is a reaction: the nightly job reminds the approver of each exp
   "type": "use-case",
   "id": "use-case/spending.remind-approvers",
   "title": "Remind Approvers",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "kind": "reaction",
   "reachedThrough": [
@@ -464,7 +464,7 @@ Remind approvers is a reaction: the nightly job reminds the approver of each exp
       "type": "result",
       "id": "result/remind-approvers.reminded",
       "title": "Reminded",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "outcome": "success",
       "meaning": "The approver is reminded."
     },
@@ -472,7 +472,7 @@ Remind approvers is a reaction: the nightly job reminds the approver of each exp
       "type": "scenario",
       "id": "scenario/remind-approvers.reminding-an-approver-succeeds",
       "title": "Reminding an approver succeeds",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "given": "An expense waited three business days with no decision.",
       "when": "The reminder job runs.",
@@ -494,7 +494,7 @@ List expenses is a query: an employee reads their own expenses with the latest s
   "type": "use-case",
   "id": "use-case/spending.list-expenses",
   "title": "List Expenses",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "kind": "query",
   "needs": [
@@ -502,7 +502,7 @@ List expenses is a query: an employee reads their own expenses with the latest s
   ],
   "anonymous": false,
   "reachedThrough": [
-    "entry-point/expenses-app"
+    "entry-point/claimwick-app"
   ],
   "raises": [],
   "fulfills": [
@@ -519,7 +519,7 @@ List expenses is a query: an employee reads their own expenses with the latest s
       "type": "result",
       "id": "result/list-expenses.listed",
       "title": "Listed",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "outcome": "success",
       "meaning": "The expenses are listed."
     },
@@ -527,7 +527,7 @@ List expenses is a query: an employee reads their own expenses with the latest s
       "type": "scenario",
       "id": "scenario/list-expenses.listing-own-expenses-succeeds",
       "title": "Listing own expenses succeeds",
-      "owner": "expenses-team",
+      "owner": "claimwick-team",
       "status": "approved",
       "given": "An employee submitted two expenses.",
       "when": "The employee lists their expenses.",
@@ -538,6 +538,6 @@ List expenses is a query: an employee reads their own expenses with the latest s
 }
 ```
 
-The output names the one row shape the screen reads: identity, amount, currency, state, and submission time, newest first. Spending keeps 10 use cases in all: 8 commands, this query, and the reminder reaction. [The Expenses Screen](the-screen.md) reads this output through the generated client.
+The output names the one row shape the screen reads: identity, amount, currency, state, and submission time, newest first. Spending keeps 10 use cases in all: 8 commands, this query, and the reminder reaction. [The Claimwick Screen](the-screen.md) reads this output through the generated client.
 
 Next, [A Use Case in Code](a-use-case-in-code.md) follows the Submit expense record into .NET code and tests.

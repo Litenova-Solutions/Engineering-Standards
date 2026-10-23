@@ -34,7 +34,7 @@ Each type has one home in the repository. The product brief lives at `docs/produ
 
 ## Links Between Records
 
-Records join through fields on the record that points. In the Expenses example, access runs through three records: the actor holds a role, the role allows permissions, and the use case needs one of them:
+Records join through fields on the record that points. In the Claimwick example, access runs through three records: the actor holds a role, the role allows permissions, and the use case needs one of them:
 
 ```json
 "holds": [{ "role": "role/employee", "scope": "self" }],

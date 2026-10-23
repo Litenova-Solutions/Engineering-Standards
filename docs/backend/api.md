@@ -81,7 +81,7 @@ WebApi maps Application member names to their public JSON field names. `traceId`
 
 The global handler maps validation failures to 400, missing targets through the operation's disclosure policy, and forbidden failures to 403 or the declared 404. It maps conflicts and state rejections to 409, and unexpected failures to 500 with code `internal-error`. It maps each known domain failure individually. It does not report cancellation from a disconnected request as an application error.
 
-In the Expenses product, reimbursing an expense that is not approved ends with `result/reimburse-expense.not-approved`, which carries the code `spending.not-approved` and the status 409. For example, the global handler answers:
+In the Claimwick product, reimbursing an expense that is not approved ends with `result/reimburse-expense.not-approved`, which carries the code `spending.not-approved` and the status 409. For example, the global handler answers:
 
 ```json
 {

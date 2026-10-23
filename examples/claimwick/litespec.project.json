@@ -1,0 +1,68 @@
+{
+  "$schema": "https://litespec.dev/2.0.0/schemas/litespec-project.schema.json",
+  "project": {
+    "name": "Claimwick"
+  },
+  "size": "large",
+  "shape": "server",
+  "stacks": [
+    "dotnet",
+    "svelte"
+  ],
+  "reviewedLiteSpecVersion": "2.0.0",
+  "optionalTypes": [
+    "constraint",
+    "research",
+    "limit",
+    "runbook",
+    "goal",
+    "external-system"
+  ],
+  "constraints": {
+    "answered": true
+  },
+  "owners": [
+    "claimwick-team"
+  ],
+  "paths": {
+    "docs": "docs",
+    "domainDocs": "docs/domain",
+    "uiDocs": "docs/ui",
+    "glossary": "docs/glossary.json",
+    "testRoots": [
+      "apps/api/tests"
+    ],
+    "frontends": [
+      {
+        "name": "web",
+        "path": "apps/web",
+        "platform": "svelte",
+        "ui": {
+          "profile": "application-balanced"
+        }
+      }
+    ],
+    "apiClient": "packages/api",
+    "uiPackage": {
+      "name": "@claimwick/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": [
+        "@claimwick/ui/expenses"
+      ]
+    },
+    "records": {}
+  },
+  "stackConfig": {
+    "dotnet": {
+      "application": "apps/api/src/Claimwick.Application",
+      "domain": "apps/api/src/Claimwick.Domain",
+      "webapi": "apps/api/src/Claimwick.WebApi"
+    }
+  },
+  "selectedExtensions": []
+}

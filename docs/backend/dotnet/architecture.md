@@ -55,11 +55,11 @@ This provision states the .NET form of `litespec/backend/architecture#keep-one-a
 **Example:** The `Spending` module owns one folder in every project, and each namespace follows its folder:
 
 ```text
-Expenses.Domain/Spending/Expenses/Expense.cs
-Expenses.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
+Claimwick.Domain/Spending/Expenses/Expense.cs
+Claimwick.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
 ```
 
-The handler above lives in namespace `Expenses.Application.Spending.Expenses.SubmitExpense`.
+The handler above lives in namespace `Claimwick.Application.Spending.Expenses.SubmitExpense`.
 
 ### Keep Implementation Types Internal
 

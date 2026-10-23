@@ -17,7 +17,7 @@ Your project does not adopt all of LiteSpec. It makes four choices in `litespec.
 
 `litespec init --preset dotnet-react --size small` writes a first project file with a common selection. The [selection page](https://litespec.dev/2.0.0/select/) on the site does the same in a form and shows which pages apply.
 
-The Expenses example in `examples/expenses/` declares its own selection in `litespec.project.json`:
+The Claimwick example in `examples/claimwick/` declares its own selection in `litespec.project.json`:
 
 ```json
 {
@@ -90,7 +90,7 @@ The standard expects departures and gives each one a home:
 
 When guidance overlaps, the most specific source wins: your deviation, then a selected extension, then the deeper page, then the shallower one.
 
-The Expenses example carries one deviation, at `examples/expenses/docs/deviations/export-review-bypass.md`:
+The Claimwick example carries one deviation, at `examples/claimwick/docs/deviations/export-review-bypass.md`:
 
 ```json
 {

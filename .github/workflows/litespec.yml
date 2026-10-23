@@ -35,8 +35,15 @@ jobs:
       - name: Run the CLI and analyzer test suites
         run: dotnet test --solution LiteSpec.slnx --no-build
 
-      - name: Pack the analyzer package
-        run: dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+      - name: Pack the tool and the analyzers
+        run: |
+          dotnet pack apps/cli/src/LiteSpec.Cli --output artifacts
+          dotnet pack apps/analyzers/src/LiteSpec.Analyzers --no-build --output artifacts
+
+      # A consumer installs the tool from a package and runs it outside this repository,
+      # where nothing but the release inside the package can answer.
+      - name: Run the packed tool the way a consumer installs it
+        run: .github/scripts/smoke-tool.sh artifacts
 
       - name: Check the generated provision index
         run: dotnet run --project apps/cli/src/LiteSpec.Cli --no-build -- provisions --check
@@ -65,16 +72,17 @@ jobs:
           package-manager-cache: false
 
       - name: Install pnpm
-        run: npm install --global pnpm@11.1.3
+        run: npm install --global pnpm@11.28.5
 
       - name: Install the site dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test the wireframe renderer against the CLI goldens
-        run: node --test src/lib/wireframe/wireframe.test.ts
+      - name: Test the site, including the wireframe renderer against the CLI goldens
+        run: pnpm test
 
+      # The same build the release deploys: Astro, then the Pagefind search index.
       - name: Build the site
-        run: pnpm exec astro build
+        run: pnpm build
 
   skipped-checks:
     if: github.event_name == 'pull_request'

@@ -44,7 +44,15 @@ Start with the product: one `docs/product/brief.md` that says what the product i
 
 ### 5. Build to the Standard
 
-Build the first use case the way the standard describes: the backend projects, the handler in its folder, the refusal codes, the tests. Then build the model to see what the builder finds:
+Build the first use case the way the standard describes: the backend projects, the handler in its folder, the refusal codes, the tests. Reference `LiteSpec.Analyzers` from the five application projects, or once in `Directory.Build.props`, so a breach of a .NET provision fails the build at the line that breaks it:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="LiteSpec.Analyzers" Version="2.0.0" PrivateAssets="all" />
+</ItemGroup>
+```
+
+Then build the model to see what the builder finds:
 
 ```bash
 dotnet litespec model build

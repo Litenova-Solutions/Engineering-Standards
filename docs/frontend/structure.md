@@ -48,7 +48,7 @@ Imports point one way: routes import modules, modules import the frame, and the 
 <frontend>/modules/orders/orders/search-merchant-orders/
 ```
 
-For example, the Expenses product submits an expense through `use-case/spending.submit-expense`, implemented in the backend under `Spending/Expenses/SubmitExpense`. The web frontend serves it from the same path in kebab case.
+For example, the Claimwick product submits an expense through `use-case/spending.submit-expense`, implemented in the backend under `Spending/Expenses/SubmitExpense`. The web frontend serves it from the same path in kebab case.
 
 ```text
 <backend>/Spending/Expenses/SubmitExpense/

@@ -54,4 +54,4 @@ The name reflects that scope. *Lite* means a project adopts one bounded context,
 
 ## Next
 
-[How LiteSpec works](how-litespec-works.md) follows these parts through one Expenses use case.
+[How LiteSpec works](how-litespec-works.md) follows these parts through one Claimwick use case.

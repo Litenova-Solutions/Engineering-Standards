@@ -8,7 +8,7 @@ You maintain the `litespec.dev` site in `apps/site/`. You change its design, its
 
 The site is the static Astro 7 site that publishes the LiteSpec standard at `https://litespec.dev`. It is maintainer tooling, not part of a consumer project, so it lives in `apps/site/` rather than in the CLI. It builds from the standard at the repository root through one loader, `src/lib/spec.ts`. People read HTML pages. Agents read `/llms.txt`, a raw `.md` copy of every page, one index per selection of shape and stacks, and one bundle per layer. The UI is hand-written CSS. Wireframes are drawn by a TypeScript port of the C# renderer, proved byte-identical by golden SVGs.
 
-The project file is `apps/site/package.json`. It names the package `litespec-site`, the package manager `pnpm@11.1.3`, the engine `node >=24`, the dependencies `astro 7.3.5` and `@astrojs/markdown-remark 7.3.1`, and the dev dependency `pagefind 1.5.2`. The workspace file `apps/site/pnpm-workspace.yaml` allows the `esbuild` build. The TypeScript config `apps/site/tsconfig.json` extends the Astro strict config and excludes `dist/`. The ignore file `apps/site/.gitignore` ignores `node_modules/`, `dist/`, and `.astro/`.
+The project file is `apps/site/package.json`. It names the package `litespec-site`, the package manager `pnpm@11.28.5`, the engine `node >=24`, the dependencies `astro 7.3.5` and `@astrojs/markdown-remark 7.3.1`, and the dev dependency `pagefind 1.5.2`. The workspace file `apps/site/pnpm-workspace.yaml` allows the `esbuild` build. The TypeScript config `apps/site/tsconfig.json` extends the Astro strict config and excludes `dist/`. The ignore file `apps/site/.gitignore` ignores `node_modules/`, `dist/`, and `.astro/`.
 
 ## Quick Start
 
@@ -225,7 +225,7 @@ The suite runs `node --test "src/**/*.test.ts"`, which today covers the wirefram
 pnpm --dir apps/site build
 ```
 
-The build renders every docs page, every raw Markdown copy, every layer bundle, every selection index, and the schema copies, then indexes the output with Pagefind. The `site` job in `.github/workflows/litespec.yml` runs the same two steps in CI on Node `24.22.0` with `pnpm@11.1.3`: `node --test src/lib/wireframe/wireframe.test.ts` and `pnpm exec astro build` after `pnpm install --frozen-lockfile`.
+The build renders every docs page, every raw Markdown copy, every layer bundle, every selection index, and the schema copies, then indexes the output with Pagefind. The `site` job in `.github/workflows/litespec.yml` runs the same two steps in CI on Node `24.22.0` with `pnpm@11.28.5`: `node --test src/lib/wireframe/wireframe.test.ts` and `pnpm exec astro build` after `pnpm install --frozen-lockfile`.
 
 ## Limits
 

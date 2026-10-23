@@ -2,7 +2,7 @@
   "name": "litespec-site",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.1.3",
+  "packageManager": "pnpm@11.28.5",
   "engines": {
     "node": ">=24"
   },

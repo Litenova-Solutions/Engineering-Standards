@@ -1,8 +1,8 @@
-# The Expenses Screen
+# The Claimwick Screen
 
 ## Intent
 
-The expenses screen is one screen of the Expenses product, the example product these pages follow: it shows each employee their expenses at one address. This page follows that screen from the folder serving its address, through its data read with the API client generated from the published contract, the shared UI package it composes, and the drawn list option it starts from, naming the frontend rule each step applies.
+The expenses screen is one screen of the Claimwick product, the example product these pages follow: it shows each employee their expenses at one address. This page follows that screen from the folder serving its address, through its data read with the API client generated from the published contract, the shared UI package it composes, and the drawn list option it starts from, naming the frontend rule each step applies.
 
 ## Where This Page Sits
 
@@ -16,7 +16,7 @@ USE CASE  List expenses (query)
 
 ## The Expenses Route
 
-The screen lives at `apps/web/src/routes/expenses/+page.svelte` in the Expenses example. A Svelte frontend holds one folder per address under `src/routes`, with the frame and the use-case code in `src/lib/app` and `src/lib/modules`, as [Web Structure](../frontend/web/structure.md) states. The route mirrors its use case path in kebab case, per `litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case` on [Frontend Structure](../frontend/structure.md): the folder `expenses` answers the List expenses use case that [Modules and Records](modules-and-records.md) describes.
+The screen lives at `apps/web/src/routes/expenses/+page.svelte` in the Claimwick example. A Svelte frontend holds one folder per address under `src/routes`, with the frame and the use-case code in `src/lib/app` and `src/lib/modules`, as [Web Structure](../frontend/web/structure.md) states. The route mirrors its use case path in kebab case, per `litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case` on [Frontend Structure](../frontend/structure.md): the folder `expenses` answers the List expenses use case that [Modules and Records](modules-and-records.md) describes.
 
 A route file holds its input, its load, and its component, with no reusable logic and no import of another route file, per `litespec/frontend/web/structure#keep-a-route-file-thin`. The expenses route therefore validates its search, prefetches its read, and composes its view, while shared code lives in the module folder or the frame. Imports point from the route to a module to the frame to a shared package, per `litespec/frontend/web/structure#keep-imports-directional`, so the route reads the client from the frame and the generated operations from the shared API package.
 
@@ -43,15 +43,15 @@ export async function load({ parent, url }) {
 }
 ```
 
-The search schema keeps the filters and the page in the address, per `litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema`, so a filtered list stays a link the team can share. The example page itself is smaller: it calls `listExpenses` from `@expenses/api` directly and renders the rows in the `ListPage` floorplan and the `DataTable` composite from `@expenses/ui/floorplans`, so the model builder joins the screen to the list use case through the generated client. The load above shows what the stack pages require once the query cache is wired.
+The search schema keeps the filters and the page in the address, per `litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema`, so a filtered list stays a link the team can share. The example page itself is smaller: it calls `listExpenses` from `@claimwick/api` directly and renders the rows in the `ListPage` floorplan and the `DataTable` composite from `@claimwick/ui/floorplans`, so the model builder joins the screen to the list use case through the generated client. The load above shows what the stack pages require once the query cache is wired.
 
 ## The Shared UI Package
 
-The screen composes the shared UI package `@expenses/ui` at `packages/ui`, which the project declares in `paths.uiPackage` of `litespec.project.json`. The package pins its baseline in the source lock at `packages/ui/ui-source-lock.json`: generator `shadcn-svelte`, CLI `1.7.0`, with the `button` and `skeleton` components at baseline status. `litespec ui` checks the package, its source lock and digests, its design contract, its stylesheets, each frontend boundary, and each route suite, per [Validate Controlled UI](../tools/ui.md). Against the Expenses example it reports this, and exits zero:
+The screen composes the shared UI package `@claimwick/ui` at `packages/ui`, which the project declares in `paths.uiPackage` of `litespec.project.json`. The package pins its baseline in the source lock at `packages/ui/ui-source-lock.json`: generator `shadcn-svelte`, CLI `1.7.0`, with the `button` and `skeleton` components at baseline status. `litespec ui` checks the package, its source lock and digests, its design contract, its stylesheets, each frontend boundary, and each route suite, per [Validate Controlled UI](../tools/ui.md). Against the Claimwick example it reports this, and exits zero:
 
 ```text
 Consumer: D:\Personal-Projects\LiteSpec\examples\expenses
-Shared UI package: @expenses/ui at packages/ui
+Shared UI package: @claimwick/ui at packages/ui
 Controlled frontends: 1
 
 PASS: the shared package, its source lock, its design contract, its stylesheets, each frontend boundary, and each route suite are valid.
@@ -67,4 +67,4 @@ A consumer keeps one pattern catalog holding its interface decisions, per `lites
 
 ## The Frontend Rules the Screen Follows
 
-Each step of the screen answers to one frontend rule. [Frontend Structure](../frontend/structure.md) and [Web Structure](../frontend/web/structure.md) place the route folder, keep the route file thin, and point its imports toward the shared packages. [Frontend Data and State](../frontend/data.md) and [Web Data and State](../frontend/web/data.md) generate the client from the contract and route the read through it. [Web Rendering and Routes](../frontend/web/rendering.md) prefetches the list in the load, reads it from the cache in the component, and keeps the view in the address. [Validate Controlled UI](../tools/ui.md) checks the shared package, its source lock, and each frontend boundary. [List and Table Patterns](../frontend/patterns/lists-and-tables.md) gives the columns decision its options, and [UI Patterns](../frontend/patterns.md) records the choice. The [Svelte Stack](../frontend/web/svelte/stack.md) selects the rendering mode for the Expenses app by its audience. A screen that keeps each of these rules reads the same way as every other screen, so the next route is a small variation on this one. [The Model and Its Checks](model-and-checks.md) shows how the model proves the screen, its use case, and its handler agree.
+Each step of the screen answers to one frontend rule. [Frontend Structure](../frontend/structure.md) and [Web Structure](../frontend/web/structure.md) place the route folder, keep the route file thin, and point its imports toward the shared packages. [Frontend Data and State](../frontend/data.md) and [Web Data and State](../frontend/web/data.md) generate the client from the contract and route the read through it. [Web Rendering and Routes](../frontend/web/rendering.md) prefetches the list in the load, reads it from the cache in the component, and keeps the view in the address. [Validate Controlled UI](../tools/ui.md) checks the shared package, its source lock, and each frontend boundary. [List and Table Patterns](../frontend/patterns/lists-and-tables.md) gives the columns decision its options, and [UI Patterns](../frontend/patterns.md) records the choice. The [Svelte Stack](../frontend/web/svelte/stack.md) selects the rendering mode for the Claimwick app by its audience. A screen that keeps each of these rules reads the same way as every other screen, so the next route is a small variation on this one. [The Model and Its Checks](model-and-checks.md) shows how the model proves the screen, its use case, and its handler agree.

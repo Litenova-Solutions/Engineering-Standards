@@ -103,7 +103,7 @@ An identifier names its record type first, then the record name, with the owning
 | `actor` | `actor/<name>` | `actor/employee` |
 | `role` | `role/<name>` | `role/approver` |
 | `permission` | `permission/<name>` | `permission/approve-expense` |
-| `entry-point` | `entry-point/<name>` | `entry-point/expenses-app` |
+| `entry-point` | `entry-point/<name>` | `entry-point/claimwick-app` |
 | `external-system` | `external-system/<name>` | `external-system/payout-bank` |
 | `limit` | `limit/<name>` | `limit/open-expenses-per-employee` |
 | `runbook` | `runbook/<name>` | `runbook/clear-stuck-reimbursements` |
@@ -288,14 +288,14 @@ A finding that an open known gap covers is reported as known and exits zero. The
 
 **Rationale:** Missing work with no owner and no date is invisible: nobody answers for it and nothing reports it. A known gap with an owner and an end date turns the same missing work into a visible promise that the checks report until the date and fail after it.
 
-**Example:** The running Expenses example accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date in `docs/known-gaps/export-expenses-unimplemented.md`.
+**Example:** The running Claimwick example accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date in `docs/known-gaps/export-expenses-unimplemented.md`.
 
 ```json
 {
   "type": "known-gap",
   "id": "known-gap/export-expenses-unimplemented",
   "title": "Export expenses unimplemented",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "check": "use-case-unimplemented",
   "subject": ["use-case/spending.export-expenses"],
@@ -312,14 +312,14 @@ The `use-case-unimplemented` check reports without failing until 2027-06-01, and
 
 **Rationale:** A project requirement can never quietly override a shared standard; without this order it would, one page at a time. The conflict becomes a deviation record instead: dated, reasoned, and reviewable. The order puts the project deviation first, then the extension, then the deeper page, then the shallower page, so the most local approved decision wins.
 
-**Example:** The running Expenses example runs its weekend export with no reviewer on shift, so it records a project deviation that outranks the shared standard in `docs/deviations/export-review-bypass.md`.
+**Example:** The running Claimwick example runs its weekend export with no reviewer on shift, so it records a project deviation that outranks the shared standard in `docs/deviations/export-review-bypass.md`.
 
 ```json
 {
   "type": "deviation",
   "id": "deviation/export-review-bypass",
   "title": "Export Review Bypass",
-  "owner": "expenses-team",
+  "owner": "claimwick-team",
   "status": "approved",
   "provision": "litespec/backend/application#enforce-target-authorization-in-the-pipeline",
   "reason": "The weekend export runs with no reviewer on shift.",
@@ -362,7 +362,7 @@ The record names the provision it departs from, the reason, and the review date,
 
 **Rationale:** Size decides which record types and test projects the checks require, while stacks decide which technology pages and checks apply. Without the declaration, the builder cannot tell a missing record from one the project never needed. Optional types switch on per project, so the declaration also names which ones this project carries.
 
-**Example:** The running Expenses example declares large with a server shape and two stacks.
+**Example:** The running Claimwick example declares large with a server shape and two stacks.
 
 ### Give Every Use Case Its Results
 
@@ -372,7 +372,7 @@ The record names the provision it departs from, the reason, and the review date,
 
 **Example:** A submit use case names `submitted` and `receipt-missing`.
 
-The running Expenses example carries this in `use-case/spending.submit-expense`, which names `result/submit-expense.submitted` and `result/submit-expense.receipt-missing` with `scenario/submit-expense.submitting-with-a-receipt-succeeds`:
+The running Claimwick example carries this in `use-case/spending.submit-expense`, which names `result/submit-expense.submitted` and `result/submit-expense.receipt-missing` with `scenario/submit-expense.submitting-with-a-receipt-succeeds`:
 
 ```json
 "records": [
@@ -380,7 +380,7 @@ The running Expenses example carries this in `use-case/spending.submit-expense`,
     "type": "result",
     "id": "result/submit-expense.submitted",
     "title": "Submitted",
-    "owner": "expenses-team",
+    "owner": "claimwick-team",
     "outcome": "success",
     "meaning": "The expense is submitted."
   },
@@ -388,7 +388,7 @@ The running Expenses example carries this in `use-case/spending.submit-expense`,
     "type": "result",
     "id": "result/submit-expense.receipt-missing",
     "title": "Receipt missing",
-    "owner": "expenses-team",
+    "owner": "claimwick-team",
     "outcome": "refusal",
     "code": "spending.receipt-missing",
     "meaning": "The expense is above the receipt threshold and carries no receipt."
@@ -397,7 +397,7 @@ The running Expenses example carries this in `use-case/spending.submit-expense`,
     "type": "scenario",
     "id": "scenario/submit-expense.submitting-with-a-receipt-succeeds",
     "title": "Submitting with a receipt succeeds",
-    "owner": "expenses-team",
+    "owner": "claimwick-team",
     "status": "approved",
     "given": "An employee paid for a train ticket and kept the receipt.",
     "when": "The employee submits the expense with the receipt.",

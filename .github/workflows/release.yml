@@ -1,0 +1,168 @@
+name: Release
+
+# A release is a v<version> tag on main. The tag publishes the two NuGet packages, the
+# GitHub release and the site for that version, after the same checks a pull request runs.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up the .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      # The tag, the manifest and both packages name one release. The version test in
+      # the suite holds the manifest, the packages, the changelog and the templates
+      # together; this step adds the tag.
+      - name: Match the tag to the manifest version
+        id: version
+        run: |
+          version="$(jq -r .version litespec.manifest.json)"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "The tag $GITHUB_REF_NAME does not name the manifest version $version."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: dotnet build LiteSpec.slnx --configuration Release
+
+      - name: Run the CLI and analyzer test suites
+        run: dotnet test --solution LiteSpec.slnx --configuration Release --no-build
+
+      - name: Check the generated provision index
+        run: dotnet run --project apps/cli/src/LiteSpec.Cli --configuration Release --no-build -- provisions --check
+
+      - name: Validate the LiteSpec repository
+        run: dotnet run --project apps/cli/src/LiteSpec.Cli --configuration Release --no-build -- validate
+
+      - name: Pack the tool and the analyzers
+        run: |
+          dotnet pack apps/cli/src/LiteSpec.Cli --configuration Release --output artifacts/packages
+          dotnet pack apps/analyzers/src/LiteSpec.Analyzers --configuration Release --no-build --output artifacts/packages
+
+      - name: Run the packed tool the way a consumer installs it
+        run: .github/scripts/smoke-tool.sh artifacts/packages
+
+      - name: Keep the packages for the publishing jobs
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+
+  nuget:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # Trusted publishing: nuget.org exchanges this run's OIDC token for a short-lived key,
+    # so no long-lived API key is stored. The policy on nuget.org names this repository,
+    # this workflow file and the release environment.
+    environment: release
+    permissions:
+      id-token: write
+    steps:
+      - name: Fetch the packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: packages
+
+      - name: Set up the .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Sign in to nuget.org
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish LiteSpec.Cli and LiteSpec.Analyzers
+        run: dotnet nuget push "packages/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  github-release:
+    needs: [verify, nuget]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch the packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: packages
+
+      # The release notes are the changelog section for this version, unchanged.
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          awk -v heading="## v$VERSION" '$0 == heading {found = 1; next} found && /^## v/ {exit} found' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "CHANGELOG.md has no section headed '## v$VERSION'."
+            exit 1
+          fi
+          gh release create "$GITHUB_REF_NAME" packages/*.nupkg --title "LiteSpec $VERSION" --notes-file notes.md --verify-tag
+
+  site:
+    needs: [verify, nuget]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: release
+    defaults:
+      run:
+        working-directory: apps/site
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Configure Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          # The Node release the manifest pins under stack.
+          node-version: "24.22.0"
+          package-manager-cache: false
+
+      - name: Install pnpm
+        run: npm install --global pnpm@11.28.5
+
+      - name: Install the site dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test the site
+        run: pnpm test
+
+      - name: Build the site
+        run: pnpm build
+
+      # wrangler.jsonc names the account and the litespec.dev route; the token is a
+      # Cloudflare API token limited to editing this Worker.
+      - name: Deploy litespec.dev
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4.151.3 deploy

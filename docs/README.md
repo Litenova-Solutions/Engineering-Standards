@@ -19,7 +19,7 @@ A project applies only some folders below. [Read the Standard](learn/reading-the
 
 - [Learn overview](learn/README.md): the reading order for the explanation pages.
 - [Why LiteSpec Exists](learn/why-litespec.md): the problem LiteSpec solves, for a team that is deciding whether LiteSpec fits.
-- [How LiteSpec Works](learn/how-litespec-works.md): the standard, the records, the model, and the tools, traced through one Expenses use case.
+- [How LiteSpec Works](learn/how-litespec-works.md): the standard, the records, the model, and the tools, traced through one Claimwick use case.
 - [Read the Standard](learn/reading-the-standard.md): project selections, page arrangement, and provision IDs; how to find the rules that apply to a project.
 - [Records and the Project Model](learn/records-and-the-model.md): what a project writes down, and what the model builder works out from the code.
 - [Reading Tracks](learn/reading-tracks.md): which records to read in which order: why before how, one journey end to end, one module end to end, and the structural words.
@@ -33,11 +33,11 @@ A project applies only some folders below. [Read the Standard](learn/reading-the
 
 One product worked end to end, from its first record to a passing check.
 
-- [Example overview](example/README.md): the Expenses product the example follows, and the reading order for its pages.
-- [The Expenses Product](example/the-product.md): the product brief, problem, requirements, decision, and constraint records.
+- [Example overview](example/README.md): the Claimwick product the example follows, and the reading order for its pages.
+- [The Claimwick Product](example/the-product.md): the product brief, problem, requirements, decision, and constraint records.
 - [Modules and Records](example/modules-and-records.md): the spending module, its records, rules, access chain, and the Submit expense use case.
 - [A Use Case in Code](example/a-use-case-in-code.md): Submit expense from its record into .NET code and tests.
-- [The Expenses Screen](example/the-screen.md): the expenses list screen, the generated client it reads through, and the UI pattern it starts from.
+- [The Claimwick Screen](example/the-screen.md): the expenses list screen, the generated client it reads through, and the UI pattern it starts from.
 - [The Model and Its Checks](example/model-and-checks.md): model build, check, and query runs, the known gap, and the CI jobs that run the checks.
 
 ## Core

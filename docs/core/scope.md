@@ -10,7 +10,7 @@ Every LiteSpec project starts by declaring the same three choices: its size, sha
 
 Three choices in `litespec.project.json` decide everything the project must produce and every page that applies to it.
 
-Size decides the record set and the test projects. A small project carries the core record types with Architecture and Integration test projects. A large project adds goals, problems, features, journeys, and scenarios with the Acceptance project. A project with one web frontend and no journeys fits small; the running Expenses example, which needs journeys, selects large.
+Size decides the record set and the test projects. A small project carries the core record types with Architecture and Integration test projects. A large project adds goals, problems, features, journeys, and scenarios with the Acceptance project. A project with one web frontend and no journeys fits small; the running Claimwick example, which needs journeys, selects large.
 
 Shape decides the deployment boundary: `server` for a project with its own backend, `client-only` for one without. A server project names one backend stack. A client-only project names none, and records which backend surfaces stay uncovered.
 
@@ -34,9 +34,9 @@ A consumer claims conformance when it applies every page its size, shape, and st
 
 **Rationale:** One size and explicit stacks tell every check which records and pages apply. The size decides which record types the project carries and which test projects prove them; each stack decides which technology pages and checks apply. Without the declaration, each agent infers the architecture from the directory tree, and two agents infer two architectures.
 
-**Example:** A project with one web frontend and no journeys selects small with the svelte stack; the running Expenses example, with journeys, selects large.
+**Example:** A project with one web frontend and no journeys selects small with the svelte stack; the running Claimwick example, with journeys, selects large.
 
-The running Expenses example declares large with a server shape and two stacks in `litespec.project.json`:
+The running Claimwick example declares large with a server shape and two stacks in `litespec.project.json`:
 
 ```json
 {

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="300" viewBox="0 0 720 300" role="img" aria-labelledby="frontend-use-case-path-title frontend-use-case-path-desc" font-family="Geist, ui-sans-serif, system-ui, sans-serif">
   <title id="frontend-use-case-path-title">The backend use-case path beside its frontend mirror</title>
-  <desc id="frontend-use-case-path-desc">Three backend segments, Spending, Expenses, and SubmitExpense, each with an arrow to its frontend spelling: spending, expenses, and submit-expense. The backend path is Expenses.Application/Spending/Expenses/SubmitExpense and the frontend path is modules/spending/expenses/submit-expense.</desc>
+  <desc id="frontend-use-case-path-desc">Three backend segments, Spending, Expenses, and SubmitExpense, each with an arrow to its frontend spelling: spending, expenses, and submit-expense. The backend path is Claimwick.Application/Spending/Expenses/SubmitExpense and the frontend path is modules/spending/expenses/submit-expense.</desc>
   <defs>
     <marker id="frontend-use-case-path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10z" style="fill: var(--muted-fg, #77706a)" />
@@ -8,7 +8,7 @@
   </defs>
 
   <g style="fill: var(--muted-fg, #77706a)" font-size="12">
-    <text x="30" y="24">Backend: Expenses.Application (PascalCase)</text>
+    <text x="30" y="24">Backend: Claimwick.Application (PascalCase)</text>
     <text x="410" y="24">Frontend: modules (kebab-case)</text>
     <text x="345" y="58" text-anchor="middle">module</text>
     <text x="345" y="133" text-anchor="middle">aggregate</text>
