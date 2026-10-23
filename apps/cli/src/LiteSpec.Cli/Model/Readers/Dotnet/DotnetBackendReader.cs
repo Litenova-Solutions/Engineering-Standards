@@ -10,11 +10,49 @@ namespace LiteSpec.Model.Readers.Dotnet;
 /// </summary>
 sealed class DotnetBackendReader : IBackendReader
 {
+    /// <summary>The interfaces whose anchor names an external system: the only ports a call counts on.</summary>
+    private static HashSet<string> externalPorts = new(StringComparer.Ordinal);
+
+    /// <summary>An external-system anchor followed by the interface it sits on.</summary>
+    private static readonly System.Text.RegularExpressions.Regex ExternalPortTag = new(
+        @"<implements>s*external-system/[A-Za-z0-9][A-Za-z0-9._#-]*s*</implements>[sS]*?interfaces+(?<name>[A-Za-z_][A-Za-z0-9_]*)",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>
+    ///     Collects the port interfaces that anchor up to an external-system record, so a call
+    ///     through any other injected interface is internal work rather than a calls edge.
+    /// </summary>
+    private static HashSet<string> ExternalPortsOf(ConsumerConfig config)
+    {
+        var ports = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var root in new[] { config.ApplicationRoot, config.ApplicationRoot + ".Abstractions", config.InfrastructureRoot })
+        {
+            foreach (var file in SourceTree.Files(root, ".cs"))
+            {
+                var text = SourceTree.Read(file);
+
+                if (!text.Contains("external-system/", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                foreach (System.Text.RegularExpressions.Match match in ExternalPortTag.Matches(text))
+                {
+                    ports.Add(match.Groups["name"].Value);
+                }
+            }
+        }
+
+        return ports;
+    }
+
     /// <summary>Reads every configured source root, parsing each file once.</summary>
     public CodeModel Read(ConsumerConfig config)
     {
         var model = new CodeModel();
 
+        externalPorts = ExternalPortsOf(config);
         ReadHandlers(config, model);
 
         var files = new List<string>();
@@ -601,7 +639,7 @@ sealed class DotnetBackendReader : IBackendReader
     /// <summary>
     ///     The dispatch calls a class makes: commands through <c>ICommandMediator</c>, events
     ///     through a publisher or the outbox, notifications through a messenger, notifier or
-    ///     sender, and any other call on an injected interface as an external port call.
+    ///     sender, and a call on an interface anchored to an external-system record as a calls edge.
     /// </summary>
     private static List<CodeDispatch> DispatchesOf(BaseTypeDeclarationSyntax declared, SyntaxTree tree, string file)
     {
@@ -661,7 +699,7 @@ sealed class DotnetBackendReader : IBackendReader
                     found.Add(new CodeDispatch("sends", sends.Target, sends.Detail, file, line));
                 }
             }
-            else if (!ExcludedReceiver(kind))
+            else if (!ExcludedReceiver(kind) && externalPorts.Contains(kind))
             {
                 found.Add(new CodeDispatch("calls", method, kind, file, line));
             }

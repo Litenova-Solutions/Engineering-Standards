@@ -159,7 +159,7 @@ You review a port declared beside its aggregate with that aggregate's specificat
 
 **Statement:** A handler MUST reach an external system only through a port carrying the operation its record's `calls` effect names.
 
-**Rationale:** The `calls` effect names one operation on one external system, and the operations entry states its timeout, its timeout behavior, its retries, its response, and its cache. The port carries that operation with project-owned types, and Infrastructure implements it, so a provider change stops at the adapter. A call no `calls` entry declares fails `effect-undeclared`.
+**Rationale:** The `calls` effect names one operation on one external system, and the operations entry states its timeout, its timeout behavior, its retries, its response, and its cache. The port carries that operation with project-owned types and anchors up to its system with `/// <implements>external-system/<name></implements>` on the port interface, and Infrastructure implements it, so a provider change stops at the adapter. The stack reader counts a call as a `calls` edge only through such an anchored port; any other injected interface is internal work. A call on an anchored port that no `calls` entry declares fails `effect-undeclared`.
 
 **Example:** A handler that calls a payment operation names it through the record's `calls` entry and the port method; a direct provider call fails the check.
 
