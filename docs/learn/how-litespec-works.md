@@ -40,7 +40,7 @@ The record lives in the project at `docs/domain/modules/spending/expenses/submit
   "needs": ["permission/submit-expense"],
   "anonymous": false,
   "reachedThrough": ["entry-point/claimwick-app"],
-  "raises": ["event/expense.expense-submitted"],
+  "raises": ["event/expense.submitted"],
   "fulfills": ["requirement/approval.receipt-over-threshold"]
 }
 ```

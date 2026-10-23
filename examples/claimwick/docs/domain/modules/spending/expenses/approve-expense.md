@@ -14,7 +14,7 @@
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/expense.expense-approved"
+    "event/expense.approved"
   ],
   "fulfills": [
     "requirement/approval.no-self-approval"
@@ -60,4 +60,4 @@ A manager decides a submitted expense so the employee learns the outcome.
 
 ## What Happens
 
-The manager opens a submitted expense. Spending refuses the decision when the approver submitted the expense. Otherwise the expense moves to Approved and `event/expense.expense-approved` is raised.
+The manager opens a submitted expense. Spending refuses the decision when the approver submitted the expense. Otherwise the expense moves to Approved and `event/expense.approved` is raised.

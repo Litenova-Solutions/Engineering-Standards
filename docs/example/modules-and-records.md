@@ -195,7 +195,7 @@ The expense page below shows the full shape, with its states, transitions, and d
     },
     {
       "type": "event",
-      "id": "event/expense.expense-submitted",
+      "id": "event/expense.submitted",
       "title": "Expense submitted",
       "owner": "claimwick-team",
       "status": "approved",
@@ -209,7 +209,7 @@ The expense page below shows the full shape, with its states, transitions, and d
     },
     {
       "type": "event",
-      "id": "event/expense.expense-approved",
+      "id": "event/expense.approved",
       "title": "Expense approved",
       "owner": "claimwick-team",
       "status": "approved",
@@ -222,7 +222,7 @@ The expense page below shows the full shape, with its states, transitions, and d
     },
     {
       "type": "event",
-      "id": "event/expense.expense-rejected",
+      "id": "event/expense.rejected",
       "title": "Expense rejected",
       "owner": "claimwick-team",
       "status": "approved",
@@ -235,7 +235,7 @@ The expense page below shows the full shape, with its states, transitions, and d
     },
     {
       "type": "event",
-      "id": "event/expense.expense-reimbursed",
+      "id": "event/expense.reimbursed",
       "title": "Expense reimbursed",
       "owner": "claimwick-team",
       "status": "approved",
@@ -251,7 +251,7 @@ The expense page below shows the full shape, with its states, transitions, and d
 }
 ```
 
-The receipt page carries one rule, `rule/receipt.attaches-before-decision`, and one event, `event/receipt.receipt-attached`. The policy page carries one rule, `rule/policy.threshold-never-negative`, and no events. Every entry states what happened or what stays true, and each names the data it carries or the requirement it fulfills.
+The receipt page carries one rule, `rule/receipt.attaches-before-decision`, and one event, `event/receipt.attached`. The policy page carries one rule, `rule/policy.threshold-never-negative`, and no events. Every entry states what happened or what stays true, and each names the data it carries or the requirement it fulfills.
 
 ## The Rules
 
@@ -368,7 +368,7 @@ A use case is one command, query, or reaction with its permissions, results, and
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/expense.expense-submitted"
+    "event/expense.submitted"
   ],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"

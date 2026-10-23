@@ -95,7 +95,7 @@
     },
     {
       "type": "event",
-      "id": "event/expense.expense-submitted",
+      "id": "event/expense.submitted",
       "title": "Expense submitted",
       "owner": "claimwick-team",
       "status": "approved",
@@ -109,7 +109,7 @@
     },
     {
       "type": "event",
-      "id": "event/expense.expense-approved",
+      "id": "event/expense.approved",
       "title": "Expense approved",
       "owner": "claimwick-team",
       "status": "approved",
@@ -122,7 +122,7 @@
     },
     {
       "type": "event",
-      "id": "event/expense.expense-rejected",
+      "id": "event/expense.rejected",
       "title": "Expense rejected",
       "owner": "claimwick-team",
       "status": "approved",
@@ -135,7 +135,7 @@
     },
     {
       "type": "event",
-      "id": "event/expense.expense-reimbursed",
+      "id": "event/expense.reimbursed",
       "title": "Expense reimbursed",
       "owner": "claimwick-team",
       "status": "approved",

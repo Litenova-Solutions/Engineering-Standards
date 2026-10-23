@@ -11,7 +11,7 @@ A [product](../reference/glossary.md) record states what is built, for whom, and
 ```json
 {
   "type": "product",
-  "id": "product/expenses",
+  "id": "product/claimwick",
   "title": "Claimwick",
   "owner": "claimwick-team",
   "status": "approved",

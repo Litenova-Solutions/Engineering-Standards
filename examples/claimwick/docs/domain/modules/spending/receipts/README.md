@@ -36,7 +36,7 @@
     },
     {
       "type": "event",
-      "id": "event/receipt.receipt-attached",
+      "id": "event/receipt.attached",
       "title": "Receipt attached",
       "owner": "claimwick-team",
       "status": "approved",

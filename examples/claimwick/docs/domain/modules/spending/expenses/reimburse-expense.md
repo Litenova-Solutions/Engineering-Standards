@@ -14,7 +14,7 @@
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/expense.expense-reimbursed"
+    "event/expense.reimbursed"
   ],
   "fulfills": [
     "requirement/approval.single-reimbursement"
@@ -69,7 +69,7 @@ Finance pays an approved expense so the employee gets the money back.
 
 ## What Happens
 
-Finance picks an approved expense. Spending refuses the payment when the expense is not approved or is already reimbursed. Otherwise the expense moves to Reimbursed, `event/expense.expense-reimbursed` is raised, and the payout batch carries it to `external-system/payout-bank`.
+Finance picks an approved expense. Spending refuses the payment when the expense is not approved or is already reimbursed. Otherwise the expense moves to Reimbursed, `event/expense.reimbursed` is raised, and the payout batch carries it to `external-system/payout-bank`.
 
 ## Risk
 

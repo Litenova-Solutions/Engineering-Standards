@@ -14,7 +14,7 @@
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/expense.expense-submitted"
+    "event/expense.submitted"
   ],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"
@@ -74,7 +74,7 @@ An employee files a work expense so it can be decided and reimbursed.
 
 ## What Happens
 
-The employee sends the amount with its currency and the receipt, if one is attached. Spending checks the receipt rule against the policy threshold. An expense above the threshold with no receipt is refused with `spending.receipt-missing`. Otherwise the expense is stored as Submitted and `event/expense.expense-submitted` is raised.
+The employee sends the amount with its currency and the receipt, if one is attached. Spending checks the receipt rule against the policy threshold. An expense above the threshold with no receipt is refused with `spending.receipt-missing`. Otherwise the expense is stored as Submitted and `event/expense.submitted` is raised.
 
 ## Example
 

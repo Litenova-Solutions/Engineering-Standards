@@ -102,9 +102,9 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
 
     | Use case | Kind | Needs | Raises |
     |:---|:---|:---|:---|
-    | `use-case/spending.submit-expense` | `command` | `permission/submit-expense` | `event/expense.expense-submitted` |
+    | `use-case/spending.submit-expense` | `command` | `permission/submit-expense` | `event/expense.submitted` |
     | `use-case/spending.approve-expense` | `command` | `permission/approve-expense` | None |
-    | `use-case/spending.reimburse-expense` | `command` | `permission/reimburse-expense` | `event/expense.expense-reimbursed` |
+    | `use-case/spending.reimburse-expense` | `command` | `permission/reimburse-expense` | `event/expense.reimbursed` |
     | `use-case/spending.list-expenses` | `query` | `permission/list-expenses` | None |
 
     A query changes nothing and declares its `output`. It loads no aggregate for presentation. This satisfies `litespec/core/domain#declare-every-query-output`.
@@ -128,8 +128,8 @@ A domain module gathers one business area's glossary terms, aggregates, rules, u
 
     | Event | Meaning | Carries |
     |:---|:---|:---|
-    | `event/expense.expense-submitted` | An expense was submitted. | `expenseId`, `amount`, `currency`, `employeeId` |
-    | `event/expense.expense-reimbursed` | An expense was reimbursed. | `expenseId`, `amount`, `currency`, `reimbursedAt` |
+    | `event/expense.submitted` | An expense was submitted. | `expenseId`, `amount`, `currency`, `employeeId` |
+    | `event/expense.reimbursed` | An expense was reimbursed. | `expenseId`, `amount`, `currency`, `reimbursedAt` |
 
     Work that crosses a transaction or time boundary is a reaction: a use case of kind `reaction` that names its `trigger`, the events it answers or the schedule or deadline in words. This satisfies `litespec/core/domain#trigger-every-reaction` and `litespec/backend/application#keep-event-reaction-implementations-explicit`.
 14. Keep one transaction per command. One handler stages the aggregates its use case owns and lets the pipeline commit once. It dispatches no further command. This satisfies `litespec/backend/application#keep-one-state-changing-use-case-in-one-pipeline` and `litespec/backend/persistence#commit-each-command-pipeline-once`.

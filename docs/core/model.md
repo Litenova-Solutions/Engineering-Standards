@@ -84,7 +84,7 @@ An identifier names its record type first, then the record name, with the owning
 
 | Type | Form | Example |
 |:---|:---|:---|
-| `product` | `product/<name>` | `product/expenses` |
+| `product` | `product/<name>` | `product/claimwick` |
 | `goal` | `goal/<name>` | `goal/faster-reimbursement` |
 | `problem` | `problem/<name>` | `problem/expenses-wait-weeks` |
 | `feature` | `feature/<name>` | `feature/approval-reminders` |
@@ -99,7 +99,7 @@ An identifier names its record type first, then the record name, with the owning
 | `use-case` | `use-case/<module>.<name>` | `use-case/spending.submit-expense` |
 | `result` | `result/<use-case-name>.<name>` | `result/submit-expense.receipt-missing` |
 | `scenario` | `scenario/<use-case-name>.<name>` | `scenario/submit-expense.submitting-with-a-receipt-succeeds` |
-| `event` | `event/<aggregate-name>.<past-tense>` | `event/expense.expense-submitted` |
+| `event` | `event/<aggregate-name>.<past-tense>` | `event/expense.submitted` |
 | `actor` | `actor/<name>` | `actor/employee` |
 | `role` | `role/<name>` | `role/approver` |
 | `permission` | `permission/<name>` | `permission/approve-expense` |

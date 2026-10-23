@@ -14,7 +14,7 @@
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/expense.expense-rejected"
+    "event/expense.rejected"
   ],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
@@ -60,4 +60,4 @@ A manager turns down a submitted expense that falls outside the policy.
 
 ## What Happens
 
-The manager opens a submitted expense and gives a reason. Spending refuses the decision when the expense is already decided. Otherwise the expense moves to Rejected and `event/expense.expense-rejected` is raised.
+The manager opens a submitted expense and gives a reason. Spending refuses the decision when the expense is already decided. Otherwise the expense moves to Rejected and `event/expense.rejected` is raised.

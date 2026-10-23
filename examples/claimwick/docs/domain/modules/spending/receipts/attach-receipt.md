@@ -14,7 +14,7 @@
     "entry-point/claimwick-app"
   ],
   "raises": [
-    "event/receipt.receipt-attached"
+    "event/receipt.attached"
   ],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"
@@ -60,4 +60,4 @@ An employee adds a receipt to a submitted expense so it can be decided.
 
 ## What Happens
 
-The employee sends the receipt for a submitted expense. Spending refuses the receipt when the expense is already decided. Otherwise the receipt sits on the expense and `event/receipt.receipt-attached` is raised.
+The employee sends the receipt for a submitted expense. Spending refuses the receipt when the expense is already decided. Otherwise the receipt sits on the expense and `event/receipt.attached` is raised.

@@ -39,7 +39,7 @@ Shared provisions keep their published `litespec/<page>#<slug>` form, as stated 
 
 **Rationale:** A reader who meets `use-case/spending.submit-expense` knows it is a use case in the spending module without opening it. If two types shared one form, a citation needs its surrounding page to make sense, and search returns the wrong records.
 
-**Example:** `event/expense.expense-submitted` names an event of the expense aggregate.
+**Example:** `event/expense.submitted` names an event of the expense aggregate.
 
 ### Name Records with One to Six Words
 
