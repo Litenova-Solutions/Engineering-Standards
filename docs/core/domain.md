@@ -114,7 +114,7 @@ The specification names only what carries business meaning. Child entities and v
 
 **Rationale:** The kind decides how the rule is proved: an invariant on every change, a precondition before the behavior, a calculation through its examples, a cross-aggregate rule where aggregates meet. A rule without a kind leaves each reader to prove it a different way, and the checks no place to confirm it.
 
-**Example:** `rule/expense.receipt-over-threshold` is an invariant stating "an expense over 25 EUR carries a receipt".
+**Example:** `rule/expense.receipt-required-above-threshold` is a precondition stating "an expense above the policy threshold needs a receipt", checked before Submit expense runs.
 
 ### Keep the Negation Word in the Rule Name
 

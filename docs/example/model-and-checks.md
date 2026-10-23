@@ -137,7 +137,7 @@ Consumer: D:\Personal-Projects\LiteSpec\examples\expenses
 Files scanned: 38 under docs, frontmatter pages: 38
 Glossary: 0 mannered term(s), 0 rejected synonym(s), documentation only
 
-PASS: project configuration, page frontmatter and language are valid.
+PASS: project configuration, page frontmatter and glossary are valid.
 ```
 
 The run scanned 38 pages under `docs` and passed: no mannered term, no rejected synonym.

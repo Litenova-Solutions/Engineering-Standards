@@ -41,7 +41,7 @@ Three related rules live on other pages:
 
 **Statement:** A test MUST prove a scenario by calling its use case and asserting its result, submitting a money-moving use case rather than only reading it.
 
-**Rationale:** A test proves a scenario when its steps call the use case and assert its result: the model builder computes proof from the test body, so proof follows exercised behavior rather than a claim. A title tag claims proof without exercising anything. A money-moving use case that a test only reads leaves completion unshown, so the test submits it.
+**Rationale:** A test proves a scenario when its steps call the use case and assert its result, so proof follows exercised behavior rather than a claim. The model builder computes that proof for each stack whose scenario reader it ships; a frontend stack without one records its unproven scenarios as known gaps until the reader exists. A title tag claims proof without exercising anything. A money-moving use case that a test only reads leaves completion unshown, so the test submits it.
 
 **Example:** An evidence specification for placing an order submits the order and asserts the confirmation the success result promises.
 

@@ -111,6 +111,7 @@ public sealed class RequirementStatusTests
           "title": "Borrowing performance",
           "owner": "lending-team",
           "status": "approved",
+          "reviewBy": "2027-04-01",
           "records": [
             {
               "type": "requirement",

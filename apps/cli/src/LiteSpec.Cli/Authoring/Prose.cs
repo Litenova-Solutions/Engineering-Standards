@@ -12,8 +12,8 @@ static partial class Prose
     /// </summary>
     public static readonly IReadOnlyList<string> LanguageDiagnosticCodes =
     [
-        "LANGUAGE_MANNERED_TERM",
-        "LANGUAGE_REJECTED_SYNONYM",
+        "GLOSSARY_MANNERED_TERM",
+        "GLOSSARY_REJECTED_SYNONYM",
     ];
 
     // .NET \b reaches Unicode letters, so every word boundary is written out as

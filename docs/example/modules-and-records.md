@@ -53,7 +53,7 @@ An expense is one work cost an employee submitted. A receipt is proof of payment
 
 The expense aggregate connects its states through transitions and classifies its data. The Transitions table below is the page body the builder parses: each row names the state it leaves, the state it enters, and the use case behind the move, which applies `litespec/core/domain#connect-every-state-through-transitions`.
 
-| From | To | By |
+| From | To | Triggered By |
 |:--|:--|:--|
 | Submitted | Approved | `use-case/spending.approve-expense` |
 | Submitted | Rejected | `use-case/spending.reject-expense` |

@@ -153,7 +153,6 @@ Each written link lives as a field on the record it starts from: a decision carr
 | `holds` | actor | Roles at a scope |
 | `allows` | role | Permissions |
 | `steps` | journey | Ordered use cases with actors |
-| `goal` | journey | The goal the journey reaches |
 | `actor` | journey, external system | The actor walking the journey; the actor the system acts as |
 | `dependsOn` | module | Modules |
 | `runbook` | limit | The runbook answering the bound |
@@ -313,19 +312,19 @@ The `use-case-unimplemented` check reports without failing until 2027-06-01, and
 
 **Rationale:** A project requirement can never quietly override a shared standard; without this order it would, one page at a time. The conflict becomes a deviation record instead: dated, reasoned, and reviewable. The order puts the project deviation first, then the extension, then the deeper page, then the shallower page, so the most local approved decision wins.
 
-**Example:** The running Expenses example carries product names with diacritics that plain ASCII cannot spell, so it records a project deviation that outranks the shared standard in `docs/deviations/product-names-with-diacritics.md`.
+**Example:** The running Expenses example runs its weekend export with no reviewer on shift, so it records a project deviation that outranks the shared standard in `docs/deviations/export-review-bypass.md`.
 
 ```json
 {
   "type": "deviation",
-  "id": "deviation/product-names-with-diacritics",
-  "title": "Product names with diacritics",
+  "id": "deviation/export-review-bypass",
+  "title": "Export Review Bypass",
   "owner": "expenses-team",
   "status": "approved",
-  "provision": "litespec/core/authoring#keep-authored-prose-ascii-safe",
-  "reason": "Product names arrive from the catalog with diacritics that transliteration would corrupt.",
+  "provision": "litespec/backend/application#enforce-target-authorization-in-the-pipeline",
+  "reason": "The weekend export runs with no reviewer on shift.",
   "reviewBy": "2027-01-01",
-  "removeWhen": "The catalog ships ASCII display names."
+  "removeWhen": "A reviewer covers weekends."
 }
 ```
 

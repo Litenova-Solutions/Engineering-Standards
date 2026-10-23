@@ -56,7 +56,7 @@ The values are `Domain`, `Application.Abstractions`, `Application`, `Infrastruct
 | LS3002 | All five | A `CancellationToken` that is not the last parameter, or not named `cancellationToken` | [Name asynchronous methods completely](https://litespec.dev/2.0.0/backend/dotnet/naming/#name-asynchronous-methods-completely) |
 | LS3003 | All five | A file whose primary type does not match its name, or that holds more than one top-level type | [Match C# files and primary types](https://litespec.dev/2.0.0/backend/dotnet/naming/#match-c-files-and-primary-types) |
 | LS3004 | All five | A concrete class with no derived type that is not sealed | [Keep implementation style consistent](https://litespec.dev/2.0.0/backend/dotnet/naming/#keep-implementation-style-consistent) |
-| LS4001 | Test | A test method that contains no assertion | [Prove each Case with a test that calls its use case](https://litespec.dev/2.0.0/backend/dotnet/testing/#prove-each-scenario-with-a-test-that-calls-its-use-case) |
+| LS4001 | Test | A test method that contains no assertion | [Prove Each Scenario with a Test That Calls Its Use Case](https://litespec.dev/2.0.0/backend/dotnet/testing/#prove-each-scenario-with-a-test-that-calls-its-use-case) |
 
 ## Change a Rule's Severity
 

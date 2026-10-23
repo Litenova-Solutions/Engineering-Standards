@@ -49,7 +49,7 @@ static class ConsumerFixture
             """),
         new("docs/product/pricing.md",
             """
-            {"type":"requirement-page","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","kind":"business","statement":"Every order carries a flat fee of one euro.","rationale":"One fee keeps every receipt readable.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}]}]}
+            {"type":"requirement-page","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","reviewBy":"2027-04-01","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","kind":"business","statement":"Every order carries a flat fee of one euro.","rationale":"One fee keeps every receipt readable.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}]}]}
             """,
             """
             # Pricing

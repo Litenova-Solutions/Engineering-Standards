@@ -249,7 +249,7 @@ static partial class ConsumerValidator
             }
 
             Console.WriteLine();
-            Console.WriteLine("PASS: project configuration, page frontmatter and language are valid.");
+            Console.WriteLine("PASS: project configuration, page frontmatter and glossary are valid.");
             return 0;
         }
 

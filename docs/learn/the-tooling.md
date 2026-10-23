@@ -24,7 +24,7 @@ The CLI finds its LiteSpec checkout above its own binary. You point it at anothe
 
 ### The Analyzers
 
-`LiteSpec.Analyzers` checks .NET code while you type and while it builds. You add the package once, and each diagnostic names the provision it enforces and links to it. A provision is one rule with a stable ID, so the warning points at exactly the rule the code breaks. The [how-to guide](../analyzers/check-dotnet-code-with-the-analyzers.md) shows the setup, and the [analyzer reference](../analyzers/README.md) documents every rule with its breach and compliant shapes.
+`LiteSpec.Analyzers` checks .NET code while you type and while it builds. You add the package once, and each diagnostic names the provision it enforces and links to it. A provision is one rule with a stable ID, so the error points at exactly the rule the code breaks. The [how-to guide](../analyzers/check-dotnet-code-with-the-analyzers.md) shows the setup, and the [analyzer reference](../analyzers/README.md) documents every rule with its breach and compliant shapes.
 
 ### The Published Site
 

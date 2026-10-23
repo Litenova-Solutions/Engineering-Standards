@@ -56,6 +56,7 @@ static class RecordTypes
         ["feature"] = ["feature"],
         ["basedOn"] = ["constraint", "research"],
         ["affects"] = ["actor"],
+        ["audience"] = ["actor"],
         ["solves"] = ["problem"],
         ["serves"] = ["goal"],
         ["fulfills"] = ["requirement"],

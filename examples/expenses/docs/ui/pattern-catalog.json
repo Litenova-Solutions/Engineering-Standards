@@ -52,10 +52,10 @@
         }
       ],
       "implementations": {
-        "react": {
+        "svelte": {
           "status": "adopted",
           "components": [
-            "packages/ui/src/floorplans/list-page.tsx"
+            "packages/ui/src/floorplans/list-page.svelte"
           ]
         }
       }
@@ -89,15 +89,11 @@
         "behavior": "Below 768 pixels headers lose their sort controls and one toolbar above the table sorts."
       },
       "implementations": {
-        "react": {
+        "svelte": {
           "status": "adopted",
           "components": [
-            "packages/ui/src/components/data-table.tsx"
+            "packages/ui/src/components/data-table.svelte"
           ]
-        },
-        "blazor": {
-          "status": "pending",
-          "gap": "No Blazor frontend implements the table yet."
         }
       }
     }

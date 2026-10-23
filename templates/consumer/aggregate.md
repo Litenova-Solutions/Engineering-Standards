@@ -50,7 +50,7 @@
 
 List every allowed state change with the use case that moves it.
 
-| From | To | Triggered by |
+| From | To | Triggered By |
 |:---|:---|:---|
 | <state> | <state> | use-case/<module>.<name> |
 

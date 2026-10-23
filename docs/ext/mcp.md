@@ -22,9 +22,9 @@ This extension switches on no record type. Authentication, authorization, and pe
 
 ### Record the Server as an Entry Point
 
-**Statement:** A project shipping an MCP server MUST record it as an entry point of kind `mcp-server`.
+**Statement:** A project shipping an MCP server MUST record it as an entry point of kind `api` whose title names the MCP server.
 
-**Rationale:** The entry point record names how callers arrive: `litespec/core/access#name-every-entry-point-with-its-kind` keeps the core kinds, and this extension adds `mcp-server` for a local model client. Without the record, the server's reach stays invisible to reviewers of the access records.
+**Rationale:** The entry point record names how callers arrive: `litespec/core/access#name-every-entry-point-with-its-kind` keeps one closed set of kinds, and an MCP server is an API a local model client calls, so it takes the kind `api` and its title says which protocol it speaks. Without the record, the server's reach stays invisible to reviewers of the access records.
 
 ### Pass Server Instructions at Initialize
 
@@ -101,7 +101,7 @@ Guides: `None.`
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/mcp#record-the-server-as-an-entry-point | guidance | The entry point list in `docs/domain/entry-points.md` names an `mcp-server` entry for the shipped server. |
+| litespec/ext/mcp#record-the-server-as-an-entry-point | guidance | The entry point list in `docs/domain/entry-points.md` names an `api` entry titled for the shipped MCP server. |
 | litespec/ext/mcp#pass-server-instructions-at-initialize | guidance | The initialize response carries a non-empty `instructions` value stating transport, audience, write surface, and refusal behavior. |
 | litespec/ext/mcp#write-one-tool-description-for-one-decision | guidance | The declared tools directory shows imperative titles, declarative behavior, positive parameter polarity, and stated side effects. |
 | litespec/ext/mcp#scope-each-tool-to-named-use-cases | guidance | Each tool description names the use cases and permissions the tool reaches. |

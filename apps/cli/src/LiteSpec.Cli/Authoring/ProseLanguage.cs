@@ -92,7 +92,7 @@ static partial class Prose
         {
             foreach (Match match in entry.Pattern.Matches(prose))
             {
-                add(relative, LineOf(prose, match.Index), "LANGUAGE_MANNERED_TERM",
+                add(relative, LineOf(prose, match.Index), "GLOSSARY_MANNERED_TERM",
                     $"'{match.Value}' is mannered prose; state it literally, such as '{entry.Instead}'");
             }
         }
@@ -106,7 +106,7 @@ static partial class Prose
             {
                 if (exempt is not null && InsideExempt(exempt, match.Index, match.Index + match.Length)) continue;
                 var because = entry.Reason is null ? "" : $"; {entry.Reason}";
-                add(relative, LineOf(prose, match.Index), "LANGUAGE_REJECTED_SYNONYM",
+                add(relative, LineOf(prose, match.Index), "GLOSSARY_REJECTED_SYNONYM",
                     $"'{match.Value}' is a rejected synonym here; the term is '{entry.Term}'{because}");
             }
         }
@@ -140,7 +140,7 @@ static partial class Prose
                     foreach (Match match in entry.Pattern.Matches(text))
                     {
                         if (!seen.Add("m:" + match.Value.ToLowerInvariant())) continue;
-                        add(relative, index + 1, "LANGUAGE_MANNERED_TERM",
+                        add(relative, index + 1, "GLOSSARY_MANNERED_TERM",
                             $"'{match.Value}' is mannered prose; state it literally, such as '{entry.Instead}'");
                     }
                 }
@@ -155,7 +155,7 @@ static partial class Prose
                         if (exempt is not null && InsideExempt(exempt, match.Index, match.Index + match.Length)) continue;
                         if (!seen.Add("r:" + entry.Term + ":" + match.Value.ToLowerInvariant())) continue;
                         var because = entry.Reason is null ? "" : $"; {entry.Reason}";
-                        add(relative, index + 1, "LANGUAGE_REJECTED_SYNONYM",
+                        add(relative, index + 1, "GLOSSARY_REJECTED_SYNONYM",
                             $"'{match.Value}' is a rejected synonym here; the term is '{entry.Term}'{because}");
                     }
                 }

@@ -4,6 +4,7 @@
   "title": "Borrowing",
   "owner": "lending-team",
   "status": "approved",
+  "reviewBy": "2027-04-01",
   "records": [
     {
       "type": "requirement",

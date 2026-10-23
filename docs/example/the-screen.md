@@ -25,9 +25,11 @@ A route file holds its input, its load, and its component, with no reusable logi
 The screen never duplicates the API contract. The workspace generates its client, types, schemas, and query options from the published OpenAPI document, per `litespec/frontend/web/data#generate-the-client-from-the-published-contract` on [Web Data and State](../frontend/web/data.md), which follows `litespec/frontend/data#generate-the-client-from-the-published-contract` on [Frontend Data and State](../frontend/data.md). The generated client lives in `packages/api`, and the list reads through its `listExpenses` operation in `packages/api/src/generated/sdk.gen.ts`:
 
 ```ts
-export const listExpenses = (options) => (options.client ?? client).get({
-    url: '/api/spending/list-expenses',
-});
+export const listExpenses = <ThrowOnError extends boolean = false>(options: Options<never, ThrowOnError> = {}) =>
+  (options.client ?? client).get<ListExpensesResponse, unknown, ThrowOnError>({
+    url: "/api/expenses",
+    ...options,
+  });
 ```
 
 The route's load prefetches the read through the query cache before the component runs, per `litespec/frontend/web/rendering#load-route-data-in-the-loader` on [Web Rendering and Routes](../frontend/web/rendering.md), and the component reads the same cache key with a suspense query, per `litespec/frontend/web/rendering#read-route-data-with-a-suspense-query`. Written the way the stack pages require, the load looks like this:
@@ -41,7 +43,7 @@ export async function load({ parent, url }) {
 }
 ```
 
-The search schema keeps the filters and the page in the address, per `litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema`, so a filtered list stays a link the team can share. The example keeps only the file layout the model builder reads: its expenses page imports `submitExpense` from `@expenses/api` as a placeholder for the client call. The code above shows what the stack pages require a real page to do.
+The search schema keeps the filters and the page in the address, per `litespec/frontend/web/rendering#keep-search-parameters-validated-by-a-schema`, so a filtered list stays a link the team can share. The example page itself is smaller: it calls `listExpenses` from `@expenses/api` directly and renders the rows in the `ListPage` floorplan and the `DataTable` composite from `@expenses/ui/floorplans`, so the model builder joins the screen to the list use case through the generated client. The load above shows what the stack pages require once the query cache is wired.
 
 ## The Shared UI Package
 

@@ -239,7 +239,7 @@ static partial class ModelBuilder
     }
 
     /// <summary>
-    ///     The name of the business record whose page folder mirrors the code folder holding
+    ///     The name of the aggregate whose page folder mirrors the code folder holding
     ///     the event: <c>Domain/&lt;Module&gt;/&lt;Plural&gt;/Events/</c> beside <c>modules/&lt;module&gt;/&lt;plural&gt;/</c>.
     /// </summary>
     private static string? OwnerOfEventFile(ProjectModel model, string file)

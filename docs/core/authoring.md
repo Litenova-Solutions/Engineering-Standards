@@ -546,9 +546,9 @@ Every command declares an audit position. To count the declarations:
 | litespec/core/authoring#restrict-normative-language-to-standards-and-conventions | checkable | `litespec validate` emits no `PROSE_NORMATIVE_LOCATION`, `STANDARD_INFORMATIVE_NORMATIVE`, or `CONVENTION_NORMATIVE` diagnostic. |
 | litespec/core/authoring#use-one-term-for-one-concept | guidance | Which concepts appear under more than one name? Look at the terms the change adds, beside the glossary. |
 | litespec/core/authoring#record-the-project-vocabulary-as-data | checkable | `litespec consumer` validates the project glossary against the glossary schema. |
-| litespec/core/authoring#reject-a-recorded-synonym-inside-its-scope | checkable | `litespec consumer` emits no `LANGUAGE_REJECTED_SYNONYM` diagnostic. |
+| litespec/core/authoring#reject-a-recorded-synonym-inside-its-scope | checkable | `litespec consumer` emits no `GLOSSARY_REJECTED_SYNONYM` diagnostic. |
 | litespec/core/authoring#check-the-vocabulary-on-every-surface-a-reader-meets | checkable | `litespec consumer` scans every `glossaryScan` pattern and fails a pattern that matches no file. |
-| litespec/core/authoring#exclude-the-compound-that-names-another-concept | checkable | `litespec consumer` reports no `LANGUAGE_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
+| litespec/core/authoring#exclude-the-compound-that-names-another-concept | checkable | `litespec consumer` reports no `GLOSSARY_REJECTED_SYNONYM` diagnostic inside an exempt compound. |
 | litespec/core/authoring#exclude-generated-regions-from-prose-checks | guidance | Which findings point inside generated-region fences? Look at the diagnostics the checks report. |
 | litespec/core/authoring#use-controlled-capitalization | checkable | `litespec validate` emits no `PAGE_TITLE_CASE` diagnostic. |
 | litespec/core/authoring#use-the-declared-page-contract | checkable | `litespec validate` emits no `PAGE_MISSING_SECTION`, `PAGE_SECTION_ORDER` or `PAGE_UNKNOWN_SECTION` diagnostic. |

@@ -1234,7 +1234,7 @@
     "requirementPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": ["type", "reviewBy"],
       "properties": {
         "type": { "const": "requirement-page" },
         "id": { "$ref": "#/$defs/nonEmptyString" },

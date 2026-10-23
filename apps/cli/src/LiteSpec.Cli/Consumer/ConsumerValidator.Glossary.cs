@@ -182,7 +182,7 @@ static partial class ConsumerValidator
             run.Err(finding);
         }
 
-        var manneredCount = languageFindings.Count(finding => finding.Contains("LANGUAGE_MANNERED_TERM", StringComparison.Ordinal));
+        var manneredCount = languageFindings.Count(finding => finding.Contains("GLOSSARY_MANNERED_TERM", StringComparison.Ordinal));
         var rejectedCount = languageFindings.Count - manneredCount;
         var surfaceNote = scannedSurfaces > 0
             ? $", {scannedSurfaces} non-Markdown surface(s) scanned"

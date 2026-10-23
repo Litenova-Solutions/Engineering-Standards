@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace LiteSpec.Model.Readers.Dotnet;
 
 /// <summary>
-///     Reads acceptance scenarios: the case each claims, the steps it runs,
+///     Reads acceptance scenarios: the scenario each claims, the steps it runs,
 ///     the failure codes it asserts, and whether it asserts anything at all.
 /// </summary>
 sealed class DotnetScenarioReader : IScenarioReader

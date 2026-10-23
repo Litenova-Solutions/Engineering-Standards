@@ -44,7 +44,7 @@ public sealed partial class ConsumerValidatorTests
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateBody(folder.Path, ModuleReadme, raw => $"{raw}\nThe orderclaim form is wrong.\n");
-        AssertProblem(RunConsumer(folder.Path), "LANGUAGE_REJECTED_SYNONYM");
+        AssertProblem(RunConsumer(folder.Path), "GLOSSARY_REJECTED_SYNONYM");
     }
 
     [Fact(DisplayName = "mannered term in page prose")]
@@ -52,7 +52,7 @@ public sealed partial class ConsumerValidatorTests
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateBody(folder.Path, ModuleReadme, raw => $"{raw}\nThis rule is load-bearing for orders.\n");
-        AssertProblem(RunConsumer(folder.Path), "LANGUAGE_MANNERED_TERM");
+        AssertProblem(RunConsumer(folder.Path), "GLOSSARY_MANNERED_TERM");
     }
 
     [Fact(DisplayName = "generated region skips language and prose")]
@@ -84,6 +84,6 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             project => PathsOf(project)["glossaryScan"] = new JsonArray("src/**/*.cs"));
         ConsumerFixture.WriteFile(folder.Path, "src/order-claims.cs", "// the orderclaim handling lives here\n");
-        AssertProblem(RunConsumer(folder.Path), "LANGUAGE_REJECTED_SYNONYM");
+        AssertProblem(RunConsumer(folder.Path), "GLOSSARY_REJECTED_SYNONYM");
     }
 }

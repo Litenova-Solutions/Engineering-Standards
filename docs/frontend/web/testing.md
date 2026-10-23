@@ -79,6 +79,24 @@ test("every module folder names a backend use case, and no folder is named for n
 pnpm --filter @shop/webshop exec playwright test --project=routes --grep "cart keeps the route contract"
 ```
 
+### Refuse a Test Without an Assertion
+
+**Statement:** Lint MUST fail a Vitest or Playwright test that contains no `expect` assertion, through the `expect-expect` rule.
+
+**Rationale:** A test that calls code and asserts nothing passes unless something throws, so it raises coverage while proving nothing. The `expect-expect` rule of the Vitest ESLint plugin reports each such test before it runs, at no measurable cost. The rule is free and maintained under MIT.
+
+### Gate Changed Lines with Mutation Testing
+
+**Statement:** Each pull request MUST show zero surviving mutants on its changed TypeScript lines from a StrykerJS run in incremental mode.
+
+**Rationale:** Mutation testing judges test strength where the change is: a project-wide score is confounded by suite size, so a large suite hides weak new tests behind a high percentage. StrykerJS reuses earlier results for unchanged code in `--incremental` mode, which keeps the gate to minutes per pull request, and runs Vitest suites through its Vitest runner. A full nightly run stays a trend rather than a gate. StrykerJS is free and maintained under Apache-2.0.
+
+### Seed Property Tests from Example Tables
+
+**Statement:** Property tests for each TypeScript calculation MUST run on fast-check with cases seeded from the calculation rule's scenario examples table.
+
+**Rationale:** A calculation rule carries an examples table on its scenarios, and those rows seed the property cases: the properties hold for the agreed examples before they are checked against generated inputs. fast-check runs inside Vitest and shrinks a failure to its smallest input. It is free and maintained under MIT.
+
 ## Conventions
 
 ### Query by Accessible Behavior
@@ -98,5 +116,8 @@ pnpm --filter @shop/webshop exec playwright test --project=routes --grep "cart k
 | litespec/frontend/web/testing#keep-mocks-at-owned-boundaries | guidance | No test replaces a library its stack page names. |
 | litespec/frontend/web/testing#use-network-mocks-for-component-tests | guidance | Each component or logic test needing HTTP serves answers through `msw` handlers generated from the published contract. |
 | litespec/frontend/web/testing#prove-the-module-mirror-in-a-structure-test | guidance | The Vitest structure test resolves each module folder to a backend use case and names no refused folder. |
+| litespec/frontend/web/testing#refuse-a-test-without-an-assertion | checkable | `pnpm eslint` reports `vitest/expect-expect` for each test that contains no assertion. |
+| litespec/frontend/web/testing#gate-changed-lines-with-mutation-testing | checkable | `pnpm stryker run --incremental` reports zero survived mutants on the changed lines in the pull request's mutation job. |
+| litespec/frontend/web/testing#seed-property-tests-from-example-tables | guidance | Each TypeScript calculation's property test imports fast-check and lists the examples-table rows as its seed cases. |
 | litespec/frontend/web/testing#run-browser-checks-through-the-playwright-cli | guidance | Each browser suite runs through the Playwright CLI, addressable per route and per file. |
 | litespec/frontend/web/testing#query-by-accessible-behavior | guidance | Each browser query scopes to one floorplan through `data-floorplan` and addresses slot content by accessible role and name. |

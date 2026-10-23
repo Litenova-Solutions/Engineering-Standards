@@ -1,32 +1,15 @@
-// Example client in the shape of the generated API client.
-export const submitExpense = (options) => (options.client ?? client).post({
-    url: '/api/spending/submit-expense',
-});
+// This file is generated from the published OpenAPI document. Do not edit it by hand.
+import { client, type Options } from "./client.gen";
+import type { ListExpensesResponse, SubmitExpenseData, SubmitExpenseResponse } from "./types.gen";
 
-export const approveExpense = (options) => (options.client ?? client).post({
-    url: '/api/spending/approve-expense',
-});
+export const submitExpense = <ThrowOnError extends boolean = false>(options: Options<SubmitExpenseData, ThrowOnError>) =>
+  (options.client ?? client).post<SubmitExpenseResponse, unknown, ThrowOnError>({
+    url: "/api/expenses",
+    ...options,
+  });
 
-export const rejectExpense = (options) => (options.client ?? client).post({
-    url: '/api/spending/reject-expense',
-});
-
-export const reimburseExpense = (options) => (options.client ?? client).post({
-    url: '/api/spending/reimburse-expense',
-});
-
-export const listExpenses = (options) => (options.client ?? client).get({
-    url: '/api/spending/list-expenses',
-});
-
-export const attachReceipt = (options) => (options.client ?? client).post({
-    url: '/api/spending/attach-receipt',
-});
-
-export const setReceiptThreshold = (options) => (options.client ?? client).post({
-    url: '/api/spending/set-receipt-threshold',
-});
-
-export const exportExpenses = (options) => (options.client ?? client).post({
-    url: '/api/spending/export-expenses',
-});
+export const listExpenses = <ThrowOnError extends boolean = false>(options: Options<never, ThrowOnError> = {}) =>
+  (options.client ?? client).get<ListExpensesResponse, unknown, ThrowOnError>({
+    url: "/api/expenses",
+    ...options,
+  });
