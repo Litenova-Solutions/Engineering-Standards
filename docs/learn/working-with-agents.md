@@ -12,19 +12,19 @@ An agent gets three things:
 
 - **Rules it can cite.** Every rule has an ID, so the agent says exactly which rule a change follows, or why it stopped.
 - **Records it can trust.** Approved records say what to build, and draft records say what is still open.
-- **Checks it can run.** `litespec consumer`, `litespec model check`, and the CI gates tell the agent whether its change holds before you review it.
+- **Checks it can run.** `dotnet litespec consumer`, `dotnet litespec model check`, and the CI gates tell the agent whether its change holds before you review it.
 
 ## Rule Sources
 
-An agent finds the rules in two places, and a project can use both.
+An agent finds the rules in two places: the installed tool and the published site.
 
-### The Pinned Release
+### The Installed Tool
 
-When the project pins LiteSpec as a submodule at `litespec/`, the rules sit in the repository next to the code. The project's `AGENTS.md` tells the agent to read them, and the agent reads only the pages a task touches.
+The project installs the `litespec` command line as a local .NET tool at the adopted release. The tool carries its whole release, manifest, schemas, docs, and templates, so every check reads the same contract the team reviewed. The project's `AGENTS.md` carries the `## LiteSpec` block that names the release and its selection index, and the agent reads only the pages a task touches.
 
 ### The Published Site
 
-An agent that can fetch URLs reads the standard from litespec.dev without a local copy. The [selection page](https://litespec.dev/2.0.0/select/) gives you a block to paste into `AGENTS.md`:
+An agent that can fetch URLs reads the standard from litespec.dev. The [selection page](https://litespec.dev/2.0.0/select/) produces the block that `litespec init` writes into a new project's `AGENTS.md`:
 
 ```markdown
 ## LiteSpec
@@ -41,7 +41,7 @@ That index lists every page the selection applies, with a one-line description a
 The [agent page](../core/agent.md) states the order, and the project's `AGENTS.md` repeats it:
 
 1. Read the project's `AGENTS.md` and `litespec.project.json`.
-2. Query the model for the records the task touches, with `litespec model query <id>`.
+2. Query the model for the records the task touches, with `dotnet litespec model query <id>`.
 3. Read those records, then the full standards pages they cite.
 4. Look at neighboring code and follow a pattern that complies.
 5. Change the records, code, tests, and contracts that belong together, in one change.
@@ -56,7 +56,7 @@ The diagram below shows that order, and where the agent stops for a person inste
 For example, an agent asked to change how expense approval works starts with one query:
 
 ```bash
-litespec model query use-case/spending.approve-expense
+dotnet litespec model query use-case/spending.approve-expense
 ```
 
 The answer prints the record with its links in both directions. The agent reads the requirement, the rule, and the results the use case touches, then the standards pages they cite, before it opens the handler. The LiteSpec block in the project's `AGENTS.md`, shown above, tells the agent where the selection index lives.
@@ -67,7 +67,7 @@ When two rules conflict and nothing decides between them, the agent stops and as
 
 An agent makes the decisions the standard has already made: where a type goes, how a lifecycle is modeled, how a refusal is reported, and which tests to write. It does not decide product policy, legal questions, money, or risk. When a record leaves one of those open, the agent names the question and its decider instead of answering it.
 
-UI design works the same way. For each recurring interface question, LiteSpec offers drawn options and a default. An agent shows the options with `litespec patterns preview`, recommends one, and builds the one you choose with your own components and style. If it sees a better option while working, it finishes on your choice and proposes the idea in its report, instead of changing your decision.
+UI design works the same way. For each recurring interface question, LiteSpec offers drawn options and a default. An agent shows the options with `dotnet litespec patterns preview`, recommends one, and builds the one you choose with your own components and style. If it sees a better option while working, it finishes on your choice and proposes the idea in its report, instead of changing your decision.
 
 ## Next Steps
 

@@ -12,7 +12,7 @@ static class InitCommand
     /// <summary>The preset names <c>litespec init</c> accepts, in list order.</summary>
     static readonly string[] Presets = ["blazor-client", "dotnet-react", "dotnet-svelte"];
 
-    /// <summary>The setup templates copied beside the project file: the checkout file and its consumer path.</summary>
+    /// <summary>The setup templates copied beside the project file: the release file and its consumer path.</summary>
     static readonly (string Template, string Target)[] Scaffold =
     [
         ("project-agents.md", "AGENTS.md"),
@@ -25,8 +25,11 @@ static class InitCommand
         Usage: litespec init --preset <name> --size <small|large> [--root <path>] [--name <project>] [--help]
 
         Writes litespec.project.json into root from the named preset, stamped with the
-        LiteSpec release this tool belongs to, and copies the starting agent context,
-        glossary, and example cast beside it. The preset selects the shape, the stacks
+        LiteSpec release this tool carries, and copies the starting agent context,
+        glossary, and example cast beside it. A fresh AGENTS.md carries the LiteSpec
+        block filled with the release, size, shape, stacks, and selection index of the
+        new project. The command also writes .config/dotnet-tools.json pinning the
+        LiteSpec.Cli tool at the release. The preset selects the shape, the stacks
         and the frontends; --size and --name complete the project record. The command
         never overwrites an existing file: it writes each missing file and leaves
         existing ones alone.
@@ -37,7 +40,7 @@ static class InitCommand
           --name     The project name. Defaults to the root folder's name.
           --help     Print this text and exit.
 
-        Exit codes: 0 written, 1 the checkout's template, preset, or scaffold file is unreadable, 2 the project file exists or an option is invalid.
+        Exit codes: 0 written, 1 the release's template, preset, or scaffold file is unreadable, 2 the project file exists or an option is invalid.
         """;
 
     /// <summary>Runs the command and returns its exit code.</summary>
@@ -118,7 +121,7 @@ static class InitCommand
 
         if (version is null)
         {
-            Console.Error.WriteLine("The LiteSpec checkout holds no readable version.");
+            Console.Error.WriteLine("The LiteSpec release holds no readable version.");
             return 1;
         }
 
@@ -130,7 +133,7 @@ static class InitCommand
         {
             if (CliJson.TryRead(Path.Combine(home, "templates", "consumer", "litespec.project.json")) is not JsonObject template)
             {
-                Console.Error.WriteLine("The LiteSpec checkout holds no readable templates/consumer/litespec.project.json.");
+                Console.Error.WriteLine("The LiteSpec release holds no readable templates/consumer/litespec.project.json.");
                 return 1;
             }
 
@@ -138,12 +141,12 @@ static class InitCommand
                 || presetJson["shape"] is null
                 || presetJson["stacks"] is null)
             {
-                Console.Error.WriteLine($"The LiteSpec checkout holds no readable templates/presets/{preset}.json.");
+                Console.Error.WriteLine($"The LiteSpec release holds no readable templates/presets/{preset}.json.");
                 return 1;
             }
 
             // The scaffold sources are read before anything is written, so a broken
-            // checkout fails before the project file exists without its companions.
+            // release fails before the project file exists without its companions.
             scaffold = [];
 
             foreach (var (file, _) in Scaffold)
@@ -152,7 +155,7 @@ static class InitCommand
 
                 if (!File.Exists(source))
                 {
-                    Console.Error.WriteLine($"The LiteSpec checkout holds no readable templates/consumer/{file}.");
+                    Console.Error.WriteLine($"The LiteSpec release holds no readable templates/consumer/{file}.");
                     return 1;
                 }
 
@@ -164,7 +167,7 @@ static class InitCommand
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            Console.Error.WriteLine($"Failed to read the LiteSpec checkout: {exception.Message}");
+            Console.Error.WriteLine($"Failed to read the LiteSpec release: {exception.Message}");
             return 1;
         }
 
@@ -230,6 +233,11 @@ static class InitCommand
         Console.WriteLine($"Wrote {target}.");
 
         var copied = 0;
+        var shapeText = (string?)project["shape"] ?? "server";
+        var stackNames = (project["stacks"] as JsonArray)?
+            .Select(entry => (string?)entry)
+            .OfType<string>()
+            .ToList() ?? [];
 
         foreach (var (file, relative) in Scaffold)
         {
@@ -241,10 +249,14 @@ static class InitCommand
                 continue;
             }
 
+            var contents = file == "project-agents.md"
+                ? FillAgents(scaffold[file], version, size, shapeText, stackNames)
+                : scaffold[file];
+
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-                File.WriteAllText(destination, scaffold[file]);
+                File.WriteAllText(destination, contents);
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
@@ -254,6 +266,28 @@ static class InitCommand
 
             Console.WriteLine($"Wrote {destination}.");
             copied += 1;
+        }
+
+        var toolManifest = Path.Combine(root, ".config", "dotnet-tools.json");
+
+        if (File.Exists(toolManifest))
+        {
+            Console.WriteLine($"'{toolManifest}' already exists; left alone.");
+        }
+        else
+        {
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(toolManifest)!);
+                File.WriteAllText(toolManifest, ToolManifest(version));
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                Console.Error.WriteLine($"Failed to write '{toolManifest}': {exception.Message}");
+                return 1;
+            }
+
+            Console.WriteLine($"Wrote {toolManifest}.");
         }
 
         if (unfilled.Count > 0)
@@ -266,9 +300,40 @@ static class InitCommand
             Console.WriteLine("Fill every <placeholder> in the copied files before validating.");
         }
 
-        Console.WriteLine("Next step: litespec consumer");
+        Console.WriteLine("Next step: dotnet litespec consumer");
         return 0;
     }
+
+    /// <summary>Fills the LiteSpec block of a fresh agent context with the new project's selection.</summary>
+    static string FillAgents(string text, string version, string size, string shape, IReadOnlyList<string> stacks) =>
+        text.Replace("__LITESPEC_VERSION__", version, StringComparison.Ordinal)
+            .Replace("__SIZE__", size, StringComparison.Ordinal)
+            .Replace("__SHAPE__", shape, StringComparison.Ordinal)
+            .Replace("__STACKS__", JoinList(stacks), StringComparison.Ordinal)
+            .Replace("__SELECTION_KEY__", $"{shape}.{string.Join(".", stacks)}", StringComparison.Ordinal);
+
+    /// <summary>The stacks as prose, the way the selection page joins them: none, one, or joined with commas and and.</summary>
+    static string JoinList(IReadOnlyList<string> items) => items.Count switch
+    {
+        0 => "none",
+        1 => items[0],
+        2 => $"{items[0]} and {items[1]}",
+        _ => $"{string.Join(", ", items.Take(items.Count - 1))} and {items[^1]}",
+    };
+
+    /// <summary>The local tool manifest pinning the LiteSpec.Cli tool at the release.</summary>
+    static string ToolManifest(string version) => $$"""
+        {
+          "version": 1,
+          "isRoot": true,
+          "tools": {
+            "LiteSpec.Cli": {
+              "version": "{{version}}",
+              "commands": ["litespec"]
+            }
+          }
+        }
+        """ + "\n";
 
     /// <summary>Replaces a placeholder inside every string value of the document.</summary>
     /// <summary>The project name as an npm package scope: lowercase, with runs of other characters as one hyphen.</summary>

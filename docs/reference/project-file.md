@@ -14,7 +14,7 @@ The [supported scope](../core/scope.md) page states which sizes, shapes, stacks,
 |:---|:---|
 | Path | `litespec.project.json` at the consumer root |
 | Schema | `schemas/litespec-project.schema.json` in the pinned release |
-| Template | `templates/consumer/litespec.project.json` in the LiteSpec checkout |
+| Template | `templates/consumer/litespec.project.json` in the release the tool carries |
 | Presets | `templates/presets/blazor-client.json`, `templates/presets/dotnet-react.json`, `templates/presets/dotnet-svelte.json` |
 
 `litespec init` merges the template with one preset and stamps the size, name, and reviewed release. `litespec consumer` validates the written file against the schema and then runs the selection checks below. The model builder reads the paths, stack config, size, shape, stacks, and owners from the same file.
@@ -31,7 +31,7 @@ The [supported scope](../core/scope.md) page states which sizes, shapes, stacks,
 | `optionalTypes` | array of string | no | none |
 | `proof` | object | no | none |
 | `constraints` | object | no | none |
-| `owners` | array of string | no | none |
+| `owners` | array of string or object | no | none |
 | `reviewedLiteSpecVersion` | string | yes | none |
 | `paths` | object | yes | none |
 | `exampleWordLimit` | integer | no | `120` |
@@ -49,8 +49,8 @@ What each field means and what reads it:
 - `optionalTypes` lists the extra record types written beside what the size requires: `goal`, `constraint`, `research`, `external-system`, `limit`, and `runbook`. The model builder reads the list when it collects records.
 - `proof` tunes how the model builder confirms proof claims for the project. See the `proof` object below.
 - `constraints` records whether any outside constraint applies to the project. See the `constraints` object below.
-- `owners` is the closed list of names a record owner comes from, such as `["shop-team"]`. The model builder reads the list and reports whether one is declared.
-- `reviewedLiteSpecVersion` records the LiteSpec release whose complete contract the project last reviewed, such as `"2.0.0"`. `litespec consumer` compares it with the version in the pinned `litespec.manifest.json` and fails the run when the two differ.
+- `owners` is the closed list of names a record owner comes from. Each entry is a plain name, such as `"shop-team"`, or an object mapping a readable name to its CODEOWNERS handles, such as `{"name": "Shop engineering", "codeowners": ["@shop/team"]}`. The model builder reads the list and reports whether one is declared. See the `owners` entry below.
+- `reviewedLiteSpecVersion` records the LiteSpec release whose complete contract the project last reviewed, such as `"2.0.0"`. `litespec consumer` compares it with the release of the installed `litespec` tool and fails the run when the two differ.
 - `paths` declares every location the tools read. See the `paths` object below.
 - `exampleWordLimit` bounds the words in an Example section. When omitted, the recorded default of `120` applies, and the validator refuses a value below `40`.
 - `prohibitedKinds` lists the record types or page styles the consumer does not use. A page that declares one is refused.
@@ -91,6 +91,21 @@ What each field means and what reads it:
 | `answered` | boolean constant `true` | yes | none |
 
 This object is included once the project states which outside constraints apply to it, possibly none. `litespec/core/scope#answer-the-constraints-question` requires the statement, and an empty answer records that no outside rule binds the project.
+
+### An `owners` Entry
+
+A plain entry is one name, such as `"shop-team"`. An object entry maps a readable name to its CODEOWNERS handles:
+
+| Field | Type | Required | Default |
+|:---|:---|:---|:---|
+| `name` | string | yes | none |
+| `codeowners` | array of string | yes | none |
+
+What each field means and what reads it:
+
+- `name` is the owner name records carry, such as `"Shop engineering"`. Names are unique across plain and object entries.
+- `codeowners` lists the CODEOWNERS handles the name maps to, such as `["@shop/team"]`. Each entry is one handle from the CODEOWNERS file.
+- A record's owner covers a path when the owner itself, or any handle its `owners` entry lists, is an owner of the last CODEOWNERS rule matching that path. `litespec model check` reports `owner-unknown` otherwise.
 
 ### The `paths` Object
 
@@ -216,7 +231,7 @@ The template names the project as `__PROJECT__` in paths and package names, and 
 Fill these placeholders before validating: __OWNER__.
 ```
 
-It also prints `Next step: litespec consumer`. `litespec consumer` treats a leftover placeholder as an error and names each one:
+It also prints `Next step: dotnet litespec consumer`. `litespec consumer` treats a leftover placeholder as an error and names each one:
 
 ```text
 litespec.project.json: template placeholder '__OWNER__' is not filled [litespec/core/scope#select-a-size-a-shape-and-stacks]
@@ -230,7 +245,7 @@ This example shows the file `litespec init --preset dotnet-react --size small --
 
 ```json
 {
-  "$schema": "./litespec/schemas/litespec-project.schema.json",
+  "$schema": "https://litespec.dev/2.0.0/schemas/litespec-project.schema.json",
   "project": {
     "name": "shop"
   },
@@ -297,8 +312,8 @@ The other two presets differ only in shape, stacks, frontends, and the shared pa
 | Mistake | Message |
 |:---|:---|
 | A placeholder is left in the file | `litespec.project.json: template placeholder '__OWNER__' is not filled [litespec/core/scope#select-a-size-a-shape-and-stacks]` |
-| The pinned release and the reviewed release differ | `litespec.project.json: reviewedLiteSpecVersion '1.9.0' does not match the pinned LiteSpec release 2.0.0; re-review the contract and record the new version` |
-| The reviewed release is missing | `litespec.project.json: missing 'reviewedLiteSpecVersion'; the pinned LiteSpec release is 2.0.0` |
+| The installed release and the reviewed release differ | `litespec.project.json: reviewedLiteSpecVersion '1.9.0' does not match the installed LiteSpec tool release 2.0.0; install the reviewed release with 'dotnet tool update LiteSpec.Cli --version 1.9.0' and run 'dotnet tool restore', or re-review the contract and record 2.0.0` |
+| The reviewed release is missing | `litespec.project.json: missing 'reviewedLiteSpecVersion'; the installed LiteSpec tool release is 2.0.0` |
 | A stack id is unknown | `litespec.project.json: stack 'rails' is not a stack the pinned LiteSpec release ships [litespec/core/scope#select-a-size-a-shape-and-stacks]` |
 | A client-only project names a backend stack | `litespec.project.json: shape 'client-only' names backend stack 'dotnet'; a client-only project names no backend stack [litespec/core/scope#select-a-size-a-shape-and-stacks]` |
 | A server names zero or two backend stacks | `litespec.project.json: stacks name 0 backend stacks; name exactly one of dotnet [litespec/core/scope#select-a-size-a-shape-and-stacks]` |

@@ -42,14 +42,15 @@ The stacks a consumer selects apply first. An extension or project deviation nam
 
 ## Use LiteSpec
 
-Pin a published release as a repository submodule:
+Install the adopted release as a local .NET tool:
 
 ```bash
-git submodule add https://github.com/Litenova-Solutions/LiteSpec.git litespec
-git -C litespec checkout --detach <approved-tag-or-commit>
+dotnet new tool-manifest
+dotnet tool install LiteSpec.Cli --version 2.0.0
+dotnet tool restore
 ```
 
-Add `litespec.project.json`, a short root `AGENTS.md`, and the project records required by current work.
+Run the first command only when the repository has no `.config/dotnet-tools.json` yet. Then start the consumer with `dotnet litespec init --preset dotnet-react --size small`, which writes `litespec.project.json`, a short root `AGENTS.md`, and the project records required by current work.
 
 Follow [Start a consumer repository](docs/tutorial/getting-started.md) when creating a consumer repository.
 
@@ -57,7 +58,7 @@ The [template index](templates/consumer/README.md) lists each consumer template 
 
 ## Repository Structure
 
-The standard sits at the root, because the root is what a consumer pins at `litespec/`. Each deliverable beside it has its own folder.
+The standard sits at the root, because the root is what each release publishes: the tool package carries it, and the site renders it. Each deliverable beside it has its own folder.
 
 ```text
 docs/                       The standard

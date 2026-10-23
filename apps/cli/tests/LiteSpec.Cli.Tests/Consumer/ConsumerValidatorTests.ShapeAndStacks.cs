@@ -1,21 +1,19 @@
 using System.Text.Json.Nodes;
+using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Consumer;
 
 public sealed partial class ConsumerValidatorTests
 {
-    static void RequireSvelteNeedsReact(string root)
-    {
-        ConsumerFixture.MutateJson(root, "litespec/litespec.manifest.json", manifest =>
+    static TempFolder HomeRequiringReactForSvelte() =>
+        ConsumerFixture.CreateHome(manifest =>
         {
             var svelte = (JsonObject)((JsonObject)manifest["stacks"]!)["svelte"]!;
             svelte["requires"] = new JsonArray("react");
         });
-    }
 
-    static void PairSvelteWith(string root, params string[] backends)
-    {
-        ConsumerFixture.MutateJson(root, "litespec/litespec.manifest.json", manifest =>
+    static TempFolder HomePairingSvelteWith(params string[] backends) =>
+        ConsumerFixture.CreateHome(manifest =>
         {
             var svelte = (JsonObject)((JsonObject)manifest["stacks"]!)["svelte"]!;
             var pairs = new JsonArray();
@@ -26,7 +24,6 @@ public sealed partial class ConsumerValidatorTests
 
             svelte["pairsWith"] = pairs;
         });
-    }
 
     [Fact(DisplayName = "server project with a backend and a frontend")]
     public void ServerProjectWithABackendAndAFrontend()
@@ -90,36 +87,36 @@ public sealed partial class ConsumerValidatorTests
     public void StackWhoseRequiresTheProjectDoesNotName()
     {
         using var folder = ConsumerFixture.Create();
-        RequireSvelteNeedsReact(folder.Path);
+        using var home = HomeRequiringReactForSvelte();
         ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("dotnet", "svelte"));
-        AssertProblem(RunConsumer(folder.Path), "stack 'svelte' requires 'react'");
+        AssertProblem(RunConsumer(folder.Path, home), "stack 'svelte' requires 'react'");
     }
 
     [Fact(DisplayName = "stack whose requires the project names")]
     public void StackWhoseRequiresTheProjectNames()
     {
         using var folder = ConsumerFixture.Create();
-        RequireSvelteNeedsReact(folder.Path);
+        using var home = HomeRequiringReactForSvelte();
         ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("dotnet", "svelte", "react"));
-        AssertAbsent(RunConsumer(folder.Path), "requires 'react'");
+        AssertAbsent(RunConsumer(folder.Path, home), "requires 'react'");
     }
 
     [Fact(DisplayName = "frontend stack whose pairsWith excludes the backend")]
     public void FrontendStackWhosePairsWithExcludesTheBackend()
     {
         using var folder = ConsumerFixture.Create();
-        PairSvelteWith(folder.Path, "cobol");
+        using var home = HomePairingSvelteWith("cobol");
         ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("dotnet", "svelte"));
-        AssertProblem(RunConsumer(folder.Path), "pairs only with cobol, not with backend stack 'dotnet'");
+        AssertProblem(RunConsumer(folder.Path, home), "pairs only with cobol, not with backend stack 'dotnet'");
     }
 
     [Fact(DisplayName = "frontend stack whose pairsWith includes the backend")]
     public void FrontendStackWhosePairsWithIncludesTheBackend()
     {
         using var folder = ConsumerFixture.Create();
-        PairSvelteWith(folder.Path, "dotnet");
+        using var home = HomePairingSvelteWith("dotnet");
         ConsumerFixture.MutateProject(folder.Path, project => project["stacks"] = new JsonArray("dotnet", "svelte"));
-        AssertAbsent(RunConsumer(folder.Path), "pairs only with");
+        AssertAbsent(RunConsumer(folder.Path, home), "pairs only with");
     }
 
 }

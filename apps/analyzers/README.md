@@ -70,7 +70,7 @@ The project references `Microsoft.CodeAnalysis.CSharp` at version `4.14.0` throu
 | `tests/LiteSpec.Analyzers.Tests/Style/` | Tests for the style rules. |
 | `tests/LiteSpec.Analyzers.Tests/Tests/` | Tests for the test rules. |
 
-The repository root adds three files the analyzers depend on. `Directory.Build.props` sets the default target to `net10.0` with nullable reference types and implicit usings, and shields this checkout from a consumer root when LiteSpec is pinned as a submodule. The analyzer project overrides the framework back to `netstandard2.0` and disables implicit usings. `Directory.Packages.props` pins the central package versions. `.github/workflows/litespec.yml` builds `LiteSpec.slnx`, tests it, packs the analyzers to `artifacts`, checks the provision index, and validates the repository.
+The repository root adds three files the analyzers depend on. `Directory.Build.props` sets the default target to `net10.0` with nullable reference types and implicit usings, and stops MSBuild files in parent folders from applying inside this repository. The analyzer project overrides the framework back to `netstandard2.0` and disables implicit usings. `Directory.Packages.props` pins the central package versions. `.github/workflows/litespec.yml` builds `LiteSpec.slnx`, tests it, packs the analyzers to `artifacts`, checks the provision index, and validates the repository.
 
 ## How a Compilation Flows Through the Package
 

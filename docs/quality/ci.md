@@ -43,7 +43,7 @@ Every pull request publishes one intent-diff comment, one job summary with inten
 
 ### Record Ownership
 
-CODEOWNERS maps record areas to owners: product pages to the product owner and each module to its team. A breaking change carries approval from the owner of the highest record it touches, requested through the CODEOWNERS review. The model check confirms each record's owner belongs to the team owning its path. Approval needs no new field: status, decider, and date already record who decided what by when.
+CODEOWNERS maps record areas to owners: product pages to the product owner and each module to its team. A breaking change carries approval from the owner of the highest record it touches, requested through the CODEOWNERS review. The model check confirms each record's owner, or a CODEOWNERS handle its project owners entry lists, belongs to the team owning its path. Approval needs no new field: status, decider, and date already record who decided what by when.
 
 ### The Supply-Chain Gate
 
@@ -135,7 +135,7 @@ The supply-chain job groups every check that keeps third-party code safe to ship
 
 **Statement:** A consumer MUST map its record areas to owners in CODEOWNERS.
 
-**Rationale:** Product pages map to the product owner and each module to its team, so every record has a team that answers for it. The file lives at `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS`, and `litespec model check` reports `owner-unknown` for a record whose owner belongs to no team owning its path.
+**Rationale:** Product pages map to the product owner and each module to its team, so every record has a team that answers for it. An owners entry maps a readable owner name to its CODEOWNERS handles, so records carry names reviewers read while the check follows the mapping. The file lives at `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS`, and `litespec model check` reports `owner-unknown` for a record whose owner, directly or through its mapped handles, belongs to no team owning its path.
 
 ### Approve Breaking Changes by the Highest Record Owner
 
@@ -200,7 +200,7 @@ A backend-only pull request runs `build`, `test-backend`, `mutation`, `measure`,
 | litespec/quality/ci#publish-the-intent-diff-on-every-pull-request | guidance | The pull request shows one intent-diff comment matching its latest push. |
 | litespec/quality/ci#show-intent-counts-in-the-job-summary | guidance | The CI run summary for the pull request lists the breaking, removed, modified, and added counts. |
 | litespec/quality/ci#publish-a-book-preview-for-every-change | guidance | The pull request links a book preview built from the change. |
-| litespec/quality/ci#map-record-areas-to-owners | checkable | `litespec model check` reports `owner-unknown` for a record whose owner belongs to no team owning its path. |
+| litespec/quality/ci#map-record-areas-to-owners | checkable | `litespec model check` reports `owner-unknown` for a record whose owner belongs to no team owning its path, directly or through its mapped handles. |
 | litespec/quality/ci#approve-breaking-changes-by-the-highest-record-owner | guidance | Each pull request with a breaking change shows approval from the team owning the highest record it touches. |
 | litespec/quality/ci#promote-verified-artifacts | guidance | The staging and production deployments reference the one artifact the release job passed. |
 | litespec/quality/ci#protect-the-default-branch | guidance | The default branch settings require the jobs-table entries, a reviewed pull request, and a clean merge state. |

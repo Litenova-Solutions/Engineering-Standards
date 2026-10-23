@@ -2,7 +2,7 @@
 
 ## v2.0.0
 
-LiteSpec 2.0.0 is the standards contract for one bounded-context business application, built by people and agents. People and agents write intent records; the model builder reads the code, screens, tests, and test runs and computes the links between the two. A consumer pins this release as a submodule at `litespec/`, records it in `reviewedLiteSpecVersion`, and keeps it for as long as it serves. The release takes effect as the `v2.0.0` tag.
+LiteSpec 2.0.0 is the standards contract for one bounded-context business application, built by people and agents. People and agents write intent records; the model builder reads the code, screens, tests, and test runs and computes the links between the two. A consumer installs this release as the `LiteSpec.Cli` local .NET tool at the release version, records it in `reviewedLiteSpecVersion`, and keeps it for as long as it serves. The release takes effect as the `v2.0.0` tag.
 
 ### Structure
 

@@ -46,7 +46,7 @@ The consumer template opens with these fields:
 
 ```json
 {
-  "$schema": "./litespec/schemas/litespec-project.schema.json",
+  "$schema": "https://litespec.dev/2.0.0/schemas/litespec-project.schema.json",
   "project": { "name": "__PROJECT__" },
   "size": "small",
   "shape": "server",
@@ -138,7 +138,7 @@ The consumer template catalog opens with these fields:
 
 ```json
 {
-  "$schema": "../../litespec/schemas/ui-pattern-catalog.schema.json",
+  "$schema": "https://litespec.dev/2.0.0/schemas/ui-pattern-catalog.schema.json",
   "kind": "ui-pattern-catalog",
   "schemaVersion": 1,
   "breakpoints": { "compact": 768 }
@@ -160,7 +160,7 @@ The consumer template lock opens with these fields:
 
 ```json
 {
-  "$schema": "../../litespec/schemas/ui-source-lock.schema.json",
+  "$schema": "https://litespec.dev/2.0.0/schemas/ui-source-lock.schema.json",
   "schemaVersion": 1,
   "generator": "shadcn/ui",
   "cli": "4.21.5"

@@ -8,13 +8,13 @@ A LiteSpec consumer is a project built against the LiteSpec standard, and this t
 
 - Read the [agent protocol](../core/agent.md), the [authoring standard](../core/authoring.md), and the [supported scope](../core/scope.md) to learn how agents work, how pages are written, and what one project covers.
 - Read the [extension catalog](../ext/README.md) to learn which capabilities stay inactive at the start.
-- Install the .NET SDK and Node.js releases pinned in `litespec.manifest.json` at the LiteSpec root.
+- Install the .NET SDK and Node.js releases the adopted release pins under `stack` in its `litespec.manifest.json`.
 - Ship the `dotnet` backend with a React frontend: this tutorial follows that pair from the `dotnet-react` preset. When the product ships another frontend, follow this tutorial first, then declare that frontend with its own how-to, [Add a Svelte Frontend](../guide/add-a-svelte-frontend.md) or [Add a Blazor Frontend](../guide/add-a-blazor-frontend.md).
 
 ## Lesson
 
-1. Pin the LiteSpec release by adding the LiteSpec repository as a submodule or another pinned dependency. This satisfies `litespec/workspace/structure#use-the-canonical-root-tree`.
-2. Write the project configuration: run `litespec init --preset dotnet-react --size small`, which writes `litespec.project.json` with the shape, the stacks, and the adopted release in `reviewedLiteSpecVersion`. Copy `project-agents.md` from the [template index](../../templates/consumer/README.md) to the consumer root as `AGENTS.md`. Fill every placeholder and name every owner. This satisfies `litespec/core/scope#select-a-size-a-shape-and-stacks`.
+1. Install the LiteSpec release as a local .NET tool: run `dotnet new tool-manifest` when the folder has no `.config/dotnet-tools.json` yet, then `dotnet tool install LiteSpec.Cli --version 2.0.0` and `dotnet tool restore`. From here on, run every command below as `dotnet litespec <command>` from the consumer root. This satisfies `litespec/workspace/structure#use-the-canonical-root-tree`.
+2. Write the project configuration: run `dotnet litespec init --preset dotnet-react --size small`, which writes `litespec.project.json` with the shape, the stacks, and the adopted release in `reviewedLiteSpecVersion`, with the `## LiteSpec` block in `AGENTS.md`, the glossary, and the example cast beside it. Fill every placeholder and name every owner. This satisfies `litespec/core/scope#select-a-size-a-shape-and-stacks`.
 3. Select extensions only when their criteria already hold. Write each selection in the object form with its criterion and review date. This satisfies `litespec/core/scope#select-conditional-extensions-explicitly` and `litespec/core/scope#record-selected-extensions`.
 4. Create the toolchain configuration from the manifest pins. Add the SDK floor, the shared build settings, the central NuGet versions, the tool manifest, and the JavaScript toolchain pin. This satisfies `litespec/backend/dotnet/config#set-the-sdk-floor-at-the-workspace-root`, `litespec/backend/dotnet/config#centralize-net-build-settings`, `litespec/backend/dotnet/config#centralize-nuget-versions`, `litespec/backend/dotnet/config#commit-the-tool-manifest`, and `litespec/workspace/config#pin-the-javascript-toolchain`.
 5. Add only the packages the manifest already pins. Record each new package approval explicitly. This satisfies `litespec/backend/dotnet/packages#pin-every-dependency-centrally` and `litespec/workspace/dependencies#approve-new-packages-explicitly`.
@@ -30,10 +30,10 @@ A LiteSpec consumer is a project built against the LiteSpec standard, and this t
 15. Declare the React frontend. Declare the application tree and mirror the backend use case path. This satisfies `litespec/frontend/web/structure#use-the-frontend-application-tree`. Compose each route from one floorplan. This satisfies `litespec/frontend/web/ui#compose-each-route-from-one-floorplan`.
 16. Deliver one complete slice. Ship source, tests, contracts, and operating evidence for one use case. This satisfies `litespec/core/system#deliver-one-complete-use-case`.
 17. Add the operating records. Write the limits and runbooks, add deployment, backup, restore, and rollback, and configure the pipeline gates. This satisfies `litespec/quality/operations#start-the-stack-with-one-local-command` and `litespec/quality/ci#run-applicable-gates-on-every-pull-request`.
-18. Build the model. Run `litespec model build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
-19. Check the model. Run `litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved scenario. Fix every finding before continuing.
-20. Render the generated regions: run `litespec model render`, then commit what it wrote.
-21. Run the remaining validators. Run `litespec consumer` and `litespec ui` from the consumer root. Both exit `0` on a clean tree. This satisfies `litespec/core/release#run-consistency-checks`.
+18. Build the model. Run `dotnet litespec model build` from the consumer root. It writes `model.json` with the computed links between records, code, screens, and tests.
+19. Check the model. Run `dotnet litespec model check`. It exits 1 on any unresolved citation, missing link, or unproved scenario. Fix every finding before continuing.
+20. Render the generated regions: run `dotnet litespec model render`, then commit what it wrote.
+21. Run the remaining validators. Run `dotnet litespec consumer` and `dotnet litespec ui` from the consumer root. Both exit `0` on a clean tree. This satisfies `litespec/core/release#run-consistency-checks`.
 
 ## What You Built
 

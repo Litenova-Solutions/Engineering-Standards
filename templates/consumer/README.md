@@ -2,7 +2,7 @@
 
 ## Intent
 
-These files are starting points for consumer records. `litespec init` copies the project setup files to their targets; copy only the record files the current work needs, replace every `<placeholder>` and every `__NAME__` placeholder before committing, and remove any optional line left unused. A section whose starter text opens with `Optional.` may be removed when it has nothing to say; every other section is required. `litespec init` fills `__PROJECT__` in `litespec.project.json` and lists the placeholders it leaves, and `litespec consumer` refuses a project file that still holds one. The other JSON templates carry working example values; adjust them to the project.
+These files are starting points for consumer records. `litespec init` copies the project setup files to their targets and writes the local tool manifest; copy only the record files the current work needs, replace every `<placeholder>` and every `__NAME__` placeholder before committing, and remove any optional line left unused. A section whose starter text opens with `Optional.` may be removed when it has nothing to say; every other section is required. `litespec init` fills `__PROJECT__` in `litespec.project.json` and the `## LiteSpec` block in `AGENTS.md`, and lists the placeholders it leaves, and `litespec consumer` refuses a project file that still holds one. The other JSON templates carry working example values; adjust them to the project.
 
 A page record carries its type, identifier, title, owner, and status in JSON frontmatter, with the body sections its template shows. An entry record sits in its page frontmatter. Requirements sit on a requirement page. Rules and events sit on an aggregate page, and results and scenarios on a use case page. Permissions, entry points, and limits sit on their list pages. Terms live in the glossary at `docs/glossary.json` instead of on a page.
 
@@ -11,7 +11,7 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 | Template | Target | Purpose |
 |:---|:---|:---|
 | `litespec.project.json` | `litespec.project.json` | Selects the size, stacks, reviewed LiteSpec release, paths, owners, optional types, and selected extensions. |
-| `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point. |
+| `project-agents.md` | `AGENTS.md` | Provides the short consumer agent entry point with the `## LiteSpec` block. |
 | `glossary.json` | `docs/glossary.json` | Holds the Term entries prose is checked against, with rejected words and mannered terms. |
 | `example-cast.md` | `docs/domain/example-cast.md` | Fixes the people, place, dates, and amounts every `Example` section draws from. |
 

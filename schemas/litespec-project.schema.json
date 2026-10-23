@@ -118,10 +118,27 @@
       }
     },
     "owners": {
-      "description": "The closed list of names a record owner comes from.",
+      "description": "The closed list of names a record owner comes from. Each entry is a plain name or an object mapping a readable name to its CODEOWNERS handles. Names are unique across both forms.",
       "type": "array",
       "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "items": {
+        "anyOf": [
+          { "type": "string", "minLength": 1 },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "codeowners"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "codeowners": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        ]
+      }
     },
     "reviewedLiteSpecVersion": {
       "description": "The LiteSpec release whose complete contract this project last reviewed.",

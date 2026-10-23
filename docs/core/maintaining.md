@@ -28,7 +28,7 @@ A citation names the cited provision by its current identifier, whether the cita
 
 ### The LiteSpec Release
 
-A LiteSpec release is a tagged snapshot of the repository, and the highest git tag names the current release. Between releases, three places name the release being prepared: the version in `litespec.manifest.json`, the topmost `CHANGELOG.md` entry, and the consumer template's `reviewedLiteSpecVersion`. Tagging that version number makes it current. Each schema `$id` carries that release under `https://litespec.dev/<version>/schemas/`, so a consumer that pins the release keeps resolving the shapes it reviewed.
+A LiteSpec release is a tagged snapshot of the repository, and the highest git tag names the current release. Between releases, four places name the release being prepared: the version in `litespec.manifest.json`, the topmost `CHANGELOG.md` entry, the consumer template's `reviewedLiteSpecVersion`, and the tool package version in `apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj`. Tagging that version number makes it current. Publishing the release puts the `LiteSpec.Cli` tool package and the site at the release version together, so the tool carries the manifest, schemas, docs, and templates the version names. A consumer upgrades by changing the tool version and `reviewedLiteSpecVersion` together. Each schema `$id` carries that release under `https://litespec.dev/<version>/schemas/`, so a consumer that pins the release keeps resolving the shapes it reviewed.
 
 ## Standards
 
@@ -50,9 +50,9 @@ A LiteSpec release is a tagged snapshot of the repository, and the highest git t
 
 ### Publish a LiteSpec Release from a Tag
 
-**Statement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, and the consumer template version.
+**Statement:** A LiteSpec release MUST carry the highest git tag in the manifest version, the changelog entry, the consumer template version, and the tool package version.
 
-**Rationale:** A git tag is the only durable artifact that names a release: branches move and files change, but the tag stays. Reading the current release from the highest tag gives maintainers, consumers, and tools one shared answer. Writing that version into the manifest, the changelog, and the template in the same release keeps the three from disagreeing.
+**Rationale:** A git tag is the only durable artifact that names a release: branches move and files change, but the tag stays. Reading the current release from the highest tag gives maintainers, consumers, and tools one shared answer. Writing that version into the manifest, the changelog, the template, and the tool package in the same release keeps the four from disagreeing.
 
 ## Conventions
 
@@ -80,7 +80,7 @@ A rule changes, so the maintainer updates the heading and replaces the identifie
 
 ### Step Three, Releasing
 
-The maintainer runs `git describe --tags --abbrev=0` to find the tag with the highest version number. That tag names the current release. The maintainer sets the manifest version, adds the changelog entry, and tags the commit with the new version number.
+The maintainer runs `git describe --tags --abbrev=0` to find the tag with the highest version number. That tag names the current release. The maintainer sets the manifest and tool package versions, adds the changelog entry, and tags the commit with the new version number.
 
 ## Verification
 
@@ -88,4 +88,4 @@ The maintainer runs `git describe --tags --abbrev=0` to find the tag with the hi
 |:---|:---|:---|
 | litespec/core/maintaining#state-the-provision-lifecycle | guidance | Each provision sits in exactly one lifecycle state, with retired identifiers cited nowhere. |
 | litespec/core/maintaining#replace-every-citation-on-a-rename | checkable | `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
-| litespec/core/maintaining#publish-a-litespec-release-from-a-tag | guidance | One new tag carries the current version across the manifest, the changelog, and the template. |
+| litespec/core/maintaining#publish-a-litespec-release-from-a-tag | guidance | One new tag carries the current version across the manifest, the changelog, the template, and the `LiteSpec.Cli` package version in `apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj`, equal to the manifest version. |

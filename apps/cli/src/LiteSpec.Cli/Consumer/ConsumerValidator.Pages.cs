@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using LiteSpec.Authoring;
+using LiteSpec.Model;
 using LiteSpec.Schemas;
 
 namespace LiteSpec.Consumer;
@@ -53,17 +54,20 @@ static partial class ConsumerValidator
          "over", "per", "to", "up", "upon", "via", "with"],
         StringComparer.Ordinal);
 
-    static readonly Regex TitleToken = new("[A-Za-z0-9][A-Za-z0-9'./+-]*");
+    // Each pattern below runs on every page of a large consumer, so each one
+    // compiles once instead of interpreting on every match. Compilation changes
+    // only the speed, never what matches.
+    static readonly Regex TitleToken = new("[A-Za-z0-9][A-Za-z0-9'./+-]*", RegexOptions.Compiled);
 
-    static readonly Regex TitleAtypical = new("^(?:v?\\d|[A-Z0-9.]+$)");
+    static readonly Regex TitleAtypical = new("^(?:v?\\d|[A-Z0-9.]+$)", RegexOptions.Compiled);
 
-    static readonly Regex TitleCamel = new("[a-z][A-Z]|[A-Z][a-z]+[A-Z]");
+    static readonly Regex TitleCamel = new("[a-z][A-Z]|[A-Z][a-z]+[A-Z]", RegexOptions.Compiled);
 
-    static readonly Regex TitleCapital = new("^[A-Z]");
+    static readonly Regex TitleCapital = new("^[A-Z]", RegexOptions.Compiled);
 
-    static readonly Regex FencedBlock = new("```[a-z]*\\s*\\n\\s*\\{[\\s\\S]{0,400}?\"type\"\\s*:");
+    static readonly Regex FencedBlock = new("```[a-z]*\\s*\\n\\s*\\{[\\s\\S]{0,400}?\"type\"\\s*:", RegexOptions.Compiled);
 
-    static readonly Regex HeadingTwo = new("^##\\s");
+    static readonly Regex HeadingTwo = new("^##\\s", RegexOptions.Compiled);
 
     /// <summary>
     ///     Collects the Markdown pages under the documentation root in ordinal name order.
@@ -106,6 +110,8 @@ static partial class ConsumerValidator
     static void CheckPages(RunState run)
     {
         var exampleLimit = ExampleWordLimit(run);
+        var schemaWatch = new System.Diagnostics.Stopwatch();
+        var sectionsWatch = new System.Diagnostics.Stopwatch();
 
         foreach (var file in run.Files)
         {
@@ -120,6 +126,8 @@ static partial class ConsumerValidator
 
             run.Pages += 1;
 
+            schemaWatch.Start();
+
             // Frontmatter is validated through the shared schema module against the
             // record schema, so the schema is the one statement of every record shape.
             foreach (var problem in JsonSchema.Problems(run.RecordSchemaFile, meta, relative, run.ReadSchema))
@@ -127,31 +135,38 @@ static partial class ConsumerValidator
                 run.Err(problem);
             }
 
-            CheckHeadings(run, relative, raw);
+            schemaWatch.Stop();
+            sectionsWatch.Start();
 
-            if (PropString(meta as JsonObject, "type") is string type && RequiredSections.TryGetValue(type, out var required))
+            // The lines split once and the sections collect in one pass: each lookup
+            // below used to re-split the whole page for one section name.
+            var lines = SplitLines(raw);
+            CheckHeadings(run, relative, lines);
+
+            var type = PropString(meta as JsonObject, "type");
+            var required = type is not null && RequiredSections.TryGetValue(type, out var names) ? names : Array.Empty<string>();
+            var bodies = SectionBodies(lines, required.Append("What Happens").Append("Example"));
+
+            foreach (var name in required)
             {
-                foreach (var name in required)
+                if (bodies[name] is null)
                 {
-                    if (SectionBody(raw, name) is null)
-                    {
-                        run.Err($"{relative}: type '{type}' requires an H2 '{name}'");
-                    }
+                    run.Err($"{relative}: type '{type}' requires an H2 '{name}'");
                 }
+            }
 
-                // A query reads what a command or reaction wrote, so it states its
-                // goal and no behavior. A command or reaction states what happens.
-                if (type == "use-case"
-                    && PropString(meta as JsonObject, "kind") is "command" or "reaction"
-                    && SectionBody(raw, "What Happens") is null)
-                {
-                    run.Err($"{relative}: type 'use-case' requires an H2 'What Happens'");
-                }
+            // A query reads what a command or reaction wrote, so it states its
+            // goal and no behavior. A command or reaction states what happens.
+            if (type == "use-case"
+                && PropString(meta as JsonObject, "kind") is "command" or "reaction"
+                && bodies["What Happens"] is null)
+            {
+                run.Err($"{relative}: type 'use-case' requires an H2 'What Happens'");
             }
 
             // The Example section stays a narrative, not a second specification: it
             // illustrates the page within the word bound and carries no authority.
-            if (SectionBody(raw, "Example") is string example)
+            if (bodies["Example"] is string example)
             {
                 var words = Prose.Words(example).Count;
 
@@ -160,7 +175,12 @@ static partial class ConsumerValidator
                     run.Err($"{relative}: Example section has {words} words, over the {exampleLimit} word bound");
                 }
             }
+
+            sectionsWatch.Stop();
         }
+
+        Timing.Report($"[time] consumer-pages-schema {schemaWatch.Elapsed.TotalSeconds:0.0}s");
+        Timing.Report($"[time] consumer-sections-headings {sectionsWatch.Elapsed.TotalSeconds:0.0}s");
     }
 
     /// <summary>
@@ -215,12 +235,12 @@ static partial class ConsumerValidator
     ///     Headings inside fenced blocks and generated regions are tool output or
     ///     quoted examples rather than authored headings, so they are skipped.
     /// </summary>
-    static void CheckHeadings(RunState run, string relative, string raw)
+    static void CheckHeadings(RunState run, string relative, string[] lines)
     {
         var inFence = false;
         var inGenerated = false;
 
-        foreach (var line in Regex.Split(raw, "\r?\n"))
+        foreach (var line in lines)
         {
             var trimmed = line.Trim();
 
@@ -317,30 +337,66 @@ static partial class ConsumerValidator
     }
 
     /// <summary>
-    ///     The text between the named H2 and the next one, or null when the page has no such section.
+    ///     Splits a page into lines the way the section and heading checks always
+    ///     split it: each newline ends a line and swallows one carriage return.
     /// </summary>
-    static string? SectionBody(string raw, string name)
+    static string[] SplitLines(string raw)
     {
-        var lines = Regex.Split(raw, "\r?\n");
-        var start = Array.FindIndex(lines, line => line.Trim() == $"## {name}");
+        var lines = raw.Split('\n');
 
-        if (start < 0)
+        for (var index = 0; index < lines.Length; index++)
         {
-            return null;
+            if (lines[index].Length > 0 && lines[index][^1] == '\r')
+            {
+                lines[index] = lines[index][..^1];
+            }
         }
 
-        var body = new List<string>();
+        return lines;
+    }
 
-        for (var index = start + 1; index < lines.Length; index++)
+    /// <summary>
+    ///     The text between each named H2 and the next one, or null for each name
+    ///     the page does not carry: the first line whose trimmed text is the name
+    ///     opens the section, and the next unindented H2 closes it.
+    /// </summary>
+    static Dictionary<string, string?> SectionBodies(string[] lines, IEnumerable<string> names)
+    {
+        var wanted = names.Select(name => "## " + name).ToHashSet(StringComparer.Ordinal);
+        var starts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        for (var index = 0; index < lines.Length && starts.Count < wanted.Count; index++)
         {
-            if (HeadingTwo.IsMatch(lines[index]))
+            var trimmed = lines[index].Trim();
+
+            if (wanted.Contains(trimmed))
             {
-                break;
+                starts.TryAdd(trimmed, index);
+            }
+        }
+
+        var bodies = new Dictionary<string, string?>(StringComparer.Ordinal);
+
+        foreach (var name in names)
+        {
+            var key = "## " + name;
+
+            if (!starts.TryGetValue(key, out var start))
+            {
+                bodies[name] = null;
+                continue;
             }
 
-            body.Add(lines[index]);
+            var end = start + 1;
+
+            while (end < lines.Length && !HeadingTwo.IsMatch(lines[end]))
+            {
+                end++;
+            }
+
+            bodies[name] = string.Join("\n", lines, start + 1, end - start - 1);
         }
 
-        return string.Join("\n", body);
+        return bodies;
     }
 }

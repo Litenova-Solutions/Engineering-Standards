@@ -18,7 +18,7 @@ sealed record PageBody(string File, string Body, int BodyStartLine, string? Page
 /// </summary>
 /// <param name="Records">Every written record.</param>
 /// <param name="Bodies">Every page body under the record roots.</param>
-/// <param name="Provisions">The shared provision ids, when the standards sit beside the consumer.</param>
+/// <param name="Provisions">The shared provision ids, from the release the tool carries.</param>
 /// <param name="Problems">Files the reader could not read.</param>
 sealed record RecordRead(
     IReadOnlyList<Record> Records,
@@ -81,7 +81,7 @@ static class RecordReader
 
         ReadTerms(config, records, problems);
 
-        return new RecordRead(records, bodies, ReadProvisions(config), problems);
+        return new RecordRead(records, bodies, ReadProvisions(), problems);
     }
 
     private static void ReadPage(
@@ -786,17 +786,17 @@ static class RecordReader
         }
     }
 
-    private static IReadOnlySet<string> ReadProvisions(ConsumerConfig config)
+    private static IReadOnlySet<string> ReadProvisions()
     {
-        var root = Path.Combine(config.Root, "litespec");
+        var home = LiteSpecHome.Root;
 
-        if (!Directory.Exists(Path.Combine(root, "docs")))
+        if (home is null || !Directory.Exists(Path.Combine(home, "docs")))
         {
             return new HashSet<string>(StringComparer.Ordinal);
         }
 
         return new HashSet<string>(
-            Provisions.Collect(root).Select(row => row.Id),
+            Provisions.Collect(home).Select(row => row.Id),
             StringComparer.Ordinal);
     }
 

@@ -9,15 +9,18 @@ namespace LiteSpec.Authoring;
 /// </summary>
 static partial class Prose
 {
-    static readonly Regex FenceBlock = new(@"```[\s\S]*?```");
-    static readonly Regex InlineCodeSpan = new(@"`[^`\n]*`");
-    static readonly Regex LinkDestination = new(@"\]\([^)\n]*\)");
-    static readonly Regex RejectionTableSeparator = new(@"^\s*\|?[\s:|-]+$");
-    static readonly Regex CamelBoundary = new(@"([a-z0-9])([A-Z])");
-    static readonly Regex AcronymBoundary = new(@"([A-Z]+)([A-Z][a-z])");
-    static readonly Regex IdentifierSeparator = new(@"[_./]");
+    static readonly Regex FenceBlock = new(@"```[\s\S]*?```", RegexOptions.Compiled);
+    static readonly Regex InlineCodeSpan = new(@"`[^`\n]*`", RegexOptions.Compiled);
+    static readonly Regex LinkDestination = new(@"\]\([^)\n]*\)", RegexOptions.Compiled);
+    static readonly Regex RejectionTableSeparator = new(@"^\s*\|?[\s:|-]+$", RegexOptions.Compiled);
+    static readonly Regex CamelBoundary = new(@"([a-z0-9])([A-Z])", RegexOptions.Compiled);
+    static readonly Regex AcronymBoundary = new(@"([A-Z]+)([A-Z][a-z])", RegexOptions.Compiled);
+    static readonly Regex IdentifierSeparator = new(@"[_./]", RegexOptions.Compiled);
 
-    const RegexOptions LanguageOptions = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+    // The term and gate patterns run once per term on every file of a large
+    // consumer, so each one compiles once. Compilation changes only the speed,
+    // never what matches.
+    const RegexOptions LanguageOptions = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled;
     const string RegexMetacharacters = ".*+?^${}()|[]\\";
 
     /// <summary>
@@ -73,7 +76,30 @@ static partial class Prose
             }
         }
 
-        return new CompiledLanguage(mannered, rejected);
+        // One scan that proves a file or line holds no term at all, so the per-term
+        // loops below run only where they can report. Every finding contains its
+        // word: a raw match contains the whole term, and an opened match contains
+        // the term's first word in the raw text, because opening only inserts
+        // spaces and turns separators into spaces. A term with no word to hold
+        // disables the gates, and the loops run as before.
+        var words = mannered.Select(entry => entry.Term).Concat(rejected.Select(entry => entry.Synonym)).ToList();
+        var canGate = words.All(HasWord);
+        Regex? fileGate = null;
+        Regex? lineGate = null;
+        Regex? firstWordGate = null;
+
+        if (canGate && words.Count > 0)
+        {
+            lineGate = GatePattern(words);
+            var firsts = words.Where(word => word.Contains(' ')).Select(FirstWord).ToList();
+            fileGate = GatePattern(words.Where(word => !word.Contains(' ')).Concat(firsts));
+            if (firsts.Count > 0)
+            {
+                firstWordGate = GatePattern(firsts);
+            }
+        }
+
+        return new CompiledLanguage(mannered, rejected, canGate, fileGate, lineGate, firstWordGate);
     }
 
     /// <summary>
@@ -88,11 +114,21 @@ static partial class Prose
         if (compiled is null) return;
         var prose = ScannableProse(raw);
 
+        // A page holding none of the words holds no finding: every match contains
+        // its whole term.
+        if (compiled.CanGate && (compiled.LineGate is null || !compiled.LineGate.IsMatch(prose)))
+        {
+            return;
+        }
+
+        int[]? lineStarts = null;
+        int Line(int index) => LineNumber(lineStarts ??= LineStarts(prose), index);
+
         foreach (var entry in compiled.ManneredTerms)
         {
             foreach (Match match in entry.Pattern.Matches(prose))
             {
-                add(relative, LineOf(prose, match.Index), "GLOSSARY_MANNERED_TERM",
+                add(relative, Line(match.Index), "GLOSSARY_MANNERED_TERM",
                     $"'{match.Value}' is mannered prose; state it literally, such as '{entry.Instead}'");
             }
         }
@@ -100,13 +136,20 @@ static partial class Prose
         foreach (var entry in compiled.RejectedTerms)
         {
             if (entry.Scope is not null && !entry.Scope.IsMatch(relative)) continue;
+            var matches = entry.Pattern.Matches(prose);
+
+            if (matches.Count == 0)
+            {
+                continue;
+            }
+
             var exempt = entry.Except.Count > 0 ? ExemptSpans(prose, entry.Except) : null;
 
-            foreach (Match match in entry.Pattern.Matches(prose))
+            foreach (Match match in matches)
             {
                 if (exempt is not null && InsideExempt(exempt, match.Index, match.Index + match.Length)) continue;
                 var because = entry.Reason is null ? "" : $"; {entry.Reason}";
-                add(relative, LineOf(prose, match.Index), "GLOSSARY_REJECTED_SYNONYM",
+                add(relative, Line(match.Index), "GLOSSARY_REJECTED_SYNONYM",
                     $"'{match.Value}' is a rejected synonym here; the term is '{entry.Term}'{because}");
             }
         }
@@ -122,12 +165,47 @@ static partial class Prose
     public static void CheckLanguageInSource(string relative, string raw, CompiledLanguage? compiled, Action<string, int, string, string> add)
     {
         if (compiled is null) return;
+
+        // A scope is written against the path, so entries out of scope are dropped
+        // once per file instead of once per line.
+        var inScope = compiled.RejectedTerms.Where(entry => entry.Scope is null || entry.Scope.IsMatch(relative)).ToList();
+
+        // A file holding none of the words holds no finding: every match contains
+        // its term, and an opened match contains the term's first word in the raw
+        // text.
+        if (compiled.CanGate && (compiled.FileGate is null || !compiled.FileGate.IsMatch(raw)))
+        {
+            return;
+        }
+
         var lines = raw.Split('\n');
 
         for (var index = 0; index < lines.Length; index++)
         {
             var line = lines[index];
-            var opened = OpenIdentifiers(line);
+            string? opened = null;
+
+            if (compiled.CanGate)
+            {
+                if (compiled.LineGate is null || !compiled.LineGate.IsMatch(line))
+                {
+                    // A single-word hit in the opened line implies the word in the
+                    // raw line, so only a multi-word term can still match there.
+                    if (compiled.FirstWordGate is null || !compiled.FirstWordGate.IsMatch(line))
+                    {
+                        continue;
+                    }
+
+                    opened = OpenIdentifiers(line);
+
+                    if (compiled.LineGate is null || !compiled.LineGate.IsMatch(opened))
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            opened ??= OpenIdentifiers(line);
             var seen = new HashSet<string>(StringComparer.Ordinal);
 
             Scan(line);
@@ -145,12 +223,18 @@ static partial class Prose
                     }
                 }
 
-                foreach (var entry in compiled.RejectedTerms)
+                foreach (var entry in inScope)
                 {
-                    if (entry.Scope is not null && !entry.Scope.IsMatch(relative)) continue;
+                    var matches = entry.Pattern.Matches(text);
+
+                    if (matches.Count == 0)
+                    {
+                        continue;
+                    }
+
                     var exempt = entry.Except.Count > 0 ? ExemptSpans(text, entry.Except) : null;
 
-                    foreach (Match match in entry.Pattern.Matches(text))
+                    foreach (Match match in matches)
                     {
                         if (exempt is not null && InsideExempt(exempt, match.Index, match.Index + match.Length)) continue;
                         if (!seen.Add("r:" + entry.Term + ":" + match.Value.ToLowerInvariant())) continue;
@@ -185,12 +269,43 @@ static partial class Prose
 
         try
         {
-            return new Regex(scope);
+            return new Regex(scope, RegexOptions.Compiled);
         }
         catch (ArgumentException)
         {
             return null;
         }
+    }
+
+    // One alternation over literal words with the same matching options as the
+    // term patterns, so a gate that misses proves no term occurs in the text.
+    static Regex GatePattern(IEnumerable<string> words) =>
+        new($"(?:{string.Join("|", words.Select(word => Regex.Escape(word)))})", LanguageOptions);
+
+    // Whether a term carries a word a gate can hold: a non-empty run between
+    // spaces. A term of spaces alone, or the empty term, disables every gate.
+    static bool HasWord(string term)
+    {
+        foreach (var character in term)
+        {
+            if (character != ' ') return true;
+        }
+
+        return false;
+    }
+
+    // The first run of non-space characters. Called only for terms HasWord accepts.
+    static string FirstWord(string term)
+    {
+        var start = 0;
+
+        while (start < term.Length && term[start] == ' ') start++;
+
+        var end = start;
+
+        while (end < term.Length && term[end] != ' ') end++;
+
+        return term[start..end];
     }
 
     // Blanks the cells that sit under a rejection column, keeping every other
@@ -242,16 +357,26 @@ static partial class Prose
         return BlankRejectionColumns(text);
     }
 
-    static int LineOf(string text, int index)
+    // The offset each line starts at: offset 0 and every offset after a newline.
+    // Built once per page that reports, so each finding maps to its line with a
+    // binary search instead of a scan from the start of the file.
+    static int[] LineStarts(string text)
     {
-        var line = 1;
+        var starts = new List<int> { 0 };
 
-        for (var offset = 0; offset < index; offset++)
+        for (var offset = 0; offset < text.Length; offset++)
         {
-            if (text[offset] == '\n') line++;
+            if (text[offset] == '\n') starts.Add(offset + 1);
         }
 
-        return line;
+        return starts.ToArray();
+    }
+
+    // The 1-based line holding the offset: the count of starts at or before it.
+    static int LineNumber(int[] starts, int index)
+    {
+        var found = Array.BinarySearch(starts, index);
+        return found >= 0 ? found + 1 : ~found;
     }
 
     // Locates every compound in which a rejected word names a different concept.
@@ -360,11 +485,44 @@ sealed class CompiledLanguage
     internal IReadOnlyList<RejectedSynonym> RejectedTerms { get; }
 
     /// <summary>
-    ///     Compiles the record from its entries.
+    ///     Whether the gates below are sound for this glossary: every term carries a
+    ///     word a gate can hold. Otherwise the scans run without them.
     /// </summary>
-    internal CompiledLanguage(IReadOnlyList<ManneredTerm> mannered, IReadOnlyList<RejectedSynonym> rejected)
+    internal bool CanGate { get; }
+
+    /// <summary>
+    ///     Matches raw text holding any single-word term or any multi-word term's
+    ///     first word, or null when the glossary holds no word.
+    /// </summary>
+    internal Regex? FileGate { get; }
+
+    /// <summary>
+    ///     Matches text holding any whole term, or null when the glossary holds no word.
+    /// </summary>
+    internal Regex? LineGate { get; }
+
+    /// <summary>
+    ///     Matches text holding any multi-word term's first word, or null when no
+    ///     term holds a space.
+    /// </summary>
+    internal Regex? FirstWordGate { get; }
+
+    /// <summary>
+    ///     Compiles the record from its entries and its gates.
+    /// </summary>
+    internal CompiledLanguage(
+        IReadOnlyList<ManneredTerm> mannered,
+        IReadOnlyList<RejectedSynonym> rejected,
+        bool canGate,
+        Regex? fileGate,
+        Regex? lineGate,
+        Regex? firstWordGate)
     {
         ManneredTerms = mannered;
         RejectedTerms = rejected;
+        CanGate = canGate;
+        FileGate = fileGate;
+        LineGate = lineGate;
+        FirstWordGate = firstWordGate;
     }
 }

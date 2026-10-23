@@ -73,6 +73,71 @@ public sealed class InitCommandTests
         Assert.Contains("Fill every <placeholder> in the copied files before validating.", result.Stdout, StringComparison.Ordinal);
     }
 
+    [Fact(DisplayName = "init writes the tool manifest pinning the tool at the release")]
+    public void WritesToolManifestAtTheRelease()
+    {
+        using var home = Cli.Temp("init-home");
+        using var consumer = Cli.Temp("init-consumer");
+        FixtureHome(home.Path);
+
+        var result = Cli.Run(
+            ["init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path],
+            environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+
+        Assert.Equal(0, result.Status);
+        var tools = Path.Combine(consumer.Path, ".config", "dotnet-tools.json");
+        Assert.Contains($"Wrote {tools}.", result.Stdout, StringComparison.Ordinal);
+        var manifest = JsonNode.Parse(File.ReadAllText(tools))!;
+        Assert.Equal(FixtureVersion, manifest["tools"]!["LiteSpec.Cli"]!["version"]!.GetValue<string>());
+        Assert.Equal("litespec", manifest["tools"]!["LiteSpec.Cli"]!["commands"]![0]!.GetValue<string>());
+    }
+
+    [Fact(DisplayName = "init leaves an existing tool manifest alone and still exits zero")]
+    public void LeavesExistingToolManifestAlone()
+    {
+        using var home = Cli.Temp("init-home");
+        using var consumer = Cli.Temp("init-consumer");
+        FixtureHome(home.Path);
+
+        var tools = Path.Combine(consumer.Path, ".config", "dotnet-tools.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(tools)!);
+        File.WriteAllText(tools, "{\"sentinel\": true}\n");
+
+        var result = Cli.Run(
+            ["init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path],
+            environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+
+        Assert.Equal(0, result.Status);
+        Assert.Equal("{\"sentinel\": true}\n", File.ReadAllText(tools));
+        Assert.Contains($"'{tools}' already exists; left alone.", result.Stdout, StringComparison.Ordinal);
+    }
+
+    [Fact(DisplayName = "init fills the LiteSpec block of a fresh agent context")]
+    public void FillsTheLiteSpecBlock()
+    {
+        using var home = Cli.Temp("init-home");
+        using var consumer = Cli.Temp("init-consumer");
+        FixtureHome(home.Path);
+
+        var result = Cli.Run(
+            ["init", "--preset", "dotnet-react", "--size", "small", "--root", consumer.Path],
+            environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+
+        Assert.Equal(0, result.Status);
+        var agents = File.ReadAllText(Path.Combine(consumer.Path, "AGENTS.md"));
+        Assert.Contains("## LiteSpec", agents, StringComparison.Ordinal);
+        Assert.Contains(
+            $"This project follows LiteSpec {FixtureVersion}: size small, shape server, stacks dotnet and react, extensions none.",
+            agents,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            $"https://litespec.dev/{FixtureVersion}/select/server.dotnet.react/llms.txt",
+            agents,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("__LITESPEC_VERSION__", agents, StringComparison.Ordinal);
+        Assert.DoesNotContain("__SELECTION_KEY__", agents, StringComparison.Ordinal);
+    }
+
     [Fact(DisplayName = "init leaves existing scaffold files alone and still exits zero")]
     public void LeavesExistingScaffoldFilesAlone()
     {

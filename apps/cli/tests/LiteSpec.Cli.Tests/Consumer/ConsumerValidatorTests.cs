@@ -49,6 +49,12 @@ public sealed partial class ConsumerValidatorTests
         return Cli.Run(args);
     }
 
+    static CliResult RunConsumer(string root, TempFolder home, params string[] extra)
+    {
+        string[] args = ["consumer", "--root", root, ..extra];
+        return Cli.Run(args, environment: new Dictionary<string, string> { ["LITESPEC_HOME"] = home.Path });
+    }
+
     static JsonObject PathsOf(JsonObject project) => (JsonObject)project["paths"]!;
 
     [Fact(DisplayName = "fixture validates as written")]
@@ -102,12 +108,14 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "/paths/frontends/0/platform");
     }
 
-    [Fact(DisplayName = "reviewed version behind the pinned release")]
-    public void ReviewedVersionBehindThePinnedRelease()
+    [Fact(DisplayName = "reviewed version behind the installed release")]
+    public void ReviewedVersionBehindTheInstalledRelease()
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateProject(folder.Path, project => project["reviewedLiteSpecVersion"] = "0.0.0");
-        AssertProblem(RunConsumer(folder.Path), "does not match the pinned LiteSpec release");
+        var result = RunConsumer(folder.Path);
+        AssertProblem(result, "does not match the installed LiteSpec tool release");
+        AssertProblem(result, "dotnet tool update LiteSpec.Cli --version 0.0.0");
     }
 
     [Fact(DisplayName = "extension the manifest does not ship")]

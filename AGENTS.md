@@ -17,7 +17,7 @@ Sources: `litespec/core/scope#keep-one-bounded-context`, `litespec/core/scope#se
 | Repository | You change | You run |
 |:---|:---|:---|
 | LiteSpec | The standard (`docs/`, `schemas/`, `templates/`, the manifest), the CLI in `apps/cli/`, the analyzers in `apps/analyzers/`, and the site in `apps/site/` | `litespec validate`, `litespec provisions`, `litespec patterns check`, the tests |
-| A consumer | Its records, code, tests and contracts, against the LiteSpec release it pins at `litespec/` | `litespec consumer`, `litespec ui`, `litespec model`, and the gates its CI selects |
+| A consumer | Its records, code, tests and contracts, against the LiteSpec release its local `litespec` tool carries | `dotnet litespec consumer`, `dotnet litespec ui`, `dotnet litespec model`, and the gates its CI selects |
 
 In this repository, run the CLI with `dotnet run --project apps/cli/src/LiteSpec.Cli -- <command>`. The [command index](docs/tools/README.md) shows how to run it from a consumer.
 

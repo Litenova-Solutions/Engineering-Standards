@@ -38,7 +38,7 @@ A selection key joins the shape and the stacks with dots: `server.dotnet.react` 
 
 A selection index answers with `Content-Type: text/plain`. It groups the pages the selection applies by layer, with each page linking its raw Markdown. It then lists the extensions the selection may add, the UI pattern groups when the selection holds a frontend stack, and a note that says to fetch only the pages a task touches.
 
-The selection page produces the `AGENTS.md` block an owner pastes into the working context. With size `small`, shape `server`, and stacks `dotnet` and `react`, it reads:
+The selection page produces the `AGENTS.md` block: `litespec init` writes it into a new consumer, and an owner pastes it when adopting an existing project. With size `small`, shape `server`, and stacks `dotnet` and `react`, it reads:
 
 ```text
 ## LiteSpec

@@ -34,6 +34,10 @@ Accepted debt never sits as an untracked compromise: it lives as a known gap wit
 
 A release record binds evidence to one artifact, so a product with no artifact yet has nothing to record in one. Before its first production release, the consumer keeps a readiness record instead, with dated rehearsals, green gates, and a rehearsal owner who owns the backup and restore rehearsal.
 
+### The Adopted LiteSpec Release
+
+A consumer adopts one LiteSpec release by installing the `LiteSpec.Cli` tool package at that release version and recording the same version in `reviewedLiteSpecVersion`. Each LiteSpec release publishes the tool package and the site at the release version together. A consumer upgrades by changing the tool version and `reviewedLiteSpecVersion` together, after reading the contract the new release states.
+
 ## Standards
 
 ### Keep Unfinished Behavior in Draft

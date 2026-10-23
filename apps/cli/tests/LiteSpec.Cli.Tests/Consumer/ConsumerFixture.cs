@@ -395,10 +395,6 @@ static class ConsumerFixture
             ["optionalTypes"] = new JsonArray(),
         };
         WriteFile(folder.Path, "litespec.project.json", $"{Stringify(project)}\n");
-        Directory.CreateDirectory(Path.Combine(folder.Path, "litespec"));
-        File.Copy(
-            Path.Combine(Cli.Repository, "litespec.manifest.json"),
-            Path.Combine(folder.Path, "litespec", "litespec.manifest.json"));
         foreach (var page in Pages)
         {
             WriteFile(folder.Path, page.Relative, Page(Meta(page.Meta), page.Body));
@@ -406,6 +402,33 @@ static class ConsumerFixture
 
         WriteFile(folder.Path, "docs/glossary.json", $"{Stringify(Meta(GlossaryJsonText))}\n");
         return folder;
+    }
+
+    /// <summary>
+    ///     Builds a throwaway LiteSpec release a test points the tool at with
+    ///     <c>LITESPEC_HOME</c>: the tracked manifest with its schemas, mutated in place.
+    /// </summary>
+    public static TempFolder CreateHome(Action<JsonObject>? mutateManifest = null)
+    {
+        var home = Cli.Temp("consumer-home");
+        File.Copy(
+            Path.Combine(Cli.Repository, "litespec.manifest.json"),
+            Path.Combine(home.Path, "litespec.manifest.json"));
+        var schemas = Path.Combine(home.Path, "schemas");
+        Directory.CreateDirectory(schemas);
+        foreach (var schema in Directory.GetFiles(Path.Combine(Cli.Repository, "schemas")))
+        {
+            File.Copy(schema, Path.Combine(schemas, Path.GetFileName(schema)));
+        }
+
+        if (mutateManifest is not null)
+        {
+            var manifest = (JsonObject)JsonNode.Parse(File.ReadAllText(Path.Combine(home.Path, "litespec.manifest.json")))!;
+            mutateManifest(manifest);
+            File.WriteAllText(Path.Combine(home.Path, "litespec.manifest.json"), $"{Stringify(manifest)}\n");
+        }
+
+        return home;
     }
 
     /// <summary>Writes a file under the fixture root, creating its directory.</summary>

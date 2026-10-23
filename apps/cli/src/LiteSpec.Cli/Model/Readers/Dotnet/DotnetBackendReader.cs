@@ -6,7 +6,7 @@ namespace LiteSpec.Model.Readers.Dotnet;
 
 /// <summary>
 ///     Reads the backend through the parser: handlers by folder, reactions and jobs
-///     by interface, events by name, failure codes as literals, and comments as text.
+///     by interface, events by name, failure codes from Code members, and comments as text.
 /// </summary>
 sealed class DotnetBackendReader : IBackendReader
 {
@@ -129,13 +129,19 @@ sealed class DotnetBackendReader : IBackendReader
         {
             if (LiteralText(token) is { } literal)
             {
+                // Every dotted literal is evidence that a recorded code is thrown, but only
+                // a literal in a declaring position states a code of its own. Elsewhere a
+                // dotted string is an audit name, a field key, a host or a file name.
+                var declares = Declares(token);
+
                 foreach (System.Text.RegularExpressions.Match match in Identifiers.RefusalCode().Matches(literal))
                 {
                     model.Literals.Add(new CodeLiteral(
                         match.Value,
                         file,
                         tree.GetLineSpan(token.Span).StartLinePosition.Line + 1,
-                        EnclosingClass(token)));
+                        EnclosingClass(token),
+                        declares));
                 }
             }
 
@@ -274,6 +280,52 @@ sealed class DotnetBackendReader : IBackendReader
             SyntaxKind.InterpolatedStringTextToken => token.ValueText,
             _ => null,
         };
+
+    /// <summary>
+    ///     Whether a literal sits where code declares a refusal code: inside a property, field or
+    ///     constant named <c>Code</c>, as an argument of a <c>new ...Exception(...)</c>, or as a
+    ///     value named <c>code</c> (a named argument, an anonymous object member or an assignment).
+    /// </summary>
+    private static bool Declares(SyntaxToken token)
+    {
+        foreach (var node in token.Parent?.AncestorsAndSelf() ?? [])
+        {
+            switch (node)
+            {
+                case PropertyDeclarationSyntax property:
+                    return property.Identifier.ValueText == "Code";
+                case FieldDeclarationSyntax field:
+                    return field.Declaration.Variables.Any(variable => variable.Identifier.ValueText == "Code");
+                case ArgumentSyntax { NameColon.Name.Identifier.ValueText: var name } when IsCodeName(name):
+                    return true;
+                case AnonymousObjectMemberDeclaratorSyntax { NameEquals.Name.Identifier.ValueText: var name }:
+                    return IsCodeName(name);
+                case AssignmentExpressionSyntax { Left: IdentifierNameSyntax or MemberAccessExpressionSyntax or ElementAccessExpressionSyntax } assignment:
+                    return IsCodeName(LastName(assignment.Left));
+                case BaseObjectCreationExpressionSyntax creation:
+                    return creation is ObjectCreationExpressionSyntax { Type: var type }
+                        && LastName(type).EndsWith("Exception", StringComparison.Ordinal);
+                case StatementSyntax or MemberDeclarationSyntax:
+                    return false;
+            }
+        }
+
+        return false;
+
+        static bool IsCodeName(string name) => string.Equals(name, "code", StringComparison.OrdinalIgnoreCase);
+
+        static string LastName(SyntaxNode node) => node switch
+        {
+            GenericNameSyntax generic => generic.Identifier.ValueText,
+            IdentifierNameSyntax identifier => identifier.Identifier.ValueText,
+            QualifiedNameSyntax qualified => qualified.Right.Identifier.ValueText,
+            MemberAccessExpressionSyntax access => access.Name.Identifier.ValueText,
+            ElementAccessExpressionSyntax element => element.ArgumentList.Arguments.FirstOrDefault()?.Expression is LiteralExpressionSyntax key
+                ? key.Token.ValueText
+                : "",
+            _ => "",
+        };
+    }
 
     private static string? Classify(string name, List<string> bases)
     {

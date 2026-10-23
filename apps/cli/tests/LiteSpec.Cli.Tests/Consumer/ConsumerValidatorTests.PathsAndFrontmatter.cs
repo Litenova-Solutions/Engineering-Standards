@@ -24,7 +24,8 @@ public sealed partial class ConsumerValidatorTests
     public void DocumentationRootThatHoldsNoMarkdown()
     {
         using var folder = ConsumerFixture.Create();
-        ConsumerFixture.MutateProject(folder.Path, project => PathsOf(project)["docs"] = "litespec");
+        Directory.CreateDirectory(Path.Combine(folder.Path, "empty-docs"));
+        ConsumerFixture.MutateProject(folder.Path, project => PathsOf(project)["docs"] = "empty-docs");
         AssertProblem(RunConsumer(folder.Path), "Scanned no Markdown files");
     }
 

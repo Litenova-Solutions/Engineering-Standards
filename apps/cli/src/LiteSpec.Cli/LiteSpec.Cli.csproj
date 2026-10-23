@@ -7,6 +7,8 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>litespec</ToolCommandName>
         <PackageId>LiteSpec.Cli</PackageId>
+        <!-- The package version is the release version: keep it equal to version in litespec.manifest.json. -->
+        <Version>2.0.0</Version>
         <Description>The LiteSpec command line: authoring checks, the provision index, consumer and UI validation, the project model, and the project book.</Description>
     </PropertyGroup>
 
@@ -20,6 +22,19 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Book/Assets/**" LogicalName="LiteSpec.Book.Assets.%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <!--
+        The tool carries its whole release beside its binary: the manifest, schemas, docs and
+        templates land in the publish folder through these links, so dotnet pack puts them in
+        the tool's folder. They stay out of the build output: in a repository checkout
+        LiteSpecHome walks up to the repository root instead.
+    -->
+    <ItemGroup>
+        <Content Include="../../../../litespec.manifest.json" Link="litespec.manifest.json" CopyToPublishDirectory="PreserveNewest" Pack="false" />
+        <Content Include="../../../../schemas/**" Link="schemas/%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" Pack="false" />
+        <Content Include="../../../../docs/**" Link="docs/%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" Pack="false" />
+        <Content Include="../../../../templates/**" Link="templates/%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" Pack="false" />
     </ItemGroup>
 
 </Project>

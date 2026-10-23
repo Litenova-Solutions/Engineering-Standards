@@ -86,10 +86,53 @@ public sealed class OwnerTeamCheckTests
         Assert.Contains("owner list", message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Owner_Object_Mapping_A_Handle_Passes()
+    {
+        using var temp = Cli.Temp("checks");
+        WriteProjectJson(temp.Path, """{"owners": [{"name": "NightHall engineering", "codeowners": ["@acme/lending-team"]}]}""");
+        WriteCodeowners(temp.Path, "docs/domain/** @acme/lending-team\n");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("actor", "actor/reader", Path.Combine(temp.Path, "docs", "domain", "actors", "reader.md"), """{"kind": "person", "owner": "NightHall engineering"}"""));
+
+        Assert.DoesNotContain("owner-unknown", TestModel.Codes(model));
+    }
+
+    [Fact]
+    public void Plain_Owner_Matching_No_Handle_Reports_Owner_Unknown()
+    {
+        using var temp = Cli.Temp("checks");
+        WriteProject(temp.Path, "NightHall engineering");
+        WriteCodeowners(temp.Path, "* @a-shafie\n");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("actor", "actor/reader", Path.Combine(temp.Path, "docs", "domain", "actors", "reader.md"), """{"kind": "person", "owner": "NightHall engineering"}"""));
+
+        var message = Checker.Check(model).Findings.Single(finding => finding.Code == "owner-unknown").Message;
+        Assert.Contains("no team", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Owner_Object_Mapping_Another_Team_Reports_Owner_Unknown()
+    {
+        using var temp = Cli.Temp("checks");
+        WriteProjectJson(temp.Path, """{"owners": [{"name": "NightHall engineering", "codeowners": ["@acme/catalog-team"]}]}""");
+        WriteCodeowners(temp.Path, "docs/domain/** @acme/lending-team\n");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("actor", "actor/reader", Path.Combine(temp.Path, "docs", "domain", "actors", "reader.md"), """{"kind": "person", "owner": "NightHall engineering"}"""));
+
+        Assert.Contains("owner-unknown", TestModel.Codes(model));
+    }
+
     static void WriteProject(string root, params string[] owners) =>
         File.WriteAllText(
             Path.Combine(root, "litespec.project.json"),
             "{\"owners\": [" + string.Join(", ", owners.Select(owner => "\"" + owner + "\"")) + "]}");
+
+    static void WriteProjectJson(string root, string json) =>
+        File.WriteAllText(Path.Combine(root, "litespec.project.json"), json);
 
     static void WriteCodeowners(string root, string text)
     {

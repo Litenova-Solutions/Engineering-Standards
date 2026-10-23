@@ -62,6 +62,10 @@ sealed class ConsumerConfig
     /// <summary>The closed owner list.</summary>
     public IReadOnlyList<string> Owners { get; private set; } = [];
 
+    /// <summary>The CODEOWNERS handles each owner name maps to, by owner name.</summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<string>> OwnerCodeowners { get; private set; } =
+        new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
+
     /// <summary>Whether the declaration names an owner list.</summary>
     public bool HasOwners { get; private set; }
 
@@ -140,16 +144,32 @@ sealed class ConsumerConfig
             && owners.ValueKind == JsonValueKind.Array)
         {
             config.HasOwners = true;
-            config.Owners =
-            [
-                .. owners.EnumerateArray()
-                           .Select(owner => owner.ValueKind == JsonValueKind.String
-                                                ? owner.GetString()!
-                                                : owner.TryGetProperty("name", out var name)
-                                                    ? name.GetString() ?? ""
-                                                    : "")
-                           .Where(name => name.Length > 0),
-            ];
+
+            // An entry is a plain name or an object mapping a readable name to its
+            // CODEOWNERS handles. The first entry wins when two entries share a name.
+            var names = new List<string>();
+            var mapped = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
+
+            foreach (var entry in owners.EnumerateArray())
+            {
+                var name = entry.ValueKind switch
+                {
+                    JsonValueKind.String => entry.GetString(),
+                    JsonValueKind.Object when entry.TryGetProperty("name", out var named)
+                        && named.ValueKind == JsonValueKind.String => named.GetString(),
+                    _ => null,
+                };
+
+                if (name is not { Length: > 0 } || !mapped.TryAdd(name, ReadHandles(entry)))
+                {
+                    continue;
+                }
+
+                names.Add(name);
+            }
+
+            config.Owners = names;
+            config.OwnerCodeowners = mapped;
         }
 
         if (document.RootElement.TryGetProperty("optionalTypes", out var optional)
@@ -179,9 +199,28 @@ sealed class ConsumerConfig
     public string Relative(string absolute) =>
         Path.GetRelativePath(Root, absolute).Replace(Path.DirectorySeparatorChar, '/');
 
+    /// <summary>
+    ///     The owner itself plus the CODEOWNERS handles its project owners entry lists.
+    /// </summary>
+    public IReadOnlyList<string> CandidatesFor(string owner) =>
+        OwnerCodeowners.TryGetValue(owner, out var handles)
+            ? [owner, .. handles]
+            : [owner];
+
     private static IReadOnlyList<string> ReadNames(JsonElement owner, string field) =>
         owner.TryGetProperty(field, out var names) && names.ValueKind == JsonValueKind.Array
             ? [.. names.EnumerateArray().Where(entry => entry.ValueKind == JsonValueKind.String).Select(entry => entry.GetString()!)]
+            : [];
+
+    private static IReadOnlyList<string> ReadHandles(JsonElement entry) =>
+        entry.ValueKind == JsonValueKind.Object
+        && entry.TryGetProperty("codeowners", out var handles)
+        && handles.ValueKind == JsonValueKind.Array
+            ? [.. handles.EnumerateArray()
+                .Where(handle => handle.ValueKind == JsonValueKind.String)
+                .Select(handle => handle.GetString()!)
+                .Where(handle => handle.Length > 0)
+                .Distinct(StringComparer.Ordinal)]
             : [];
 
     private static string ReadString(JsonElement? paths, string field, string fallback) =>

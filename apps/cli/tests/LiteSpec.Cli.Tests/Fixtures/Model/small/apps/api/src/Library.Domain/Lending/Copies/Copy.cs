@@ -1,3 +1,5 @@
+using Library.Domain.Lending.Copies.Exceptions;
+
 namespace Library.Domain.Lending.Copies;
 
 public sealed class Copy
@@ -7,6 +9,6 @@ public sealed class Copy
     public void Retire(bool onLoan)
     {
         if (onLoan)
-            throw new InvalidOperationException("lending.copy-on-loan");
+            throw new CopyOnLoanException();
     }
 }

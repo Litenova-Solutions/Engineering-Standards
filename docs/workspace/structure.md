@@ -27,7 +27,7 @@ The model builder writes the generated project model under `.model/` from record
 ```text
 {repo}/
   .config/
-    <tool manifest>
+    dotnet-tools.json
   .model/                      generated; ignored
   apps/
     api/
@@ -71,7 +71,6 @@ The model builder writes the generated project model under `.model/` from record
     known-gaps/                create with the first known-gap record
     ui/                        create with the first UI decision or guide, held in the pattern catalog and the design contract
     glossary.json
-  litespec/
   AGENTS.md
   <toolchain pin file>
   package.json                 when a frontend or TypeScript package exists
@@ -129,7 +128,7 @@ apps/api/
 
 **Statement:** Project records MUST live under the root `docs/` directory.
 
-**Rationale:** Project records describe the product, not the standard and not the code. Placing them inside the LiteSpec submodule or the application tree makes them disappear when either is replaced. The root `docs/` directory keeps records in a place that survives replacing the standard or rewriting the application.
+**Rationale:** Project records describe the product, not the standard and not the code. Placing them inside the application tree makes them disappear when it is rewritten. The root `docs/` directory keeps records in a place that survives replacing the standard or rewriting the application.
 
 ### Keep Orientation Documents Separate from Canonical Records
 

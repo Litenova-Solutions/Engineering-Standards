@@ -12,7 +12,9 @@ litespec init --preset <name> --size <small|large> [--root <path>] [--name <proj
 
 ## Description
 
-This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the LiteSpec checkout, overlays the preset's shape, stacks, and frontends, then writes the project size, name, and `reviewedLiteSpecVersion`. It refuses to overwrite an existing project file.
+This command writes `litespec.project.json` into the consumer root. It reads the consumer template and the named preset from the release the tool carries, overlays the preset's shape, stacks, and frontends, then writes the project size, name, and `reviewedLiteSpecVersion`. It refuses to overwrite an existing project file.
+
+It also copies the starting agent context, glossary, and example cast beside the project file, leaving existing files alone. A fresh `AGENTS.md` carries the `## LiteSpec` block filled with the release, size, shape, stacks, and selection index of the new project. It writes `.config/dotnet-tools.json` pinning the `LiteSpec.Cli` tool at the release, leaving an existing tool manifest alone.
 
 Three presets ship with the release:
 
@@ -43,7 +45,7 @@ None.
 | Code | Meaning |
 |:---|:---|
 | `0` | The project file was written. |
-| `1` | The checkout holds no readable template, preset or version. |
+| `1` | The release holds no readable template, preset, scaffold file, or version. |
 | `2` | The project file exists, the preset or size is invalid, or an option is unknown. |
 
 ## Examples
@@ -62,4 +64,4 @@ litespec init --preset blazor-client --size large --name shop
 
 ## Underneath
 
-This command merges `templates/consumer/litespec.project.json` with `templates/presets/<name>.json` from the LiteSpec checkout and writes the result. Nothing beneath it is separately runnable. Validate the written file with `litespec consumer`.
+This command merges `templates/consumer/litespec.project.json` with `templates/presets/<name>.json` from the release the tool carries and writes the result. Nothing beneath it is separately runnable. Validate the written file with `litespec consumer`.

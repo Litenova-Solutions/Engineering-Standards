@@ -36,7 +36,7 @@ Each record template carries JSON frontmatter valid against [record.schema.json]
 
 ## How It Works
 
-`litespec init` accepts only the three shipped preset names and the two sizes, `small` and `large`. It reads `templates/presets/<name>.json` and `templates/consumer/litespec.project.json` from the checkout the tool belongs to, or from `LITESPEC_HOME` when set. It fills the project name from `--name` or from the target folder name, stamps `reviewedLiteSpecVersion` with the release the tool ships in, and writes the file. It reports an unreadable template or preset with exit code 1, and an existing project file or an invalid option with exit code 2.
+`litespec init` accepts only the three shipped preset names and the two sizes, `small` and `large`. It reads `templates/presets/<name>.json` and `templates/consumer/litespec.project.json` from the release the tool carries, or from `LITESPEC_HOME` when set. It fills the project name from `--name` or from the target folder name, stamps `reviewedLiteSpecVersion` with the release the tool carries, writes the file, copies the scaffold with the `## LiteSpec` block of `AGENTS.md` filled, and writes `.config/dotnet-tools.json` pinning the tool at the release. It reports an unreadable template, preset, or scaffold file with exit code 1, and an existing project file or an invalid option with exit code 2.
 
 Record authors copy templates by hand into the paths [consumer/README.md](consumer/README.md) maps. The standard seeds are never copied into consumers: the validator reads them directly as virtual pages.
 

@@ -143,5 +143,5 @@ Each release states its complete contract. Add no compatibility guarantee, migra
 
 To prepare a release:
 
-1. Name the version in [litespec.manifest.json](litespec.manifest.json), in the topmost [CHANGELOG.md](CHANGELOG.md) entry, and in `reviewedLiteSpecVersion` in [templates/consumer/litespec.project.json](templates/consumer/litespec.project.json). Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`.
+1. Name the version in [litespec.manifest.json](litespec.manifest.json), in the topmost [CHANGELOG.md](CHANGELOG.md) entry, in `reviewedLiteSpecVersion` in [templates/consumer/litespec.project.json](templates/consumer/litespec.project.json), and in `<Version>` in [apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj](apps/cli/src/LiteSpec.Cli/LiteSpec.Cli.csproj). Every schema `$id` names the release under `https://litespec.dev/<version>/schemas/`. The release publishes the `LiteSpec.Cli` tool package and the site at that version together.
 2. Tag the commit with the version number. The highest git tag is the current release, as [docs/core/maintaining.md](docs/core/maintaining.md) states.

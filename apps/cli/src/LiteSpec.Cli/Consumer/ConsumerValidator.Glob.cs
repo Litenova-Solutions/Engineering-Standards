@@ -71,7 +71,9 @@ static partial class ConsumerValidator
                 return;
             }
 
-            var matcher = SegmentMatchers.GetOrAdd(segment, key => new Regex(GlobSegment(key)));
+            // Each matcher compiles once and stays shared: it runs on every name the
+            // walk visits. Compilation changes only the speed, never what matches.
+            var matcher = SegmentMatchers.GetOrAdd(segment, key => new Regex(GlobSegment(key), RegexOptions.Compiled));
 
             foreach (var entry in entries)
             {

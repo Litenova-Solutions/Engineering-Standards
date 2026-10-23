@@ -113,31 +113,23 @@ static partial class ConsumerValidator
     static void CheckManifest(RunState run)
     {
         JsonNode? manifest = null;
+        var manifestFile = Path.Join(run.StandardsRoot, "litespec.manifest.json");
 
-        foreach (var relative in new[] { "litespec/litespec.manifest.json", "../litespec.manifest.json" })
+        if (File.Exists(manifestFile))
         {
-            var candidate = Path.Join(run.Root, relative);
-
-            if (!File.Exists(candidate))
-            {
-                continue;
-            }
-
             try
             {
-                manifest = run.ReadJson(candidate);
+                manifest = run.ReadJson(manifestFile);
             }
             catch (Exception cause)
             {
-                run.FailInput($"{relative}: not valid JSON ({cause.Message})");
+                run.FailInput($"litespec.manifest.json: not valid JSON ({cause.Message})");
             }
-
-            break;
         }
 
         // Adopting a release means accepting its complete contract, so the project
-        // records the release it reviewed. A mismatch means the pinned LiteSpec release moved
-        // without anyone re-reading the contract that now applies.
+        // records the release it reviewed. A mismatch means the installed tool
+        // carries a release nobody re-read the contract for.
         if (IsTruthy((manifest as JsonObject)?["version"]))
         {
             var version = (manifest as JsonObject)!["version"];
@@ -145,11 +137,11 @@ static partial class ConsumerValidator
 
             if (IsFalsy(reviewed))
             {
-                run.Err($"litespec.project.json: missing 'reviewedLiteSpecVersion'; the pinned LiteSpec release is {JsText(version)}");
+                run.Err($"litespec.project.json: missing 'reviewedLiteSpecVersion'; the installed LiteSpec tool release is {JsText(version)}");
             }
             else if (!StrictEqual(reviewed, version))
             {
-                run.Err($"litespec.project.json: reviewedLiteSpecVersion '{JsText(reviewed)}' does not match the pinned LiteSpec release {JsText(version)}; re-review the contract and record the new version");
+                run.Err($"litespec.project.json: reviewedLiteSpecVersion '{JsText(reviewed)}' does not match the installed LiteSpec tool release {JsText(version)}; install the reviewed release with 'dotnet tool update LiteSpec.Cli --version {JsText(reviewed)}' and run 'dotnet tool restore', or re-review the contract and record {JsText(version)}");
             }
         }
 

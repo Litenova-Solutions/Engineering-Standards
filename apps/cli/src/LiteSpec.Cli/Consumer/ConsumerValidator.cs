@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using LiteSpec.Model;
 
 namespace LiteSpec.Consumer;
 
@@ -116,6 +117,8 @@ static partial class ConsumerValidator
 
         public Dictionary<string, string> TextCache { get; } = new(StringComparer.Ordinal);
 
+        public Dictionary<string, JsonNode?> SchemaCache { get; } = new(StringComparer.Ordinal);
+
         public string StandardsRoot { get; set; } = "";
 
         public string ProjectSchemaFile { get; set; } = "";
@@ -179,6 +182,8 @@ static partial class ConsumerValidator
                 FailInput($"litespec.project.json: not valid JSON ({cause.Message})");
             }
 
+            var total = System.Diagnostics.Stopwatch.StartNew();
+            var projectWatch = System.Diagnostics.Stopwatch.StartNew();
             CheckProjectRecord(this);
             CheckManifest(this);
             CheckFrontends(this);
@@ -191,9 +196,17 @@ static partial class ConsumerValidator
                 Err($"Scanned no Markdown files under '{DocsPath}'; check paths.docs, because a consumer with no page is a misconfigured scan");
             }
 
+            projectWatch.Stop();
+            Timing.Report($"[time] consumer-project {projectWatch.Elapsed.TotalSeconds:0.0}s");
+
             CheckPages(this);
             CheckGlossaryAndProse(this);
+
+            var uiWatch = System.Diagnostics.Stopwatch.StartNew();
             CheckControlledUi(this);
+            uiWatch.Stop();
+            Timing.Report($"[time] consumer-ui {uiWatch.Elapsed.TotalSeconds:0.0}s");
+            Timing.Report($"[time] consumer total {total.Elapsed.TotalSeconds:0.0}s");
         }
 
         /// <summary>
@@ -281,7 +294,21 @@ static partial class ConsumerValidator
 
         public JsonNode? ReadJson(string file) => JsonNode.Parse(ReadText(file));
 
-        public JsonNode? ReadSchema(string file) => JsonNode.Parse(File.ReadAllText(file));
+        /// <summary>
+        ///     Reads a schema once and reuses the parsed shape: every page validates
+        ///     against the same record schema, so parsing it per page re-reads one
+        ///     file thousands of times. The evaluator never writes to a schema.
+        /// </summary>
+        public JsonNode? ReadSchema(string file)
+        {
+            if (!SchemaCache.TryGetValue(file, out var schema))
+            {
+                schema = JsonNode.Parse(File.ReadAllText(file));
+                SchemaCache[file] = schema;
+            }
+
+            return schema;
+        }
 
         public string Relative(string file) => ConsumerValidator.Relative(Root, file);
 

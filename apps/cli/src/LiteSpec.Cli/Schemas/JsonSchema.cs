@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -44,6 +46,23 @@ static class JsonSchema
 
     // Compact JSON with relaxed escaping, so structural comparison and diagnostic text stay stable.
     static readonly JsonSerializerOptions CompactJson = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
+    // A schema repeats its patterns and references on every value it meets: a
+    // record schema with hundreds of nested records resolves the same reference
+    // thousands of times per page. Each distinct expression compiles once, each
+    // reference resolves once per schema root, and the keyword gate walks each
+    // schema once. The tables hold no diagnostic text, only the parsed shapes,
+    // so every finding reads exactly as before.
+    static readonly ConcurrentDictionary<string, Regex> PatternCache = new(StringComparer.Ordinal);
+
+    static readonly ConditionalWeakTable<JsonNode, ConcurrentDictionary<string, JsonNode?>> RefCache = new();
+
+    static readonly ConditionalWeakTable<JsonNode, string[]> GateCache = new();
+
+    static readonly JsonObject NoProperties = new();
+
+    static Regex CachedPattern(string pattern) =>
+        PatternCache.GetOrAdd(pattern, expression => new Regex(expression, RegexOptions.Compiled));
 
     /// <summary>
     ///     Reports each keyword the evaluator does not implement, descending into every
@@ -153,6 +172,41 @@ static class JsonSchema
     }
 
     /// <summary>
+    ///     Resolves a local reference once per schema root and reuses the target: the
+    ///     same root resolves the same reference for every value it validates.
+    /// </summary>
+    static JsonNode? CachedRef(JsonNode root, string reference)
+    {
+        var resolved = RefCache.GetValue(root, _ => new ConcurrentDictionary<string, JsonNode?>(StringComparer.Ordinal));
+
+        if (resolved.TryGetValue(reference, out var target))
+        {
+            return target;
+        }
+
+        target = ResolveRef(root, reference);
+
+        if (target is not null)
+        {
+            resolved.TryAdd(reference, target);
+        }
+
+        return target;
+    }
+
+    /// <summary>
+    ///     The keyword gate's messages for a schema, walked once per schema root.
+    ///     The caller prefixes each one with its own location.
+    /// </summary>
+    static string[] GateMessages(JsonNode schema, string schemaFile) =>
+        GateCache.GetValue(schema, _ =>
+        {
+            var found = new List<string>();
+            UnsupportedKeywords(schema, schemaFile, "#", (_, _, _, message) => found.Add(message));
+            return found.ToArray();
+        });
+
+    /// <summary>
     ///     Validates <paramref name="value"/> against <paramref name="schema"/>, appending
     ///     one <c>{location}: ...</c> message per violation to <paramref name="errors"/>.
     ///     A missing property is distinct from an explicit JSON null.
@@ -173,7 +227,7 @@ static class JsonSchema
                 throw new InvalidOperationException($"unsupported schema reference '{Stringify(refNode)}'");
             }
 
-            var target = ResolveRef(root, reference);
+            var target = CachedRef(root, reference);
 
             if (!IsTruthy(target))
             {
@@ -317,7 +371,7 @@ static class JsonSchema
 
             if (obj.TryGetPropertyValue("pattern", out var patternNode) && patternNode is JsonValue patternValue
                 && patternValue.TryGetValue<string>(out var pattern) && !string.IsNullOrEmpty(pattern)
-                && !Regex.IsMatch(text, pattern))
+                && !CachedPattern(pattern).IsMatch(text))
             {
                 errors.Add($"{location}: string does not match {pattern}");
             }
@@ -466,13 +520,10 @@ static class JsonSchema
 
             var declared = obj.TryGetPropertyValue("properties", out var properties) && properties is JsonObject declaredFields
                 ? declaredFields
-                : new JsonObject();
-            List<KeyValuePair<string, JsonNode?>> patterns = [];
-
-            if (obj.TryGetPropertyValue("patternProperties", out var patternProperties) && patternProperties is JsonObject patternFields)
-            {
-                patterns = patternFields.ToList();
-            }
+                : NoProperties;
+            var patternFields = obj.TryGetPropertyValue("patternProperties", out var patternProperties) && patternProperties is JsonObject patterns
+                ? patterns
+                : null;
             obj.TryGetPropertyValue("additionalProperties", out var additional);
 
             foreach (var (key, child) in fields)
@@ -485,15 +536,18 @@ static class JsonSchema
                     evaluated = true;
                 }
 
-                foreach (var (expression, subschema) in patterns)
+                if (patternFields is not null)
                 {
-                    if (!Regex.IsMatch(key, expression))
+                    foreach (var (expression, subschema) in patternFields)
                     {
-                        continue;
-                    }
+                        if (!CachedPattern(expression).IsMatch(key))
+                        {
+                            continue;
+                        }
 
-                    Validate(child, subschema, root, $"{location}/{key}", errors);
-                    evaluated = true;
+                        Validate(child, subschema, root, $"{location}/{key}", errors);
+                        evaluated = true;
+                    }
                 }
 
                 if (evaluated)
@@ -528,7 +582,11 @@ static class JsonSchema
         }
 
         var problems = new List<string>();
-        UnsupportedKeywords(schema, schemaFile, "#", (_, _, _, message) => problems.Add($"{location}: {message}"));
+
+        foreach (var message in GateMessages(schema!, schemaFile))
+        {
+            problems.Add($"{location}: {message}");
+        }
 
         try
         {

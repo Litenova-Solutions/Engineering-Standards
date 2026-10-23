@@ -10,25 +10,33 @@ LiteSpec fits a team building one business application: one domain, one API, and
 
 ## Adoption Steps
 
-Teams usually adopt LiteSpec in six steps, from the pin to the checks. For the exact commands on a new repository, follow [Start a consumer repository](../tutorial/getting-started.md).
+Teams usually adopt LiteSpec in six steps, from the install to the checks. For the exact commands on a new repository, follow [Start a consumer repository](../tutorial/getting-started.md).
 
-### 1. Pin a Release
+### 1. Install the Release
 
-Add the LiteSpec repository to the project as a Git submodule at `litespec/`, at a release tag such as `v2.0.0`. That copy is the contract: it does not change until the tag moves, so a new LiteSpec release never breaks the build by surprise. The team adopts a newer release when it chooses, by moving the pin and reading the new release.
+Install the `litespec` command line as a local .NET tool at the release the team adopts, such as `2.0.0`:
+
+```bash
+dotnet new tool-manifest
+dotnet tool install LiteSpec.Cli --version 2.0.0
+dotnet tool restore
+```
+
+Run the first command only when the project has no `.config/dotnet-tools.json` yet. The installed release is the contract: it carries the manifest, schemas, docs, and templates the version names, and it never changes until the version moves, so a new LiteSpec release never breaks the build by surprise. The team adopts a newer release when it chooses, by moving the version and reading the new release.
 
 ### 2. Describe the Project
 
-Run `litespec init` with the preset closest to the stack and the size:
+Run `dotnet litespec init` with the preset closest to the stack and the size:
 
 ```bash
-litespec init --preset dotnet-react --size small
+dotnet litespec init --preset dotnet-react --size small
 ```
 
-It writes `litespec.project.json` with the size, shape, and stacks, and records the release the team reviewed in `reviewedLiteSpecVersion`. Fill in the owners and paths, and select the extensions the project needs. The [selection page](https://litespec.dev/2.0.0/select/) shows which pages the choices apply.
+It writes `litespec.project.json` with the size, shape, and stacks, records the release the team reviewed in `reviewedLiteSpecVersion`, and writes the starting agent context, glossary, and example cast beside it. Fill in the owners and paths, and select the extensions the project needs. The [selection page](https://litespec.dev/2.0.0/select/) shows which pages the choices apply.
 
 ### 3. Tell the Agents
 
-Add a LiteSpec section to the project's `AGENTS.md`. The selection page gives you the block to paste, and the `templates/consumer/project-agents.md` template in the release gives you a full starting file. From then on, every agent working in the repository loads the same rules.
+`litespec init` writes the `## LiteSpec` block into the project's `AGENTS.md`, with the release, size, shape, stacks, and selection index of the new project. For an existing project, the selection page gives you the block to paste. From then on, every agent working in the repository loads the same rules.
 
 ### 4. Write the First Records
 
@@ -39,13 +47,13 @@ Start with the product: one `docs/product/brief.md` that says what the product i
 Build the first use case the way the standard describes: the backend projects, the handler in its folder, the refusal codes, the tests. Then build the model to see what the builder finds:
 
 ```bash
-litespec model build
-litespec model check
+dotnet litespec model build
+dotnet litespec model check
 ```
 
 ### 6. Add the Checks to CI
 
-Run `litespec consumer`, `litespec model check`, and the gates the [CI page](../quality/ci.md) lists for each area on every pull request. A gap then shows up in the change that caused it, not months later.
+Run `dotnet litespec consumer`, `dotnet litespec model check`, and the gates the [CI page](../quality/ci.md) lists for each area on every pull request. A gap then shows up in the change that caused it, not months later.
 
 ## Departures During Adoption
 

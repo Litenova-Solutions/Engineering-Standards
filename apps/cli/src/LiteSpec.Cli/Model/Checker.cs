@@ -172,7 +172,7 @@ static partial class Checker
             {
                 findings.Add(new Finding("owner-unknown", $"Record '{record.Id}' names owner '{record.Owner}', which the owner list does not hold.", record.File, record.Line, SubjectOf(record)));
             }
-            else if (record.Owner is { } owner && !owners.Covers(model.Config.Root, record.File, owner))
+            else if (record.Owner is { } owner && !owners.Covers(model.Config.Root, record.File, model.Config.CandidatesFor(owner)))
             {
                 findings.Add(new Finding("owner-unknown", $"Record '{record.Id}' names owner '{owner}', which belongs to no team owning its path.", record.File, record.Line, SubjectOf(record)));
             }
@@ -1106,7 +1106,7 @@ static partial class Checker
             .OfType<string>()
             .ToHashSet(StringComparer.Ordinal);
 
-        foreach (var literal in model.Code.Literals)
+        foreach (var literal in model.Code.Literals.Where(literal => literal.Declares))
         {
             if (!declared.Contains(literal.Value))
             {
@@ -1512,9 +1512,10 @@ static partial class Checker
     sealed record CodeownerRule(Regex Matcher, IReadOnlyList<string> Owners);
 
     /// <summary>
-    ///     The consumer CODEOWNERS file, when one exists: a record's owner matches an owner
-    ///     of the last pattern its path matches. Basename patterns match in any folder,
-    ///     directory patterns own everything beneath, and `*`, `**` and `?` span as usual.
+    ///     The consumer CODEOWNERS file, when one exists: a record's owner, or a CODEOWNERS
+    ///     handle its project owners entry lists, matches an owner of the last pattern its
+    ///     path matches. Basename patterns match in any folder, directory patterns own
+    ///     everything beneath, and `*`, `**` and `?` span as usual.
     /// </summary>
     sealed class Codeowners
     {
@@ -1538,8 +1539,8 @@ static partial class Checker
             return new Codeowners([]);
         }
 
-        /// <summary>Whether the owner matches an owner of the file's path, or no rule constrains the path.</summary>
-        public bool Covers(string root, string file, string owner)
+        /// <summary>Whether a candidate matches an owner of the file's path, or no rule constrains the path.</summary>
+        public bool Covers(string root, string file, IReadOnlyList<string> candidates)
         {
             if (_rules.Count == 0)
             {
@@ -1557,7 +1558,7 @@ static partial class Checker
                 }
             }
 
-            return hit is null || hit.Any(entry => OwnerMatches(entry, owner));
+            return hit is null || candidates.Any(candidate => hit.Any(entry => OwnerMatches(entry, candidate)));
         }
 
         private static IReadOnlyList<CodeownerRule> Parse(string text)
@@ -1589,9 +1590,10 @@ static partial class Checker
         private static bool OwnerMatches(string entry, string owner)
         {
             var named = entry.StartsWith('@') ? entry[1..] : entry;
+            var claimed = owner.StartsWith('@') ? owner[1..] : owner;
 
-            return named.Equals(owner, StringComparison.OrdinalIgnoreCase)
-                || named.EndsWith("/" + owner, StringComparison.OrdinalIgnoreCase);
+            return named.Equals(claimed, StringComparison.OrdinalIgnoreCase)
+                || named.EndsWith("/" + claimed, StringComparison.OrdinalIgnoreCase);
         }
 
         private static Regex RuleMatcher(string pattern)

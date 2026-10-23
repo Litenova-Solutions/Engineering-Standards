@@ -1,8 +1,8 @@
 <Project>
     <!--
         The one source of package versions for the LiteSpec repository's own
-        tools. Kept beside Directory.Build.props so the consumer's central
-        versions do not apply inside the LiteSpec repository.
+        tools. Kept beside Directory.Build.props so central versions in a
+        parent folder do not apply inside the LiteSpec repository.
     -->
     <ItemGroup>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />

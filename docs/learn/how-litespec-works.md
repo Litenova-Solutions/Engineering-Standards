@@ -10,12 +10,12 @@ LiteSpec has four parts. Each one answers a different question.
 
 | Part | What it is | The question it answers |
 |:---|:---|:---|
-| The standard | The pages under `docs/` in the LiteSpec repository, pinned at a release | How do we build? |
+| The standard | The pages of one LiteSpec release, carried by the installed tool | How do we build? |
 | Records | Short Markdown pages in your project, each with a small JSON header | What do we build, and why? |
 | The model | A file the `litespec model` command computes from your records and code | Does what we built match what we wrote? |
 | The tools | The `litespec` command line | Is everything consistent, and what is missing? |
 
-Your project pins one LiteSpec release, usually as a Git submodule at `litespec/`. The pinned release never changes under you. When you want a newer one, you move the pin.
+Your project installs one LiteSpec release as a local .NET tool. The installed release never changes under you. When you want a newer one, you move the version.
 
 The diagram below shows how the four parts connect in a loop, with the checks sending their findings back to the records.
 
@@ -91,7 +91,7 @@ The handler refuses an expense above the threshold that carries no receipt with 
 Run the model builder from the project root:
 
 ```bash
-litespec model build
+dotnet litespec model build
 ```
 
 It reads every record, the C# code, the frontend routes, and the test results, and writes `.model/model.json`. It reports one summary line with the totals, for example:
@@ -103,7 +103,7 @@ It reads every record, the C# code, the frontend routes, and the test results, a
 Then ask about one record:
 
 ```bash
-litespec model query use-case/spending.submit-expense
+dotnet litespec model query use-case/spending.submit-expense
 ```
 
 Alongside the record's own fields, the answer holds what the builder worked out from the code:
@@ -137,9 +137,9 @@ The use case is implemented: the builder found its handler. Two tests claim its 
 
 ### 4. the Reported Gaps
 
-`litespec model check` turns gaps into findings: a use case with no handler, a result the code never returns, a link to a record that does not exist, or a requirement nothing fulfills. `litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
+`dotnet litespec model check` turns gaps into findings: a use case with no handler, a result the code never returns, a link to a record that does not exist, or a requirement nothing fulfills. `dotnet litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
 
-For example, if the submit-expense page named no success result, `litespec model check` reports `use-case-without-success` against `docs/domain/modules/spending/expenses/submit-expense.md`, and the pull request fails until the record names one.
+For example, if the submit-expense page named no success result, `dotnet litespec model check` reports `use-case-without-success` against `docs/domain/modules/spending/expenses/submit-expense.md`, and the pull request fails until the record names one.
 
 ## The Provision Identifier
 

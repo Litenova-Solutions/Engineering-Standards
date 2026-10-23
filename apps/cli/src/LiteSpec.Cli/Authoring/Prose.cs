@@ -18,38 +18,43 @@ static partial class Prose
 
     // .NET \b reaches Unicode letters, so every word boundary is written out as
     // an explicit ASCII class. Case-insensitive matches are culture-invariant,
-    // so the same text reports the same diagnostics on every machine.
-    const RegexOptions WordOptions = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
+    // so the same text reports the same diagnostics on every machine. Every
+    // pattern below runs on each page of a large consumer, so each one compiles
+    // once instead of interpreting on every match. Compilation changes only the
+    // speed, never what matches.
+    const RegexOptions WordOptions = RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled;
+
+    const RegexOptions PlainOptions = RegexOptions.Compiled;
 
     // The page's metadata block: three dashes, one JSON object, three dashes, with
     // an optional leading byte-order mark (U+FEFF). The mark is built from its
     // code point so this file stays plain ASCII.
     static readonly Regex MetadataBlock = new(
-        "\\A(?:" + char.ConvertFromUtf32(0xFEFF) + ")?---\\r?\\n\\{[\\s\\S]*?\\r?\\n\\}\\r?\\n---\\r?\\n");
+        "\\A(?:" + char.ConvertFromUtf32(0xFEFF) + ")?---\\r?\\n\\{[\\s\\S]*?\\r?\\n\\}\\r?\\n---\\r?\\n", PlainOptions);
 
     // A generated region holds text the model builder wrote, so the measures do not
     // reach inside one. An opener with no closer is left alone: an unclosed region
     // is a builder defect rather than prose a page author can fix.
-    static readonly Regex GeneratedRegion = new(@"<!--\s*generated:[^>]*-->[\s\S]*?<!--\s*/generated:[^>]*-->");
+    static readonly Regex GeneratedRegion = new(@"<!--\s*generated:[^>]*-->[\s\S]*?<!--\s*/generated:[^>]*-->", PlainOptions);
 
     static readonly Regex LabelPrefix = new(@"^\s*\*\*(?:Statement|Deviation|Rationale|Example|Default|Replacement):\*\*\s*", WordOptions);
-    static readonly Regex InlineCode = new(@"`[^`]*`");
-    static readonly Regex Image = new(@"!\[([^\]]*)\]\([^)]+\)");
-    static readonly Regex Link = new(@"\[([^\]]+)\]\([^)]+\)");
-    static readonly Regex Autolink = new(@"<https?:[^>]+>");
-    static readonly Regex BareUrl = new(@"https?://\S+");
-    static readonly Regex HtmlTag = new(@"<[^>]+>");
-    static readonly Regex Emphasis = new(@"[*_~]");
-    static readonly Regex HeadingAnchor = new(@"\{#[^}]+\}");
-    static readonly Regex Whitespace = new(@"\s+");
-    static readonly Regex WordPattern = new(@"[A-Za-z0-9][A-Za-z0-9@#%+&'./:-]*");
-    static readonly Regex TitleAbbreviation = new(@"(?<![A-Za-z0-9_])(?:Mr|Mrs|Ms|Dr|vs)\.");
-    static readonly Regex InitialLetter = new(@"(?<![A-Za-z0-9_])[A-Z]\.");
-    static readonly Regex DotBeforeAlnum = new(@"\.(?=[A-Za-z0-9])");
-    static readonly Regex DotInsideAlnum = new(@"(?<=[A-Za-z0-9])\.(?=[A-Za-z0-9])");
-    static readonly Regex SentencePattern = new(@"[^.!?]+[.!?]+|[^.!?]+$");
+    static readonly Regex InlineCode = new(@"`[^`]*`", PlainOptions);
+    static readonly Regex Image = new(@"!\[([^\]]*)\]\([^)]+\)", PlainOptions);
+    static readonly Regex Link = new(@"\[([^\]]+)\]\([^)]+\)", PlainOptions);
+    static readonly Regex Autolink = new(@"<https?:[^>]+>", PlainOptions);
+    static readonly Regex BareUrl = new(@"https?://\S+", PlainOptions);
+    static readonly Regex HtmlTag = new(@"<[^>]+>", PlainOptions);
+    static readonly Regex Emphasis = new(@"[*_~]", PlainOptions);
+    static readonly Regex HeadingAnchor = new(@"\{#[^}]+\}", PlainOptions);
+    static readonly Regex Whitespace = new(@"\s+", PlainOptions);
+    static readonly Regex WordPattern = new(@"[A-Za-z0-9][A-Za-z0-9@#%+&'./:-]*", PlainOptions);
+    static readonly Regex TitleAbbreviation = new(@"(?<![A-Za-z0-9_])(?:Mr|Mrs|Ms|Dr|vs)\.", PlainOptions);
+    static readonly Regex InitialLetter = new(@"(?<![A-Za-z0-9_])[A-Z]\.", PlainOptions);
+    static readonly Regex DotBeforeAlnum = new(@"\.(?=[A-Za-z0-9])", PlainOptions);
+    static readonly Regex DotInsideAlnum = new(@"(?<=[A-Za-z0-9])\.(?=[A-Za-z0-9])", PlainOptions);
+    static readonly Regex SentencePattern = new(@"[^.!?]+[.!?]+|[^.!?]+$", PlainOptions);
 
-    static readonly Regex TableRow = new(@"^\s*\|");
+    static readonly Regex TableRow = new(@"^\s*\|", PlainOptions);
 
     // A column that exists to list rejected words has to be able to contain them.
     // A glossary states `Avoid` beside each term and a module states

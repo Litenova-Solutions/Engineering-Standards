@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using LiteSpec.Authoring;
+using LiteSpec.Model;
 using LiteSpec.Schemas;
 using LiteSpec.Ui;
 
@@ -17,6 +18,7 @@ static partial class ConsumerValidator
     /// </summary>
     static void CheckGlossaryAndProse(RunState run)
     {
+        var pagesWatch = System.Diagnostics.Stopwatch.StartNew();
         var paths = (run.Project as JsonObject)?["paths"] as JsonObject;
         var glossaryPath = PropString(paths, "glossary");
         var glossaryFile = glossaryPath is not null ? Path.Join(run.Root, glossaryPath) : Path.Join(run.DocsRoot, "glossary.json");
@@ -121,6 +123,9 @@ static partial class ConsumerValidator
             });
         }
 
+        pagesWatch.Stop();
+        Timing.Report($"[time] consumer-glossary-pages {pagesWatch.Elapsed.TotalSeconds:0.0}s");
+
         // The documentation tree is one of the surfaces a word reaches, and usually
         // the smallest. A project's source, its interface copy, its API contract and
         // its tests carry the same vocabulary to a developer, a customer and a
@@ -130,6 +135,7 @@ static partial class ConsumerValidator
         // A scope in the glossary is written against the documentation root
         // for a page under it, and against the repository root for one of these
         // files, because there is no other root the two have in common.
+        var surfacesWatch = System.Diagnostics.Stopwatch.StartNew();
         var scannedSurfaces = 0;
         var glossaryScan = paths?["glossaryScan"] is JsonArray patterns ? patterns.ToList() : new List<JsonNode?>();
 
@@ -174,6 +180,9 @@ static partial class ConsumerValidator
                 });
             }
         }
+
+        surfacesWatch.Stop();
+        Timing.Report($"[time] consumer-glossary-surfaces {surfacesWatch.Elapsed.TotalSeconds:0.0}s");
 
         // Every language finding is an error. The vocabulary is the project's own,
         // so a term it rejects or a mannered term it names is a term it chose to act on.

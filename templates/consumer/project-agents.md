@@ -1,10 +1,16 @@
 # <Project> agent context
 
-Read `litespec/AGENTS.md`, then `litespec.project.json`, before changing the project. (litespec/core/agent#select-task-context)
+## LiteSpec
+This project follows LiteSpec __LITESPEC_VERSION__: size __SIZE__, shape __SHAPE__, stacks __STACKS__, extensions none.
+Before a task, read https://litespec.dev/__LITESPEC_VERSION__/select/__SELECTION_KEY__/llms.txt and fetch only the pages the task touches.
+Selected extensions: none
+UI work: the pattern pages listed in that index.
+
+Read `litespec.project.json` before changing the project. (litespec/core/agent#select-task-context)
 
 Query the model builder for the records a task touches, with their links and the tool-read code and test state, instead of reading page lists. (litespec/core/agent#select-task-context, litespec/core/scope#record-selected-extensions)
 
-`litespec model query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further. (litespec/core/agent#select-task-context)
+`dotnet litespec model query <record-id>` returns one record with its links. Query the record before changing behavior it describes, and query again when a link leads further. (litespec/core/agent#select-task-context)
 
 A project Deviation record overrides a Standard only when it names the provision ID, with reason and review date. (litespec/core/agent#apply-guidance-precedence)
 
@@ -27,7 +33,7 @@ Run the root pnpm gates for every changed frontend in `litespec.project.json`. (
 
 Run metadata and model checks for each changed record, source, test, or generated contract. Query the model again after the change, and report what stays red. (litespec/core/system#update-records-with-behavior, litespec/core/authoring#declare-structured-specification-metadata)
 
-Run `litespec model render` after adding, approving, or retiring a record, so generated regions match the model. (litespec/core/system#update-records-with-behavior)
+Run `dotnet litespec model render` after adding, approving, or retiring a record, so generated regions match the model. (litespec/core/system#update-records-with-behavior)
 
 Report every skipped check with its reason. (litespec/core/release#report-verification-exactly)
 
@@ -35,6 +41,6 @@ Compose each route from one floorplan in the frontend `DESIGN.md`, or name the d
 
 Cite every path of every use case a route calls in a test title, or record an exclusion with its reach. (litespec/frontend/web/ui#prove-every-result-a-route-calls)
 
-Run `litespec ui` after changing UI configuration, vocabulary, the design contract, source locks, CSS, or primitives. Run the route suite after changing a route. (litespec/frontend/web/ui#prove-ui-behavior-and-appearance, litespec/frontend/web/ui#check-every-route-in-a-browser)
+Run `dotnet litespec ui` after changing UI configuration, vocabulary, the design contract, source locks, CSS, or primitives. Run the route suite after changing a route. (litespec/frontend/web/ui#prove-ui-behavior-and-appearance, litespec/frontend/web/ui#check-every-route-in-a-browser)
 
 Record a deviation before selecting another visual system or component base. (litespec/frontend/ui#select-one-visual-authority)

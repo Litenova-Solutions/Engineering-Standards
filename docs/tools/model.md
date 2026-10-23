@@ -58,7 +58,7 @@ The finding codes are:
 | `record-shape` | A record fails the shape its type requires. |
 | `identifier-form` | An identifier breaks the form its type requires. |
 | `identifier-duplicate` | One identifier names two records. |
-| `reference-unresolved` | A citation names no written record or pinned shared provision. |
+| `reference-unresolved` | A citation names no written record or shared provision of the installed release. |
 | `draft-gate` | An approved record rests on a draft decision. |
 | `owner-unknown` | A record names an owner or decider the owners list does not hold, or an owner no team owning its path claims. |
 | `draft-without-decider` | A draft names no decider or no decide-by date. |
@@ -159,4 +159,4 @@ litespec model diff main --root ../consumer --format markdown --breaking-only --
 
 ## Underneath
 
-The builder reads `paths`, `shape`, and `stacks` from the consumer's `litespec.project.json`. It reads shared provisions from the pinned docs under `litespec/docs`, the record owners from the CODEOWNERS file at `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS`, and the test run from TRX or JUnit XML files under `paths.testResults`. A git diff base is read through an archive into a temporary folder, which is removed after the diff. Nothing beneath it is separately runnable.
+The builder reads `paths`, `shape`, and `stacks` from the consumer's `litespec.project.json`. It reads shared provisions from the release the tool carries, the record owners from the CODEOWNERS file at `.github/CODEOWNERS`, `CODEOWNERS`, or `docs/CODEOWNERS`, and the test run from TRX or JUnit XML files under `paths.testResults`. A git diff base is read through an archive into a temporary folder, which is removed after the diff. Nothing beneath it is separately runnable.

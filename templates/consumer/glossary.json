@@ -1,5 +1,5 @@
 {
-  "$schema": "../litespec/schemas/glossary.schema.json",
+  "$schema": "https://litespec.dev/2.0.0/schemas/glossary.schema.json",
   "schemaVersion": 2,
   "terms": [
     {

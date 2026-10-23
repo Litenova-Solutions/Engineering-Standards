@@ -77,10 +77,12 @@ sealed class UiFixture : IDisposable
     static readonly JsonSerializerOptions Indented = new() { WriteIndented = true };
 
     readonly TempFolder temp;
+    readonly TempFolder home;
 
-    UiFixture(TempFolder temp)
+    UiFixture(TempFolder temp, TempFolder home)
     {
         this.temp = temp;
+        this.home = home;
     }
 
     /// <summary>The consumer root.</summary>
@@ -122,16 +124,16 @@ sealed class UiFixture : IDisposable
     /// <summary>The baseline configuration file.</summary>
     public string ComponentsFile => Join("packages/ui/components.json");
 
-    /// <summary>The vendored LiteSpec checkout the fixture-local run resolves.</summary>
-    public string LiteSpecDir => Join("litespec");
+    /// <summary>The fixture LiteSpec release the fixture-local run resolves.</summary>
+    public string HomeDir => home.Path;
 
     /// <summary>The fixture pattern page the fixture-local run reads.</summary>
-    public string FixturePatternPage => Join("litespec/docs/frontend/patterns/page-frames.md");
+    public string FixturePatternPage => Path.Join(HomeDir, "docs", "frontend", "patterns", "page-frames.md");
 
     /// <summary>Builds a fresh fixture from the tracked templates.</summary>
     public static UiFixture Create()
     {
-        var fixture = new UiFixture(Cli.Temp("ui"));
+        var fixture = new UiFixture(Cli.Temp("ui"), Cli.Temp("ui-home"));
         fixture.Build();
         return fixture;
     }
@@ -151,12 +153,12 @@ sealed class UiFixture : IDisposable
 
     /// <summary>
     /// Runs <c>litespec ui</c> against the fixture with the LiteSpec home pointed at the
-    /// fixture's own vendored copy, so the pattern pages it reads are the fixture pages.
+    /// fixture release, so the pattern pages it reads are the fixture pages.
     /// </summary>
     public CliResult RunWithFixtureHome() => Cli.Run(
         new[] { "ui", "--root", Root },
         null,
-        new Dictionary<string, string> { ["LITESPEC_HOME"] = LiteSpecDir });
+        new Dictionary<string, string> { ["LITESPEC_HOME"] = HomeDir });
 
     /// <summary>Every problem line the run printed, without the leading marker.</summary>
     public static List<string> Problems(CliResult result) => result.Output
@@ -331,7 +333,11 @@ sealed class UiFixture : IDisposable
         });
     }
 
-    public void Dispose() => temp.Dispose();
+    public void Dispose()
+    {
+        temp.Dispose();
+        home.Dispose();
+    }
 
     string Join(string relative) => Path.Join(Root, relative.Replace('/', Path.DirectorySeparatorChar));
 
@@ -346,21 +352,21 @@ sealed class UiFixture : IDisposable
             "apps/web/src/modules",
             "apps/web/tests/routes",
             "docs/deviations",
-            "litespec/schemas",
-            "litespec/docs/frontend/patterns",
         })
         {
             Directory.CreateDirectory(Join(directory));
         }
 
-        File.Copy(Path.Join(Cli.Repository, "litespec.manifest.json"), Path.Join(LiteSpecDir, "litespec.manifest.json"));
+        Directory.CreateDirectory(Path.Join(HomeDir, "schemas"));
+        Directory.CreateDirectory(Path.Join(HomeDir, "docs", "frontend", "patterns"));
+        File.Copy(Path.Join(Cli.Repository, "litespec.manifest.json"), Path.Join(HomeDir, "litespec.manifest.json"));
         foreach (var schema in Directory.GetFiles(Path.Join(Cli.Repository, "schemas")))
         {
-            File.Copy(schema, Path.Join(LiteSpecDir, "schemas", Path.GetFileName(schema)));
+            File.Copy(schema, Path.Join(HomeDir, "schemas", Path.GetFileName(schema)));
         }
 
-        // The citation cases run with the fixture as the LiteSpec home, so the pattern
-        // page they read is this fixture rather than the release's own pages.
+        // The citation cases run with the fixture release as the LiteSpec home, so the
+        // pattern page they read is this fixture rather than the release's own pages.
         File.WriteAllText(FixturePatternPage, FixturePatternPageText);
 
         var project = (JsonObject)ReadJson(Path.Join(Cli.Repository, "templates/consumer/litespec.project.json"))!;
@@ -371,7 +377,6 @@ sealed class UiFixture : IDisposable
         WriteJson(ProjectFile, project);
 
         var sourceLock = (JsonObject)ReadJson(Path.Join(Cli.Repository, "templates/consumer/ui-source-lock.json"))!;
-        sourceLock["$schema"] = "./litespec/schemas/ui-source-lock.schema.json";
         WriteJson(LockFile, sourceLock);
 
         File.WriteAllText(Join("packages/ui/src/components/button.tsx"), ButtonSource);

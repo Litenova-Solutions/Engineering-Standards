@@ -68,7 +68,7 @@ static partial class UiValidator
 
         if (LiteSpecHome.Root is null)
         {
-            Console.Error.WriteLine($"No LiteSpec checkout was found above '{AppContext.BaseDirectory}'. Set LITESPEC_HOME to the folder that holds {LiteSpecHome.ManifestFile}.");
+            Console.Error.WriteLine($"No LiteSpec release was found above '{AppContext.BaseDirectory}'. Set LITESPEC_HOME to the folder that holds {LiteSpecHome.ManifestFile}.");
             return 2;
         }
 
@@ -268,16 +268,9 @@ static partial class UiValidator
             }
 
             var project = ReadJson(projectFile, "litespec.project.json");
-            // The consumer's pinned release first, then a checkout one folder up, then
-            // the checkout this tool runs from, the way every other command finds it.
-            var manifestFile = new[]
-                {
-                    Path.Combine(Root, "litespec", "litespec.manifest.json"),
-                    Path.Combine(Root, "..", "litespec.manifest.json"),
-                }
-                .FirstOrDefault(File.Exists)
-                ?? (LiteSpecHome.Root is { } home ? Path.Combine(home, LiteSpecHome.ManifestFile) : Path.Combine(Root, "..", "litespec.manifest.json"));
-            Manifest = File.Exists(manifestFile) ? ReadJson(manifestFile, RelativeToRoot(manifestFile)) : null;
+            // The manifest comes from the release the tool carries, the way every other command finds it.
+            var manifestFile = LiteSpecHome.Root is { } home ? Path.Combine(home, LiteSpecHome.ManifestFile) : null;
+            Manifest = manifestFile is not null && File.Exists(manifestFile) ? ReadJson(manifestFile, RelativeToRoot(manifestFile)) : null;
 
             var frontends = Chain(project, "paths", "frontends").Node is JsonArray array
                 ? array.ToList()
