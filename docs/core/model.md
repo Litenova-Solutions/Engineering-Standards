@@ -437,7 +437,7 @@ Success names the submitted ending, the refusal carries the code `spending.recei
 
 **Statement:** Implemented, verified, and reachable MUST come from the builder, never from handwriting.
 
-**Rationale:** Handwritten status drifts: a record marked implemented stays marked after its handler is deleted. Computed status cannot drift, because the builder re-derives it from handlers, routes, scenarios, and test runs on every run. A use case reads implemented when its handler exists, verified when every scenario passes its proof, and a requirement reads verified when everything fulfilling it is verified.
+**Rationale:** Handwritten status drifts: a record marked implemented stays marked after its handler is deleted. Computed status cannot drift, because the builder re-derives it from handlers, routes, scenarios, and test runs on every run. A use case reads implemented when a handler, reaction, job, or endpoint carries it out, verified when every scenario passes its proof, and a requirement reads verified when everything fulfilling it is verified.
 
 **Example:** A use case reads implemented when its handler exists.
 

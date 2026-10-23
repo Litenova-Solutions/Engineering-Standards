@@ -825,6 +825,13 @@ static partial class ModelBuilder
             }
         }
 
+        // An endpoint that holds its behavior itself, with no handler behind it, implements
+        // its use case too: a small development or session route needs no command.
+        foreach (var endpoint in model.Code.Endpoints)
+        {
+            implemented.Add(endpoint.UseCaseId);
+        }
+
         var scenarios = model.Records.Where(record => record.Type == "scenario").ToList();
 
         foreach (var useCase in model.Records.Where(record => record.Type == "use-case"))
