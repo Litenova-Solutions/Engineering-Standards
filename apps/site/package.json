@@ -11,7 +11,8 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "test": "node --test \"src/**/*.test.ts\"",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy --config ../../wrangler.jsonc",
+    "deploy:preview": "wrangler preview --config ../../wrangler.jsonc"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.3.1",
