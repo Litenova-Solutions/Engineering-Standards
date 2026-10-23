@@ -14,6 +14,7 @@ static class ModelCommand
           litespec model check --root <consumer> [--format json]
           litespec model render --root <consumer>
           litespec model query --root <consumer> <id>
+          litespec model approve --root <consumer> (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>]
           litespec model diff <base> --root <consumer> [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
           litespec model --help
 
@@ -31,9 +32,24 @@ static class ModelCommand
         var command = args[0];
         var parsed = CliArgs.Parse(
             args[1..],
-            command == "diff" ? ["--breaking-only", "--intent", "--behavior"] : [],
-            command == "diff" ? ["--root", "--out", "--format", "--fail-on"] : ["--root", "--out", "--format"],
-            maxPositionals: command is "query" or "diff" ? 1 : 0);
+            command switch
+            {
+                "diff" => ["--breaking-only", "--intent", "--behavior"],
+                "approve" => ["--all"],
+                _ => [],
+            },
+            command switch
+            {
+                "diff" => ["--root", "--out", "--format", "--fail-on"],
+                "approve" => ["--root", "--by", "--on"],
+                _ => ["--root", "--out", "--format"],
+            },
+            maxPositionals: command switch
+            {
+                "query" or "diff" => 1,
+                "approve" => int.MaxValue,
+                _ => 0,
+            });
 
         if (parsed.Help)
         {
@@ -151,6 +167,40 @@ static class ModelCommand
 
                     Console.WriteLine($"{changed.Count} files rewritten.");
                     return 0;
+                }
+
+                case "approve":
+                {
+                    var model = ModelBuilder.Build(config);
+                    var all = parsed.Has("--all");
+                    var ids = parsed.Positionals;
+
+                    if (!all && ids.Count == 0)
+                    {
+                        Console.Error.WriteLine("Approve needs record ids, or --all for every approved or reviewed record with no approvedHash.");
+                        return 2;
+                    }
+
+                    var written = model.Records.Where(record => !record.Derived).ToList();
+                    var targets = all
+                        ? written.Where(record => record.Status is "approved" or "reviewed" && string.IsNullOrEmpty(record.ApprovedHash)).ToList()
+                        : written.Where(record => ids.Contains(record.Id)).ToList();
+                    var unknown = all ? [] : ids.Where(id => written.All(record => record.Id != id)).ToList();
+                    var on = parsed.Value("--on") ?? DateTime.UtcNow.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+                    var (stamped, missing) = Approver.Approve(model, targets, parsed.Value("--by"), on);
+
+                    foreach (var record in stamped)
+                    {
+                        Console.WriteLine($"{config.Relative(record.File)}: {record.Id} {Checker.SemanticHash(record)}");
+                    }
+
+                    foreach (var id in unknown.Concat(missing))
+                    {
+                        Console.Error.WriteLine($"No written record holds '{id}'.");
+                    }
+
+                    Console.WriteLine($"{stamped.Count} records approved.");
+                    return unknown.Count + missing.Count > 0 ? 1 : 0;
                 }
 
                 case "query":

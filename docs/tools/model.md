@@ -11,12 +11,15 @@ litespec model build [--root <consumer>] [--out <file>]
 litespec model check [--root <consumer>] [--format json]
 litespec model render [--root <consumer>]
 litespec model query [--root <consumer>] <id>
+litespec model approve [--root <consumer>] (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>]
 litespec model diff <base> [--root <consumer>] [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
 ```
 
 ## Description
 
 The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, the computed `implemented`, `verified`, `stale`, and `reachable` state of each record, and the effective status of each record. Computed states are never written on a record; they appear in the book and the model output only.
+
+`approve` writes approval data onto the named records, or with `--all` onto every approved or reviewed record that carries no `approvedHash`. It sets `approvedBy` (from `--by`, else the record decider, else its owner) and `approvedOn` (from `--on`, else today) when they are missing, and always writes `approvedHash`, the builder hash over the record semantic fields. A person runs it when they approve or review a record; agents run it only with `--by "auto (veto window)"` for a tier-3 question past its veto window.
 
 Aggregate transitions and data, and scenario examples, may be written as Markdown tables the builder parses, so the parts people debate read naturally even in the raw file. A front-matter field wins over a table with the same name.
 
@@ -170,6 +173,12 @@ Print one record with its links:
 
 ```bash
 litespec model query --root ../consumer use-case/orders.cancel-order
+```
+
+Record the founder approving two requirements:
+
+```bash
+litespec model approve --root ../consumer requirement/buyers.guest-checkout requirement/buyers.all-in-first-price --by "NightHall founder"
 ```
 
 Diff the working tree against the main branch:

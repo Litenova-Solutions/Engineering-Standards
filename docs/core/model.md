@@ -241,7 +241,7 @@ The builder also writes each record effective status: draft when the record, a d
 
 ### Approval as Data
 
-An approved or reviewed record carries its approval as data: `approvedBy` names a person owner or `auto (veto window)`, `approvedOn` names the date, and `approvedHash` is the builder hash over the semantic fields. The semantic fields are the statements, results, output names, rules, and steps. Prose bodies sit outside the hash, so rewording prose reopens no approval. `approval-reopened` fires when the semantic hash differs from `approvedHash`.
+An approved or reviewed record carries its approval as data: `approvedBy` names a person owner or `auto (veto window)`, `approvedOn` names the date, and `approvedHash` is the builder hash over the semantic fields, written by `litespec model approve`. The semantic fields are the statements, results, output names, rules, and steps. Prose bodies sit outside the hash, so rewording prose reopens no approval. `approval-reopened` fires when the semantic hash differs from `approvedHash`.
 
 ### Risk Tiers
 
