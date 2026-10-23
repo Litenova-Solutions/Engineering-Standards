@@ -13,28 +13,35 @@ Each extension below states its own activation criterion and whether it applies 
 Selected once for the whole project:
 
 - [Agent Delegation](delegation.md): briefs and containment for one agent starting another on the same tree.
+- [AI Assistance](ai.md): closed tool sets, structure-only scenarios, and pinned stubs for queries a model mediates.
 - [API Compatibility](compat.md): versioning and retirement for APIs with public, partner, mobile, or independently deployed consumers.
 - [Audit Trail](audit.md): tamper-resistant evidence of who attempted what in data another party owns.
 - [Container Deployment](containers.md): images, rollouts, and runtime limits where staging or production ships containers.
+- [Customer Automation](automation.md): customer-composed rules and hooks for a product whose tenants automate their own work.
 - [Localization](locale.md): locales, catalogs, and formatting for a product that ships in more than one locale.
 - [Model Context Protocol](mcp.md): the server a product ships so an LLM client can call its public API.
 - [Multitenancy](tenancy.md): tenant isolation across authorization, storage, jobs, and recovery for one shared deployment.
 - [Plans and Entitlements](plans.md): plans, entitlements, and feature gating for a product that sells tiers.
+- [Privacy and Erasure](privacy.md): erasure positions, conflict rules, export-first guards, and restore sweeps for personal data past the core positions.
 - [Release Stage](stage.md): the pre-customer-data stage, what it defers, and the promotion that ends it.
 - [Static Marketing Site](site.md): the static build for marketing pages, pricing, and help articles beside the application.
 
 ## Local Extensions
 
-Selected per record, for the use cases, journeys, modules, rules, or aggregates the criterion names:
+Selected per record, for the use cases, entry points, jobs, journeys, modules, rules, or aggregates the criterion names:
 
 - [Caching](cache.md): staleness contracts and recovery for a repeated expensive read that traces or load tests name.
 - [Concurrency and Idempotency](concurrency.md): versions, client keys, and fingerprints where writes can overlap or retries can duplicate an effect.
+- [Connected Devices](devices.md): protocol blocks with messages, version rules, and offline uploads for entry points that devices reach.
 - [Data Lifecycle](lifecycle.md): retention, deletion, archival, and restore behavior for records with a lifetime duty.
 - [External Integrations](integrations.md): provider isolation, failure mapping, and boundary tests for use cases that call outside systems.
+- [Human Work Queues](queues.md): claims, scores, and confirmed bulk actions for work items people pick up and clear.
+- [Ingest Pipelines](pipeline.md): drop and enrich steps, drop reasons, and buffer policy for feeds that ingest outside records.
 - [Outbox Worker](outbox.md): one-transaction commits with dispatched messages where delivery must survive process failure.
 - [Realtime Updates](realtime.md): live transport where measured polling cannot meet the update target.
 - [Reporting and Exports](report.md): heavy queries and large exports moved off the request path.
 - [Scheduled Jobs](jobs.md): recurring, delayed, and calendar-based work with leases that survive restarts.
+- [Workflow Engine](workflow-engine.md): engine-step mapping onto use cases for a process an engine carries.
 
 ## Stack Extensions
 
