@@ -193,15 +193,13 @@ Pattern pages render each option as a card with `Preview` and `Wireframe` tabs a
 
 The site runs on Cloudflare Workers as a static-assets-only Worker named `litespec-site` on the LiteNova Solutions account, so no script runs and requests cost nothing on the free plan. `wrangler.jsonc` at the repository root names the Worker, serves `apps/site/dist/` with trailing-slash HTML handling and `404.html` for unknown paths, and attaches the custom domain `litespec.dev`; the `workers.dev` address is off, so search engines see one copy. A second Worker, `litespec-www` (`wrangler.www.jsonc` and `workers/www-redirect.js`), answers `www.litespec.dev` with a 301 to the same path and query on `litespec.dev`.
 
-Workers Builds deploys the `litespec-site` Worker on every push to `main` and builds a Preview for every other branch. The Worker is connected to this repository with the repository root as its root directory, so it reads `wrangler.jsonc` and `.node-version` there. Its build command installs and builds the site with the pnpm the site pins, and its deploy and preview commands run the wrangler the site pins:
+Workers Builds deploys the `litespec-site` Worker on every push to `main` and builds a Preview for every other branch, from the repository root, where `wrangler.jsonc` and `.node-version` live. The Worker's build command builds the site into `apps/site/dist`:
 
-| Setting | Value |
-|:---|:---|
-| Build command | `npx --yes pnpm@11.28.5 --dir apps/site install --frozen-lockfile && npx --yes pnpm@11.28.5 --dir apps/site build` |
-| Deploy command | `npx --yes pnpm@11.28.5 --dir apps/site run deploy` |
-| Preview command | `npx --yes pnpm@11.28.5 --dir apps/site run deploy:preview` |
+```bash
+npx --yes pnpm@11.28.5 --dir apps/site install --frozen-lockfile && npx --yes pnpm@11.28.5 --dir apps/site build
+```
 
-Preview URLs are on, so each branch build gets a `workers.dev` Preview, which Cloudflare serves with `X-Robots-Tag: noindex`. `wrangler.jsonc` also turns on observability with full log sampling. Each build reports its result as a check on the commit.
+The deploy and preview commands stay at their defaults, `npx wrangler deploy` and `npx wrangler preview`. A Preview is served on a subdomain of `litespec.dev`, which the `previews_enabled` route turns on; every page names its `litespec.dev` address as canonical, so a Preview is not indexed as a second site, and `workers.dev` serves neither the site nor its Previews.
 
 To deploy by hand, build the site and run its deploy script:
 

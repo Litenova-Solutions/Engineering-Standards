@@ -1,8 +1,7 @@
 name: Release
 
 # A release is a v<version> tag on main. The tag publishes the two NuGet packages and the
-# GitHub release for that version, after the same checks a pull request runs. The site
-# deploys from main through Cloudflare Workers Builds, not from this workflow.
+# GitHub release for that version, after the same checks a pull request runs.
 on:
   push:
     tags:

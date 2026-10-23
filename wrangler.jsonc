@@ -1,27 +1,20 @@
-// litespec.dev on Cloudflare Workers: a static-assets-only Worker, so every request is served
-// from apps/site/dist without running a script. The site build writes dist/_redirects (/latest).
-// Workers Builds deploys it on every push to main and builds a Preview for every other branch.
 {
-  "$schema": "./apps/site/node_modules/wrangler/config-schema.json",
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "litespec-site",
-  "account_id": "864f2fee2367d77cf443122378ca1366",
   "compatibility_date": "2026-10-01",
+  // The site build writes apps/site/dist; the Worker serves it as static assets.
   "assets": {
     "directory": "./apps/site/dist",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   },
-  "routes": [
-    { "pattern": "litespec.dev", "custom_domain": true }
-  ],
-  // workers.dev stays off so search engines index one copy. Preview URLs are on: each
-  // branch build gets a workers.dev Preview, which Cloudflare serves with noindex.
-  "workers_dev": false,
-  "preview_urls": true,
-  // `wrangler preview` needs this block. The site has no bindings, so it stays empty.
+  // A branch other than main builds a Preview with `wrangler preview`, which needs this block. The site has no
+  // bindings, so it stays empty. Previews are served on subdomains of litespec.dev (<preview-name>.litespec.dev),
+  // which the previews_enabled route below turns on once main deploys; every page names its litespec.dev address as
+  // canonical, so a Preview is not indexed as a second site. workers.dev serves no Preview.
   "previews": {},
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  }
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "litespec.dev", "custom_domain": true, "previews_enabled": true }
+  ]
 }
