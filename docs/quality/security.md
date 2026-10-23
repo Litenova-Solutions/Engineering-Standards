@@ -18,6 +18,10 @@ A trust boundary is any point where data crosses from one owner to another: a re
 
 Personal data spreads further than the database: logs, search indexes, outboxes, snapshots, and backups each hold their own copy. Each store that holds personal data keeps its own inventory entry naming the fields, the purposes, and the retention, so every export, erasure, and breach answer starts from the same map.
 
+### Security Review
+
+Three changes move trust or data outward: an access tenant scope widening to cross, a new calls effect on an outside operation, and a new personal or sensitive data class. The behavior diff lists them in the security queue for the security reviewer named in `review.securityReviewer`, who approves them separately from the developer review.
+
 ## Standards
 
 ### Keep Backend Authentication Provider-Neutral
@@ -45,6 +49,12 @@ Personal data spreads further than the database: logs, search indexes, outboxes,
 **Rationale:** A collection has no single target, so the check that `litespec/quality/security#authorize-each-target-resource` states has nothing to resolve against: the scope must become part of the database query itself. Reading the unrestricted set already exposes the rows to the process, and a page assembled from them leaks the total count even when every row is dropped. Filtering after the load is the shape [OWASP lists as broken object level authorization](https://owasp.org/www-project-top-ten/2021/A01_2021-Broken_Access_Control/).
 
 **Example:** A query for an organization's orders adds the organization predicate to the database query. It does not load every order and drop the ones the caller may not read.
+
+### Route Tier-1 Access and Data Changes Through the Security Reviewer
+
+**Statement:** A change that widens access tenant scope to cross, adds a calls effect, or adds a personal or sensitive data class MUST pass the security reviewer named in `review.securityReviewer`.
+
+**Rationale:** A cross-tenant grant, a new outside call, and a new personal-data flow each move trust or data further than the developer review sees: the use case still reads correctly while the exposure grows. The security queue in the behavior diff lists each of the three, so one named reviewer judges them together and the decision stays visible beside the change.
 
 ### Validate at Trust Boundaries
 
@@ -90,7 +100,7 @@ Personal data spreads further than the database: logs, search indexes, outboxes,
 
 ### Apply Erasure and Export to Every Store
 
-**Statement:** Erasure and export MUST reach every store holding personal data, with backups expiring inside the retention bound the limit records state.
+**Statement:** Erasure and export MUST reach every store holding personal data, with backups expiring inside the retention bound the retention schedule states.
 
 **Rationale:** Personal data lives in logs, search indexes, and outboxes beside the database. A request honored in the database but left in a log export answers half the duty and breaks the promise to the person. A backup cannot answer field by field, so it carries a retention bound instead, and the data ages out with the backup.
 
@@ -120,9 +130,9 @@ Personal data spreads further than the database: logs, search indexes, outboxes,
 
 ### Bound Abuse at Exposed Endpoints
 
-**Statement:** A public, authentication, webhook, search, or upload endpoint MUST declare its limit as a limit record with key, owner, and rejection response.
+**Statement:** A public, authentication, webhook, search, or upload endpoint MUST declare its limit as a setting record with key, owner, and rejection response.
 
-**Rationale:** Public, authentication, webhook, search, and upload endpoints invite abuse: credential stuffing, scraping, flooding. Declaring the limit as a limit record names the key that isolates one caller, the owner who monitors the limit, and the rejection response the caller sees. The rejection is `429` with a stable code, so legitimate callers can back off and retry.
+**Rationale:** Public, authentication, webhook, search, and upload endpoints invite abuse: credential stuffing, scraping, flooding. Declaring the bound as a setting record names the key that isolates one caller, the owner who monitors the limit, and the rejection response the caller sees. The rejection is `429` with a stable code, so legitimate callers can back off and retry.
 
 ### Keep One Limit Store Across Replicas
 
@@ -214,6 +224,7 @@ This informative example demonstrates `litespec/quality/security#authorize-each-
 | litespec/quality/security#derive-the-actor-from-claims | guidance | Actor resolution in WebApi maps verified claims through the one current-actor accessor. |
 | litespec/quality/security#authorize-each-target-resource | guidance | Each protected operation passes the application guard from its use case's declared permissions. |
 | litespec/quality/security#restrict-a-protected-collection-in-the-database | guidance | Each protected collection query carries its authorization scope as a database predicate before paging. |
+| litespec/quality/security#route-tier-1-access-and-data-changes-through-the-security-reviewer | guidance | Each cross-scope access grant, new calls effect, and new personal-data flow carries the security reviewer's approval. Look at the security queue of the behavior diff. |
 | litespec/quality/security#validate-at-trust-boundaries | guidance | Each trust boundary validates transport shape and file metadata before use. |
 | litespec/quality/security#keep-secrets-out-of-tracked-and-observable-data | guidance | Source, logs, traces, messages, files, URLs, snapshots, layers, and browser storage hold no secret. |
 | litespec/quality/security#parameterize-database-input | guidance | Each external value reaches the database through a query API call or a SQL parameter. |
@@ -226,7 +237,7 @@ This informative example demonstrates `litespec/quality/security#authorize-each-
 | litespec/quality/security#treat-an-unsalted-digest-as-personal-data | guidance | Each unsalted digest of personal data receives the handling its source data receives. |
 | litespec/quality/security#report-a-breach-within-its-deadline | guidance | The breach procedure names an owner, a backup person, and the deadline the constraint record states. |
 | litespec/quality/security#protect-live-data-at-rest | guidance | Each live store carries encryption, or a deviation record names this provision. |
-| litespec/quality/security#bound-abuse-at-exposed-endpoints | guidance | Each public, authentication, webhook, search, and upload endpoint declares its limit with key, owner, and rejection response. |
+| litespec/quality/security#bound-abuse-at-exposed-endpoints | guidance | Each public, authentication, webhook, search, and upload endpoint declares its setting with key, owner, and rejection response. |
 | litespec/quality/security#keep-one-limit-store-across-replicas | guidance | The deployment reads rate and concurrency counters from one store on every replica. |
 | litespec/quality/security#restrict-cross-origin-access | guidance | The cross-origin policy lists origins, methods, headers, and credential mode with no wildcard origin. |
 | litespec/quality/security#record-security-audit-events | guidance | Each security audit event records actor, action, target, outcome, timestamp, trace identifier, and reason. |

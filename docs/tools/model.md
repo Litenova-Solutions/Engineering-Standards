@@ -11,22 +11,24 @@ litespec model build [--root <consumer>] [--out <file>]
 litespec model check [--root <consumer>] [--format json]
 litespec model render [--root <consumer>]
 litespec model query [--root <consumer>] <id>
-litespec model diff <base> [--root <consumer>] [--format text|markdown|json] [--fail-on breaking] [--breaking-only]
+litespec model diff <base> [--root <consumer>] [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
 ```
 
 ## Description
 
-The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, the computed `implemented` and `verified` state of each use case and requirement, the reachable states of each aggregate, and the effective status of each record.
+The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, the computed `implemented`, `verified`, `stale`, and `reachable` state of each record, and the effective status of each record. Computed states are never written on a record; they appear in the book and the model output only.
 
 Aggregate transitions and data, and scenario examples, may be written as Markdown tables the builder parses, so the parts people debate read naturally even in the raw file. A front-matter field wins over a table with the same name.
 
 The five subcommands share one reader:
 
 - `build` writes `model.json` under `.model/` in the consumer root, unless `--out` names another file. That folder holds generated output, and the consumer ignores it in Git.
-- `check` builds the model in memory and reports every finding with its code, message, path, and line.
+- `check` builds the model in memory and reports every finding with its tier, code, message, path, and line.
 - `render` rewrites the fenced generated regions and touches no text outside them.
 - `query` prints one record with its links in both directions. Agents use it to load a record's context.
-- `diff` compares the working tree against a base and prints the intent change in the book's language: what intent the change adds, changes, or removes. The base is a consumer folder holding `litespec.project.json`, or a git revision of the consumer. Records match by identifier. The changelog prints REMOVED, then MODIFIED, then ADDED; each section groups entries by family: goals and requirements, domain, access, operations. The header counts breaking, removed, modified, and added changes. `text` is the changelog reviewers read, `markdown` is the pull request comment, and `json` carries every change with its fingerprint and the counts for machines. `--breaking-only` shows breaking changes and hides the rest.
+- `diff` compares the working tree against a base. The base is a consumer folder holding `litespec.project.json`, or a git revision of the consumer. Records match by identifier. `--intent` shows Intent changes in product words, `--behavior` shows Behavior changes and the security queue, and without either flag it shows both. The changelog prints REMOVED, then MODIFIED, then ADDED; each section groups entries by family: goals and requirements, domain, access, operations. The header counts breaking, removed, modified, and added changes. `text` is the changelog reviewers read, `markdown` is the pull request comment, and `json` carries every change with its fingerprint and the counts for machines. `--breaking-only` shows breaking changes and hides the rest.
+
+The security queue ends the behavior diff. It lists the changes the security reviewer named in `review.securityReviewer` approves: access tenant scope widenings to `cross`, new `calls` effects, and new personal or sensitive data classes.
 
 A change breaks approved intent when it removes or narrows an approved requirement, adds a refusal or a precondition to an approved use case, removes a result, state, transition, or scenario, weakens a rule, or changes a quality measure or target. Each breaking entry names its reason code:
 
@@ -47,49 +49,72 @@ A change breaks approved intent when it removes or narrows an approved requireme
 | `refusal-meaning-changed` | A refusal meaning changed. |
 | `result-outcome-changed` | A result outcome changed. |
 
-Every reason except `refusal-path-added` fires only on approved records.
+Every reason except `refusal-path-added` fires only on approved or reviewed records.
 
 A finding that an open known gap covers is reported as known and exits zero. The gap covers the finding when its `check` equals the finding code, its `subject` lists the finding's subject, the gap is not retired, and its end date has not passed. A gap on a use case also covers the findings about the scenarios and results it holds. An expired known gap fails the check.
 
-The finding codes are:
+Every check has a tier. G reads records only and always blocks. S reads code through a stack reader: it blocks where the stack reader is qualified (.NET today), and reports otherwise. A is advisory: it reports and never blocks. The finding codes are:
 
-| Code | Meaning |
-|:---|:---|
-| `record-shape` | A record fails the shape its type requires. |
-| `identifier-form` | An identifier breaks the form its type requires. |
-| `identifier-duplicate` | One identifier names two records. |
-| `reference-unresolved` | A citation names no written record or shared provision of the installed release. |
-| `draft-gate` | An approved record rests on a draft decision. |
-| `owner-unknown` | A record names an owner or decider the owners list does not hold, or an owner no team owning its path claims. |
-| `draft-without-decider` | A draft names no decider or no decide-by date. |
-| `known-gap-expired` | A known gap passed its end date with its check still red. |
-| `rule-name-negation` | A rule statement negates what its name does not keep. |
-| `use-case-without-success` | A use case ends with no success result. |
-| `use-case-without-scenario` | A use case has no scenario. It runs at large size only. |
-| `requirement-unfulfilled` | A requirement is fulfilled by no rule, use case or journey. |
-| `requirement-unmeasured` | A measured requirement names no check, or its check has no passing run. |
-| `scenario-result-unresolved` | A scenario ends in a result outside its own use case. |
-| `refusal-not-thrown` | A refusal result names a code the code never throws. |
-| `use-case-unimplemented` | No code implements the use case and no known gap covers it. |
-| `proves-unconfirmed` | No proving step of a claimed scenario reaches its use case, or no assertion matches its refusal. |
-| `size-type-missing` | The size requires a type the project lacks. |
-| `journey-reach` | A public use case sits in no journey and names no background caller. It runs at large size only. |
-| `invalid-field` | A field holds a value outside its shape, or a record other than a decision carries `replaces`. |
-| `use-case-name-clash` | Two use cases share one name across the project. |
-| `aggregate-name-clash` | Two aggregates share one name across the project. |
-| `gap-unknown-check` | A known gap names a check that no check uses. |
-| `decision-decides-nothing` | A decision names nothing it decides. |
-| `link-unresolved` | A Markdown link on a record page resolves to no file. |
-| `use-case-access` | A use case names no permission, is not anonymous, and runs beyond reactions and jobs. |
-| `region-unknown` | A generated region names no region the builder renders. |
-| `product-not-singleton` | The project holds no single product record. |
-| `behavior-unrecorded` | A handler, endpoint, reaction, domain event, or refusal code in code is named by no record. |
-| `state-unreachable` | A state is reached by no transition. |
-| `transition-unresolved` | A transition names a missing state or use case. |
-| `personal-data-uncovered` | A personal or sensitive field stands outside an erasure or export use case: one in its aggregate's module, or one a rule governs together with the aggregate. |
-| `calculation-without-table` | A calculation rule has no scenario examples table. |
-| `reaction-without-trigger` | A reaction names no trigger. |
-| `open-questions` | A record stands approved with open questions. |
+| Code | Tier | Meaning |
+|:---|:---|:---|
+| `record-shape` | G | A record fails the shape its type requires. |
+| `identifier-form` | G | An identifier breaks the form its type requires. |
+| `identifier-duplicate` | G | One identifier names two records. |
+| `invalid-field` | G | A field holds a value outside its shape, or a record other than a decision carries `replaces`. |
+| `reference-unresolved` | G | A citation names no written record or shared provision of the installed release. |
+| `link-unresolved` | G | A Markdown link on a record page resolves to no file. |
+| `owner-unknown` | G | A record names an owner or decider the owners list does not hold, or an owner no team owning its path claims. |
+| `draft-without-decider` | G | A draft names no decider or no decide-by date. |
+| `draft-gate` | G | An approved record rests on a draft decision. |
+| `product-not-singleton` | G | The project holds no single product record. |
+| `size-type-missing` | G | The size requires a type the project lacks. |
+| `requirement-unfulfilled` | G | A requirement is fulfilled by no rule, use case or journey. |
+| `requirement-unmeasured` | G | A measured requirement names no check, or its check has no passing run. |
+| `decision-decides-nothing` | G | A decision names nothing it decides. |
+| `journey-reach` | G | A public use case sits in no journey and names no background caller. It runs at large size only. |
+| `state-unreachable` | G | A state is reached by no transition. |
+| `transition-unresolved` | G | A transition names a missing state or use case. |
+| `use-case-without-success` | G | A use case ends with no success result. |
+| `scenario-result-unresolved` | G | A scenario ends in a result outside its own use case and outside the derived results. |
+| `calculation-without-table` | G | A calculation rule has no scenario examples table. |
+| `rule-name-negation` | G | A rule statement negates what its name does not keep. |
+| `known-gap-expired` | G | A known gap passed its end date with its check still red. |
+| `gap-unknown-check` | G | A known gap names a check that no check uses. |
+| `aggregate-name-clash` | G | Two aggregates share one name across the project. |
+| `use-case-name-clash` | G | Two use cases share one name across the project. |
+| `reaction-trigger-unresolved` | G | A reaction names a trigger no domain event or integration event carries. |
+| `erasure-undeclared` | G | A personal or sensitive field stands outside a declared erasure position. |
+| `record-orphaned` | G | A Behavior record names neither `serves` nor `fulfills`. |
+| `step-unserved` | G | A journey step is served by no use case or reaction. |
+| `effect-loop` | G | The effect graph cycles outside a domain event with a stated end condition. |
+| `consistency-unexplained` | G | An atomic use case changing more than one aggregate names no `because` rule. |
+| `query-output-missing` | G | A query declares no `output`. |
+| `paging-undeclared` | G | A collection query declares no `paging`. |
+| `widening-unjustified` | G | A query group visible beyond its sources names no `wideningBecause` requirement. |
+| `retention-without-enforcement` | G | A data class names no `enforcedBy`. |
+| `risk-without-acceptance` | G | A retained or exempt personal data class names no `acceptedBy` in Intent. |
+| `exemption-expired` | G | An erasure exemption passed its `reviewBy` date. |
+| `setting-default-without-requirement` | G | A commercial, legal, or tenant-varying default fulfills no requirement. |
+| `reservation-without-release` | G | A reservation rule names no `releasedBy`. |
+| `notification-without-sender` | G | A notification is sent by no reaction or use case. |
+| `except-without-fallback` | G | An `except` names no fallback requirement, or the fallback carries its own `except`. |
+| `approval-reopened` | G | A semantic hash differs from the recorded `approvedHash`. |
+| `transcribed-reviewed` | G | A transcribed record is reviewed while its parent is unapproved. |
+| `transcribed-after-adoption` | G | A transcribed record remains after the adoption decision is approved. |
+| `operator-job-without-guard` | G | An operator job states no `guard`. |
+| `schedule-unstructured` | G | A job schedule is neither an `every` duration nor a `cron` expression. |
+| `behavior-unrecorded` | S | A handler, endpoint, reaction, domain event, or refusal code in code is named by no record. The remedy reads: delete the code, or write its parent record from a requirement, drafting the requirement if none exists. |
+| `use-case-unimplemented` | S | No code implements the use case and no known gap covers it. |
+| `use-case-access` | S | The code runs beyond the access grant the use case declares. |
+| `refusal-not-thrown` | S | A refusal result names a code the code never throws. |
+| `proves-unconfirmed` | S | No proving step of a claimed scenario reaches its use case, or no assertion matches its refusal. |
+| `use-case-without-scenario` | S | A use case has no scenario. It runs at large size only. |
+| `write-undeclared` | S | The code writes an aggregate outside `changes`. |
+| `result-undeclared` | S | The code returns an outcome no result declares. |
+| `effect-undeclared` | S | The code takes an edge no record declares. |
+| `prose-missing` | A | A use case needing Goal and What Happens prose carries none. |
+| `many-aggregates` | A | One command saves more than one atomic write group. |
+| `question-aged` | A | A question stands past its `decideBy` date. |
 
 The `render` subcommand writes these generated regions, each fenced by `<!-- generated:<name> -->` and `<!-- /generated:<name> -->`: `history`, `use-case-coverage`, `sub-processors`, `runbook-index`, `rule-map`, `operations-log`, `open-questions`, `journeys`, `glossary`, `deviations`, `census`, `aggregate-map`, `audit-register`, `alert-inventory`, and `counts`.
 
@@ -107,6 +132,8 @@ The `render` subcommand writes these generated regions, each fenced by `<!-- gen
 | `--root <consumer>` | the working directory | Selects the consumer repository to read. |
 | `--out <file>` | `.model/model.json` under the root | Writes the model to this file instead. Only `build` reads it. |
 | `--format <name>` | human lines | Only `check` and `diff` read it. `check` accepts `json` and writes the findings as one JSON object. `diff` accepts `text`, `markdown`, or `json`. |
+| `--intent` | off | Only `diff` reads it. Shows the Intent changes in product words. |
+| `--behavior` | off | Only `diff` reads it. Shows the Behavior changes and the security queue. |
 | `--fail-on breaking` | off | Only `diff` reads it. Exits 1 when the change breaks approved intent. |
 | `--breaking-only` | off | Only `diff` reads it. Shows the breaking changes and hides the rest. |
 | `--help` | off | Prints the usage text and exits 0. |
@@ -115,8 +142,8 @@ The `render` subcommand writes these generated regions, each fenced by `<!-- gen
 
 | Code | Meaning |
 |:---|:---|
-| `0` | The command finished with no open finding. |
-| `1` | `check` found an open finding or an expired known gap, `query` found no record with the `id`, `diff` with `--fail-on breaking` found a breaking change, or the run failed. |
+| `0` | The command finished with no open blocking finding. |
+| `1` | `check` found an open blocking finding or an expired known gap, `query` found no record with the `id`, `diff` with `--fail-on breaking` found a breaking change, or the run failed. |
 | `2` | The arguments are wrong, the root holds no project record, or the diff base is neither a consumer folder nor a git revision. |
 
 ## Examples
@@ -149,6 +176,18 @@ Diff the working tree against the main branch:
 
 ```bash
 litespec model diff main --root ../consumer
+```
+
+Show the Intent changes in product words for the founder review:
+
+```bash
+litespec model diff main --root ../consumer --intent
+```
+
+Show the Behavior changes with the security queue for the developer review:
+
+```bash
+litespec model diff main --root ../consumer --behavior
 ```
 
 Show only the breaking changes as a pull request comment, and fail on them:
