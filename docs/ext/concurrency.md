@@ -16,7 +16,9 @@ The consumer enables `concurrency` when accepted writes can conflict with each o
 
 This extension replaces no baseline provision. `litespec/ext/concurrency#return-precondition-outcomes` adds the 428 outcome for a missing precondition to the outcome table that `litespec/backend/api#use-consistent-status-codes` owns.
 
-This extension switches on `limit`: key retention is a limit record under `litespec/ext/concurrency#set-key-retention`.
+This extension switches on `setting`: key retention is a setting record under `litespec/ext/concurrency#set-key-retention`.
+
+Its client-key standards apply to operations whose `idempotency.mode` is `key`, and its version standards apply where `consistency` requires conflicting writes to be rejected.
 
 ## Standards
 
@@ -144,9 +146,9 @@ This extension switches on `limit`: key retention is a limit record under `lites
 
 ### Set Key Retention
 
-**Statement:** An idempotency owner MUST record key retention as a limit record set from the caller retry window and business risk.
+**Statement:** An idempotency owner MUST record key retention as a setting record set from the caller retry window and business risk.
 
-**Rationale:** A key that expires too early turns a legitimate retry into duplicate business work. Retention therefore spans the caller retry window plus the business risk of a late duplicate. The limit record states that span where reviewers and operators read it.
+**Rationale:** A key that expires too early turns a legitimate retry into duplicate business work. Retention therefore spans the caller retry window plus the business risk of a late duplicate. The setting record states that span where reviewers and operators read it.
 
 ### Bound Expired-Record Cleanup
 
@@ -244,7 +246,7 @@ Guides: None.
 | litespec/ext/concurrency#discard-failed-replay-state | checkable | `IdempotencyReplayTests` leave no business change or completed replay state. |
 | litespec/ext/concurrency#delay-irreversible-provider-calls | guidance | Which irreversible provider calls run before their business transaction commits? Look at the idempotent operation paths. |
 | litespec/ext/concurrency#route-required-external-effects-durably | guidance | Which required external effects use neither the outbox nor a documented provider idempotency contract? Look at the idempotent operation paths. |
-| litespec/ext/concurrency#set-key-retention | guidance | Which key retentions miss the caller retry window or the business risk? Look at the limit record beside the idempotent use case. |
+| litespec/ext/concurrency#set-key-retention | guidance | Which key retentions miss the caller retry window or the business risk? Look at the setting record beside the idempotent use case. |
 | litespec/ext/concurrency#bound-expired-record-cleanup | checkable | `IdempotencyRetentionTests` show bounded deletion of expired idempotency records. |
 | litespec/ext/concurrency#retain-safe-retry-keys | checkable | `IdempotencyRetentionTests` reject expiration before the documented safe retry time. |
 | litespec/ext/concurrency#declare-replayed-transport-outcomes | checkable | `IdempotencyOutcomeTests` match replayed statuses and headers against the declared list. |

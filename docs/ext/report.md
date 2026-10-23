@@ -16,7 +16,7 @@ A use case selects this extension for one documented query or export that the no
 
 This extension replaces no baseline provision. Ordinary queries stay under `litespec/backend/persistence#query-through-the-read-session`; this extension governs only the reads whose cost or duration exceeds that path.
 
-Selecting `report` switches on the limit record type: the request budget and each report bound live in limit records.
+Selecting `report` switches on the setting record type: the request budget and each report bound live in setting records.
 
 ## Standards
 
@@ -58,9 +58,9 @@ Selecting `report` switches on the limit record type: the request budget and eac
 
 ### Run Budget-Exceeding Exports in Worker
 
-**Statement:** An export exceeding its request budget MUST run through Worker, with the budget a limit record the export's use case names.
+**Statement:** An export exceeding its request budget MUST run through Worker, with the budget a setting record the export's use case names.
 
-**Rationale:** An export that outlasts its request budget holds an HTTP connection open while the reader waits and the server counts threads. Running it in a Worker returns the request immediately, and the budget in its limit record tells the team exactly when an export outgrows the request path.
+**Rationale:** An export that outlasts its request budget holds an HTTP connection open while the reader waits and the server counts threads. Running it in a Worker returns the request immediately, and the budget in its setting record tells the team exactly when an export outgrows the request path.
 
 ### Protect Export Output
 
@@ -76,9 +76,21 @@ Selecting `report` switches on the limit record type: the request budget and eac
 
 ### Define Report Limits
 
-**Statement:** A report specification MUST state each bound as a limit record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
+**Statement:** A report specification MUST state each bound as a setting record: maximum date range, rows, execution time, concurrent jobs, output size, and storage lifetime.
 
-**Rationale:** Date range, rows, execution time, concurrent jobs, output size, and storage lifetime each cap one dimension of report cost. Limit records hold all six, so a runaway report hits a documented bound instead of an exhausted database, a full disk, or a surprise invoice.
+**Rationale:** Date range, rows, execution time, concurrent jobs, output size, and storage lifetime each cap one dimension of report cost. Setting records hold all six, so a runaway report hits a documented bound instead of an exhausted database, a full disk, or a surprise invoice.
+
+### Declare Export Paging
+
+**Statement:** An export query MUST state `paging` or `none` with its reason.
+
+**Rationale:** An export reads many rows at once, so it states how the read is bounded: `paging` bounds each run, and `none` with a reason states why the export reads all rows at once. Without the declaration, a reviewer cannot tell a bounded export from one that grows with the table.
+
+### Audit Export Reads
+
+**Statement:** An export query MUST state its `audit` reason and target.
+
+**Rationale:** An export file concentrates sensitive rows into one downloadable object, so the use case states why the bulk read is audited and where the audit lands. Without the stated audit, the concentrated read leaves no trace a reviewer can follow.
 
 ### Support Report Cancellation
 
@@ -142,10 +154,12 @@ Guides: None.
 | litespec/ext/report#keep-raw-sql-in-infrastructure | guidance | Raw report SQL and connection handling sit in Infrastructure code. |
 | litespec/ext/report#review-report-plans | guidance | The review record shows query plans and indexes checked against representative data. |
 | litespec/ext/report#apply-item-read-authorization | guidance | Each report and export enforces the item-read rules in the authorization tests. |
-| litespec/ext/report#run-budget-exceeding-exports-in-worker | guidance | Each export past its request budget runs through a Worker, with the budget in its limit record. |
+| litespec/ext/report#run-budget-exceeding-exports-in-worker | guidance | Each export past its request budget runs through a Worker, with the budget in its setting record. |
 | litespec/ext/report#protect-export-output | guidance | Export output sits in approved object storage with an owner, an expiry, and a short-lived authorized download. |
 | litespec/ext/report#scope-export-output-to-the-tenant | guidance | Each export stores its output under a tenant-scoped path in object storage. |
-| litespec/ext/report#define-report-limits | guidance | Each report bound lives as a limit record in `docs/operations/limits.md`. |
+| litespec/ext/report#define-report-limits | guidance | Each report bound lives as a setting record beside the report. |
+| litespec/ext/report#declare-export-paging | guidance | Which export queries lack `paging` or `none` with its reason? Look at the export query beside the report. |
+| litespec/ext/report#audit-export-reads | guidance | Which export queries lack a stated `audit` reason and target? Look at the export query beside the report. |
 | litespec/ext/report#support-report-cancellation | guidance | Report work cancels on request and expired output clears in the cancellation tests. |
 | litespec/ext/report#escape-formula-leading-export-values | guidance | Exported values starting a formula are escaped, except in reviewed formula fields. |
 | litespec/ext/report#define-export-encoding-and-columns | guidance | Each export states its character encoding and stable columns in its format record. |

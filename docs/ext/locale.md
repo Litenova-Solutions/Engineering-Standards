@@ -16,7 +16,7 @@ The project selects `locale` when the product ships in more than one locale. A t
 
 This extension replaces no baseline provision.
 
-This extension switches on no record type. The Decision that records the locale contract is a core record every project writes.
+This extension switches on no record type. The Decision that records the locale contract is a core record every project writes. Each notification names where its language comes from in `locale`.
 
 ## Standards
 

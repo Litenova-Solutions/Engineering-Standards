@@ -16,7 +16,7 @@ A use case or journey selects this extension after the team measures polling aga
 
 This extension replaces no baseline provision. One-way notifications travel over server-sent events, which need no added package because the platform ships them.
 
-Selecting `realtime` switches on the event and limit record types: each notification carries an event record, and each resource bound lives in a limit record.
+Selecting `realtime` switches on the notification and setting record types: each pushed update is a notification record, and each resource bound lives in a setting record.
 
 ## Standards
 
@@ -50,6 +50,12 @@ Selecting `realtime` switches on the event and limit record types: each notifica
 
 **Rationale:** Hosted platforms limit connection duration, idle timeouts, and transport upgrades in ways that differ per host. Recording the transport choice with its expected platform support surfaces the mismatch before deployment instead of during the first long-lived connection.
 
+### Declare Realtime Freshness
+
+**Statement:** A query served over realtime MUST declare `freshness` `immediate` or `advisory` on its output.
+
+**Rationale:** A realtime channel delivers an update seconds after the change, so the served query promises `immediate` freshness; where the pushed value still awaits a later decision, it promises `advisory` and names the authority that decides. Without the declared freshness, a reader cannot tell whether the live value is final or provisional.
+
 ### Authenticate and Authorize Subscriptions
 
 **Statement:** A realtime server MUST authenticate each connection and authorize every user-, tenant-, or resource-scoped subscription.
@@ -76,9 +82,9 @@ Selecting `realtime` switches on the event and limit record types: each notifica
 
 ### Bound Realtime Resources
 
-**Statement:** A realtime deployment MUST set four limit-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
+**Statement:** A realtime deployment MUST set four setting-record bounds: concurrent connections per host, receive message size, parallel invocations per connection, and client timeout.
 
-**Rationale:** Each open connection holds memory, each message costs CPU, and a flood of either starves the host. The deployment sets four bounds as limit records - concurrent connections per host, receive message size, parallel invocations per connection, and client timeout - with each value drawn from the deployment's own connection count and message size and the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
+**Rationale:** Each open connection holds memory, each message costs CPU, and a flood of either starves the host. The deployment sets four bounds as setting records - concurrent connections per host, receive message size, parallel invocations per connection, and client timeout - with each value drawn from the deployment's own connection count and message size and the observation that produced it. [The platform's realtime security guidance](https://learn.microsoft.com/en-us/aspnet/core/signalr/security) names the same settings.
 
 ### Reject Unbounded Slow-Client Buffering
 
@@ -121,11 +127,12 @@ Guides: None.
 | litespec/ext/realtime#use-server-sent-events-for-notifications | guidance | Each one-way notification travels over the server-sent events boundary in code. |
 | litespec/ext/realtime#use-signalr-for-interactive-messaging | guidance | Each bidirectional use case runs on SignalR groups, messages, or fallback in code. |
 | litespec/ext/realtime#record-transport-support | guidance | The use case page names its transport choice with the expected hosted-platform support. |
+| litespec/ext/realtime#declare-realtime-freshness | guidance | Which realtime-served queries lack `immediate` or `advisory` freshness on their output? Look at the served query beside the realtime use case. |
 | litespec/ext/realtime#authenticate-and-authorize-subscriptions | guidance | The connection tests show authenticated connections only, with each scoped subscription authorized. |
 | litespec/ext/realtime#revalidate-long-lived-access | guidance | A connection whose token or session expired loses access in the revalidation tests. |
 | litespec/ext/realtime#reconnect-and-refresh-authoritative-state | guidance | The client reconnects with bounded backoff and refreshes authoritative state after a gap in the recovery tests. |
 | litespec/ext/realtime#tolerate-notification-ordering-differences | guidance | Duplicate and reordered notifications leave client state correct in the client tests. |
-| litespec/ext/realtime#bound-realtime-resources | guidance | The four deployment bounds live as limit records with their values in `docs/operations/limits.md`. |
+| litespec/ext/realtime#bound-realtime-resources | guidance | The four deployment bounds live as setting records with their values beside the deployment. |
 | litespec/ext/realtime#reject-unbounded-slow-client-buffering | guidance | Slow-client buffering in the server code is bounded with backpressure. |
 | litespec/ext/realtime#place-realtime-code-at-outer-boundaries | guidance | Realtime transport code sits at the documented boundaries, or the realtime-placement convention names where it lives. |
 | litespec/ext/realtime#subscribe-through-narrow-functions | guidance | Features subscribe through use-case-specific functions, or the realtime-subscription convention names how they subscribe. |

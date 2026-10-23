@@ -16,7 +16,7 @@ The consumer enables `containers` when production or staging deploys the API, th
 
 This extension replaces no baseline provision. Its schema, rollback, and secret rules cite the baseline provisions that own those obligations instead of restating them.
 
-This extension switches on `limit` and `runbook`: resource bounds are limit records under `litespec/ext/containers#declare-writable-paths-and-limits`, and the rollback procedure is a runbook record under `litespec/ext/containers#retain-rollback-material`.
+This extension switches on `setting` and `runbook`: resource bounds are setting records under `litespec/ext/containers#declare-writable-paths-and-limits`, and the rollback procedure is a runbook record under `litespec/ext/containers#retain-rollback-material`.
 
 ## Standards
 
@@ -94,9 +94,9 @@ This extension switches on `limit` and `runbook`: resource bounds are limit reco
 
 ### Declare Writable Paths and Limits
 
-**Statement:** A deployment MUST declare writable paths and record CPU and memory bounds as limit records.
+**Statement:** A deployment MUST declare writable paths and record CPU and memory bounds as setting records.
 
-**Rationale:** Declared writable paths name the mutable storage the application needs, and CPU and memory bounds as limit records cap what one deployment may consume. The bounds protect the node's capacity from one hungry replica. The declarations also tell the next reader what the application was sized for.
+**Rationale:** Declared writable paths name the mutable storage the application needs, and CPU and memory bounds as setting records cap what one deployment may consume. The bounds protect the node's capacity from one hungry replica. The declarations also tell the next reader what the application was sized for.
 
 ### Run the Application as PID 1
 
@@ -200,7 +200,7 @@ Guides: None.
 | litespec/ext/containers#test-released-traffic | checkable | `ContainersTrafficTests` pass after new-version traffic shift. |
 | litespec/ext/containers#retain-rollback-material | checkable | `ContainersRollbackTests` resolve the runbook record and its previous image digest. |
 | litespec/ext/containers#limit-container-privileges | checkable | `ContainersSecurityTests` assert read-only filesystem and dropped capabilities in the deployment manifest. |
-| litespec/ext/containers#declare-writable-paths-and-limits | checkable | `ContainersSecurityTests` match the manifest against declared writable paths and limit records. |
+| litespec/ext/containers#declare-writable-paths-and-limits | checkable | `ContainersSecurityTests` match the manifest against declared writable paths and setting records. |
 | litespec/ext/containers#run-the-application-as-pid-1 | checkable | `ContainersProcessTests` confirm the application receives the container stop signal. |
 | litespec/ext/containers#set-sufficient-shutdown-time | checkable | `ContainersProcessTests` assert in-flight work stops within the declared grace period. |
 | litespec/ext/containers#write-runtime-logs-to-streams | checkable | `ContainersProcessTests` assert container logs appear on standard output or standard error. |

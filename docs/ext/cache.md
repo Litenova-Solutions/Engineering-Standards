@@ -2,7 +2,7 @@
 
 ## Intent
 
-A cache answers repeated expensive reads from stored results instead of recomputing them, trading lower latency and source load for stale reads and invalidation work. This page states when that trade is justified, what each cache's staleness contract covers, how keys separate results, and how the system behaves when the cache fails. A team applies it once traces or load tests name a repeated expensive read, so each cache carries a staleness limit the team chose instead of one it discovers during an incident.
+A cache answers repeated expensive reads from stored results instead of recomputing them, trading lower latency and source load for stale reads and invalidation work. This page states when that trade is justified, what each cache's staleness contract covers, how keys separate results, and how the system behaves when the cache fails. A team applies it once traces or load tests name a repeated expensive read, so each cache carries a staleness bound the team chose instead of one it discovers during an incident.
 
 ## Activation
 
@@ -16,7 +16,7 @@ The consumer enables `cache` after traces or load tests identify a repeated expe
 
 This extension replaces no baseline provision. It selects no provider package: a project that adds one records the decision and pins its version in the manifest.
 
-This extension switches on `limit`: the accepted staleness and the expiry of each cache are limit records.
+This extension switches on `setting`: the expiry of each cache is a setting record, and the accepted staleness is the served query's `freshness`.
 
 ## Standards
 
@@ -28,9 +28,9 @@ This extension switches on `limit`: the accepted staleness and the expiry of eac
 
 ### Record Accepted Cache Staleness
 
-**Statement:** A cache proposal MUST record its accepted staleness as a limit record with `owner`, `status`, `decider`, and `decideBy`.
+**Statement:** A cached query MUST state its accepted staleness as `freshness: bounded` with its duration.
 
-**Rationale:** Accepted staleness is the contract each reader relies on: it states how stale a read may be before it counts as a defect. Recording it as a limit record with its `owner`, `status`, `decider`, and `decideBy` keeps the approval visible beside the cache it governs.
+**Rationale:** Accepted staleness is the contract each reader relies on: it states how stale a read may be before it counts as a defect. The served query states it as `freshness: bounded` with its duration on its output, so the cache and the query share one bound that is reviewed with the use case.
 
 ### Remove Unjustified Caches
 
@@ -56,7 +56,7 @@ This extension switches on `limit`: the accepted staleness and the expiry of eac
 
 ### Define Cache Invalidation
 
-**Statement:** A cached value MUST define expiry as a limit record, invalidating write events, an invalidation owner, and behavior after invalidation failure.
+**Statement:** A cached value MUST define expiry as a setting record, invalidating write events, an invalidation owner, and behavior after invalidation failure.
 
 **Rationale:** Every cached value goes stale, and the only choice is whether the project decides the behavior up front or discovers it during an incident. Expiry, invalidating write events, an owner, and failure behavior state how long staleness lasts and who fixes it when invalidation fails. A cache without that contract serves stale data on a schedule nobody chose.
 
@@ -133,7 +133,7 @@ Guides: None.
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/ext/cache#record-measured-cache-need | guidance | Which cache proposals lack observed query, load, latency, cost, or target? Look at the proposal behind each cache. |
-| litespec/ext/cache#record-accepted-cache-staleness | guidance | Which caches lack a limit record of accepted staleness with owner, status, decider, and decideBy? Look at the proposal behind each cache. |
+| litespec/ext/cache#record-accepted-cache-staleness | guidance | Which cached queries lack `freshness: bounded` with its duration on their output? Look at the served query beside each cache. |
 | litespec/ext/cache#remove-unjustified-caches | guidance | Which caches stay past measurements that no longer justify their cost? Look at the owner reviews beside the operating cost. |
 | litespec/ext/cache#compose-cache-keys-from-result-inputs | guidance | Which keys miss the data-shape version, a result-affecting input, or the tenant or actor partition? Look at the key construction. |
 | litespec/ext/cache#exclude-unsafe-cache-key-material | guidance | Which keys contain a secret, unbounded input, or unhashed personal data? Look at the key construction. |
