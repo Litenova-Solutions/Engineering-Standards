@@ -80,7 +80,7 @@ static class RecordReader
         });
 
         ReadTerms(config, records, problems);
-        DeriveResults(records);
+        DeriveResults(records, config.ForbiddenCode, config.InvalidInputCode);
 
         return new RecordRead(records, bodies, ReadProvisions(), problems);
     }
@@ -747,7 +747,7 @@ static class RecordReader
     ///     grant, and invalid-input for every use case with a validated input. Scenarios and
     ///     tests point at them; they are never written as records.
     /// </summary>
-    private static void DeriveResults(List<Record> records)
+    private static void DeriveResults(List<Record> records, string forbiddenCode, string invalidInputCode)
     {
         var taken = records
             .Where(record => record.Id.Length > 0)
@@ -769,7 +769,8 @@ static class RecordReader
                     useCase,
                     $"result/{home}.{name}.forbidden",
                     "Forbidden",
-                    "The caller lacks the grant the use case requires."));
+                    "The caller lacks the grant the use case requires.",
+                    forbiddenCode));
             }
 
             if (ModelBuilder.HasValidatedInput(useCase)
@@ -779,7 +780,8 @@ static class RecordReader
                     useCase,
                     $"result/{home}.{name}.invalid-input",
                     "Invalid input",
-                    "An input value breaks the rules the use case declares."));
+                    "An input value breaks the rules the use case declares.",
+                    invalidInputCode));
             }
         }
 
@@ -787,7 +789,7 @@ static class RecordReader
     }
 
     /// <summary>One derived generic result, carried by its use case's page.</summary>
-    private static Record DerivedResult(Record useCase, string id, string title, string meaning)
+    private static Record DerivedResult(Record useCase, string id, string title, string meaning, string code)
     {
         var json = JsonSerializer.Serialize(new Dictionary<string, string?>(StringComparer.Ordinal)
         {
@@ -795,6 +797,7 @@ static class RecordReader
             ["id"] = id,
             ["title"] = title,
             ["outcome"] = "refusal",
+            ["code"] = code,
             ["meaning"] = meaning,
         });
 

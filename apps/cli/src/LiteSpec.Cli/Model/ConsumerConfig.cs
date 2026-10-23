@@ -38,6 +38,12 @@ sealed class ConsumerConfig
     /// <summary>The decision whose approval ends transcription mode.</summary>
     public string? TranscriptionEndsWith { get; private set; }
 
+    /// <summary>The refusal code the derived forbidden result carries.</summary>
+    public string ForbiddenCode { get; private set; } = "authorization.forbidden";
+
+    /// <summary>The refusal code the derived invalid-input result carries.</summary>
+    public string InvalidInputCode { get; private set; } = "request.validation-failed";
+
     /// <summary>The backend layers.</summary>
     public string ApplicationRoot { get; private set; } = "";
 
@@ -219,6 +225,24 @@ sealed class ConsumerConfig
                 && reviewer.GetString() is { Length: > 0 } name)
             {
                 config.SecurityReviewer = name;
+            }
+        }
+
+        if (document.RootElement.TryGetProperty("refusals", out var refusals)
+            && refusals.ValueKind == JsonValueKind.Object)
+        {
+            if (refusals.TryGetProperty("forbidden", out var forbidden)
+                && forbidden.ValueKind == JsonValueKind.String
+                && forbidden.GetString() is { Length: > 0 } forbiddenCode)
+            {
+                config.ForbiddenCode = forbiddenCode;
+            }
+
+            if (refusals.TryGetProperty("invalidInput", out var invalid)
+                && invalid.ValueKind == JsonValueKind.String
+                && invalid.GetString() is { Length: > 0 } invalidCode)
+            {
+                config.InvalidInputCode = invalidCode;
             }
         }
 
