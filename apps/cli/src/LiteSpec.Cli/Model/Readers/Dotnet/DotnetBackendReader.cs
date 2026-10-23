@@ -159,7 +159,7 @@ sealed class DotnetBackendReader : IBackendReader
                         file,
                         tree.GetLineSpan(token.Span).StartLinePosition.Line + 1,
                         EnclosingClass(token),
-                        declares));
+                        declares && match.Value == literal));
                 }
             }
 
@@ -226,11 +226,17 @@ sealed class DotnetBackendReader : IBackendReader
 
         var declared = classes.FirstOrDefault();
 
+        // An event class that states its record id in a string literal names its record
+        // outright; the builder falls back to the class name when none is stated.
+        var stated = declared?.DescendantTokens()
+            .Select(LiteralText)
+            .FirstOrDefault(text => text is not null && Identifiers.EventId().IsMatch(text));
+
         model.Events.Add(new DomainEventInfo(
             declared?.Identifier.ValueText ?? name,
             file,
             declared is null ? 1 : tree.GetLineSpan(declared.Span).StartLinePosition.Line + 1,
-            null));
+            stated));
     }
 
     private static void ReadEndpoint(ConsumerConfig config, string file, SyntaxNode root, CodeModel model)
@@ -311,9 +317,9 @@ sealed class DotnetBackendReader : IBackendReader
             switch (node)
             {
                 case PropertyDeclarationSyntax property:
-                    return property.Identifier.ValueText == "Code";
+                    return property.Identifier.ValueText == "Code" && RefusalType(property);
                 case FieldDeclarationSyntax field:
-                    return field.Declaration.Variables.Any(variable => variable.Identifier.ValueText == "Code");
+                    return field.Declaration.Variables.Any(variable => variable.Identifier.ValueText == "Code") && RefusalType(field);
                 case ArgumentSyntax { NameColon.Name.Identifier.ValueText: var name } when IsCodeName(name):
                     return true;
                 case AnonymousObjectMemberDeclaratorSyntax { NameEquals.Name.Identifier.ValueText: var name }:
@@ -329,6 +335,14 @@ sealed class DotnetBackendReader : IBackendReader
         }
 
         return false;
+
+        // A Code member declares a refusal on a type named for one; on a closed set of
+        // features or kinds the same member name holds a label instead.
+        static bool RefusalType(SyntaxNode member) =>
+            member.Parent is BaseTypeDeclarationSyntax type
+            && (type.Identifier.ValueText.EndsWith("Exception", StringComparison.Ordinal)
+                || type.Identifier.ValueText.EndsWith("Failure", StringComparison.Ordinal)
+                || type.Identifier.ValueText.EndsWith("Refusal", StringComparison.Ordinal));
 
         static bool IsCodeName(string name) => string.Equals(name, "code", StringComparison.OrdinalIgnoreCase);
 
@@ -347,16 +361,11 @@ sealed class DotnetBackendReader : IBackendReader
 
     private static string? Classify(string name, List<string> bases)
     {
-        if (bases.Any(baseName =>
-            baseName is "BackgroundService" or "IHostedService"
-            || baseName.StartsWith("BackgroundService<", StringComparison.Ordinal)))
-        {
-            return "job";
-        }
-
+        // A job is named as one. A hosted service that wires the host at startup (a schema
+        // check, a topology, a probe) is plumbing, and a type that only mentions recurring
+        // work (its options, its model) runs nothing.
         if (name.EndsWith("Job", StringComparison.Ordinal)
-            || name.EndsWith("Worker", StringComparison.Ordinal)
-            || name.Contains("Recurring", StringComparison.Ordinal))
+            || name.EndsWith("Worker", StringComparison.Ordinal))
         {
             return "job";
         }

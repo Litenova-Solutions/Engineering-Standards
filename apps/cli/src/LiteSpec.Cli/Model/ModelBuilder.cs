@@ -172,6 +172,15 @@ static partial class ModelBuilder
         for (var index = 0; index < model.Code.Events.Count; index++)
         {
             var code = model.Code.Events[index];
+
+            if (code.EventId is not null && events.Any(record => record.Id == code.EventId))
+            {
+                model.Implements.Add(new ImplementsLink(model.Config.Relative(code.File), code.EventId, "event"));
+                continue;
+            }
+
+            code = code with { EventId = null };
+            model.Code.Events[index] = code;
             var kebab = Naming.Kebab(code.Class.EndsWith("Event", StringComparison.Ordinal)
                 ? code.Class[..^"Event".Length]
                 : code.Class);

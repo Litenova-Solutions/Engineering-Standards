@@ -14,6 +14,10 @@ static partial class Identifiers
     [GeneratedRegex(@"\blitespec/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*#[a-z0-9]+(?:-[a-z0-9]+)*")]
     public static partial Regex SharedCitation();
 
+    /// <summary>A whole event record id, such as <c>event/expense.submitted</c>.</summary>
+    [GeneratedRegex(@"^event/[a-z0-9]+(?:-[a-z0-9]+)*.[a-z0-9]+(?:-[a-z0-9]+)*$")]
+    public static partial Regex EventId();
+
     /// <summary>A refusal code in identifier form: module and name in kebab-case.</summary>
     [GeneratedRegex(@"\b[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:-[a-z0-9]+)*\b")]
     public static partial Regex RefusalCode();

@@ -30,10 +30,10 @@ public sealed class DotnetBackendReaderTests
     {
         using var temp = Cli.Temp("reader");
         WriteProject(temp.Path);
-        WriteSource(temp.Path, "Domain", "BotCheck.cs", """
+        WriteSource(temp.Path, "Domain", "BotCheckFailure.cs", """
             namespace Library.Domain.Requests;
 
-            public static class BotCheck
+            public static class BotCheckFailure
             {
                 public const string Code = "request.bot-check-failed";
             }
@@ -147,6 +147,43 @@ public sealed class DotnetBackendReaderTests
               "application": "src/App", "domain": "src/Domain",
               "webapi": "src/WebApi", "infrastructure": "src/Infra"}}}
             """);
+
+    [Fact]
+    public void A_Code_Inside_A_Message_Declares_Nothing()
+    {
+        using var temp = Cli.Temp("reader");
+        WriteProject(temp.Path);
+        WriteSource(temp.Path, "App", "Startup.cs", """
+            namespace Library.Application;
+
+            public static class Startup
+            {
+                public static void Check() =>
+                    throw new InvalidOperationException("Set the edge to 10.0.0.7 in appsettings.json.");
+            }
+            """);
+
+        Assert.Empty(Literals(temp.Path));
+    }
+
+    [Fact]
+    public void An_Event_States_Its_Record_Id()
+    {
+        using var temp = Cli.Temp("reader");
+        WriteProject(temp.Path);
+        WriteSource(temp.Path, Path.Combine("Domain", "Lending", "Loans", "Events"), "LoanRenewedEvent.cs", """
+            namespace Library.Domain.Lending.Loans.Events;
+
+            public sealed record LoanRenewedEvent
+            {
+                public const string Classification = "event/loan.extended";
+            }
+            """);
+
+        var domainEvent = Assert.Single(new DotnetBackendReader().Read(ConsumerConfig.Load(temp.Path)).Events);
+
+        Assert.Equal("event/loan.extended", domainEvent.EventId);
+    }
 
     [Fact]
     public void Reaction_Without_A_Tag_Belongs_To_Its_Use_Case_Folder()
