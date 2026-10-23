@@ -637,3 +637,196 @@
 @media (max-width: 760px) {
   .prose .diagram-art { min-width: 560px; }
 }
+
+/* Trail: where a page sits in the specification tree (the `trail` fence) */
+
+.prose .trail {
+  margin: 0 0 var(--space-block);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.prose .trail-tree {
+  padding: var(--pad-card-y) var(--pad-card-x);
+}
+
+.prose .trail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.prose .trail-list .trail-list {
+  margin-left: 11px;
+  padding-left: var(--space-5);
+  border-left: 1px solid var(--border);
+}
+
+.prose .trail-node {
+  margin: 0;
+  padding: 0;
+}
+
+.prose .trail-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: 5px var(--space-2);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+
+.prose .trail-type {
+  flex: none;
+  min-width: 92px;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: 600 11px/18px var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--muted-fg);
+  background: var(--muted);
+}
+
+.prose .trail-intent > .trail-row .trail-type {
+  background: var(--rule-bg);
+  border-color: var(--rule-bd);
+  color: var(--rule-fg);
+}
+
+.prose .trail-behavior > .trail-row .trail-type {
+  background: var(--conv-bg);
+  border-color: var(--conv-bd);
+  color: var(--conv-fg);
+}
+
+.prose .trail-outcome > .trail-row .trail-type {
+  background: var(--pat-bg);
+  border-color: var(--pat-bd);
+  color: var(--pat-fg);
+}
+
+.prose .trail-text {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--fg);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The review line: people review the records above it, code proves the scenarios below. */
+.prose .trail-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--muted-fg);
+}
+
+.prose .trail-divider::before,
+.prose .trail-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--rail);
+}
+
+.prose .trail-divider::before {
+  flex: 0 0 var(--space-4);
+}
+
+.prose .trail-divider-label {
+  font-weight: 600;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+.prose .trail-divider-note {
+  white-space: nowrap;
+}
+
+.prose .trail-facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--gap-cards);
+  margin: 0;
+  padding: 0 var(--pad-card-x) var(--pad-card-y);
+}
+
+.prose .trail-facet {
+  margin: 0;
+  padding: var(--pad-box-y) var(--pad-box-x);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--muted-strong);
+}
+
+.prose .trail-facet dt {
+  margin: 0 0 var(--space-2);
+  font: 600 11px var(--sans);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-fg);
+}
+
+.prose .trail-facet dd {
+  margin: 0;
+}
+
+/* A facet path reads top to bottom, each step tucked under the one before it. */
+.prose .trail-path {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--fg);
+}
+
+.prose .trail-crumb {
+  margin: 0;
+  padding: 0;
+}
+
+.prose .trail-crumb + .trail-crumb {
+  position: relative;
+  margin-top: 2px;
+  padding-left: var(--space-5);
+}
+
+.prose .trail-crumb + .trail-crumb::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: -2px;
+  width: 9px;
+  height: 12px;
+  border-left: 1.5px solid var(--rail);
+  border-bottom: 1.5px solid var(--rail);
+  border-bottom-left-radius: 3px;
+}
+
+@media (max-width: 640px) {
+  .prose .trail-row {
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .prose .trail-type {
+    min-width: 0;
+  }
+
+  .prose .trail-list .trail-list {
+    margin-left: var(--space-2);
+    padding-left: var(--space-3);
+  }
+
+  .prose .trail-divider-note {
+    white-space: normal;
+  }
+}

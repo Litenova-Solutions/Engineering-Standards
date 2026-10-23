@@ -4,16 +4,6 @@
 
 The expenses screen is one screen of the Claimwick product, the example product these pages follow: it shows each employee their expenses at one address. This page follows that screen from the folder serving its address, through its data read with the API client generated from the published contract, the shared UI package it composes, and the drawn list option it starts from, naming the frontend rule each step applies.
 
-## Where This Page Sits
-
-```text
-USE CASE  List expenses (query)
-  +-- result    Listed
-        +-- scenario  Listing own expenses succeeds  <- the review line
-              |
-              +-- below the line: the expenses screen  <- this page
-```
-
 ## The Expenses Route
 
 The screen lives at `apps/web/src/routes/expenses/+page.svelte` in the Claimwick example. A Svelte frontend holds one folder per address under `src/routes`, with the frame and the use-case code in `src/lib/app` and `src/lib/modules`, as [Web Structure](../frontend/web/structure.md) states. The route mirrors its use case path in kebab case, per `litespec/frontend/structure#mirror-the-backend-use-case-path-in-kebab-case` on [Frontend Structure](../frontend/structure.md): the folder `expenses` answers the List expenses use case that [Modules and Records](modules-and-records.md) describes.

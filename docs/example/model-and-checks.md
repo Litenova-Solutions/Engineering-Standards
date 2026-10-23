@@ -4,16 +4,6 @@
 
 The project model is the computed join between a project's written records and its code, screens, and tests: it proves they agree, and its checks report every gap as a finding. This page shows that model at work on the Claimwick product, the example product these pages follow, with real output from `litespec model build`, `check`, and `query`: how a known gap (a missing piece the team accepts until an end date) covers the still-missing handler for Export expenses, what the check reports when the Approve expense handler is removed, and which continuous integration jobs run these checks.
 
-## Where This Page Sits
-
-```text
-scenario  Submitting with a receipt succeeds  <- the review line
-   |
-   +-- proven by a passing test through the public boundary  <- this page
-
-computed by the builder: implemented, verified, reachable, effective status
-```
-
 ## Building the Model
 
 `litespec model build` reads the written records, the code anchors, the routes, the tests, and the latest test run, and writes `model.json` with every record and its resolved links. [Model Builder](../tools/model.md) states the five subcommands, and [Project Model](../core/model.md) states the records they read. The run below is against the Claimwick example:

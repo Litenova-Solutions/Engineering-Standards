@@ -4,16 +4,6 @@
 
 A use case is one command, query, or reaction with its permissions, results, and scenarios. Implementing one means turning its written record into code in the layer that owns each part. Claimwick is the example product the docs follow, in which employees submit work expenses with receipts; this page follows its Submit expense use case from the written record into .NET code, naming where each file lives across the backend projects, then showing the Expense aggregate, the command and its handler, the endpoint, and the acceptance scenario that proves the code matches the record.
 
-## Where This Page Sits
-
-```text
-USE CASE  Submit expense (command)
-  +-- result    Submitted, Receipt missing
-        +-- scenario  Submitting with a receipt succeeds  <- the review line
-              |
-              +-- below the line: aggregate, command, endpoint, test  <- this page
-```
-
 ## Where Each File Lives
 
 A .NET backend holds 5 projects: Domain, Application.Abstractions, Application, Infrastructure, and WebApi (`litespec/backend/dotnet/architecture#use-five-application-projects`). The [.NET Architecture](../backend/dotnet/architecture.md) page states the 5 projects. The use-case record itself, with its results and scenarios, is shown on [Modules and Records](modules-and-records.md).

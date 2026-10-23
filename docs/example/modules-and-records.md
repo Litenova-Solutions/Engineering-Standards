@@ -4,21 +4,6 @@
 
 The spending module is the Claimwick example's one business area: it turns product intent into operations by organizing the business state the company tracks, the rules that bind it, and who may act on it. This page shows each piece as the project writes it: the module record, 3 aggregates (one unit of consistent state each) for expenses, receipts, and the policy with their states, transitions, and data, the rules that bind them, the access chain of actors, roles, permissions, and entry points with the outside system for payouts, and the Submit expense, Remind approvers, and List expenses use cases with their results and scenarios.
 
-## Where This Page Sits
-
-```text
-REQUIREMENT     Approval                             <- this page starts here
-|
-+-- rule        Receipt required above threshold, and 6 more
-+-- USE CASE    Submit expense, Remind approvers, List expenses, and 7 more
-      +-- result    Submitted, Receipt missing, ...
-            +-- scenario  Submitting with a receipt succeeds  <- the review line
-
-WHERE IT LIVES  spending module > expense aggregate > its rules, events, use cases
-WHO MAY DO IT   employee, manager, finance > role at a scope > permission
-HOW IT IS REACHED  expenses app, reminder job; payout bank outside
-```
-
 ## The Spending Module
 
 A module is one business area that organizes language, records, use cases, and ownership. Claimwick keeps one module, spending, which tracks expenses, receipts, and the policy. Its record lives at `docs/domain/modules/spending/README.md`, and its empty `dependsOn` list states that it depends on no other module, which applies `litespec/core/domain#state-every-module-dependency` on the [Domain Model](../core/domain.md).

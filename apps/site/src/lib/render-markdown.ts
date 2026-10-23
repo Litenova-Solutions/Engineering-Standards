@@ -13,15 +13,16 @@ import { paths } from "./icons";
 import { parseWireframe, renderWireframe } from "./wireframe/index.js";
 import { decorateCodeBlocks } from "./code-blocks";
 import { inlineDiagrams } from "./diagrams";
+import { parseTrail, renderTrail } from "./trail";
 
 let processor: MarkdownRenderer | null = null;
 
 async function renderer(): Promise<MarkdownRenderer> {
   if (!processor) {
-    // Shiki highlights every fenced block except wireframes, which become drawings.
+    // Shiki highlights every fenced block except wireframes and trails, which become drawings.
     // Both themes are emitted as CSS variables; code.css picks one per color scheme.
     processor = await createMarkdownProcessor({
-      syntaxHighlight: { type: "shiki", excludeLangs: ["wireframe"] },
+      syntaxHighlight: { type: "shiki", excludeLangs: ["wireframe", "trail"] },
       shikiConfig: { themes: { light: "github-light", dark: "github-dark" }, defaultColor: false, wrap: false },
       smartypants: false,
     });
@@ -408,6 +409,42 @@ function splitIntro(html: string): { intro: string; body: string } {
   return { intro: html.slice(start + introMarker.length, end).trim(), body: html.slice(0, start) + html.slice(end + introEnd.length) };
 }
 
+// The text of every trail fence in the Markdown, in order.
+function collectTrails(markdown: string): string[] {
+  const blocks: string[] = [];
+  let inFence: string | null = null;
+  let fenceText: string[] = [];
+  for (const line of markdown.split("\n")) {
+    const fence = /^(\s*```)(.*)$/.exec(line);
+    if (fence) {
+      if (inFence === null) {
+        inFence = fence[2].trim();
+        fenceText = [];
+      } else {
+        if (inFence === "trail") blocks.push(fenceText.join("\n"));
+        inFence = null;
+      }
+      continue;
+    }
+    if (inFence !== null) fenceText.push(line);
+  }
+  return blocks;
+}
+
+// Replaces each rendered trail block, in order, with its drawing. A block that does
+// not parse keeps its text, so a typo never hides the content.
+function renderTrails(html: string, page: Page): string {
+  const blocks = collectTrails(page.markdown);
+  if (blocks.length === 0) return html;
+  let index = 0;
+  return html.replace(/<pre><code class="language-trail">[\s\S]*?<\/code><\/pre>/g, (match) => {
+    const text = blocks[index++];
+    if (text === undefined) return match;
+    const { trail, errors } = parseTrail(text);
+    return errors.length > 0 ? match : renderTrail(trail);
+  });
+}
+
 export async function renderPage(page: Page): Promise<RenderedPage> {
   const { code } = await (await renderer()).render(page.markdown);
   const provisions = new Map(page.provisions.map((provision) => [provision.slug, provision]));
@@ -447,6 +484,7 @@ export async function renderPage(page: Page): Promise<RenderedPage> {
   html = rewriteLinks(html, page);
   html = inlineDiagrams(html, page);
   html = renderWireframes(html, collectWireframes(page.markdown));
+  html = renderTrails(html, page);
   html = mergeOptionAnnotations(html);
   html = hoistOptionIds(html);
   html = styleTables(html);

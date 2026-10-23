@@ -4,23 +4,6 @@
 
 Claimwick is the small product the example follows: employees submit work expenses with receipts, managers approve or reject them, and finance reimburses the approved ones. This page states what that product is and why through 9 records, each a short page stating one piece of product intent: the product brief, the goal, the problem, the feature, the requirements, the research, the decision, the constraint, and the journey. Each record below shows the shape a project writes, with JSON taken from `examples/claimwick/docs/`, so a team sees what written intent looks like before the example turns it into modules, code, and checks.
 
-## Where This Page Sits
-
-```text
-PRODUCT  Claimwick: submit, approve, reimburse          <- this page
-|
-+-- goal            Decided in days
-+-- problem         Expenses wait weeks
-|     feature       Approval reminders
-+-- research        Approval time benchmarks
-+-- decision        Receipt threshold
-|
-+-- REQUIREMENT     Approval: five-day decision, receipt over threshold,
-|                   no self approval, single reimbursement
-|     |
-|     +-- journey   Submit and reimburse
-```
-
 ## The Product Brief
 
 A [product](../reference/glossary.md) record states what is built, for whom, and what is excluded. The Claimwick brief below carries the fields every product record carries: a boundary that names what the product does, a `neverDoes` list that names what it refuses, and an audience of actors. It lives at `docs/product/brief.md`, the home the [Project Model](../core/model.md) names for the single product page, which applies `litespec/core/model#write-every-record-in-its-home`.
