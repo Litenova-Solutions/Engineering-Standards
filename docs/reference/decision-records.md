@@ -14,7 +14,7 @@ Each record is one Markdown file in the consumer repository. Start it with `lite
 
 | Item | Value |
 |:---|:---|
-| Path | `docs/product/decisions/<number>-<name>.md` in the consumer repository |
+| Path | `docs/intent/decisions/<number>-<name>.md` in the consumer repository |
 | Template | `templates/consumer/decision.md` |
 | Metadata type | `decision` |
 

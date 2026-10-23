@@ -40,7 +40,7 @@ It writes `litespec.project.json` with the size, shape, and stacks, records the 
 
 ### 4. Write the First Records
 
-Start with the product: one `docs/product/brief.md` that says what the product is, who it is for, and what it never does. Then work one slice at a time, one feature from problem to scenario, then the next, as the [model page](../core/model.md) describes: Intent first, then Behavior specified from it, then code, then Proof. A first module, its aggregates, and the use cases about to be built are enough to start. Each record has a template in the release.
+Start with the product: one `docs/intent/brief.md` that says what the product is, who it is for, and what it never does. Then work one slice at a time, one feature from problem to scenario, then the next, as the [model page](../core/model.md) describes: Intent first, then Behavior specified from it, then code, then Proof. A first module, its aggregates, and the use cases about to be built are enough to start. Each record has a template in the release.
 
 ### 5. Build to the Standard
 

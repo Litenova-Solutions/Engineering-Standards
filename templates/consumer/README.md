@@ -19,17 +19,17 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `product-brief.md` | `docs/product/brief.md` | Defines the product boundary, what it never does, and its audience. |
-| `goal.md` | `docs/product/goals/<name>.md` | States one measurable outcome the product serves. |
-| `constraint.md` | `docs/product/constraints/<name>.md` | Records one outside rule and whether it applies. |
-| `research.md` | `docs/research/<name>.md` | Records one outside fact that informs a choice. |
-| `decision.md` | `docs/product/decisions/<number>-<name>.md` | Records one dated choice with its options and evidence. |
-| `problem.md` | `docs/product/problems/<name>.md` | Records one pain someone has today. |
-| `feature.md` | `docs/product/features/<name>.md` | Records what is offered against a problem. |
+| `product-brief.md` | `docs/intent/brief.md` | Defines the product boundary, what it never does, and its audience. |
+| `goal.md` | `docs/intent/goals/<name>.md` | States one measurable outcome the product serves. |
+| `constraint.md` | `docs/intent/constraints/<name>.md` | Records one outside rule and whether it applies. |
+| `research.md` | `docs/intent/research/<name>.md` | Records one outside fact that informs a choice. |
+| `decision.md` | `docs/intent/decisions/<number>-<name>.md` | Records one dated choice with its options and evidence. |
+| `problem.md` | `docs/intent/problems/<name>.md` | Records one pain someone has today. |
+| `feature.md` | `docs/intent/features/<name>.md` | Records what is offered against a problem. |
 | `actor.md` | `docs/behavior/actors/<name>.md` | Records one person, organization, or system. |
-| `role.md` | `docs/behavior/roles/<name>.md` | Records one named set of permissions at a scope. |
-| `external-system.md` | `docs/behavior/systems/<name>.md` | Records one outside system, its operations, what crosses its boundary, and its failure and erasure behavior. |
-| `journey.md` | `docs/product/journeys/<name>.md` | Records the ordered steps an actor takes toward one goal. |
+| `role.md` | `docs/behavior/access/roles/<name>.md` | Records one named set of permissions at a scope. |
+| `external-system.md` | `docs/behavior/external-systems/<name>.md` | Records one outside system, its operations, what crosses its boundary, and its failure and erasure behavior. |
+| `journey.md` | `docs/intent/journeys/<name>.md` | Records the ordered steps an actor takes toward one goal. |
 | `module.md` | `docs/behavior/modules/<module>/README.md` | Defines one business area and its boundaries. |
 | `aggregate.md` | `docs/behavior/modules/<module>/<aggregate>/README.md` | Defines one aggregate, with its kind, states, data classes, and its rule and event entries. |
 | `use-case.md` | `docs/behavior/modules/<module>/<aggregate>/<use-case>.md` | Defines one command or query, with its result and scenario entries. |
@@ -37,17 +37,17 @@ A page record carries its type, identifier, title, owner, and status in JSON fro
 | `job.md` | `docs/behavior/modules/<module>/jobs/<job>.md` | Defines one scheduled, one-off, or operator job. |
 | `notification.md` | `docs/behavior/modules/<module>/notifications/<name>.md` | Defines one person-facing message and its claims. |
 | `integration-event.md` | `docs/behavior/integration-events/<name>.md` | Defines one published or consumed integration event. |
-| `runbook.md` | `docs/runbooks/<name>.md` | Gives one repeatable recovery or operating procedure. |
-| `deviation.md` | `docs/deviations/<name>.md` | Records one departure from a provision, with reason and review date. |
-| `known-gap.md` | `docs/known-gaps/<name>.md` | Records one accepted gap whose check stays red. |
+| `runbook.md` | `docs/behavior/runbooks/<name>.md` | Gives one repeatable recovery or operating procedure. |
+| `deviation.md` | `docs/governance/deviations/<name>.md` | Records one departure from a provision, with reason and review date. |
+| `known-gap.md` | `docs/governance/known-gaps/<name>.md` | Records one accepted gap whose check stays red. |
 
 ## Entry Lists and Page Styles
 
 | Template | Target | Purpose |
 |:---|:---|:---|
-| `requirement-page.md` | `docs/product/<area>/<topic>.md` | States one area of business intent, with its requirement entries. |
-| `permission-list.md` | `docs/behavior/permissions.md` | Holds the permission entries roles allow. |
-| `entry-point-list.md` | `docs/behavior/entry-points.md` | Holds the entry point entries use cases are reached through. |
+| `requirement-page.md` | `docs/intent/<area>/<topic>.md` | States one area of business intent, with its requirement entries. |
+| `permission-list.md` | `docs/behavior/access/permissions.md` | Holds the permission entries roles allow. |
+| `entry-point-list.md` | `docs/behavior/access/entry-points.md` | Holds the entry point entries use cases are reached through. |
 | `setting-set.md` | `docs/behavior/modules/<module>/settings.md` | Holds the setting entries a module runs with. |
 | `retention-schedule.md` | `docs/behavior/retention-schedule.md` | Holds the retention rows for every data class. |
 | `rule-set.md` | `docs/behavior/rules/<name>.md` | Holds rule entries that sit together outside one aggregate. |

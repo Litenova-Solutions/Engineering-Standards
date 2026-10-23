@@ -12,15 +12,15 @@ Everything this page asks an operator to know lives in one of four records, each
 
 ### Operations Log
 
-The operations log is append-only: one file per month under `docs/operations/log/`, named `YYYY-MM.md`, with entries appended and never edited. It records branch-protection bypasses, runbook rehearsals, restores, production deployments, and incidents, so the dated rehearsal each runbook needs has one home.
+The operations log is append-only: one file per month under `docs/behavior/operations/log/`, named `YYYY-MM.md`, with entries appended and never edited. It records branch-protection bypasses, runbook rehearsals, restores, production deployments, and incidents, so the dated rehearsal each runbook needs has one home.
 
 ### Alert Inventory
 
-The alert inventory lists the baseline alerts and the runbook each one names. A runbook is the procedure that answers an alert. The model builder renders the inventory from the limit entries, each naming one bound the product runs within and the runbook that answers it, beside the severity routing on the limits page at `docs/operations/limits.md`. The severity routing states where each severity level goes and how fast it is answered. Nobody edits the inventory by hand.
+The alert inventory lists the baseline alerts and the runbook each one names. A runbook is the procedure that answers an alert. The model builder renders the inventory from the limit entries, each naming one bound the product runs within and the runbook that answers it, beside the severity routing on the limits page at `docs/behavior/operations/limits.md`. The severity routing states where each severity level goes and how fast it is answered. Nobody edits the inventory by hand.
 
 ### Secret Inventory
 
-The secret inventory is hand-written at `docs/operations/secrets.json`. Each entry names the secret, its owner, where it lives, and its next rotation date, and never the value itself. The owner reviews each rotation date before it passes. An entry has this shape:
+The secret inventory is hand-written at `docs/behavior/operations/secrets.json`. Each entry names the secret, its owner, where it lives, and its next rotation date, and never the value itself. The owner reviews each rotation date before it passes. An entry has this shape:
 
 ```json
 {
@@ -33,7 +33,7 @@ The secret inventory is hand-written at `docs/operations/secrets.json`. Each ent
 
 ### Sub-Processor List
 
-The sub-processor list names every provider that processes personal data for the product. The model builder renders it from the project's provider actors, the actor records that name its providers, on `docs/operations/sub-processors.md`. Nobody edits it by hand.
+The sub-processor list names every provider that processes personal data for the product. The model builder renders it from the project's provider actors, the actor records that name its providers, on `docs/behavior/operations/sub-processors.md`. Nobody edits it by hand.
 
 ## Standards
 
@@ -188,7 +188,7 @@ Declaring all five before production makes each alert answerable the first time 
 
 ### Keep Runbooks Near Project Documentation
 
-**Default:** Place runbooks under `docs/runbooks/` stating trigger, impact, prerequisites, steps, and verification, covering restore, rollback, schema failure, leaked secrets, dependency outages, and extension recovery.
+**Default:** Place runbooks under `docs/behavior/runbooks/` stating trigger, impact, prerequisites, steps, and verification, covering restore, rollback, schema failure, leaked secrets, dependency outages, and extension recovery.
 
 **Replacement:** A consumer records a runbook-layout convention naming where its runbooks live and what each holds.
 
@@ -234,5 +234,5 @@ A release applies a reviewed Marten schema plan as its schema step, then deploys
 | litespec/quality/operations#attach-dashboard-links-to-production-objectives | guidance | Each production objective in the book links its dashboard. |
 | litespec/quality/operations#keep-production-secrets-out-of-the-repository | guidance | Production values live on the host, with only placeholders in the repository example file. |
 | litespec/quality/operations#use-stable-service-names | guidance | Service, resource, meter, and trace-source names match across environments, or the service-naming convention names another arrangement. |
-| litespec/quality/operations#keep-runbooks-near-project-documentation | guidance | Each runbook sits under `docs/runbooks/` with its sections, or the runbook-layout convention names another arrangement. |
+| litespec/quality/operations#keep-runbooks-near-project-documentation | guidance | Each runbook sits under `docs/behavior/runbooks/` with its sections, or the runbook-layout convention names another arrangement. |
 | litespec/quality/operations#keep-deployment-descriptors-together | guidance | The deployment descriptors sit under one `deploy/` tree, or the deployment-layout convention names another arrangement. |

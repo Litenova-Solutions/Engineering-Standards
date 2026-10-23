@@ -21,15 +21,15 @@ static class RecordPages
     /// <summary>Where an entry type lives, for the refusal message.</summary>
     public static readonly Dictionary<string, string> EntryHomes = new(StringComparer.Ordinal)
     {
-        ["requirement"] = "a requirement page under docs/product/",
+        ["requirement"] = "a requirement page under docs/intent/",
         ["rule"] = "its aggregate page, or a rule page under docs/behavior/rules/ for a cross-aggregate rule",
         ["result"] = "its use-case page",
         ["scenario"] = "its use-case or reaction page",
         ["event"] = "its aggregate page",
-        ["integration-event"] = "the published set in docs/behavior/integration-events.md",
+        ["integration-event"] = "one page per event under docs/behavior/integration-events/",
         ["setting"] = "its module page, or a setting-set page",
-        ["permission"] = "docs/behavior/permissions.md",
-        ["entry-point"] = "docs/behavior/entry-points.md",
+        ["permission"] = "docs/behavior/access/permissions.md",
+        ["entry-point"] = "docs/behavior/access/entry-points.md",
         ["term"] = "the glossary",
     };
 
@@ -55,26 +55,26 @@ static class RecordPages
 
         return type switch
         {
-            "product" => Path.Combine(docs, "product", "brief.md"),
-            "goal" => Path.Combine(docs, "product", "goals", $"{name}.md"),
-            "problem" => Path.Combine(docs, "product", "problems", $"{name}.md"),
-            "feature" => Path.Combine(docs, "product", "features", $"{name}.md"),
-            "constraint" => Path.Combine(docs, "product", "constraints", $"{name}.md"),
-            "research" => Path.Combine(docs, "research", $"{name}.md"),
-            "decision" => Path.Combine(docs, "product", "decisions", $"{name}.md"),
-            "journey" => Path.Combine(docs, "product", "journeys", $"{name}.md"),
-            "actor" => Path.Combine(docs, "product", "actors", $"{name}.md"),
+            "product" => Path.Combine(docs, "intent", "brief.md"),
+            "goal" => Path.Combine(docs, "intent", "goals", $"{name}.md"),
+            "problem" => Path.Combine(docs, "intent", "problems", $"{name}.md"),
+            "feature" => Path.Combine(docs, "intent", "features", $"{name}.md"),
+            "constraint" => Path.Combine(docs, "intent", "constraints", $"{name}.md"),
+            "research" => Path.Combine(docs, "intent", "research", $"{name}.md"),
+            "decision" => Path.Combine(docs, "intent", "decisions", $"{name}.md"),
+            "journey" => Path.Combine(docs, "intent", "journeys", $"{name}.md"),
+            "actor" => Path.Combine(docs, "intent", "actors", $"{name}.md"),
             "module" => Path.Combine(behavior, "modules", name, "README.md"),
             "aggregate" => Path.Combine(behavior, "modules", home!, name, "README.md"),
             "use-case" => Path.Combine(behavior, "modules", home!, "reads", $"{name}.md"),
             "reaction" => Path.Combine(behavior, "modules", home!, "reactions", $"{name}.md"),
             "job" => Path.Combine(behavior, "modules", home!, "jobs", $"{name}.md"),
             "notification" => Path.Combine(behavior, "modules", home!, "notifications", $"{name}.md"),
-            "role" => Path.Combine(behavior, "roles", $"{name}.md"),
-            "external-system" => Path.Combine(behavior, "systems", $"{name}.md"),
-            "runbook" => Path.Combine(docs, "runbooks", $"{name}.md"),
-            "deviation" => Path.Combine(docs, "deviations", $"{name}.md"),
-            "known-gap" => Path.Combine(docs, "known-gaps", $"{name}.md"),
+            "role" => Path.Combine(behavior, "access", "roles", $"{name}.md"),
+            "external-system" => Path.Combine(behavior, "external-systems", $"{name}.md"),
+            "runbook" => Path.Combine(behavior, "runbooks", $"{name}.md"),
+            "deviation" => Path.Combine(docs, "governance", "deviations", $"{name}.md"),
+            "known-gap" => Path.Combine(docs, "governance", "known-gaps", $"{name}.md"),
             _ => throw new ArgumentOutOfRangeException(nameof(type), $"Type '{type}' owns no page."),
         };
     }

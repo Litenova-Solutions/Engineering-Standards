@@ -161,7 +161,7 @@ The supply-chain job groups every check that keeps third-party code safe to ship
 
 **Rationale:** The bypass permission exists so a recovery can proceed when the gates cannot run. A recovery nobody wrote down is indistinguishable from a habit, so the next reviewer cannot tell which commits on the branch were reviewed. The record names the actor, the reason, and the admitted change, which is the attribution [NIST SP 800-218](https://csrc.nist.gov/publications/detail/sp/800-218/final) states for the same event.
 
-**Example:** The record is the recovery decision itself where one exists. A bypass smaller than a decision takes a dated entry in the operations log at `docs/operations/log/`.
+**Example:** The record is the recovery decision itself where one exists. A bypass smaller than a decision takes a dated entry in the operations log at `docs/behavior/operations/log/`.
 
 ### Keep a Canonical Job Graph
 

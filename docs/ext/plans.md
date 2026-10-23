@@ -90,7 +90,7 @@ Guides: None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/plans#record-each-plan-once | guidance | The requirement pages under `docs/product/` hold one record per plan with its price, billing period, and entitlements. |
+| litespec/ext/plans#record-each-plan-once | guidance | The requirement pages under `docs/intent/` hold one record per plan with its price, billing period, and entitlements. |
 | litespec/ext/plans#gate-behavior-through-permissions | guidance | Each gated use case declares a permission in its grant that only an entitled plan grants. |
 | litespec/ext/plans#bound-plan-amounts-in-settings | guidance | Each plan allowance lives as a setting the gated use case cites. |
 | litespec/ext/plans#refuse-runs-beyond-entitlement | guidance | A run past its plan ends in the named refusal result in the use case tests. |

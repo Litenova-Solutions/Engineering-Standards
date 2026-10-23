@@ -27,7 +27,7 @@ The Export expenses use case has no handler, so the `use-case-unimplemented` che
 
 ## The Known Gap for Export Expenses
 
-The team accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date, per `litespec/core/model#record-accepted-gaps-as-known-gaps`. The record sits at `docs/known-gaps/export-expenses-unimplemented.md`, and the use case it covers waits for its handler at `docs/behavior/modules/spending/expenses/export-expenses.md`. The known-gap record reads:
+The team accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date, per `litespec/core/model#record-accepted-gaps-as-known-gaps`. The record sits at `docs/governance/known-gaps/export-expenses-unimplemented.md`, and the use case it covers waits for its handler at `docs/behavior/modules/spending/expenses/export-expenses.md`. The known-gap record reads:
 
 ```json
 {

@@ -186,7 +186,7 @@ A publishing product supports sign-in, draft creation, publication, and public r
 | litespec/core/scope#answer-the-constraints-question | guidance | `litespec.project.json` states which outside constraints apply, or records an empty answer. |
 | litespec/core/scope#declare-a-consumer-that-has-no-backend | checkable | `litespec consumer` refuses a `client-only` project that names a backend stack. |
 | litespec/core/scope#record-unsupported-scope-decisions | guidance | A project decision names each architecture outside the supported boundary the project adopts. |
-| litespec/core/scope#claim-conformance-only-when-every-applicable-provision-holds | guidance | `litespec.project.json` names the selected size, shape, stacks, and extensions; each departure from an applied page resolves to a deviation record under `docs/deviations/`, and the selected checks pass. |
+| litespec/core/scope#claim-conformance-only-when-every-applicable-provision-holds | guidance | `litespec.project.json` names the selected size, shape, stacks, and extensions; each departure from an applied page resolves to a deviation record under `docs/governance/deviations/`, and the selected checks pass. |
 | litespec/core/scope#record-the-review-configuration | checkable | `litespec consumer` rejects a project record without `review.vetoWindowDays` or `review.securityReviewer`. |
 | litespec/core/scope#record-the-transcription-endpoint | checkable | `litespec consumer` rejects a transcribed record in a project without `adoption.transcriptionEndsWith`. |
 | litespec/core/scope#point-behavior-docs-at-the-behavior-root | checkable | `litespec consumer` rejects a project record without `paths.behaviorDocs`. |

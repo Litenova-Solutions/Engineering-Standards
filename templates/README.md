@@ -22,7 +22,7 @@ The command merges the preset over `consumer/litespec.project.json`, stamps the 
 
 ### Consumer Templates
 
-`consumer/` holds one starting point per record type and page style, plus the project file, the language file, the design contract, the UI catalog, and the source lock. [consumer/README.md](consumer/README.md) maps each file to the consumer path it targets, from `docs/product/brief.md` to `packages/ui/ui-source-lock.json`.
+`consumer/` holds one starting point per record type and page style, plus the project file, the language file, the design contract, the UI catalog, and the source lock. [consumer/README.md](consumer/README.md) maps each file to the consumer path it targets, from `docs/intent/brief.md` to `packages/ui/ui-source-lock.json`.
 
 Each record template carries JSON frontmatter valid against [record.schema.json](../schemas/record.schema.json) plus the body sections of its page style. Each JSON template carries working example values. Replace every `<placeholder>`, `__PROJECT__`, and `__OWNER__` value before committing. `litespec init` fills the project placeholders in `litespec.project.json` and lists the ones it leaves, and `litespec consumer` refuses a project file that still holds one. Do not edit [consumer/README.md](consumer/README.md): it is the template index the validator checks.
 

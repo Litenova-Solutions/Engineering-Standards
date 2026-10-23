@@ -234,7 +234,7 @@ The entry names the pattern's default option and records `owner` as the source, 
 
 **Rationale:** When the catalog waits for a later change, the code ships, the follow-up slips, and the entry describes behavior no route renders. Updating the entry in the same change as its implementation keeps the two in agreement by construction. A deliberate departure in one route names a decision record instead, so the departure stays reviewable.
 
-**Example:** A route departing from the chosen option names `decision.record`, such as `docs/product/decisions/0014-invoice-sort-menu.md`.
+**Example:** A route departing from the chosen option names `decision.record`, such as `docs/intent/decisions/0014-invoice-sort-menu.md`.
 
 ### State the Implementation Status
 

@@ -92,7 +92,7 @@ The standard expects departures and gives each one a home:
 
 When guidance overlaps, the most specific source wins: your deviation, then a selected extension, then the deeper page, then the shallower one.
 
-The Claimwick example carries one deviation, at `examples/claimwick/docs/deviations/export-review-bypass.md`:
+The Claimwick example carries one deviation, at `examples/claimwick/docs/governance/deviations/export-review-bypass.md`:
 
 ```json
 {

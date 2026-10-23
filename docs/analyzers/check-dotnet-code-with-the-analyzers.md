@@ -141,10 +141,10 @@ Every rule is an error by default, so `dotnet build` already fails on a finding 
 
 ### 6. Record a Deliberate Departure
 
-When a finding is wrong for the project, record a deviation that cites the provision, with its reason and review date, as [the model page](../core/model.md) describes. Keep the record at `docs/deviations/<name>.md`, then suppress narrowly next to the code:
+When a finding is wrong for the project, record a deviation that cites the provision, with its reason and review date, as [the model page](../core/model.md) describes. Keep the record at `docs/governance/deviations/<name>.md`, then suppress narrowly next to the code:
 
 ```csharp
-#pragma warning disable LS1011 // deviation: docs/deviations/domain-docs-deferred.md
+#pragma warning disable LS1011 // deviation: docs/governance/deviations/domain-docs-deferred.md
 public string LegacyLabel { get; }
 #pragma warning restore LS1011
 ```

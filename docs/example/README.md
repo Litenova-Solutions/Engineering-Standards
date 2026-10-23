@@ -6,7 +6,7 @@ The example pages show LiteSpec applied instead of described, following Claimwic
 
 ## How to Read the Example
 
-Employees submit work expenses with receipts. Managers approve or reject them, and finance reimburses the approved ones. Its records live under `examples/claimwick/docs/`, with Intent under `docs/product/` and Behavior under `docs/behavior/`, and the example shows each record as the project writes it, shaped as `schemas/record.schema.json` defines. The pages follow one thread down the layers:
+Employees submit work expenses with receipts. Managers approve or reject them, and finance reimburses the approved ones. Its records live under `examples/claimwick/docs/`, with Intent under `docs/intent/` and Behavior under `docs/behavior/`, and the example shows each record as the project writes it, shaped as `schemas/record.schema.json` defines. The pages follow one thread down the layers:
 
 ```trail
 product        Claimwick: submit, approve, reimburse

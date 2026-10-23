@@ -22,7 +22,7 @@ A project Deviation record overrides a Standard only when it names the provision
 
 An explicit project convention can replace a baseline Convention when local documentation cites its ID. (litespec/core/agent#apply-guidance-precedence)
 
-Read `docs/product/brief.md` and the affected requirement pages before changing behavior that touches price, money, markets, customers, or terms. (litespec/core/intent#keep-intent-in-its-homes)
+Read `docs/intent/brief.md` and the affected requirement pages before changing behavior that touches price, money, markets, customers, or terms. (litespec/core/intent#keep-intent-in-its-homes)
 
 Draft a product decision for any changed business choice, and leave its approval to the accountable person. Research outside `docs/` is source material, never authority. (litespec/core/intent#name-the-person-who-approved-a-decision, litespec/core/intent#treat-generated-research-as-source-material)
 

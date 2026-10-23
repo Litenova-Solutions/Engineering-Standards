@@ -192,7 +192,7 @@ Guides: None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/tenancy#record-the-tenant-adoption-decision | guidance | The tenant adoption decision under `docs/product/decisions/` names source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound. |
+| litespec/ext/tenancy#record-the-tenant-adoption-decision | guidance | The tenant adoption decision under `docs/intent/decisions/` names source, storage model, isolation guarantee, administrative access, evolution path, and enumeration bound. |
 | litespec/ext/tenancy#define-tenant-isolation | guidance | The adoption decision names shared-table, schema, or database isolation with its guarantee and operating trade-off. |
 | litespec/ext/tenancy#avoid-unplanned-isolation-models | guidance | Each mixed isolation model traces to a decision with a data evolution plan. |
 | litespec/ext/tenancy#resolve-tenant-identity-from-trusted-context | guidance | Each trusted host boundary resolves the tenant from verified claims, host mapping, or another authenticated source. |

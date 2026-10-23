@@ -187,11 +187,11 @@ Create an optional directory only when its first real artifact exists. Never cre
 
 ### Keep Operational and Security References Under Operations
 
-**Default:** Keep operating and security reference prose under `docs/operations/`.
+**Default:** Keep operating and security reference prose under `docs/behavior/operations/`.
 
 **Replacement:** A consumer names its own home for operating and security reference prose in its documentation.
 
-**Rationale:** One home for operating and security reference prose means an on-call reader looks in `docs/operations/` first and finds the runbooks, limits, and inventories there. Scattering that prose across product and domain pages buries it where an incident never looks. Enforceable security and privacy rules still belong to their owning use case sections and rules, since those are what the code and tests prove.
+**Rationale:** One home for operating and security reference prose means an on-call reader looks in `docs/behavior/operations/` first and finds the runbooks, limits, and inventories there. Scattering that prose across product and domain pages buries it where an incident never looks. Enforceable security and privacy rules still belong to their owning use case sections and rules, since those are what the code and tests prove.
 
 ### Use Established Technical Terms
 
@@ -219,7 +219,7 @@ The `use-case/spending.submit-expense` use case is complete only with its behavi
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/system#keep-decision-authority-with-accountable-people | guidance | The draft decision pages under `docs/product/decisions/` naming the open question, the decider, and the decide-by date. |
+| litespec/core/system#keep-decision-authority-with-accountable-people | guidance | The draft decision pages under `docs/intent/decisions/` naming the open question, the decider, and the decide-by date. |
 | litespec/core/system#drive-work-from-approved-records | guidance | The change report listing the approved Intent and reviewed Behavior records the work started from. |
 | litespec/core/system#point-code-and-tests-up-to-records | checkable | `litespec model check` emits no `behavior-unrecorded` finding for code and tests that name no parent record. |
 | litespec/core/system#declare-every-edge-between-records | checkable | `litespec model check` emits no `effect-undeclared` or `effect-loop` finding across use cases, reactions, jobs, notifications, and integration events. |
@@ -228,6 +228,6 @@ The `use-case/spending.submit-expense` use case is complete only with its behavi
 | litespec/core/system#keep-computed-facts-in-proof | guidance | Which Intent or Behavior records restate a fact computed from code? Look at the statuses and counts the change adds, beside the book and model output. |
 | litespec/core/system#use-this-consumer-documentation-layout | guidance | The `docs/` tree matching the layout, or the project documentation naming the replacement layout. |
 | litespec/core/system#group-module-use-case-files-by-aggregate | guidance | Each use case file under its module directory or its aggregate subdirectory. |
-| litespec/core/system#keep-operational-and-security-references-under-operations | guidance | Operating and security reference prose under `docs/operations/`, or the project documentation naming the replacement home. |
+| litespec/core/system#keep-operational-and-security-references-under-operations | guidance | Operating and security reference prose under `docs/behavior/operations/`, or the project documentation naming the replacement home. |
 | litespec/core/system#use-established-technical-terms | guidance | Prose using aggregate, command, query, reaction, repository, projection, outbox, idempotency, and transaction with their accepted meanings. |
 | litespec/core/system#use-ordinary-capitalization-in-prose | guidance | Prose writing module, aggregate, use case, journey, rule, event, and decision in lowercase outside names and identifiers. |

@@ -62,22 +62,36 @@ The [intent page](intent.md) states the Intent records, the [behavior page](beha
 
 Each record page uses the page style the [Authoring Standard](authoring.md) names for its type. A setting-set page holds many settings, and the retention-schedule page holds the retention rows at `docs/behavior/retention-schedule.md`. The retention schedule is a page style, not a record type.
 
+### The Docs Layout
+
+A consumer keeps its documentation in one folder per layer, so the folder a page sits in says who writes it, who reviews it, and what it may contain.
+
+| Folder | Layer | Holds |
+|:---|:---|:---|
+| `docs/intent/` | Intent | The brief, goals, problems, features, requirement pages by area, constraints, decisions, journeys, actors, research, and the product documents the business publishes, such as legal texts and the writing voice |
+| `docs/behavior/` | Behavior | Modules with their aggregates, use cases, reactions, jobs, notifications and settings; rule pages; access (roles, permissions, entry points); external systems; integration events; the retention schedule; runbooks and operating procedures |
+| `docs/implementation/` | Implementation | Guides for people working in the code: frontend architecture, the command reference, the published API guide, and setup guides. These pages describe code and hold no records |
+| `docs/proof/` | Proof | Evidence the tools compute or a run leaves behind: generated registers, gate files, and operating logs. No person writes a fact here that a tool can compute |
+| `docs/governance/` | Governance | Deviations and known gaps, which can attach to any layer |
+
+The glossary (`docs/glossary.json`) and the example cast stay at the top of `docs/`, because every layer uses them.
+
 ### Pages and Entries
 
 A page record is a Markdown file whose opening block names a record type. An entry record is an object in the `records` array of that block. Terms are the exception: each term is an entry in the glossary. Each type has one home.
 
 | Type | Stored as | Home |
 |:---|:---|:---|
-| `product` | page, exactly one | `docs/product/brief.md` |
-| `goal` | page | `docs/product/goals/<name>.md` |
-| `problem` | page | `docs/product/problems/<name>.md` |
-| `feature` | page | `docs/product/features/<name>.md` |
-| `constraint` | page | `docs/product/constraints/<name>.md` |
-| `research` | page | `docs/research/<name>.md` |
-| `decision` | page | `docs/product/decisions/<number>-<name>.md` |
-| `requirement` | entry | `docs/product/<area>/<topic>.md` |
-| `journey` | page | `docs/product/journeys/<name>.md` |
-| `actor` | page | `docs/product/actors/<name>.md` |
+| `product` | page, exactly one | `docs/intent/brief.md` |
+| `goal` | page | `docs/intent/goals/<name>.md` |
+| `problem` | page | `docs/intent/problems/<name>.md` |
+| `feature` | page | `docs/intent/features/<name>.md` |
+| `constraint` | page | `docs/intent/constraints/<name>.md` |
+| `research` | page | `docs/intent/research/<name>.md` |
+| `decision` | page | `docs/intent/decisions/<number>-<name>.md` |
+| `requirement` | entry | `docs/intent/<area>/<topic>.md` |
+| `journey` | page | `docs/intent/journeys/<name>.md` |
+| `actor` | page | `docs/intent/actors/<name>.md` |
 | `module` | page | `docs/behavior/modules/<module>/README.md` |
 | `aggregate` | page | `docs/behavior/modules/<module>/<aggregate>/README.md` |
 | `rule` | entry | On its aggregate page; a cross-aggregate rule on a rule page under `docs/behavior/rules/` |
@@ -85,18 +99,18 @@ A page record is a Markdown file whose opening block names a record type. An ent
 | `result` | entry | In its use case page |
 | `scenario` | entry | In its use case page, or in its reaction page |
 | `event` | entry | On its aggregate page |
-| `integration-event` | entry | In the published set: `docs/behavior/integration-events.md` |
+| `integration-event` | page | `docs/behavior/integration-events/<name>.md` |
 | `reaction` | page | `docs/behavior/modules/<module>/reactions/<reaction>.md` |
 | `job` | page | `docs/behavior/modules/<module>/jobs/<job>.md` |
 | `notification` | page | `docs/behavior/modules/<module>/notifications/<name>.md` |
-| `setting` | entry | On its module page, or on a setting-set page under `docs/behavior/modules/<module>/` |
-| `role` | page | `docs/behavior/roles/<name>.md` |
-| `permission` | entry | `docs/behavior/permissions.md` |
-| `entry-point` | entry | `docs/behavior/entry-points.md` |
-| `external-system` | page | `docs/behavior/systems/<name>.md` |
-| `runbook` | page | `docs/runbooks/<name>.md` |
-| `deviation` | page | `docs/deviations/<name>.md` |
-| `known-gap` | page | `docs/known-gaps/<name>.md` |
+| `setting` | entry | On a setting-set page: `docs/behavior/modules/<module>/settings.md`, or `docs/behavior/settings/<name>.md` for platform-wide settings |
+| `role` | page | `docs/behavior/access/roles/<name>.md` |
+| `permission` | entry | `docs/behavior/access/permissions.md` |
+| `entry-point` | entry | `docs/behavior/access/entry-points.md` |
+| `external-system` | page | `docs/behavior/external-systems/<name>.md` |
+| `runbook` | page | `docs/behavior/runbooks/<name>.md` |
+| `deviation` | page | `docs/governance/deviations/<name>.md` |
+| `known-gap` | page | `docs/governance/known-gaps/<name>.md` |
 | `term` | entry in the glossary | `docs/glossary.json` |
 
 ### Identifiers
@@ -357,7 +371,7 @@ Field tables render as tables. Scenarios group under their result. Field names n
 
 **Rationale:** One home per type tells a reader where to open a record and tells the builder where to read it. A record kept anywhere else is invisible to the checks that scan its home, so it looks sound while nothing validates it.
 
-**Example:** A decision lives at `docs/product/decisions/0001-receipt-threshold.md`.
+**Example:** A decision lives at `docs/intent/decisions/0001-receipt-threshold.md`.
 
 ### State the Common Fields on Every Record
 
@@ -442,7 +456,7 @@ Field tables render as tables. Scenarios group under their result. Field names n
 
 **Rationale:** Missing work with no owner and no date is invisible: nobody answers for it and nothing reports it. A known gap with an owner and an end date turns the same missing work into a visible promise that the checks report until the date and fail after it.
 
-**Example:** The running Claimwick example accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date in `docs/known-gaps/export-expenses-unimplemented.md`.
+**Example:** The running Claimwick example accepts that exporting expenses has no handler yet, so the gap lives as a known gap with an owner and an end date in `docs/governance/known-gaps/export-expenses-unimplemented.md`.
 
 ```json
 {
@@ -466,7 +480,7 @@ The `use-case-unimplemented` check reports without failing until 2027-06-01, and
 
 **Rationale:** A project requirement can never quietly override a shared standard; without this order it would, one page at a time. The conflict becomes a deviation record instead: dated, reasoned, and reviewable. The order puts the project deviation first, then the extension, then the deeper page, then the shallower page, so the most local approved decision wins.
 
-**Example:** The running Claimwick example runs its weekend export with no reviewer on shift, so it records a project deviation that outranks the shared standard in `docs/deviations/export-review-bypass.md`.
+**Example:** The running Claimwick example runs its weekend export with no reviewer on shift, so it records a project deviation that outranks the shared standard in `docs/governance/deviations/export-review-bypass.md`.
 
 ```json
 {
@@ -632,11 +646,11 @@ Success names the submitted ending, the refusal carries the code `spending.recei
 | litespec/core/model#write-links-on-the-record-that-points | checkable | `litespec model check` reports `reference-unresolved` for a link whose target no record carries. |
 | litespec/core/model#connect-every-use-case-to-intent | checkable | `litespec model check` reports `record-orphaned` for a use case with neither `serves` nor `fulfills`. |
 | litespec/core/model#serve-every-journey-step | checkable | `litespec model check` reports `step-unserved` for a journey step with no serving use case. |
-| litespec/core/model#follow-the-authority-order | guidance | Conflict decisions under `docs/product/decisions/` name the higher record that won, in the order this page states. |
+| litespec/core/model#follow-the-authority-order | guidance | Conflict decisions under `docs/intent/decisions/` name the higher record that won, in the order this page states. |
 | litespec/core/model#resolve-ties-by-the-later-decision | guidance | Each tie-breaking decision carries a later approval date than the peer records it settles. |
 | litespec/core/model#hold-approval-behind-draft-decisions | checkable | `litespec model check` reports `draft-gate` for an approved or reviewed record behind a draft decision. |
 | litespec/core/model#record-accepted-gaps-as-known-gaps | checkable | `litespec model check` reports `record-shape` and `known-gap-expired` for a gap missing its owner, date, or renewal. |
-| litespec/core/model#apply-guidance-precedence | guidance | Every departure from a shared provision resolves to a deviation record under `docs/deviations/` with reason and review date. |
+| litespec/core/model#apply-guidance-precedence | guidance | Every departure from a shared provision resolves to a deviation record under `docs/governance/deviations/` with reason and review date. |
 | litespec/core/model#keep-one-owner-and-status-on-every-record | checkable | `litespec model check` reports `owner-unknown` and `draft-without-decider` for a page missing its owner or draft decider. |
 | litespec/core/model#retire-records-with-replaces | checkable | `litespec model check` reports `invalid-field` for `replaces` outside a decision and `reference-unresolved` for an unknown target. |
 | litespec/core/model#name-what-every-decision-decides | checkable | `litespec model check` reports `decision-decides-nothing` for a decision with an empty `decides` field. |

@@ -38,7 +38,7 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 
 ### Record a First-Load Budget
 
-**Default:** Record the compressed transfer size of the framework payload as a limit entry in `docs/operations/limits.md`.
+**Default:** Record the compressed transfer size of the framework payload as a limit entry in `docs/behavior/operations/limits.md`.
 
 **Replacement:** A consumer can replace this default with an explicit local convention.
 
@@ -51,4 +51,4 @@ dotnet test apps/web/{ProjectName}.slnx --configuration Release --no-build
 | litespec/frontend/blazor/stack#keep-blazor-outside-the-ui-contract | guidance | The consumer's stack selection and CI jobs apply no UI contract page or route check. |
 | litespec/frontend/blazor/stack#publish-static-webassembly-output | guidance | The published output holds static files with no server assembly or server render mode. |
 | litespec/frontend/blazor/stack#verify-with-the-net-toolchain | guidance | The CI client job runs `dotnet build` and `dotnet test`. |
-| litespec/frontend/blazor/stack#record-a-first-load-budget | guidance | A limit entry in `docs/operations/limits.md` records the compressed transfer size budget the publish job enforces. |
+| litespec/frontend/blazor/stack#record-a-first-load-budget | guidance | A limit entry in `docs/behavior/operations/limits.md` records the compressed transfer size budget the publish job enforces. |

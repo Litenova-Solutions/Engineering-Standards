@@ -92,7 +92,7 @@ Guides: None.
 |:---|:---|:---|
 | litespec/ext/stage#declare-the-release-stage | checkable | `litespec consumer` refuses a `stage` selection with a missing or unknown `releaseStage`. |
 | litespec/ext/stage#defer-named-provisions-until-promotion | checkable | `litespec consumer` refuses a deferral naming an unknown provision or past its `until` date, and any deferral in `production`. |
-| litespec/ext/stage#promote-through-a-recorded-decision | guidance | The promotion decision under `docs/product/decisions/` carries approval before the first deployment holds customer data and ends every deferred provision. |
+| litespec/ext/stage#promote-through-a-recorded-decision | guidance | The promotion decision under `docs/intent/decisions/` carries approval before the first deployment holds customer data and ends every deferred provision. |
 | litespec/ext/stage#record-rested-on-draft-intent | guidance | The promotion decision names each draft decision and requirement that a reviewed Behavior record rests on. |
 | litespec/ext/stage#resolve-rested-on-draft-intent-at-promotion | guidance | Each named draft intent carries approval or retirement before the first deployment holds customer data. |
 | litespec/ext/stage#hold-transcribed-records-in-draft | guidance | Each transcribed Behavior record stays in draft until its fulfills or serves parent is approved. |

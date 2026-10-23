@@ -76,9 +76,9 @@ Intent never contains Behavior field names, code identifiers, or mechanism: no s
 
 ### Keep Intent in Its Homes
 
-**Statement:** A consumer MUST keep its brief, requirement pages, goals, problems, features, constraints, decisions, and journeys under `docs/product/`, and its research under `docs/research/`.
+**Statement:** A consumer MUST keep its brief, requirement pages, goals, problems, features, constraints, decisions, and journeys under `docs/intent/`, and its research under `docs/intent/research/`.
 
-**Rationale:** Intent split across notes and books gives no single answer to the question an agent asks before building. One home per kind, with the brief, requirement pages, goals, problems, features, constraints, decisions, and journeys under `docs/product/` and research under `docs/research/`, gives every reader one place to look. A second home for any kind starts a second truth about the business.
+**Rationale:** Intent split across notes and books gives no single answer to the question an agent asks before building. One home per kind, with the brief, requirement pages, goals, problems, features, constraints, decisions, and journeys under `docs/intent/` and research under `docs/intent/research/`, gives every reader one place to look. A second home for any kind starts a second truth about the business.
 
 ### State One Product
 
@@ -228,7 +228,7 @@ Intent never contains Behavior field names, code identifiers, or mechanism: no s
 
 ### Group Product Records by Area
 
-**Default:** Keep the brief at `docs/product/brief.md`, requirement pages in one folder per area, each other kind in its folder, and research under `docs/research/`.
+**Default:** Keep the brief at `docs/intent/brief.md`, requirement pages in one folder per area, each other kind in its folder, and research under `docs/intent/research/`.
 
 **Replacement:** A project records its own product layout in its documentation index.
 
@@ -237,7 +237,7 @@ Intent never contains Behavior field names, code identifiers, or mechanism: no s
 **Example:**
 
 ```text
-docs/product/
+docs/intent/
   README.md
   brief.md
   business/
@@ -325,7 +325,7 @@ For step 3, the serving use case `use-case/sales.complete-ticket-resale` contrib
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/intent#keep-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/product/`, and each research record under `docs/research/`. |
+| litespec/core/intent#keep-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/intent/`, and each research record under `docs/intent/research/`. |
 | litespec/core/intent#state-one-product | checkable | `litespec model check` reports no `product-not-singleton` finding, and `litespec consumer` validates the brief fields against the record schema. |
 | litespec/core/intent#state-each-goal-with-its-measure | checkable | `litespec consumer` fails a goal page missing a required field or its Why It Matters section. |
 | litespec/core/intent#state-each-problem-with-its-evidence | checkable | `litespec consumer` fails a problem page missing its statement, Situation, or Evidence. |
@@ -340,7 +340,7 @@ For step 3, the serving use case `use-case/sales.complete-ticket-resale` contrib
 | litespec/core/intent#explain-each-requirement-in-one-line | guidance | The one-line `rationale` on each requirement entry. |
 | litespec/core/intent#state-the-measure-on-a-counted-requirement | checkable | `litespec model check` reports no `requirement-unmeasured` finding on requirements whose statements name numbers. |
 | litespec/core/intent#order-each-journey-toward-one-goal | checkable | `litespec consumer` fails a journey missing its actor, goal, `finishedWhen`, or steps. |
-| litespec/core/intent#keep-behavior-out-of-intent | guidance | Intent records under `docs/product/` and `docs/research/` free of states, results, codes, and code names. |
+| litespec/core/intent#keep-behavior-out-of-intent | guidance | Intent records under `docs/intent/` and `docs/intent/research/` free of states, results, codes, and code names. |
 | litespec/core/intent#treat-generated-research-as-source-material | guidance | A research record or an approved decision behind each position built from generated records. |
 | litespec/core/intent#state-each-exception-with-its-fallback | checkable | `litespec model check` reports no `except-without-fallback` finding. |
 | litespec/core/intent#write-journey-steps-as-sentences-with-ids | checkable | `litespec consumer` fails a journey step missing `id` or `says`, or naming a use case. |
@@ -348,5 +348,5 @@ For step 3, the serving use case `use-case/sales.complete-ticket-resale` contrib
 | litespec/core/intent#group-questions-into-ballots | checkable | `litespec model check` reports no `draft-without-decider` finding on Intent questions. |
 | litespec/core/intent#leave-business-choices-to-the-founder | guidance | The founder's answer on each business draft question beside its `approvedBy`. |
 | litespec/core/intent#treat-tenant-set-values-as-data | guidance | Each `setBy: tenant` value stored as tenant data with no founder approval beside it. |
-| litespec/core/intent#group-product-records-by-area | guidance | The `docs/product/` layout beside the project's recorded layout. |
+| litespec/core/intent#group-product-records-by-area | guidance | The `docs/intent/` layout beside the project's recorded layout. |
 | litespec/core/intent#name-product-decisions-in-one-numbered-sequence | guidance | Each decision file named `<number>-<name>.md` beside its matching identifier. |
