@@ -30,6 +30,25 @@ static partial class BookPages
         var parts = new List<string>();
         parts.Add(BookRender.PageHeader(BookModel.TypeLabel(type), BookModel.SortTitle(record), "", facts));
         parts.Add(AuthorityStrip(index, record));
+        if (type == "journey")
+        {
+            var journeyAbout = RenderAbout(index, rel, record);
+            if (journeyAbout != "")
+            {
+                parts.Add(journeyAbout);
+            }
+
+            parts.Add(RenderJourneyChapter(index, rel, record));
+            parts.Add(RenderDeveloper(record));
+            var journeyReview = RenderRecordReview(index, rel, record, review);
+            if (journeyReview != "")
+            {
+                parts.Add(journeyReview);
+            }
+
+            return string.Join("\n", parts);
+        }
+
         var why = RenderWhy(index, rel, record);
         if (why != "")
         {
@@ -77,6 +96,15 @@ static partial class BookPages
             if (resultsHtml != "")
             {
                 parts.Add(resultsHtml);
+            }
+        }
+
+        if (type == "reaction")
+        {
+            var reactionScenarios = RenderReactionScenarios(index, rel, record);
+            if (reactionScenarios != "")
+            {
+                parts.Add(reactionScenarios);
             }
         }
 
@@ -154,6 +182,16 @@ static partial class BookPages
         var fields = BookRender.Fields(record);
         cells.Add(("Decider", BookRender.EscOr(fields?["decider"], "none"), false));
         cells.Add(("Decide By", BookRender.EscOr(fields?["decideBy"], "none"), false));
+        if (BookRender.IsTruthy(fields?["approvedBy"]))
+        {
+            cells.Add(("Approved By", BookRender.Esc(fields?["approvedBy"]), false));
+        }
+
+        if (BookRender.IsTruthy(fields?["approvedOn"]))
+        {
+            cells.Add(("Approved On", BookRender.Esc(fields?["approvedOn"]), false));
+        }
+
         if (BookRender.StrProp(record, "type") == "use-case")
         {
             var state = BookModel.UseCaseStatus(index, BookRender.StrProp(record, "id"));
@@ -163,6 +201,13 @@ static partial class BookPages
             cells.Add(("Verified", state.Verified
                 ? "<span class=\"chip ok\">Yes</span> <span>every scenario proved by a passing test</span>"
                 : "<span class=\"chip warn\">No</span> <span>a scenario is unproved or failing</span>", false));
+            cells.Add(("Stale", state.Stale
+                ? "<span class=\"chip risk\">Yes</span> <span>a proof went stale after its scenario changed</span>"
+                : "<span class=\"chip ok\">No</span> <span>no proof went stale</span>", false));
+        }
+        else if (BookModel.IsStale(index, BookRender.StrProp(record, "id")))
+        {
+            cells.Add(("Stale", "<span class=\"chip risk\">Yes</span> <span>a proof went stale after its scenario changed</span>", false));
         }
 
         return $"<div class=\"strip\" role=\"region\" aria-label=\"Authority\">{string.Concat(cells.Select(cell =>
@@ -242,6 +287,24 @@ static partial class BookPages
             parts.Add($"<h3>Data</h3>\n{DataTable(data)}");
         }
 
+        var dataClasses = fields["dataClasses"] as JsonArray ?? [];
+        if (dataClasses.Count > 0)
+        {
+            parts.Add($"<h3>Data Classes</h3>\n{RenderDataClasses(index, rel, dataClasses)}");
+        }
+
+        var steps = fields["steps"] as JsonArray ?? [];
+        if (steps.Count > 0)
+        {
+            parts.Add($"<h3>Steps</h3>\n{RenderFieldValue(index, rel, "steps", steps)}");
+        }
+
+        var exits = fields["exits"] as JsonArray ?? [];
+        if (exits.Count > 0)
+        {
+            parts.Add($"<h3>Exits</h3>\n{RenderFieldValue(index, rel, "exits", exits)}");
+        }
+
         if (parts.Count == 0)
         {
             return "";
@@ -262,7 +325,12 @@ static partial class BookPages
 
         var date = BookModel.TestRunDate(index);
         var run = date is { Length: > 0 } ? $" The last proof run was on {BookRender.Esc(date)}." : "";
-        if (state.Verified)
+        if (state.Stale)
+        {
+            parts.Add("<p class=\"proofline\"><span class=\"chip risk\">Stale</span> "
+                + $"A proof beneath this requirement went stale after its scenario changed.{run}</p>");
+        }
+        else if (state.Verified)
         {
             var measure = state.MeasurePassed == false
                 ? " Its measure has no passing check."
@@ -300,6 +368,11 @@ static partial class BookPages
             {
                 parts.Add($"<p>When it breaks: {BookRender.Esc(meaning)} ({BookRender.RecordLink(index, rel, refusal)}).</p>");
             }
+        }
+
+        if (BookRender.StrProp(fields, "releasedBy") is { } released)
+        {
+            parts.Add($"<p>Released by {RenderMaybeId(index, rel, released)}.</p>");
         }
 
         if (BookRender.StrProp(fields, "kind") == "calculation" && BookModel.CalculationExample(index, record) is { } example)
@@ -511,57 +584,104 @@ static partial class BookPages
     static string RenderUseCaseResults(BookIndex index, string rel, JsonObject record)
     {
         var (results, scenarios) = BookModel.UseCaseChildren(index, BookRender.StrProp(record, "id") ?? "");
+        if (results.Count == 0 && scenarios.Count == 0)
+        {
+            return "";
+        }
+
+        var byResult = new Dictionary<string, List<JsonObject>>(StringComparer.Ordinal);
+        var ungrouped = new List<JsonObject>();
+        foreach (var scenario in scenarios)
+        {
+            var target = (BookRender.Links(scenario)?["result"] as JsonArray ?? [])
+                .Where(link => link is JsonValue scalar && scalar.TryGetValue<string>(out _))
+                .Select(link => BookRender.Str(link))
+                .FirstOrDefault(id => id.Length > 0);
+            if (target is not null && results.Any(result => BookRender.StrProp(result, "id") == target))
+            {
+                if (!byResult.TryGetValue(target, out var grouped))
+                {
+                    grouped = [];
+                    byResult[target] = grouped;
+                }
+
+                grouped.Add(scenario);
+            }
+            else
+            {
+                ungrouped.Add(scenario);
+            }
+        }
+
         var parts = new List<string>();
-        if (results.Count > 0)
+        foreach (var result in results)
         {
-            var items = string.Concat(results.Select(result =>
+            var resultId = BookRender.StrProp(result, "id") ?? "";
+            var fields = BookRender.Fields(result) ?? new JsonObject();
+            var outcome = BookRender.StrProp(fields, "outcome") == "refusal" ? "Refusal" : "Success";
+            var code = BookRender.IsTruthy(fields["code"]) ? $" <span class=\"dev-only\"><code>{BookRender.Esc(fields["code"])}</code></span>" : "";
+            var derived = BookRender.IsTrue(result["derived"]) ? " <span class=\"dim\">(derived)</span>" : "";
+            var meaning = BookRender.IsTruthy(fields["meaning"]) ? $"<div class=\"dim\">{BookRender.Esc(fields["meaning"])}</div>" : "";
+            var recorded = BookRender.IsTrue(fields["recorded"]) ? "<div class=\"dim\">The attempt is recorded with its reason.</div>" : "";
+            parts.Add($"<h3>{BookRender.RecordLink(index, rel, resultId)} <span class=\"dim\">{outcome}</span>{code}{derived}</h3>\n{meaning}{recorded}");
+            if (byResult.TryGetValue(resultId, out var grouped) && grouped.Count > 0)
             {
-                var fields = BookRender.Fields(result) ?? new JsonObject();
-                var outcome = BookRender.StrProp(fields, "outcome") == "refusal" ? "Refusal" : "Success";
-                var code = BookRender.IsTruthy(fields["code"]) ? $" <span class=\"dev-only\"><code>{BookRender.Esc(fields["code"])}</code></span>" : "";
-                var meaning = BookRender.IsTruthy(fields["meaning"]) ? $"<div class=\"dim\">{BookRender.Esc(fields["meaning"])}</div>" : "";
-                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(result, "id") ?? "")} <span class=\"dim\">{outcome}</span>{code}{meaning}</li>";
-            }));
-            parts.Add($"<h2 id=\"results\">Results</h2>\n<ul class=\"links\">{items}</ul>");
+                parts.Add($"<ul class=\"links\">{string.Concat(grouped.Select(scenario => ScenarioItem(index, rel, scenario)))}</ul>");
+            }
         }
 
-        if (scenarios.Count > 0)
+        if (ungrouped.Count > 0)
         {
-            var items = string.Concat(scenarios.Select(scenario =>
-            {
-                var state = BookModel.ScenarioProof(index, BookRender.StrProp(scenario, "id") ?? "").State;
-                var fields = BookRender.Fields(scenario) ?? new JsonObject();
-                var sentences = new List<string>();
-                if (BookRender.IsTruthy(fields["given"]))
-                {
-                    sentences.Add($"Given {BookRender.Str(fields["given"])}");
-                }
-
-                if (BookRender.IsTruthy(fields["when"]))
-                {
-                    sentences.Add($"When {BookRender.Str(fields["when"])}");
-                }
-
-                if (BookRender.IsTruthy(fields["then"]))
-                {
-                    sentences.Add($"Then {BookRender.Str(fields["then"])}");
-                }
-
-                var detail = sentences.Count > 0 ? $"<div class=\"dim\">{BookRender.Esc(string.Join(" ", sentences))}</div>" : "";
-                return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(scenario, "id") ?? "")} {ProofChip(state)}{detail}</li>";
-            }));
-            parts.Add($"<h2 id=\"scenarios\">Scenarios</h2>\n<ul class=\"links\">{items}</ul>");
+            parts.Add($"<h3>Other scenarios</h3>\n<ul class=\"links\">{string.Concat(ungrouped.Select(scenario => ScenarioItem(index, rel, scenario)))}</ul>");
         }
 
-        return string.Join("\n", parts);
+        return $"<h2 id=\"results\">Results</h2>\n{string.Join("\n", parts)}";
+    }
+
+    static string RenderReactionScenarios(BookIndex index, string rel, JsonObject record)
+    {
+        var name = BookModel.SplitId(BookRender.StrProp(record, "id") ?? "").Name;
+        var scenarios = index.ScenariosOf.TryGetValue(name, out var found) ? found : [];
+        if (scenarios.Count == 0)
+        {
+            return "";
+        }
+
+        return $"<h2 id=\"scenarios\">Scenarios</h2>\n<ul class=\"links\">{string.Concat(scenarios.Select(scenario => ScenarioItem(index, rel, scenario)))}</ul>";
+    }
+
+    static string ScenarioItem(BookIndex index, string rel, JsonObject scenario)
+    {
+        var state = BookModel.ScenarioProof(index, BookRender.StrProp(scenario, "id") ?? "").State;
+        var fields = BookRender.Fields(scenario) ?? new JsonObject();
+        var sentences = new List<string>();
+        if (BookRender.IsTruthy(fields["given"]))
+        {
+            sentences.Add($"Given {BookRender.Str(fields["given"])}");
+        }
+
+        if (BookRender.IsTruthy(fields["when"]))
+        {
+            sentences.Add($"When {BookRender.Str(fields["when"])}");
+        }
+
+        if (BookRender.IsTruthy(fields["then"]))
+        {
+            sentences.Add($"Then {BookRender.Str(fields["then"])}");
+        }
+
+        var detail = sentences.Count > 0 ? $"<div class=\"dim\">{BookRender.Esc(string.Join(" ", sentences))}</div>" : "";
+        var stale = BookModel.IsStale(index, BookRender.StrProp(scenario, "id")) ? " <span class=\"chip risk\">Stale</span>" : "";
+        return $"<li>{BookRender.RecordLink(index, rel, BookRender.StrProp(scenario, "id") ?? "")} {ProofChip(state)}{stale}{detail}</li>";
     }
 
     static string RenderScenarioProof(BookIndex index, string rel, JsonObject record)
     {
         var proof = BookModel.ScenarioProof(index, BookRender.StrProp(record, "id") ?? "");
+        var stale = BookModel.IsStale(index, BookRender.StrProp(record, "id")) ? " <span class=\"chip risk\">Stale</span>" : "";
         var parts = new List<string>
         {
-            $"<h2 id=\"proof\">Proof</h2>\n<p>{ProofChip(proof.State)}"
+            $"<h2 id=\"proof\">Proof</h2>\n<p>{ProofChip(proof.State)}{stale}"
             + (proof.Claimed ? " A test claims this scenario, but the claim does not hold: no proving step calls the use case, or a refusal asserts no code." : "")
             + "</p>",
         };
@@ -615,7 +735,10 @@ static partial class BookPages
 
             items.Add($"<li>Open question: {BookRender.Esc(question.Question)}"
                 + (question.Decider is { Length: > 0 } ? $" awaiting {BookRender.Esc(question.Decider)}" : "")
-                + (question.DecideBy is { Length: > 0 } ? $" by {BookRender.Esc(question.DecideBy)}" : "") + ".</li>");
+                + (question.DecideBy is { Length: > 0 } ? $" by {BookRender.Esc(question.DecideBy)}" : "")
+                + (question.Recommended is { Length: > 0 } ? $" Recommended: {BookRender.Esc(question.Recommended)}" : "")
+                + (question.Ballot is { Length: > 0 } ? $" Ballot {BookRender.Esc(question.Ballot)}" : "")
+                + $" Tier {question.Tier}.</li>");
         }
 
         foreach (var finding in review.Findings)
@@ -634,5 +757,238 @@ static partial class BookPages
         }
 
         return $"<section class=\"review-only\" aria-label=\"Review notes\"><h2>Review</h2>\n<ul class=\"links\">{string.Concat(items)}</ul></section>";
+    }
+
+    /// <summary>Renders one journey as a chapter: goal, steps, promises, outcomes, consequences and questions.</summary>
+    static string RenderJourneyChapter(BookIndex index, string rel, JsonObject journey)
+    {
+        var fields = BookRender.Fields(journey) ?? new JsonObject();
+        var journeyId = BookRender.StrProp(journey, "id") ?? "";
+        var parts = new List<string>();
+
+        if (BookRender.IsTruthy(fields["goal"]))
+        {
+            parts.Add($"<p class=\"lede\">{BookRender.Esc(fields["goal"])}</p>");
+        }
+
+        if (BookRender.IsTruthy(fields["finishedWhen"]))
+        {
+            parts.Add($"<p>Finished when: {BookRender.Esc(fields["finishedWhen"])}</p>");
+        }
+
+        var steps = fields["steps"] as JsonArray ?? [];
+        if (steps.Count > 0)
+        {
+            parts.Add("<h2 id=\"steps\">Steps</h2>");
+            var items = string.Concat(steps.OfType<JsonObject>().Select((step, position) =>
+            {
+                var id = BookRender.StrProp(step, "id") ?? $"s{position + 1}";
+                var says = BookRender.EscOr(step["says"], "");
+                var actor = BookRender.StrProp(step, "actor") is { } actorId && index.ById.TryGetValue(actorId, out var actorRecord)
+                    ? $" <span class=\"dim\">({BookRender.Esc(actorRecord["title"])})</span>"
+                    : "";
+                var wrong = BookRender.IsTruthy(step["ifItGoesWrong"])
+                    ? $"<div class=\"dim\">If it goes wrong: {BookRender.Esc(step["ifItGoesWrong"])}</div>"
+                    : "";
+                return $"<li id=\"{BookRender.Esc(id)}\">{says}{actor}{wrong}</li>";
+            }));
+            parts.Add($"<ol class=\"plain\">{items}</ol>");
+        }
+
+        parts.Add("<h2 id=\"serving\">How Each Step Is Served</h2>");
+        var served = new List<string>();
+        foreach (var step in steps.OfType<JsonObject>())
+        {
+            var id = BookRender.StrProp(step, "id") ?? "";
+            var says = BookRender.Str(step["says"]);
+            var serving = BookModel.ServingUseCases(index, $"{journeyId}#{id}");
+            if (serving.Count == 0)
+            {
+                served.Add($"<li>{BookRender.Esc(says)}: no use case serves this step yet.</li>");
+                continue;
+            }
+
+            foreach (var useCase in serving)
+            {
+                var goal = BookRender.Str(BookRender.Fields(useCase)?["goal"]);
+                var line = goal.Length > 0 ? goal : BookModel.SortTitle(useCase);
+                served.Add($"<li>{BookRender.Esc(says)}: {BookRender.Esc(line)} ({BookRender.RecordLink(index, rel, BookRender.StrProp(useCase, "id") ?? "")}).</li>");
+            }
+        }
+
+        parts.Add(served.Count > 0 ? $"<ul class=\"plain\">{string.Concat(served)}</ul>" : "<p>No step is recorded yet.</p>");
+
+        var requirements = BookModel.JourneyRequirements(index, journey);
+        parts.Add("<h2 id=\"promises\">Promises</h2>");
+        if (requirements.Count == 0)
+        {
+            parts.Add("<p>This journey promises nothing yet.</p>");
+        }
+        else
+        {
+            var items = string.Concat(requirements.Select(requirement =>
+            {
+                var requireFields = BookRender.Fields(requirement) ?? new JsonObject();
+                var statement = BookRender.EscOr(requireFields["statement"], "");
+                var link = BookRender.RecordLink(index, rel, BookRender.StrProp(requirement, "id") ?? "");
+                var excepts = string.Concat((requireFields["except"] as JsonArray ?? []).OfType<JsonObject>().Select(except =>
+                {
+                    var when = BookRender.EscOr(except["when"], "");
+                    var fallbackId = BookRender.StrProp(except, "fallback");
+                    var fallback = fallbackId is not null && index.ById.TryGetValue(fallbackId, out var target)
+                        ? BookRender.Str(BookRender.Fields(target)?["statement"])
+                        : "";
+                    var fallbackLink = fallbackId is not null ? $" ({BookRender.RecordLink(index, rel, fallbackId)})" : "";
+                    return $"<div class=\"dim\">Except when {when}. Then {BookRender.Esc(fallback)}{fallbackLink}.</div>";
+                }));
+                return $"<li>{statement} ({link}).{excepts}</li>";
+            }));
+            parts.Add($"<ul class=\"plain\">{items}</ul>");
+        }
+
+        var useCases = BookModel.JourneyUseCases(index, journey);
+        var thens = new List<string>();
+        foreach (var useCase in useCases)
+        {
+            var kids = BookModel.UseCaseChildren(index, BookRender.StrProp(useCase, "id") ?? "");
+            foreach (var scenario in kids.Scenarios)
+            {
+                var then = BookRender.Str(BookRender.Fields(scenario)?["then"]);
+                if (then.Length == 0)
+                {
+                    continue;
+                }
+
+                thens.Add($"<li>Then {BookRender.Esc(then)} <span class=\"dim\">({BookRender.RecordLink(index, rel, BookRender.StrProp(scenario, "id") ?? "")})</span></li>");
+            }
+        }
+
+        parts.Add("<h2 id=\"outcomes\">Outcomes</h2>");
+        parts.Add("<p class=\"dim\">Context: these lines come from Behavior and are not part of what you approve.</p>");
+        parts.Add(thens.Count > 0 ? $"<ul class=\"plain\">{string.Concat(thens)}</ul>" : "<p>No outcome is recorded yet.</p>");
+
+        parts.Add("<h2 id=\"consequences\">Consequences</h2>");
+        parts.Add("<p class=\"dim\">Context: this box is rendered from Behavior and stays outside the approval.</p>");
+        var consequences = JourneyConsequences(index, rel, journey, useCases, requirements);
+        parts.Add(consequences.Count > 0 ? $"<ul class=\"plain\">{string.Concat(consequences)}</ul>" : "<p>No new refusal, kept data or money effect is recorded.</p>");
+
+        var questions = JourneyQuestions(index, journey, useCases, requirements);
+        parts.Add("<h2 id=\"questions\">Open Questions</h2>");
+        if (questions.Count == 0)
+        {
+            parts.Add("<p>No open question is recorded.</p>");
+        }
+        else
+        {
+            var items = string.Concat(questions.Select((question, position) =>
+            {
+                var owner = BookRender.StrProp(question.Record, "id") ?? "";
+                var recommended = question.Recommended is { Length: > 0 } ? $" Recommended: {BookRender.Esc(question.Recommended)}." : "";
+                return $"<li>{position + 1}. {BookRender.Esc(question.Question)}{recommended} <span class=\"dim\">(on {BookRender.RecordLink(index, rel, owner)}, {BookRender.Esc(question.Decider ?? "no decider")} by {BookRender.Esc(question.DecideBy ?? "no date")})</span></li>";
+            }));
+            parts.Add($"<ol class=\"plain\">{items}</ol>");
+        }
+
+        return string.Join("\n", parts);
+    }
+
+    static List<string> JourneyConsequences(BookIndex index, string rel, JsonObject journey, IReadOnlyList<JsonObject> useCases, IReadOnlyList<JsonObject> requirements)
+    {
+        var items = new List<string>();
+        foreach (var useCase in useCases)
+        {
+            var kids = BookModel.UseCaseChildren(index, BookRender.StrProp(useCase, "id") ?? "");
+            foreach (var result in kids.Results)
+            {
+                if (BookRender.IsTrue(result["derived"]))
+                {
+                    continue;
+                }
+
+                if (BookRender.StrProp(BookRender.Fields(result), "outcome") != "refusal")
+                {
+                    continue;
+                }
+
+                var meaning = BookRender.Str(BookRender.Fields(result)?["meaning"]);
+                if (meaning.Length > 0)
+                {
+                    items.Add($"<li>New refusal a reader can meet: &quot;{BookRender.Esc(meaning)}&quot;.</li>");
+                }
+            }
+        }
+
+        var aggregates = new Dictionary<string, JsonObject>(StringComparer.Ordinal);
+        foreach (var useCase in useCases)
+        {
+            var fields = BookRender.Fields(useCase) ?? new JsonObject();
+            foreach (var id in FieldIds(fields["changes"]).Concat(FieldIds(fields["reads"])))
+            {
+                if (index.ById.TryGetValue(id, out var aggregate) && aggregates.TryAdd(id, aggregate))
+                {
+                }
+            }
+        }
+
+        foreach (var aggregate in aggregates.Values.OrderBy(record => BookModel.SortTitle(record), BookRender.LocaleComparer))
+        {
+            foreach (var dataClass in BookRender.Fields(aggregate)?["dataClasses"] as JsonArray ?? [])
+            {
+                if (dataClass is JsonObject entry && BookRender.IsTruthy(entry["name"]) && BookRender.IsTruthy(entry["period"]))
+                {
+                    items.Add($"<li>Kept data: {BookRender.Esc(entry["name"])} is kept for {BookRender.Esc(entry["period"])}.</li>");
+                }
+            }
+        }
+
+        foreach (var requirement in requirements.Where(record => BookModel.HasRiskValue(record, "money")))
+        {
+            var statement = BookRender.Str(BookRender.Fields(requirement)?["statement"]);
+            items.Add($"<li>Money: {BookRender.Esc(statement.Length > 0 ? statement : BookModel.SortTitle(requirement))}.</li>");
+        }
+
+        foreach (var useCase in useCases.Where(record => BookModel.HasRiskValue(record, "money")))
+        {
+            items.Add($"<li>Money: {BookRender.RecordLink(index, rel, BookRender.StrProp(useCase, "id") ?? "")} touches money.</li>");
+        }
+
+        return items;
+    }
+
+    static IReadOnlyList<OpenQuestion> JourneyQuestions(BookIndex index, JsonObject journey, IReadOnlyList<JsonObject> useCases, IReadOnlyList<JsonObject> requirements)
+    {
+        var wanted = new HashSet<string>(StringComparer.Ordinal) { BookRender.StrProp(journey, "id") ?? "" };
+        foreach (var record in useCases.Concat(requirements))
+        {
+            if (BookRender.StrProp(record, "id") is { } id)
+            {
+                wanted.Add(id);
+            }
+        }
+
+        return BookModel.CollectQuestions(index)
+            .Where(question => wanted.Contains(BookRender.StrProp(question.Record, "id") ?? ""))
+            .OrderBy(question => question.Tier)
+            .ThenBy(question => question.DecideBy ?? "", BookRender.LocaleComparer)
+            .ToList();
+    }
+
+    static IReadOnlyList<string> FieldIds(JsonNode? value)
+    {
+        if (value is JsonValue scalar && scalar.TryGetValue<string>(out var single) && single is { Length: > 0 })
+        {
+            return [single];
+        }
+
+        if (value is JsonArray list)
+        {
+            return list
+                .Where(entry => entry is JsonValue item && item.TryGetValue<string>(out _))
+                .Select(entry => BookRender.Str(entry))
+                .Where(id => id.Length > 0)
+                .ToList();
+        }
+
+        return [];
     }
 }

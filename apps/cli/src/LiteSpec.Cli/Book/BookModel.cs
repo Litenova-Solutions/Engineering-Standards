@@ -40,25 +40,35 @@ sealed record UseCaseKids(IReadOnlyList<JsonObject> Results, IReadOnlyList<JsonO
 /// <summary>One use case's implementation state from the status map.</summary>
 /// <param name="Implemented">Whether code implements the use case.</param>
 /// <param name="Verified">Whether every scenario is proved by a passing test.</param>
-sealed record UseCaseState(bool Implemented, bool Verified);
+/// <param name="Stale">Whether a proof went stale after its scenario changed.</param>
+sealed record UseCaseState(bool Implemented, bool Verified, bool Stale);
 
 /// <summary>One requirement's verification state from the requirement status map.</summary>
 /// <param name="Known">Whether the model holds an entry for the requirement.</param>
 /// <param name="Verified">Whether everything fulfilling it is verified, with a passing measure check when measured.</param>
 /// <param name="MeasurePassed">Whether the measure check passed, or null without a measure or a result.</param>
-sealed record RequirementState(bool Known, bool Verified, bool? MeasurePassed);
+/// <param name="Stale">Whether a proof beneath it went stale.</param>
+sealed record RequirementState(bool Known, bool Verified, bool? MeasurePassed, bool Stale);
 
 /// <summary>One step of a record's why-chain: a plain label and the record it points at.</summary>
 /// <param name="Label">The step label, such as Result or Goal.</param>
 /// <param name="Id">The linked record's id.</param>
 sealed record WhyLink(string Label, string Id);
 
-/// <summary>One open question on a record, for the review page.</summary>
+/// <summary>One open question on a record, for the review and ballots pages.</summary>
 /// <param name="Record">The record carrying the question.</param>
 /// <param name="Question">The question in words.</param>
 /// <param name="Decider">The decider, or null when none is named.</param>
 /// <param name="DecideBy">The decide-by date, or null when none is named.</param>
-sealed record OpenQuestion(JsonObject Record, string Question, string? Decider, string? DecideBy);
+/// <param name="Recommended">The recommendation, or null when none is named.</param>
+/// <param name="Ballot">The ballot grouping, or null when none is named.</param>
+/// <param name="Tier">The approval tier: 1 needs explicit approval, 3 may auto-approve.</param>
+sealed record OpenQuestion(JsonObject Record, string Question, string? Decider, string? DecideBy, string? Recommended, string? Ballot, int Tier);
+
+/// <summary>One ballot: the questions sharing a ballot name, tier 1 first.</summary>
+/// <param name="Name">The ballot name, or null for questions with no ballot.</param>
+/// <param name="Questions">The ballot's questions, tier 1 first.</param>
+sealed record BallotGroup(string? Name, IReadOnlyList<OpenQuestion> Questions);
 
 /// <summary>One goal-lens feature with the requirements it carries.</summary>
 /// <param name="Feature">The feature record.</param>
@@ -161,6 +171,9 @@ sealed class BookIndex
 
     /// <summary>The latest test run, or null when the model holds none.</summary>
     public JsonNode? TestRun { get; set; }
+
+    /// <summary>Days before a tier-3 question auto-approves; 7 when the model names none.</summary>
+    public int VetoWindowDays { get; set; } = 7;
 }
 
 /// <summary>
@@ -175,9 +188,9 @@ static class BookModel
         new("Problems and Features", ["problem", "feature"]),
         new("People", ["actor", "role", "permission"]),
         new("Journeys", ["journey"]),
-        new("How the Business Works", ["module", "aggregate", "rule", "use-case", "result", "scenario", "event"]),
+        new("How the Business Works", ["module", "aggregate", "rule", "use-case", "result", "scenario", "event", "integration-event", "reaction", "job", "notification", "setting"]),
         new("Entry Points", ["entry-point", "external-system"]),
-        new("Running It", ["limit", "runbook"]),
+        new("Running It", ["runbook"]),
         new("How We Build", ["deviation", "known-gap"]),
         new("Terms", ["term"]),
     ];
@@ -204,9 +217,13 @@ static class BookModel
             ["result"] = ("Result", "Results"),
             ["scenario"] = ("Scenario", "Scenarios"),
             ["event"] = ("Event", "Events"),
+            ["integration-event"] = ("Integration event", "Integration events"),
+            ["reaction"] = ("Reaction", "Reactions"),
+            ["job"] = ("Job", "Jobs"),
+            ["notification"] = ("Notification", "Notifications"),
+            ["setting"] = ("Setting", "Settings"),
             ["entry-point"] = ("Entry point", "Entry points"),
             ["external-system"] = ("External system", "External systems"),
-            ["limit"] = ("Limit", "Limits"),
             ["runbook"] = ("Runbook", "Runbooks"),
             ["deviation"] = ("Deviation", "Deviations"),
             ["known-gap"] = ("Known gap", "Known gaps"),
@@ -214,8 +231,8 @@ static class BookModel
         };
 
     /// <summary>
-    ///     The outgoing link fields, in display order with their headings. Trigger and refusal
-    ///     render as typed fields and rule sentences instead, so they stay out of this list.
+    ///     The outgoing link fields, in display order with their headings. Refusal
+    ///     renders as rule sentences instead, so it stays out of this list.
     /// </summary>
     public static readonly IReadOnlyList<(string Field, string Label)> LinkLabels =
     [
@@ -227,9 +244,19 @@ static class BookModel
         ("feature", "Feature"),
         ("fulfills", "Fulfills"),
         ("governs", "Governs"),
+        ("computedBy", "Computed By"),
         ("raises", "Raises"),
+        ("on", "On"),
+        ("issues", "Issues"),
+        ("sends", "Sends"),
+        ("publishes", "Publishes"),
+        ("calls", "Calls"),
+        ("changes", "Changes"),
+        ("reads", "Reads"),
+        ("translates", "Translates"),
+        ("enforcedBy", "Enforced By"),
+        ("acceptedBy", "Accepted By"),
         ("allows", "Allows"),
-        ("needs", "Needs"),
         ("reachedThrough", "Reached Through"),
         ("dependsOn", "Depends On"),
         ("terms", "Terms"),
@@ -252,11 +279,26 @@ static class BookModel
             ["serves"] = "Served By",
             ["feature"] = "Requirements",
             ["fulfills"] = "Fulfilled By",
+            ["except"] = "Excepted By",
+            ["fallback"] = "Fallback For",
             ["governs"] = "Governed By",
+            ["computedBy"] = "Computes",
             ["raises"] = "Raised By",
-            ["trigger"] = "Triggers",
+            ["on"] = "Reactions",
+            ["issues"] = "Issued By",
+            ["sends"] = "Sent By",
+            ["publishes"] = "Published By",
+            ["calls"] = "Called By",
+            ["effects"] = "Effect For",
+            ["changes"] = "Changed By",
+            ["reads"] = "Read By",
+            ["translates"] = "Translated By",
+            ["releasedBy"] = "Releases",
+            ["enforcedBy"] = "Enforces",
+            ["acceptedBy"] = "Accepts",
+            ["dataClasses"] = "Data Class For",
+            ["access"] = "Access For",
             ["allows"] = "Allowed By",
-            ["needs"] = "Needed By",
             ["reachedThrough"] = "Entry For",
             ["dependsOn"] = "Depended On By",
             ["terms"] = "Used By",
@@ -289,20 +331,32 @@ static class BookModel
             ? (plural ? labels.Many : labels.One)
             : (plural ? "Records" : "Record");
 
-    /// <summary>The record URL: the id with "/" and "." mapped to path segments.</summary>
+    /// <summary>The record URL: the id with "/" and "." mapped to path segments, keeping any "#step" fragment.</summary>
     public static string RecordUrl(string id)
     {
-        var slash = id.IndexOf('/');
+        var fragment = "";
+        var baseId = id;
+        var hash = id.IndexOf('#');
+        if (hash >= 0)
+        {
+            baseId = id[..hash];
+            fragment = id[hash..];
+        }
+
+        var slash = baseId.IndexOf('/');
         if (slash < 0)
         {
             return "index.html";
         }
 
-        return $"{id[..slash]}/{id[(slash + 1)..].Replace(".", "/")}.html";
+        return $"{baseId[..slash]}/{baseId[(slash + 1)..].Replace(".", "/")}.html{fragment}";
     }
 
     /// <summary>The URL of a record type's index page.</summary>
     public static string TypeIndexUrl(string type) => $"{type}/index.html";
+
+    /// <summary>The URL of the ballots page.</summary>
+    public static string BallotsUrl() => "ballots/index.html";
 
     /// <summary>The URL of an actor's lens page.</summary>
     public static string LensUrl(string actorId)
@@ -410,6 +464,20 @@ static class BookModel
                         }
 
                         from.Add(new Backlink(BookRender.StrProp(record, "id") ?? "", field));
+
+                        // A step or operation target also links its carrying record, so the
+                        // journey and system pages list what serves and calls them.
+                        var hash = id.IndexOf('#');
+                        if (hash > 0 && id[..hash] is { Length: > 0 } baseId && baseId != id)
+                        {
+                            if (!index.Backlinks.TryGetValue(baseId, out var baseFrom))
+                            {
+                                baseFrom = [];
+                                index.Backlinks[baseId] = baseFrom;
+                            }
+
+                            baseFrom.Add(new Backlink(BookRender.StrProp(record, "id") ?? "", field));
+                        }
                     }
                 }
             }
@@ -423,16 +491,29 @@ static class BookModel
                 continue;
             }
 
-            if (BookRender.StrProp(record, "id") is not { } id || SplitId(id).Home is not { } home)
+            if (BookRender.StrProp(record, "id") is not { } id)
+            {
+                continue;
+            }
+
+            // A derived generic result carries its use case as home.name before the
+            // forbidden or invalid-input suffix, so it files under the use case name.
+            var key = SplitId(id).Home;
+            if (type == "result" && BookRender.IsTrue(record["derived"]) && DerivedHolder(id) is { } holder)
+            {
+                key = holder;
+            }
+
+            if (key is not { Length: > 0 })
             {
                 continue;
             }
 
             var map = type == "result" ? index.ResultsOf : index.ScenariosOf;
-            if (!map.TryGetValue(home, out var list))
+            if (!map.TryGetValue(key, out var list))
             {
                 list = [];
-                map[home] = list;
+                map[key] = list;
             }
 
             list.Add(record);
@@ -523,8 +604,50 @@ static class BookModel
         }
 
         index.TestRun = model["testRun"] is { } run && BookRender.IsTruthy(run) && run is JsonObject or JsonArray ? run : null;
+        index.VetoWindowDays = VetoWindowOf(model);
 
         return index;
+    }
+
+    /// <summary>The veto window in days: the model's review value, or 7 when absent.</summary>
+    static int VetoWindowOf(JsonObject model)
+    {
+        JsonNode? value = (model["review"] as JsonObject)?["vetoWindowDays"] ?? model["vetoWindowDays"];
+        if (value is JsonValue scalar && scalar.TryGetValue<int>(out var days) && days > 0)
+        {
+            return days;
+        }
+
+        if (value is JsonValue text && text.TryGetValue<string>(out var words)
+            && int.TryParse(words, out var parsed) && parsed > 0)
+        {
+            return parsed;
+        }
+
+        return 7;
+    }
+
+    /// <summary>The use-case name holding a derived generic result, or null when the id is not derived.</summary>
+    static string? DerivedHolder(string id)
+    {
+        const string prefix = "result/";
+        if (!id.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        var rest = id[prefix.Length..];
+        foreach (var suffix in new[] { ".forbidden", ".invalid-input" })
+        {
+            if (rest.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                var holder = rest[..^suffix.Length];
+                var dot = holder.IndexOf('.');
+                return dot >= 0 && dot + 1 < holder.Length ? holder[(dot + 1)..] : null;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>One scenario's proof state from its proves links.</summary>
@@ -577,10 +700,31 @@ static class BookModel
         var entry = useCaseId is not null && index.Status.TryGetPropertyValue(useCaseId, out var node) ? node as JsonObject : null;
         if (entry is null)
         {
-            return new UseCaseState(false, false);
+            return new UseCaseState(false, false, IsStale(index, useCaseId));
         }
 
-        return new UseCaseState(BookRender.IsTrue(entry["implemented"]), BookRender.IsTrue(entry["verified"]));
+        return new UseCaseState(
+            BookRender.IsTrue(entry["implemented"]),
+            BookRender.IsTrue(entry["verified"]),
+            BookRender.IsTrue(entry["stale"]) || IsStale(index, useCaseId));
+    }
+
+    /// <summary>Whether a record's proof went stale: the status map or the record says so.</summary>
+    public static bool IsStale(BookIndex index, string? recordId)
+    {
+        if (recordId is null)
+        {
+            return false;
+        }
+
+        if (index.ById.TryGetValue(recordId, out var record) && BookRender.IsTrue(record["stale"]))
+        {
+            return true;
+        }
+
+        return index.Status.TryGetPropertyValue(recordId, out var node)
+            && node is JsonObject entry
+            && BookRender.IsTrue(entry["stale"]);
     }
 
     /// <summary>One requirement's verification state from the requirement status map.</summary>
@@ -588,13 +732,14 @@ static class BookModel
     {
         if (requirementId is null || !index.RequirementStatus.TryGetValue(requirementId, out var entry))
         {
-            return new RequirementState(false, false, null);
+            return new RequirementState(false, false, null, IsStale(index, requirementId));
         }
 
         return new RequirementState(
             true,
             BookRender.IsTrue(entry["verified"]),
-            entry["measurePassed"] is JsonValue scalar && scalar.TryGetValue<bool>(out var passed) ? passed : (bool?)null);
+            entry["measurePassed"] is JsonValue scalar && scalar.TryGetValue<bool>(out var passed) ? passed : (bool?)null,
+            BookRender.IsTrue(entry["stale"]) || IsStale(index, requirementId));
     }
 
     /// <summary>The latest test run's date, or null when the model holds none.</summary>
@@ -612,6 +757,10 @@ static class BookModel
             "precondition" => "is checked before the use case runs",
             "calculation" => "is computed as stated",
             "cross-aggregate" => "holds across records",
+            "atomicity" => "explains why one write covers several records",
+            "reservation" => "holds something until its release",
+            "commercial-data" => "freezes commercial facts as stated",
+            "default" => "sets the starting value",
             { Length: > 0 } other => $"is {other}",
             _ => "",
         };
@@ -631,6 +780,12 @@ static class BookModel
     /// <summary>The use case a result or scenario belongs to, matched by home name.</summary>
     public static JsonObject? UseCaseOf(BookIndex index, string childId)
     {
+        if (DerivedHolder(childId) is { } holder)
+        {
+            return (index.ByType.TryGetValue("use-case", out var derived) ? derived : [])
+                .FirstOrDefault(useCase => SplitId(BookRender.StrProp(useCase, "id") ?? "").Name == holder);
+        }
+
         var home = SplitId(childId).Home;
         if (home is null)
         {
@@ -903,11 +1058,11 @@ static class BookModel
             .OfType<JsonObject>()
             .OrderBy(record => BookRender.PropText(record, "title"), BookRender.LocaleComparer)
             .ToList();
+        var actorKind = BookRender.StrProp(BookRender.Fields(actor), "kind");
         var useCases = new List<JsonObject>();
         foreach (var record in index.ByType.TryGetValue("use-case", out var cases) ? cases : [])
         {
-            var needs = BookRender.Links(record)?["needs"] as JsonArray ?? [];
-            if (needs.Any(id => id is JsonValue scalar && scalar.TryGetValue<string>(out var need) && need is not null && permissionIds.Contains(need)))
+            if (ActorReaches(index, record, permissionIds, actorKind))
             {
                 useCases.Add(record);
             }
@@ -915,6 +1070,34 @@ static class BookModel
 
         useCases = useCases.OrderBy(record => BookRender.PropText(record, "title"), BookRender.LocaleComparer).ToList();
         return new ActorLens(journeys, roles, permissions, useCases);
+    }
+
+    /// <summary>Whether an actor reaches a use case: its grant names a held permission, or it is open.</summary>
+    static bool ActorReaches(BookIndex index, JsonObject useCase, HashSet<string> permissionIds, string? actorKind)
+    {
+        var grant = (BookRender.Fields(useCase)?["access"] as JsonObject)?["grant"];
+        var grantText = BookRender.Str(grant);
+        if (grantText == "anonymous")
+        {
+            return true;
+        }
+
+        if (grantText == "system")
+        {
+            return actorKind == "system";
+        }
+
+        var access = BookRender.Links(useCase)?["access"] as JsonArray ?? [];
+        foreach (var id in access)
+        {
+            if (id is JsonValue scalar && scalar.TryGetValue<string>(out var allowed) && allowed is not null && permissionIds.Contains(allowed))
+            {
+                return true;
+            }
+        }
+
+        // A grant written inline as a permission id still opens the use case.
+        return grantText.StartsWith("permission/", StringComparison.Ordinal) && permissionIds.Contains(grantText);
     }
 
     /// <summary>Collects the gaps, drafts and findings the review page shows.</summary>
@@ -941,22 +1124,7 @@ static class BookModel
             .Where(record => !(BookRender.IsTruthy(record["fields"]) && BookRender.IsTruthy(BookRender.Fields(record)?["decideBy"])))
             .OrderBy(record => BookRender.PropText(record, "id"), BookRender.LocaleComparer)
             .ToList();
-        var questions = new List<OpenQuestion>();
-        foreach (var record in index.Records.OfType<JsonObject>())
-        {
-            foreach (var entry in BookRender.Fields(record)?["questions"] as JsonArray ?? [])
-            {
-                if (entry is JsonObject question && BookRender.IsTruthy(question["question"]))
-                {
-                    questions.Add(new OpenQuestion(
-                        record,
-                        BookRender.Str(question["question"]),
-                        BookRender.StrProp(question, "decider"),
-                        BookRender.StrProp(question, "decideBy")));
-                }
-            }
-        }
-
+        var questions = CollectQuestions(index);
         questions = questions
             .OrderBy(question => question.DecideBy ?? "", BookRender.LocaleComparer)
             .ThenBy(question => BookRender.PropText(question.Record, "id"), BookRender.LocaleComparer)
@@ -969,5 +1137,177 @@ static class BookModel
             questions,
             (file?["findings"] as JsonArray ?? []).Select(entry => entry as JsonObject).ToList(),
             (file?["known"] as JsonArray ?? []).Select(entry => entry as JsonObject).ToList());
+    }
+
+    /// <summary>Every open question on every record, with its ballot and tier.</summary>
+    public static List<OpenQuestion> CollectQuestions(BookIndex index)
+    {
+        var questions = new List<OpenQuestion>();
+        foreach (var record in index.Records.OfType<JsonObject>())
+        {
+            foreach (var entry in BookRender.Fields(record)?["questions"] as JsonArray ?? [])
+            {
+                if (entry is JsonObject question && BookRender.IsTruthy(question["question"]))
+                {
+                    questions.Add(new OpenQuestion(
+                        record,
+                        BookRender.Str(question["question"]),
+                        BookRender.StrProp(question, "decider"),
+                        BookRender.StrProp(question, "decideBy"),
+                        BookRender.StrProp(question, "recommended"),
+                        BookRender.StrProp(question, "ballot"),
+                        TierOf(question, record)));
+                }
+            }
+        }
+
+        return questions;
+    }
+
+    /// <summary>One question's tier: its own tier, else 1 when its record carries risk, else 3.</summary>
+    public static int TierOf(JsonObject question, JsonObject record)
+    {
+        if (question["tier"] is JsonValue scalar && scalar.TryGetValue<int>(out var tier) && (tier == 1 || tier == 3))
+        {
+            return tier;
+        }
+
+        if (question["tier"] is JsonValue words && words.TryGetValue<string>(out var text) && int.TryParse(text, out var parsed) && (parsed == 1 || parsed == 3))
+        {
+            return parsed;
+        }
+
+        return HasRisk(record) ? 1 : 3;
+    }
+
+    /// <summary>Whether a record carries any risk value.</summary>
+    public static bool HasRisk(JsonObject record) =>
+        BookRender.Fields(record)?["risk"] is JsonArray risks && risks.Count > 0;
+
+    /// <summary>Whether a record carries one risk value, such as money.</summary>
+    public static bool HasRiskValue(JsonObject record, string value)
+    {
+        foreach (var entry in BookRender.Fields(record)?["risk"] as JsonArray ?? [])
+        {
+            if (entry is JsonValue scalar && scalar.TryGetValue<string>(out var named) && named == value)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The auto-approval date: decideBy plus the veto window, or "" without a date.</summary>
+    public static string AutoApprovalDate(BookIndex index, string? decideBy)
+    {
+        if (decideBy is not { Length: >= 10 })
+        {
+            return "";
+        }
+
+        if (!DateOnly.TryParse(decideBy[..10], out var date))
+        {
+            return "";
+        }
+
+        return date.AddDays(index.VetoWindowDays).ToString("yyyy-MM-dd");
+    }
+
+    /// <summary>Every open question grouped by ballot, ballots with tier 1 first.</summary>
+    public static IReadOnlyList<BallotGroup> BallotsOf(BookIndex index)
+    {
+        const string none = "\u0000none";
+        var groups = new Dictionary<string, List<OpenQuestion>>(StringComparer.Ordinal);
+        var order = new List<string>();
+        foreach (var question in CollectQuestions(index))
+        {
+            var key = question.Ballot is { Length: > 0 } ? question.Ballot : none;
+            if (!groups.TryGetValue(key, out var list))
+            {
+                list = [];
+                groups[key] = list;
+                order.Add(key);
+            }
+
+            list.Add(question);
+        }
+
+        var ballots = new List<BallotGroup>();
+        foreach (var key in order)
+        {
+            var sorted = groups[key]
+                .OrderBy(question => question.Tier)
+                .ThenBy(question => question.DecideBy ?? "", BookRender.LocaleComparer)
+                .ThenBy(question => question.Question, BookRender.LocaleComparer)
+                .ToList();
+            ballots.Add(new BallotGroup(key == none ? null : key, sorted));
+        }
+
+        return ballots
+            .OrderBy(ballot => ballot.Questions.Any(question => question.Tier == 1) ? 0 : 1)
+            .ThenBy(ballot => ballot.Name ?? "\uffff", BookRender.LocaleComparer)
+            .ToList();
+    }
+
+    /// <summary>The use cases serving one journey step id, such as journey/name#s1.</summary>
+    public static IReadOnlyList<JsonObject> ServingUseCases(BookIndex index, string stepId)
+    {
+        var serving = new List<JsonObject>();
+        foreach (var record in index.ByType.TryGetValue("use-case", out var cases) ? cases : [])
+        {
+            var serves = BookRender.Links(record)?["serves"] as JsonArray ?? [];
+            foreach (var target in serves)
+            {
+                if (target is JsonValue scalar && scalar.TryGetValue<string>(out var id) && id == stepId)
+                {
+                    serving.Add(record);
+                    break;
+                }
+            }
+        }
+
+        return serving
+            .OrderBy(record => SortTitle(record), BookRender.LocaleComparer)
+            .ToList();
+    }
+
+    /// <summary>The use cases serving any step of one journey.</summary>
+    public static IReadOnlyList<JsonObject> JourneyUseCases(BookIndex index, JsonObject journey)
+    {
+        var journeyId = BookRender.StrProp(journey, "id") ?? "";
+        var steps = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var step in BookRender.Fields(journey)?["steps"] as JsonArray ?? [])
+        {
+            if (step is JsonObject obj && BookRender.StrProp(obj, "id") is { } stepId)
+            {
+                steps.Add($"{journeyId}#{stepId}");
+            }
+        }
+
+        var serving = new List<JsonObject>();
+        foreach (var record in index.ByType.TryGetValue("use-case", out var cases) ? cases : [])
+        {
+            var serves = BookRender.Links(record)?["serves"] as JsonArray ?? [];
+            if (serves.Any(target => target is JsonValue scalar && scalar.TryGetValue<string>(out var id) && id is not null && steps.Contains(id)))
+            {
+                serving.Add(record);
+            }
+        }
+
+        return serving
+            .OrderBy(record => SortTitle(record), BookRender.LocaleComparer)
+            .ToList();
+    }
+
+    /// <summary>The requirements one journey fulfils, in title order.</summary>
+    public static IReadOnlyList<JsonObject> JourneyRequirements(BookIndex index, JsonObject journey)
+    {
+        var ids = LinksOf(journey, "fulfills");
+        return ids
+            .Select(id => index.ById.GetValueOrDefault(id))
+            .OfType<JsonObject>()
+            .OrderBy(record => SortTitle(record), BookRender.LocaleComparer)
+            .ToList();
     }
 }

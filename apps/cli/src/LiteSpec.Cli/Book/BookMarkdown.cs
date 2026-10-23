@@ -16,7 +16,7 @@ static class BookMarkdown
     static readonly Regex Bold = new(@"\*\*([^*\n]+)\*\*", RegexOptions.Compiled);
     static readonly Regex Italic = new(@"\*([^*\n]+)\*", RegexOptions.Compiled);
     static readonly Regex RecordId = new(
-        @"\b((?:product|goal|problem|feature|constraint|research|decision|requirement|journey|term|module|aggregate|rule|event|use-case|result|scenario|actor|role|permission|entry-point|external-system|limit|runbook|deviation|known-gap)/[A-Za-z0-9][A-Za-z0-9._-]*)",
+        @"\b((?:product|goal|problem|feature|constraint|research|decision|requirement|journey|term|module|aggregate|rule|event|integration-event|reaction|job|notification|setting|use-case|result|scenario|actor|role|permission|entry-point|external-system|runbook|deviation|known-gap)/[A-Za-z0-9][A-Za-z0-9._-]*(?:#[A-Za-z0-9_-]+)?)",
         RegexOptions.Compiled);
     static readonly Regex Heading = new(@"^(#{1,6})\s+(.*)$", RegexOptions.Compiled);
     static readonly Regex Rule = new(@"^\s*(?:---|\*\*\*|___)\s*$", RegexOptions.Compiled);

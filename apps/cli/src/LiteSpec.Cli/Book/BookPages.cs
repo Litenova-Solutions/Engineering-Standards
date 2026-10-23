@@ -18,6 +18,7 @@ static partial class BookPages
         var useCases = index.ByType.TryGetValue("use-case", out var cases) ? cases : [];
         var implemented = 0;
         var verified = 0;
+        var stale = 0;
         foreach (var useCase in useCases)
         {
             var state = BookModel.UseCaseStatus(index, BookRender.StrProp(useCase, "id"));
@@ -29,6 +30,11 @@ static partial class BookPages
             if (state.Verified)
             {
                 verified += 1;
+            }
+
+            if (state.Stale)
+            {
+                stale += 1;
             }
         }
 
@@ -42,6 +48,7 @@ static partial class BookPages
                 ("Use cases", $"<b>{useCases.Count}</b>"),
                 ("Implemented", $"<b>{implemented}</b>"),
                 ("Verified", $"<b>{verified}</b>"),
+                ("Stale", $"<b>{stale}</b>"),
             ]));
 
         if (product is not null)
@@ -80,16 +87,17 @@ static partial class BookPages
                 }
 
                 var approved = list.Count(record => BookRender.StrProp(record, "status") == "approved");
+                var reviewed = list.Count(record => BookRender.StrProp(record, "status") == "reviewed");
                 var draft = list.Count(record => BookRender.StrProp(record, "status") == "draft");
                 var retired = list.Count(record => BookRender.StrProp(record, "status") == "retired");
                 rows.Add($"<tr><td><a href=\"{rel}{BookModel.TypeIndexUrl(type)}\">{BookRender.Esc(BookModel.TypeLabel(type, true))}</a></td>"
-                    + $"<td class=\"num\">{list.Count}</td><td class=\"num\">{approved}</td>"
+                    + $"<td class=\"num\">{list.Count}</td><td class=\"num\">{approved}</td><td class=\"num\">{reviewed}</td>"
                     + $"<td class=\"num\">{draft}</td><td class=\"num\">{retired}</td></tr>");
             }
         }
 
         parts.Add("<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Type</th>"
-            + "<th class=\"num\">Records</th><th class=\"num\">Approved</th><th class=\"num\">Draft</th>"
+            + "<th class=\"num\">Records</th><th class=\"num\">Approved</th><th class=\"num\">Reviewed</th><th class=\"num\">Draft</th>"
             + $"<th class=\"num\">Retired</th></tr></thead><tbody>{string.Concat(rows)}</tbody></table></div>");
 
         if (BookRender.IsTruthy(index.TestRun))

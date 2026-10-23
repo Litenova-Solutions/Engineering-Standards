@@ -94,6 +94,8 @@ static class BookCommand
         pages.Add(new BookPage("index.html", "Project book", BookPages.RenderHome(index, ""), "home", true, "", false));
         pages.Add(new BookPage("search.html", "Search · Project book", BookPages.RenderSearch("", searchEntries), "search", false, "", false));
         pages.Add(new BookPage("glossary.html", "Glossary · Project book", BookPages.RenderGlossary(index, ""), "glossary", false, "", false));
+        pages.Add(new BookPage(BookModel.BallotsUrl(), "Ballots · Project book",
+            BookPages.RenderBallots(index, "../"), "ballots", true, "", false));
         pages.Add(new BookPage("review/index.html", "Review · Project book",
             BookPages.RenderReview(index, "../", review, generatedDate), "review", true, "review-always", false));
         pages.Add(new BookPage("lens/index.html", "Lenses · Project book", BookPages.RenderLensIndex(index, "../"), "lens-index", false, "", false));

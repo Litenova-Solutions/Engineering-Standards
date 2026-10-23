@@ -22,7 +22,7 @@ static partial class BookPages
                 + $"<td data-value=\"{BookRender.Esc(status)}\">{BookRender.StatusChip(status)}</td>"
                 + $"<td>{BookRender.EscOr(record["owner"], "")}</td>{extra}</tr>";
         }));
-        var extraHead = type == "use-case" ? "<th>Implemented</th><th>Verified</th>" : "";
+        var extraHead = type == "use-case" ? "<th>Implemented</th><th>Verified</th><th>Stale</th>" : "";
         parts.Add("<div class=\"tablewrap\"><table class=\"tbl sortable\">"
             + "<thead><tr><th><button type=\"button\" data-sort=\"0\">Title</button></th>"
             + "<th><button type=\"button\" data-sort=\"1\">Status</button></th>"
@@ -32,7 +32,7 @@ static partial class BookPages
     }
 
     static string StatusCells(UseCaseState state) =>
-        $"<td>{(state.Implemented ? "Yes" : "No")}</td><td>{(state.Verified ? "Yes" : "No")}</td>";
+        $"<td>{(state.Implemented ? "Yes" : "No")}</td><td>{(state.Verified ? "Yes" : "No")}</td><td>{(state.Stale ? "Yes" : "No")}</td>";
 
     /// <summary>Renders the lens index: one entry per actor.</summary>
     public static string RenderLensIndex(BookIndex index, string rel)
@@ -189,9 +189,11 @@ static partial class BookPages
                 return $"<tr><td><a href=\"{rel}{BookModel.RecordUrl(id)}\">{BookRender.Esc(question.Record["title"])}</a></td>"
                     + $"<td>{BookRender.Esc(question.Question)}</td>"
                     + $"<td>{BookRender.Esc(question.Decider ?? "no decider")}</td>"
-                    + $"<td>{BookRender.Esc(question.DecideBy ?? "no date")}</td></tr>";
+                    + $"<td>{BookRender.Esc(question.DecideBy ?? "no date")}</td>"
+                    + $"<td>{BookRender.Esc(question.Ballot ?? "")}</td>"
+                    + $"<td class=\"num\">{question.Tier}</td></tr>";
             }));
-            parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Record</th><th>Question</th><th>Decider</th><th>Decide By</th></tr></thead><tbody>{rows}</tbody></table></div>");
+            parts.Add($"<div class=\"tablewrap\"><table class=\"tbl\"><thead><tr><th>Record</th><th>Question</th><th>Decider</th><th>Decide By</th><th>Ballot</th><th>Tier</th></tr></thead><tbody>{rows}</tbody></table></div>");
         }
         else
         {
@@ -231,6 +233,82 @@ static partial class BookPages
         return string.Join("\n", parts);
     }
 
+    /// <summary>Renders the ballots page: every open question grouped by ballot, tier 1 first.</summary>
+    public static string RenderBallots(BookIndex index, string rel)
+    {
+        var ballots = BookModel.BallotsOf(index);
+        var total = ballots.Sum(ballot => ballot.Questions.Count);
+        var parts = new List<string>();
+        parts.Add(BookRender.PageHeader(
+            "Ballots",
+            "Ballots",
+            $"Every open question grouped by ballot, tier 1 first. A tier-3 question with a recommendation auto-approves {index.VetoWindowDays} days after its decide-by date.",
+            [
+                ("Ballots", $"<b>{ballots.Count}</b>"),
+                ("Open questions", $"<b>{total}</b>"),
+            ]));
+        if (total == 0)
+        {
+            parts.Add("<p>No open question is recorded.</p>");
+            return string.Join("\n", parts);
+        }
+
+        foreach (var ballot in ballots)
+        {
+            var title = ballot.Name ?? "No ballot";
+            var slug = BallotSlug(title);
+            var tier1 = ballot.Questions.Count(question => question.Tier == 1);
+            parts.Add($"<h2 id=\"ballot-{slug}\">{BookRender.Esc(title)} <span class=\"dim\">{ballot.Questions.Count} questions{(tier1 > 0 ? $", {tier1} tier 1" : "")}</span></h2>");
+            var rows = string.Concat(ballot.Questions.Select((question, position) =>
+            {
+                var id = BookRender.StrProp(question.Record, "id") ?? "";
+                var auto = question.Tier == 3 && question.Recommended is { Length: > 0 }
+                    ? BookModel.AutoApprovalDate(index, question.DecideBy)
+                    : "";
+                var approval = question.Tier == 1
+                    ? "Needs explicit approval"
+                    : auto.Length > 0 ? $"Auto-approves {auto}" : "No recommendation yet";
+                return $"<tr><td class=\"num\">{position + 1}</td>"
+                    + $"<td>{BookRender.Esc(question.Question)}<div class=\"dim\">On {BookRender.RecordLink(index, rel, id)}</div></td>"
+                    + $"<td>{BookRender.Esc(question.Recommended ?? "")}</td>"
+                    + $"<td>{BookRender.Esc(question.Decider ?? "no decider")}</td>"
+                    + $"<td>{BookRender.Esc(question.DecideBy ?? "no date")}</td>"
+                    + $"<td>{BookRender.Esc(approval)}</td>"
+                    + $"<td class=\"num\">{question.Tier}</td></tr>";
+            }));
+            parts.Add("<div class=\"tablewrap\"><table class=\"tbl\">"
+                + "<thead><tr><th></th><th>Question</th><th>Recommended</th><th>Decider</th><th>Decide By</th><th>Approval</th><th>Tier</th></tr></thead>"
+                + $"<tbody>{rows}</tbody></table></div>");
+        }
+
+        return string.Join("\n", parts);
+    }
+
+    static string BallotSlug(string title)
+    {
+        var built = new System.Text.StringBuilder();
+        foreach (var ch in title.ToLowerInvariant())
+        {
+            if (ch is >= 'a' and <= 'z' or >= '0' and <= '9')
+            {
+                built.Append(ch);
+            }
+            else if (ch is ' ' or '-' or '_' or '/')
+            {
+                built.Append('-');
+            }
+        }
+
+        var slug = built.ToString();
+        while (slug.Contains("--", StringComparison.Ordinal))
+        {
+            slug = slug.Replace("--", "-", StringComparison.Ordinal);
+        }
+
+        slug = slug.Trim('-');
+        return slug.Length > 0 ? slug : "ballot";
+    }
+
     /// <summary>Renders the glossary: one card per term.</summary>
     public static string RenderGlossary(BookIndex index, string rel)
     {
@@ -261,9 +339,14 @@ static partial class BookPages
                 }
             }
 
+            var aliases = fields["aliases"] is JsonArray names
+                ? string.Join(", ", names.Select(BookRender.Str).Where(part => part.Length > 0))
+                : "";
             parts.Add($"<div class=\"card term\"><div class=\"h\"><b><a href=\"{rel}{BookModel.RecordUrl(BookRender.StrProp(term, "id") ?? "")}\">{BookRender.Esc(term["title"])}</a></b>"
-                + (labels.Length > 0 ? $"<span>{BookRender.Esc(labels)}</span>" : "") + "</div>"
+                + (labels.Length > 0 ? $"<span>{BookRender.Esc(labels)}</span>" : "")
+                + (BookRender.IsTruthy(fields["layer"]) ? $"<span class=\"chip\">{BookRender.Esc(fields["layer"])}</span>" : "") + "</div>"
                 + (BookRender.IsTruthy(fields["meaning"]) ? $"<p>{BookRender.Esc(fields["meaning"])}</p>" : "")
+                + (aliases.Length > 0 ? $"<p class=\"dim\">Also called: {BookRender.Esc(aliases)}.</p>" : "")
                 + (rejected.Count > 0 ? $"<p class=\"dim\">Not: {BookRender.Esc(string.Join(", ", rejected))}.</p>" : "") + "</div>");
         }
 
@@ -357,7 +440,9 @@ static partial class BookPages
             var rows = string.Concat(feature.Requirements.Select(requirement =>
             {
                 var state = BookModel.RequirementStateOf(index, BookRender.StrProp(requirement, "id"));
-                var chip = state.Verified ? "<span class=\"chip ok\">Verified</span>" : "<span class=\"chip warn\">Awaiting proof</span>";
+                var chip = state.Stale
+                    ? "<span class=\"chip risk\">Stale</span>"
+                    : state.Verified ? "<span class=\"chip ok\">Verified</span>" : "<span class=\"chip warn\">Awaiting proof</span>";
                 return $"<tr><td>{BookRender.RecordLink(index, rel, BookRender.StrProp(requirement, "id") ?? "")}</td>"
                     + $"<td>{BookRender.EscOr(BookRender.Fields(requirement)?["kind"], "")}</td>"
                     + $"<td>{chip}</td></tr>";
