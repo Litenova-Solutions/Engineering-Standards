@@ -127,7 +127,7 @@ static partial class ModelBuilder
         return links;
     }
 
-    /// <summary>Every id a link field names, reading through nested objects.</summary>
+    /// <summary>Every id a link field names, reading through nested objects and self() grants.</summary>
     public static List<string> TargetsOf(JsonElement value)
     {
         var targets = new List<string>();
@@ -137,7 +137,7 @@ static partial class ModelBuilder
             case JsonValueKind.String:
                 if (value.GetString() is { } single)
                 {
-                    targets.Add(single);
+                    targets.Add(UnwrapSelf(single));
                 }
 
                 break;
@@ -151,7 +151,7 @@ static partial class ModelBuilder
                 break;
 
             case JsonValueKind.Object:
-                foreach (var name in new[] { "role", "useCase", "requires", "events" })
+                foreach (var name in new[] { "role", "useCase", "requires", "events", "actor", "grant", "issues", "sends", "publishes", "calls", "fallback", "enforcedBy", "acceptedBy" })
                 {
                     if (value.TryGetProperty(name, out var nested))
                     {
@@ -211,8 +211,8 @@ static partial class ModelBuilder
 
     /// <summary>
     ///     Computes each record's effective status: draft when the record is a draft, when a draft
-    ///     decision decides it, or when a requirement it fulfills is effectively a draft. A result or
-    ///     a scenario takes its use case's effective status.
+    ///     decision decides it, or when a requirement it fulfills is effectively a draft. Reviewed
+    ///     counts as live like approved. A result or a scenario takes its use case's effective status.
     /// </summary>
     private static void ComputeAuthority(ProjectModel model)
     {
@@ -224,31 +224,31 @@ static partial class ModelBuilder
         string Own(Record record) =>
             record.Status == "draft" || draftDecided.Contains(record.Id) ? "draft" : record.Status ?? "approved";
 
-        foreach (var record in model.Records.Where(record => record.Type is "requirement" or "feature" or "constraint" or "product" or "decision"))
+        static bool Live(string status) => status is "approved" or "reviewed";
+
+        foreach (var record in model.Records.Where(record => record.Type is "product" or "goal" or "problem" or "feature" or "requirement" or "constraint" or "decision" or "research" or "actor" or "module" or "role" or "permission" or "external-system" or "event" or "integration-event" or "aggregate" or "runbook" or "deviation" or "known-gap" or "term"))
         {
             model.EffectiveStatus[record.Id] = Own(record);
         }
 
-        foreach (var record in model.Records.Where(record => record.Type is "rule" or "use-case" or "journey"))
+        foreach (var record in model.Records.Where(record => record.Type is "rule" or "use-case" or "reaction" or "job" or "notification" or "setting" or "entry-point" or "journey"))
         {
             var own = Own(record);
             var inherited = record.Ids("fulfills").Any(id =>
                 model.EffectiveStatus.TryGetValue(id, out var status) && status == "draft");
 
-            model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;
+            model.EffectiveStatus[record.Id] = Live(own) && inherited ? "draft" : own;
         }
 
         foreach (var record in model.Records.Where(record => record.Type is "result" or "scenario"))
         {
             var own = Own(record);
-            var useCase = Identifiers.TrySplit(record.Id, out _, out var home, out _) && home is not null
-                ? UseCaseOf(model, home)
-                : null;
+            var useCase = UseCaseHolder(model, record);
             var inherited = useCase is not null
                 && model.EffectiveStatus.TryGetValue(useCase.Id, out var status)
                 && status == "draft";
 
-            model.EffectiveStatus[record.Id] = own == "approved" && inherited ? "draft" : own;
+            model.EffectiveStatus[record.Id] = Live(own) && inherited ? "draft" : own;
         }
     }
 
@@ -377,10 +377,73 @@ static partial class ModelBuilder
     private static partial Regex TemplateConstraint();
 
     /// <summary>Whether the use case lets anonymous callers in.</summary>
-    public static bool Anonymous(Record useCase) =>
+    public static bool Anonymous(Record useCase) => GrantOf(useCase) == "anonymous";
+
+    /// <summary>
+    ///     The permission the use case's access grant names, reading through self(),
+    ///     or null when the grant is anonymous, system, or missing.
+    /// </summary>
+    public static string? GrantedPermission(Record useCase)
+    {
+        if (GrantOf(useCase) is not { } grant)
+        {
+            return null;
+        }
+
+        var permission = UnwrapSelf(grant);
+
+        return permission.StartsWith("permission/", StringComparison.Ordinal) ? permission : null;
+    }
+
+    /// <summary>Whether any of the use case's inputs carries rules.</summary>
+    public static bool HasValidatedInput(Record useCase)
+    {
+        if (useCase.Raw.ValueKind != JsonValueKind.Object
+            || !useCase.Raw.TryGetProperty("input", out var input)
+            || input.ValueKind != JsonValueKind.Array)
+        {
+            return false;
+        }
+
+        foreach (var entry in input.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object
+                || !entry.TryGetProperty("rules", out var rules))
+            {
+                continue;
+            }
+
+            if (rules.ValueKind == JsonValueKind.String && rules.GetString() is { Length: > 0 })
+            {
+                return true;
+            }
+
+            if (rules.ValueKind == JsonValueKind.Array && rules.GetArrayLength() > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The use case's access grant as written.</summary>
+    private static string? GrantOf(Record useCase) =>
         useCase.Raw.ValueKind == JsonValueKind.Object
-        && useCase.Raw.TryGetProperty("anonymous", out var value)
-        && value.ValueKind == JsonValueKind.True;
+        && useCase.Raw.TryGetProperty("access", out var access)
+        && access.ValueKind == JsonValueKind.Object
+        && access.TryGetProperty("grant", out var grant)
+        && grant.ValueKind == JsonValueKind.String
+            ? grant.GetString()
+            : null;
+
+    /// <summary>The permission inside a self() grant, or the value itself.</summary>
+    private static string UnwrapSelf(string value) =>
+        value.StartsWith("self(", StringComparison.Ordinal)
+        && value.EndsWith(')')
+        && value.Length > 6
+            ? value[5..^1]
+            : value;
 
     /// <summary>Whether the use case runs only through reactions or jobs.</summary>
     public static bool BackgroundOnly(ProjectModel model, Record useCase)
@@ -417,6 +480,25 @@ static partial class ModelBuilder
             record.Type == "use-case"
             && Identifiers.TrySplit(record.Id, out _, out _, out var name)
             && name == home);
+
+    /// <summary>
+    ///     The use case holding a result or scenario: the carrying page for a derived
+    ///     result, else the use case its home names.
+    /// </summary>
+    private static Record? UseCaseHolder(ProjectModel model, Record record)
+    {
+        if (record.Derived
+            && record.PageId is not null
+            && model.ById.TryGetValue(record.PageId, out var holder)
+            && holder.Type == "use-case")
+        {
+            return holder;
+        }
+
+        return Identifiers.TrySplit(record.Id, out _, out var home, out _) && home is not null
+            ? UseCaseOf(model, home)
+            : null;
+    }
 
     private static void ComputeRefusalCodes(ProjectModel model)
     {
@@ -686,18 +768,29 @@ static partial class ModelBuilder
     ///     Whether a when step sets a background use case off: it drives a use case that raises
     ///     an event the reaction reacts to, or it is a step of a declared job trigger.
     /// </summary>
-    /// <summary>The events a use case's trigger names, in every trigger shape the schema allows.</summary>
+    /// <summary>The events that set a background use case off: the on of each reaction issuing it.</summary>
     private static HashSet<string> TriggerEvents(ProjectModel model, Record useCase)
     {
-        if (useCase.Raw.ValueKind != JsonValueKind.Object
-            || !useCase.Raw.TryGetProperty("trigger", out var value))
+        var trigger = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var reaction in model.Records.Where(record => record.Type == "reaction"))
         {
-            return [];
+            if (!reaction.Ids("issues").Contains(useCase.Id, StringComparer.Ordinal))
+            {
+                continue;
+            }
+
+            foreach (var id in reaction.Ids("on"))
+            {
+                if (model.ById.TryGetValue(id, out var target)
+                    && target.Type is "event" or "integration-event")
+                {
+                    trigger.Add(id);
+                }
+            }
         }
 
-        return TargetsOf(value)
-            .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "event")
-            .ToHashSet(StringComparer.Ordinal);
+        return trigger;
     }
 
     /// <summary>
@@ -903,18 +996,20 @@ static partial class ModelBuilder
 
     private static bool JourneyVerified(ProjectModel model, Record journey)
     {
-        if (journey.Raw.ValueKind != JsonValueKind.Object
-            || !journey.Raw.TryGetProperty("steps", out var steps))
+        var steps = journey.StepIds().ToHashSet(StringComparer.Ordinal);
+
+        if (steps.Count == 0)
         {
             return false;
         }
 
-        var stepped = TargetsOf(steps)
-            .Where(id => model.ById.TryGetValue(id, out var target) && target.Type == "use-case")
+        var serving = model.Records
+            .Where(record => record.Type == "use-case"
+                && record.Ids("serves").Any(steps.Contains))
             .ToList();
 
-        return stepped.Count > 0
-            && stepped.All(id => model.Status.TryGetValue(id, out var status) && status.Verified);
+        return serving.Count > 0
+            && serving.All(record => model.Status.TryGetValue(record.Id, out var status) && status.Verified);
     }
 
     /// <summary>Whether a measure result answers the requirement's check.</summary>

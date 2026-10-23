@@ -10,14 +10,16 @@ static class RecordTypes
     {
         "product", "goal", "constraint", "research", "decision", "requirement", "problem",
         "feature", "actor", "role", "permission", "journey", "module",
-        "aggregate", "rule", "use-case", "result", "scenario", "event",
-        "entry-point", "external-system", "limit", "runbook", "deviation", "known-gap", "term",
+        "aggregate", "rule", "use-case", "result", "scenario", "event", "integration-event",
+        "reaction", "job", "notification", "setting",
+        "entry-point", "external-system", "runbook", "deviation", "known-gap", "term",
     };
 
     /// <summary>Page styles: templates a page may carry instead of a record.</summary>
     public static readonly HashSet<string> PageStyles = new(StringComparer.Ordinal)
     {
-        "requirement-page", "permission-list", "entry-point-list", "limit-set",
+        "requirement-page", "permission-list", "entry-point-list", "setting-set",
+        "retention-schedule",
         "rule-set", "index", "tutorial", "how-to", "reference", "command",
         "configuration", "glossary", "example-cast",
     };
@@ -26,7 +28,7 @@ static class RecordTypes
     public static readonly HashSet<string> WithHome = new(StringComparer.Ordinal)
     {
         "requirement", "aggregate", "rule", "use-case", "result",
-        "scenario", "event",
+        "scenario", "event", "reaction", "job", "notification", "setting",
     };
 
     /// <summary>Types the small size requires.</summary>
@@ -48,7 +50,9 @@ static class RecordTypes
 
     /// <summary>
     ///     Whether the field names a link, and which record types it may point at.
-    ///     An empty set means any record type.
+    ///     An empty set means any record type. A serves target of journey/<name>#<step>
+    ///     resolves through its journey, and a calls target of
+    ///     external-system/<name>#<operation> through its system.
     /// </summary>
     public static readonly Dictionary<string, HashSet<string>> LinkTargets = new(StringComparer.Ordinal)
     {
@@ -58,13 +62,28 @@ static class RecordTypes
         ["affects"] = ["actor"],
         ["audience"] = ["actor"],
         ["solves"] = ["problem"],
-        ["serves"] = ["goal"],
+        ["serves"] = ["goal", "journey"],
         ["fulfills"] = ["requirement"],
         ["governs"] = ["aggregate", "use-case"],
         ["raises"] = ["event"],
-        ["trigger"] = ["event"],
+        ["issues"] = ["use-case"],
+        ["sends"] = ["notification"],
+        ["publishes"] = ["integration-event"],
+        ["calls"] = ["external-system"],
+        ["on"] = ["event", "integration-event"],
+        ["changes"] = ["aggregate"],
+        ["reads"] = ["aggregate"],
+        ["translates"] = ["event"],
+        ["acceptedBy"] = ["decision", "requirement"],
+        ["fallback"] = ["requirement"],
+        ["releasedBy"] = ["use-case"],
+        ["computedBy"] = ["rule"],
+        ["enforcedBy"] = ["job"],
+        ["effects"] = ["use-case", "notification", "integration-event", "external-system"],
+        ["access"] = ["permission"],
+        ["except"] = ["requirement"],
+        ["dataClasses"] = ["job", "decision", "requirement"],
         ["allows"] = ["permission"],
-        ["needs"] = ["permission"],
         ["reachedThrough"] = ["entry-point"],
         ["dependsOn"] = ["module"],
         ["terms"] = ["term"],

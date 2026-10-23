@@ -120,6 +120,38 @@ static partial class Identifiers
         word.Length > 0 && word.All(char.IsDigit);
 
     /// <summary>
+    ///     Splits a journey step link of the form journey/name#step into the journey id and the step.
+    /// </summary>
+    public static bool TrySplitStep(string id, out string journey, out string step)
+    {
+        journey = "";
+        step = "";
+
+        var hash = id.IndexOf('#', StringComparison.Ordinal);
+
+        if (hash <= 0 || hash == id.Length - 1)
+        {
+            return false;
+        }
+
+        journey = id[..hash];
+        step = id[(hash + 1)..];
+
+        return journey.StartsWith("journey/", StringComparison.Ordinal) && step.Length > 0;
+    }
+
+    /// <summary>
+    ///     The link without its number-sign fragment: a journey step resolves through its
+    ///     journey, and an external-system operation through its system.
+    /// </summary>
+    public static string BaseId(string id)
+    {
+        var hash = id.IndexOf('#', StringComparison.Ordinal);
+
+        return hash < 0 ? id : id[..hash];
+    }
+
+    /// <summary>
     ///     Trims prose punctuation from a matched citation.
     /// </summary>
     public static string TrimCitation(string match) =>

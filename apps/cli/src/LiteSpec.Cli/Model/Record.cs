@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace LiteSpec.Model;
 
 /// <summary>
-///     One written record: a page, an entry on a page, or a term.
+///     One record: a page, an entry on a page, a term, or a derived generic result.
 /// </summary>
 sealed class Record
 {
@@ -27,6 +27,18 @@ sealed class Record
 
     /// <summary>The resolved decide-by date.</summary>
     public string? DecideBy { get; init; }
+
+    /// <summary>Who approved or reviewed the record: an owner name, or auto (veto window).</summary>
+    public string? ApprovedBy { get; init; }
+
+    /// <summary>The date the record was approved or reviewed.</summary>
+    public string? ApprovedOn { get; init; }
+
+    /// <summary>The semantic hash the approval covers, written by the builder.</summary>
+    public string? ApprovedHash { get; init; }
+
+    /// <summary>Whether the builder derived the record rather than reading it from a page.</summary>
+    public bool Derived { get; init; }
 
     /// <summary>The absolute file path.</summary>
     public string File { get; init; } = "";
@@ -93,6 +105,33 @@ sealed class Record
         }
 
         return [];
+    }
+
+    /// <summary>The journey's step targets: journey/name#step for each step carrying an id.</summary>
+    public IReadOnlyList<string> StepIds()
+    {
+        if (Type != "journey"
+            || Raw.ValueKind != JsonValueKind.Object
+            || !Raw.TryGetProperty("steps", out var steps)
+            || steps.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        var ids = new List<string>();
+
+        foreach (var step in steps.EnumerateArray())
+        {
+            if (step.ValueKind == JsonValueKind.Object
+                && step.TryGetProperty("id", out var id)
+                && id.ValueKind == JsonValueKind.String
+                && id.GetString() is { Length: > 0 } stepId)
+            {
+                ids.Add($"{Id}#{stepId}");
+            }
+        }
+
+        return ids;
     }
 
     /// <summary>Whether the record carries the field.</summary>

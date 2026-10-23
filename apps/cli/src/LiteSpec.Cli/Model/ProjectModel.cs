@@ -120,6 +120,11 @@ sealed class ProjectModel
                 WriteNullable(writer, "decider", record.Decider);
                 WriteNullable(writer, "decideBy", record.DecideBy);
 
+                if (record.Derived)
+                {
+                    writer.WriteBoolean("derived", true);
+                }
+
                 if (record.Type == "use-case")
                 {
                     WriteNullable(writer, "aggregate", ModelBuilder.AggregateOf(this, record)?.Id);

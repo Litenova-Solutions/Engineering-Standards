@@ -80,6 +80,7 @@ static class RecordReader
         });
 
         ReadTerms(config, records, problems);
+        DeriveResults(records);
 
         return new RecordRead(records, bodies, ReadProvisions(), problems);
     }
@@ -731,12 +732,91 @@ static class RecordReader
             Status = StringField(element, "status") ?? pageStatus,
             Decider = StringField(element, "decider") ?? pageDecider,
             DecideBy = StringField(element, "decideBy") ?? pageDecideBy,
+            ApprovedBy = StringField(element, "approvedBy"),
+            ApprovedOn = StringField(element, "approvedOn"),
+            ApprovedHash = StringField(element, "approvedHash"),
             File = file,
             Line = line,
             IsEntry = isEntry,
             PageId = pageId,
             Raw = element.Clone(),
         };
+
+    /// <summary>
+    ///     Derives the generic refusal results: forbidden for every use case with a permission
+    ///     grant, and invalid-input for every use case with a validated input. Scenarios and
+    ///     tests point at them; they are never written as records.
+    /// </summary>
+    private static void DeriveResults(List<Record> records)
+    {
+        var taken = records
+            .Where(record => record.Id.Length > 0)
+            .Select(record => record.Id)
+            .ToHashSet(StringComparer.Ordinal);
+        var derived = new List<Record>();
+
+        foreach (var useCase in records.Where(record => record.Type == "use-case"))
+        {
+            if (!Identifiers.TrySplit(useCase.Id, out _, out var home, out var name) || home is null)
+            {
+                continue;
+            }
+
+            if (ModelBuilder.GrantedPermission(useCase) is not null
+                && taken.Add($"result/{home}.{name}.forbidden"))
+            {
+                derived.Add(DerivedResult(
+                    useCase,
+                    $"result/{home}.{name}.forbidden",
+                    "Forbidden",
+                    "The caller lacks the grant the use case requires."));
+            }
+
+            if (ModelBuilder.HasValidatedInput(useCase)
+                && taken.Add($"result/{home}.{name}.invalid-input"))
+            {
+                derived.Add(DerivedResult(
+                    useCase,
+                    $"result/{home}.{name}.invalid-input",
+                    "Invalid input",
+                    "An input value breaks the rules the use case declares."));
+            }
+        }
+
+        records.AddRange(derived);
+    }
+
+    /// <summary>One derived generic result, carried by its use case's page.</summary>
+    private static Record DerivedResult(Record useCase, string id, string title, string meaning)
+    {
+        var json = JsonSerializer.Serialize(new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["type"] = "result",
+            ["id"] = id,
+            ["title"] = title,
+            ["outcome"] = "refusal",
+            ["meaning"] = meaning,
+        });
+
+        using var document = JsonDocument.Parse(json);
+
+        return new Record
+        {
+            Type = "result",
+            Id = id,
+            Title = title,
+            Owner = useCase.Owner,
+            Status = useCase.Status,
+            Decider = useCase.Decider,
+            DecideBy = useCase.DecideBy,
+            File = useCase.File,
+            Line = useCase.Line,
+            IsEntry = true,
+            PageId = useCase.Id,
+            Derived = true,
+            Raw = document.RootElement.Clone(),
+        };
+    }
 
     private static void ReadTerms(ConsumerConfig config, List<Record> records, List<Finding> problems)
     {

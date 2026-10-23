@@ -26,6 +26,18 @@ sealed class ConsumerConfig
     /// <summary>The glossary.</summary>
     public string GlossaryPath { get; private set; } = "";
 
+    /// <summary>Where behavior records live.</summary>
+    public string BehaviorDocs { get; private set; } = "";
+
+    /// <summary>Days before a tier-3 draft question auto-approves.</summary>
+    public int VetoWindowDays { get; private set; } = 7;
+
+    /// <summary>The owner reviewing access, outside calls and personal-data flows.</summary>
+    public string? SecurityReviewer { get; private set; }
+
+    /// <summary>The decision whose approval ends transcription mode.</summary>
+    public string? TranscriptionEndsWith { get; private set; }
+
     /// <summary>The backend layers.</summary>
     public string ApplicationRoot { get; private set; } = "";
 
@@ -105,6 +117,7 @@ sealed class ConsumerConfig
         // Records live under the documentation roots that paths.docs names.
         config.RecordRoots = ReadRoots(config.Root, paths, "docs", ["docs"]);
         config.GlossaryPath = Combine(config.Root, ReadString(paths, "glossary", "docs/glossary.json"));
+        config.BehaviorDocs = Combine(config.Root, ReadString(paths, "behaviorDocs", "docs/behavior"));
         config.ApplicationRoot = Resolve(config.Root, ReadString(dotnet, "application", "apps/api/src/*.Application"));
         config.DomainRoot = Resolve(config.Root, ReadString(dotnet, "domain", "apps/api/src/*.Domain"));
         config.WebApiRoot = Resolve(config.Root, ReadString(dotnet, "webapi", "apps/api/src/*.WebApi"));
@@ -188,6 +201,34 @@ sealed class ConsumerConfig
         {
             config.JobTriggerSteps = ReadNames(proof, "jobTriggerSteps");
             config.OutcomeOnlySteps = ReadNames(proof, "outcomeOnlySteps");
+        }
+
+        if (document.RootElement.TryGetProperty("review", out var review)
+            && review.ValueKind == JsonValueKind.Object)
+        {
+            if (review.TryGetProperty("vetoWindowDays", out var window)
+                && window.ValueKind == JsonValueKind.Number
+                && window.TryGetInt32(out var days)
+                && days > 0)
+            {
+                config.VetoWindowDays = days;
+            }
+
+            if (review.TryGetProperty("securityReviewer", out var reviewer)
+                && reviewer.ValueKind == JsonValueKind.String
+                && reviewer.GetString() is { Length: > 0 } name)
+            {
+                config.SecurityReviewer = name;
+            }
+        }
+
+        if (document.RootElement.TryGetProperty("adoption", out var adoption)
+            && adoption.ValueKind == JsonValueKind.Object
+            && adoption.TryGetProperty("transcriptionEndsWith", out var ends)
+            && ends.ValueKind == JsonValueKind.String
+            && ends.GetString() is { Length: > 0 } decision)
+        {
+            config.TranscriptionEndsWith = decision;
         }
 
         return config;
