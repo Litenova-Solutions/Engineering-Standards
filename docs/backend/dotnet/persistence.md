@@ -8,7 +8,7 @@ A .NET backend persists aggregates through Marten, the baseline document store: 
 
 ### Sessions, Repositories, and the One Commit
 
-One scoped session serves a whole command: the Domain repositories stage aggregate writes through it, and exactly one command post-handler commits it. Query handlers read through the read session instead, projecting shaped records without loading aggregates. Only that post-handler commits, so a failed command leaves nothing stored.
+One scoped session serves a whole command: the Domain repositories stage aggregate writes through it, and exactly one command post-handler commits it. Query handlers read through the read session instead, projecting shaped records without loading aggregates. Only that post-handler commits, so a failed command leaves nothing stored. The declared consistency mode decides how work splits across commands; each command still commits once.
 
 ### The Baseline Provider and Its Replacement
 
@@ -41,7 +41,7 @@ The table names the binding per provider. The obligation to project with filter,
 
 **Rationale:** Exactly one post-handler commits, so a failed command leaves the scoped session uncommitted and no partial work persists. A second committer, in a handler, repository, validator, reaction, or endpoint, would store work the pipeline later refuses. This provision states the .NET form of `litespec/backend/persistence#commit-each-command-pipeline-once`.
 
-The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`. The pipeline wraps the call in an explicit transaction when it writes through more than one context.
+The obligation is one commit for one pipeline, not one named method. Under the baseline provider that commit is `IDocumentSession.SaveChangesAsync`. Under the `efcore` extension it is `DbContext.SaveChangesAsync`. The pipeline wraps the call in an explicit transaction when it writes through more than one context. Under `consistency: atomic` that commit covers everything the handler staged. Other modes split work across commands: each command still commits once, and the driver resumes from its cursor or runs the declared compensation.
 
 ## Conventions
 

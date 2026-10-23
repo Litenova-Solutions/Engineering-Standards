@@ -44,7 +44,7 @@ The OpenAPI document is generated from the code during the Release build, with n
 
 **Statement:** A WebApi endpoint MUST enforce only coarse authenticated, role, or scope policies, leaving target decisions to the application guard.
 
-**Rationale:** Authentication establishes who is calling, not whether the caller is allowed to act on this specific resource. Coarse policies at the endpoint check the caller; the application guard decides the target from the permissions the use case needs. An endpoint that decided target authorization would duplicate business data access the guard already owns. Target authorization lives in `litespec/backend/application#enforce-target-authorization-in-the-pipeline`.
+**Rationale:** Authentication establishes who is calling, not whether the caller is allowed to act on this specific resource. Coarse policies at the endpoint check the caller; the application guard decides the target from the `access` the use-case record declares. An endpoint that decided target authorization would duplicate business data access the guard already owns. Target authorization lives in `litespec/backend/application#enforce-target-authorization-in-the-pipeline`.
 
 An operation applies a stable forbidden or not-found policy when revealing that a resource exists would leak information.
 
@@ -79,7 +79,7 @@ An operation applies a stable forbidden or not-found policy when revealing that 
 
 WebApi maps Application member names to their public JSON field names. `traceId` carries the trace identifier from the current [W3C Trace Context](https://www.w3.org/TR/trace-context/) `traceparent`, with the request identifier as fallback. The same shape applies to authentication and authorization failures.
 
-The global handler maps validation failures to 400, missing targets through the operation's disclosure policy, and forbidden failures to 403 or the declared 404. It maps conflicts and state rejections to 409, and unexpected failures to 500 with code `internal-error`. It maps each known domain failure individually. It does not report cancellation from a disconnected request as an application error.
+The global handler maps validation failures to 400, missing targets through the operation's disclosure policy, and forbidden failures to 403 or the declared 404. The derived `invalid-input` refusal answers 400, and the derived `forbidden` refusal answers 403 or the declared 404. It maps conflicts and state rejections to 409, and unexpected failures to 500 with code `internal-error`. It maps each known domain failure individually. It does not report cancellation from a disconnected request as an application error.
 
 In the Claimwick product, reimbursing an expense that is not approved ends with `result/reimburse-expense.not-approved`, which carries the code `spending.not-approved` and the status 409. For example, the global handler answers:
 
@@ -171,9 +171,9 @@ The `operationId` keeps its verb-noun form, so `CancelShipment` names the same t
 
 ### Bound Collection Queries
 
-**Statement:** A collection endpoint MUST apply deterministic ordering, a default limit of 20, and the use case's declared maximum limit of 100 or lower.
+**Statement:** A collection endpoint MUST apply deterministic ordering, its record's declared default limit, and its record's declared maximum limit of 100 or lower.
 
-**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Deterministic ordering keeps pages stable, the default limit of 20 bounds the common case, and the declared maximum of 100 or lower caps the worst case. Cursor mechanics live in `litespec/backend/api#use-opaque-cursors-for-collection-paging` and `litespec/backend/api#version-cursors-with-stable-sort-values`.
+**Rationale:** An unbounded collection read turns one caller into a source of unbounded database and serialization work. Deterministic ordering keeps pages stable, the declared default limit bounds the common case, and the declared maximum of 100 or lower caps the worst case. The use-case record declares its paging with order, cursor or offset, default limit, and maximum limit, and the endpoint applies exactly that. Cursor mechanics live in `litespec/backend/api#use-opaque-cursors-for-collection-paging` and `litespec/backend/api#version-cursors-with-stable-sort-values`.
 
 **Example:** A request uses `after` as an opaque cursor and `limit` as a positive integer. The implementation fetches one record beyond the requested limit to determine whether another page exists. The response uses one shape:
 
@@ -237,7 +237,7 @@ When a typed consumer reads the API, the pinned generator reads the source artif
 
 **Rationale:** A consumer that learns an authentication requirement from a runtime 401 has already built the wrong client: declared security schemes and per-operation requirements let it build the right one. Handwritten security metadata drifts from registered schemes, so the document derives them from the registered authentication schemes.
 
-**Example:** The implementation reads the registered authentication schemes and adds the matching `securitySchemes` and `security` entries. Handwritten security metadata drifts from registered schemes. An intentionally anonymous operation declares no security requirement.
+**Example:** The implementation reads the registered authentication schemes and adds the matching `securitySchemes` and `security` entries. Handwritten security metadata drifts from registered schemes. An operation whose `access` grant is `anonymous` declares no security requirement.
 
 ### Publish Precise, Complete Schemas
 
@@ -422,19 +422,19 @@ GET    /api/posts?after={cursor}&limit=20
 
 ### Declare a Smaller Collection Maximum
 
-**Default:** A use case with stricter needs declares its smaller maximum on its collection query message and states the reason on its use-case record.
+**Default:** A use case with stricter needs declares its smaller maximum in its record's `paging` and states the reason on its use-case record.
 
 **Replacement:** A project names its collection limit shape in its backend documentation.
 
-**Rationale:** Some collections cost more per item than others. A use case with stricter needs declares its smaller maximum on its collection query message with the reason on its use-case record, and the endpoint enforces it under `litespec/backend/api#bound-collection-queries`.
+**Rationale:** Some collections cost more per item than others. A use case with stricter needs declares its smaller maximum in its record's `paging` with the reason on its use-case record, and the endpoint enforces it under `litespec/backend/api#bound-collection-queries`.
 
 ### Use Offsets for Proven Bounded Datasets
 
-**Default:** A collection over a proven bounded dataset pages with an offset while the public contract stays cursor-shaped.
+**Default:** A collection over a proven bounded dataset declares offset paging in its record while the public contract stays cursor-shaped.
 
 **Replacement:** A project names its paging shape in its backend documentation.
 
-**Rationale:** Offsets skip rows the database still scans, so they stay cheap only while the dataset stays small. A collection over a proven bounded dataset pages with an offset internally while the public contract stays cursor-shaped, and the use-case record states the bound that makes it safe.
+**Rationale:** Offsets skip rows the database still scans, so they stay cheap only while the dataset stays small. A collection over a proven bounded dataset declares offset paging while the public contract stays cursor-shaped, and the use-case record states the bound that makes it safe.
 
 ### Generate the Contract Without Hosted Dependencies
 
@@ -467,7 +467,7 @@ A refund outcome is a closed set whose cases carry different data. Domain models
 | litespec/backend/api#state-an-unexpressible-transition-as-a-custom-method | guidance | Transitions beyond the five verbs appear as POST routes with a colon-suffixed verb. |
 | litespec/backend/api#apply-patch-to-a-partial-update | guidance | Partial updates arrive as PATCH requests with the merge-patch media type. |
 | litespec/backend/api#use-put-for-a-whole-replacement | guidance | PUT requests replace the whole resource their path names, with omitted members removed. |
-| litespec/backend/api#bound-collection-queries | guidance | Collection responses carry deterministic order with default limit 20 inside the declared maximum. |
+| litespec/backend/api#bound-collection-queries | guidance | Collection responses carry deterministic order with the declared default limit inside the declared maximum of 100 or lower. |
 | litespec/backend/api#use-opaque-cursors-for-collection-paging | guidance | A malformed cursor sent to a collection endpoint answers 400 with code invalid-cursor. |
 | litespec/backend/api#version-cursors-with-stable-sort-values | guidance | Cursor payloads carry a version with the last sort values and a unique tie-breaker, and no readable secret. |
 | litespec/backend/api#treat-openapi-as-a-generated-contract | guidance | The Release build regenerates the OpenAPI artifact, with the contract gate failing on a changed tree. |

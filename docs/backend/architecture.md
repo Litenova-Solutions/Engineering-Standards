@@ -2,7 +2,7 @@
 
 ## Intent
 
-The backend is a modular monolith of five parts: Domain holds business rules, Application coordinates use cases, Application.Abstractions holds the contracts that more than one module names, Infrastructure holds technical adapters, and WebApi hosts HTTP. A use case is one command, query, or reaction with its permissions, results, and scenarios. This page states those parts, the direction their references point, and how modules and use cases organize every layer; a team building the backend reads it before the layer pages, which state what each part owns.
+The backend is a modular monolith of five parts: Domain holds business rules, Application coordinates use cases, Application.Abstractions holds the contracts that more than one module names, Infrastructure holds technical adapters, and WebApi hosts HTTP. A use case is one command or query with its access, results, and scenarios, and a reaction answers an event by issuing a command or sending a notification. This page states those parts, the direction their references point, and how modules and use cases organize every layer; a team building the backend reads it before the layer pages, which state what each part owns.
 
 ## Concepts
 
@@ -14,7 +14,7 @@ A part is one of the five projects. The provisions say layer when they talk abou
 |:---|:---|:---|
 | Domain | Business rules: aggregates, value objects, domain events, and domain repository contracts | Nothing |
 | Application.Abstractions | Contracts more than one module names: pipeline positions, cross-module ports, transport-neutral refusals, and published integration events | Domain |
-| Application | Use-case coordination: commands, queries, handlers, validators, and reactions | Application.Abstractions, Domain |
+| Application | Use-case coordination: commands, queries, handlers, validators, and reaction classes | Application.Abstractions, Domain |
 | Infrastructure | Technical adapters implementing the declared boundaries | Application, Application.Abstractions, Domain |
 | WebApi | HTTP hosting and process composition | Infrastructure, Application, Application.Abstractions |
 
@@ -22,11 +22,15 @@ Part boundaries are not deployment boundaries: the parts deploy together as one 
 
 ### Modules and Use Cases
 
-A [module](../reference/glossary.md) is one business area organizing language, records, use cases, and ownership. A [use case](../reference/glossary.md) is one command, query, or reaction with its permissions, results, and scenarios. Every layer uses the same module names and orders its folders as module, then aggregate, then layer detail, so a reader moves from a Domain aggregate to its handler, its domain repository, and its endpoint without a map.
+A [module](../reference/glossary.md) is one business area organizing language, records, use cases, and ownership. A [use case](../reference/glossary.md) is one command or query with its access, results, and scenarios. A [reaction](../reference/glossary.md) answers one event, and a [job](../reference/glossary.md) runs scheduled or operator work. Every layer uses the same module names and orders its folders as module, then aggregate, then layer detail, so a reader moves from a Domain aggregate to its handler, its domain repository, and its endpoint without a map.
 
 ### Commands and Queries
 
-CQRS separates the command and query models inside the one Application part: a command mutates aggregates through domain repositories, while a query projects read results without loading one. A reaction runs when its trigger fires rather than traveling the command pipeline. Publishing a post, for example, runs a `PublishPostCommand` through the handler and the domain repository, while reading a post runs a query that projects the stored data directly to its result.
+CQRS separates the command and query models inside the one Application part: a command mutates aggregates through domain repositories, while a query projects read results without loading one. A reaction answers its trigger by issuing a command or sending a notification, and a job issues one command per item in its scope; neither travels the command pipeline itself. Publishing a post, for example, runs a `PublishPostCommand` through the handler and the domain repository, while reading a post runs a query that projects the stored data directly to its result.
+
+### From Records to Code
+
+Behavior records map onto code one way: the use-case folder is the anchor for a command or query, and a reaction class carries one anchor tag naming its reaction record. Jobs, notifications, settings, and integration events map onto the code shapes the layer pages state. Nothing above Implementation is computed from code: code points up to the record it serves, and an undeclared edge or outcome is the defect.
 
 ## Standards
 
@@ -70,9 +74,9 @@ WebApi/
 
 ### Keep One Application Part
 
-**Statement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
+**Statement:** An application MUST place commands, queries, results, validators, handlers, reaction classes, and module-owned ports in one Application part, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Commands, queries, and reactions coordinate the same use cases, so splitting them into Write, Read, Contracts, and Event-handler parts buys unused deployment boundaries at the cost of a dependency every use case crosses. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): separate command and query models inside one Application part, with cross-module contracts in Application.Abstractions.
+**Rationale:** Commands, queries, reactions, and jobs coordinate the same use cases, so splitting them into Write, Read, Contracts, and event-handler parts buys unused deployment boundaries at the cost of a dependency every use case crosses. Reaction classes live in Application folders named for their records. The separation this backend keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): separate command and query models inside one Application part, with cross-module contracts in Application.Abstractions.
 
 ### Organize Every Layer by Module and Use Case
 
@@ -206,7 +210,7 @@ Publishing a post follows this direction:
 2. Application loads the post through its domain repository.
 3. Domain publishing enforces publication rules and raises the post-published event.
 4. Infrastructure stages and commits the post through the command pipeline.
-5. An event reaction implementation handles the event through the delivery classification its reaction declares under `litespec/backend/application#keep-event-reaction-implementations-explicit`.
+5. One reaction class answers the event through the reaction its record declares under `litespec/backend/application#keep-event-reaction-implementations-explicit`, carrying one anchor tag naming that record.
 
 ## Verification
 
@@ -215,7 +219,7 @@ Publishing a post follows this direction:
 | litespec/backend/architecture#use-five-application-parts | guidance | The solution file lists Domain, Application.Abstractions, Application, Infrastructure, and WebApi as the application parts, with no sixth part. |
 | litespec/backend/architecture#point-dependencies-inward | guidance | The project reference graph in the solution shows every reference pointing toward Domain, with Domain referencing nothing. |
 | litespec/backend/architecture#own-each-layers-contract-types | guidance | The outward contracts in each layer's folders are declared in that layer, apart from shared-kernel values and aggregate typed identifiers. |
-| litespec/backend/architecture#keep-one-application-part | guidance | The Application part holds every message, handler, and module-owned port, and the shared contracts part holds the cross-module contracts. |
+| litespec/backend/architecture#keep-one-application-part | guidance | The Application part holds every message, handler, reaction class, and module-owned port, and the shared contracts part holds the cross-module contracts. |
 | litespec/backend/architecture#organize-every-layer-by-module-and-use-case | guidance | Each layer folder path resolves to a declared module and aggregate, with no technical-grouping folder name. |
 | litespec/backend/architecture#place-a-type-at-the-lowest-folder-that-holds-its-consumers | guidance | Each type sits in the lowest folder holding every consumer that names it, with no Shared, Common, Util, Helpers, Core, or Misc folder. |
 | litespec/backend/architecture#keep-implementation-types-hidden | guidance | Handlers, validators, definitions, persistence implementations, and endpoint implementations in the solution stay inside their own part and closed to extension. |

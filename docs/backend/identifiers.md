@@ -8,7 +8,7 @@ Every record carries one identifier naming its type, its home, and its own name.
 
 ### Identifier Forms
 
-An identifier names its record type first, then the record name, with the owning home in between when the type has one. The model states the form each type uses, with one row per type and one example per row. A rule home is an aggregate name or a module name. A result or scenario home is a use-case name, and an event home is an aggregate name. A use-case name is unique across the project, so a result cites only that name. An aggregate name is unique across the project, so a rule cites only that name. A rule name keeps the negation its statement makes, as `litespec/core/behavior#keep-the-negation-word-in-the-rule-name` requires.
+An identifier names its record type first, then the record name, with the owning home in between when the type has one. The model states the form each type uses, with one row per type and one example per row. A rule home is an aggregate name or a module name. A result or scenario home is a use-case name, and an event home is an aggregate name. A use-case name is unique across the project, so a result cites only that name. An aggregate name is unique across the project, so a rule cites only that name. A reaction, job, notification, and setting home is the module that owns it: `reaction/sales.notify-buyer` is a reaction owned by the sales module. An integration event has no module home: `integration-event/ticket-resale.resold` names the published set. A rule name keeps the negation its statement makes, as `litespec/core/behavior#keep-the-negation-word-in-the-rule-name` requires. A journey step identifier is `journey/<name>#<step-id>`, and a derived generic result is `result/<use-case-home.name>.forbidden` or `result/<use-case-home.name>.invalid-input`; scenarios may point at derived results, which are never written as records.
 
 ### Name Rules
 
@@ -95,7 +95,7 @@ None.
 
 This informative example demonstrates `litespec/backend/identifiers#follow-the-identifier-form-of-each-record-type` and `litespec/backend/identifiers#name-records-with-one-to-six-words`.
 
-An ordering system names one module, one aggregate, one rule, and one use case with its results.
+An ordering system names one module, one aggregate, one rule, and one use case with its results. It also names a reaction, a job, a notification, a setting, and an integration event.
 
 ```text
 module/orders
@@ -104,6 +104,11 @@ rule/order.only-paid-orders-ship
 use-case/orders.place-order
 result/place-order.order-placed
 result/place-order.item-out-of-stock
+reaction/orders.void-code-on-resale
+job/orders.expire-lapsed-returns
+notification/orders.buyer-refunded
+setting/orders.return-queue-cap
+integration-event/ticket-resale.resold
 ```
 
 ## Verification

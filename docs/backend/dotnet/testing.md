@@ -50,7 +50,7 @@ A small solution holds the first two; Acceptance appears when the executable BDD
 
 **Rationale:** The `proves` tag is the claim that ties a test to its scenario, and the model builder confirms it: an acceptance scenario is confirmed when its When step belongs to the use case steps class, and an integration test when its body names the use case message type. The test calls the use case and asserts its result: the success fields for a success, or the refusal code inside an assertion for a refusal. The model builder matches the proving test by its fully qualified name, so a renamed test fails loudly instead of becoming "awaiting run". A test that asserts nothing is reported by LS4001, the assertion rule on test projects. A scenario no test proves is recorded as a known gap with owner and end date.
 
-A test carries no coverage tag; the `proves` tag is its only record citation. The latest test run marks each confirmed claim passing or failing. This provision states the .NET form of `litespec/backend/testing#tag-the-test-that-proves-each-scenario`.
+A test carries no coverage tag; the `proves` tag is its only record citation. A reaction scenario is proved by a test that fires the trigger and asserts the issued use case's result. The latest test run marks each confirmed claim passing or failing. This provision states the .NET form of `litespec/backend/testing#tag-the-test-that-proves-each-scenario`.
 
 **Example:** An acceptance scenario for submitting an expense carries its scenario tag on the scenario method.
 

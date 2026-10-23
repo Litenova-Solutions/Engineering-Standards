@@ -12,6 +12,10 @@ A command handler reaches persistence only through Domain repositories. It loads
 
 In the Claimwick product, `use-case/spending.submit-expense` stages the new expense through its repository, and one post-handler commits once after the handler returns. A failed submission leaves the session uncommitted, so no partial expense is stored.
 
+### Consistency Modes
+
+Each use-case record declares one consistency mode, and persistence honors it. `atomic` commits everything the handler staged in one unit of work. `per-record` lets a driver issue one command per record, and each command commits alone with the cursor resuming the rest. `compensated` commits each step in its own command, and a failure runs the compensation the step declares. `best-effort` records a receipt per target. Every mode still commits once per command pipeline; the mode decides how work splits across commands.
+
 ### Provider-Neutral and Provider-Specific Rules
 
 The persistence provisions divide into two groups, so a project that replaces the provider knows which obligations move with it.
@@ -42,7 +46,7 @@ The manifest pins both providers' packages, because the extension is part of thi
 
 **Statement:** Exactly one global command post-handler MUST commit the session for a command pipeline.
 
-**Rationale:** One commit point makes the transaction boundary visible: everything the handler staged succeeds or fails together, and a failed command leaves the session uncommitted. If handlers or repositories committed, a later failure in the same pipeline leaves a partial write behind. Handlers, repositories, validators, reactions, and endpoints commit nothing.
+**Rationale:** One commit point makes the transaction boundary visible: everything the handler staged succeeds or fails together, and a failed command leaves the session uncommitted. If handlers or repositories committed, a later failure in the same pipeline leaves a partial write behind. Handlers, repositories, validators, reactions, and endpoints commit nothing. A declared consistency mode other than `atomic` splits work across commands; each command still commits once.
 
 **Example:** In the Claimwick product, `use-case/spending.submit-expense` stages the expense through its Domain repository, and one post-handler commits once after the handler returns:
 
@@ -53,6 +57,14 @@ post-handler commits the session once
 ```
 
 A failed submission leaves the session uncommitted, so no partial expense is stored. Handlers, repositories, validators, reactions, and endpoints commit nothing.
+
+### Honor the Declared Consistency Mode
+
+**Statement:** Persistence MUST commit a command exactly as its use-case record's `consistency` mode states.
+
+**Rationale:** `atomic` commits everything the handler staged in one unit of work, citing the rule in `because` when `changes` names more than one aggregate. `per-record` commits each record's command alone, with the driver resuming from its cursor after a failure. `compensated` commits each step alone, and a failure runs the compensation the step declares. `best-effort` records a receipt per target. A second commit in one command splits one unit of work across two transactions, so the failure between them leaves a partial write.
+
+**Example:** The door-scan command commits each attempt alone under `per-record`; the place-order command commits its aggregates together under `atomic`.
 
 ### Collect Events Without a Public Unit of Work
 
@@ -221,6 +233,7 @@ An accepted business rule caps `Order.Lines` at 200 entries inside the aggregate
 | litespec/backend/persistence#stage-aggregate-writes-through-domain-repositories | guidance | Command handler bodies reach persistence through Domain repositories, with no direct session use. |
 | litespec/backend/persistence#query-through-the-read-session | guidance | Query handler bodies project through the read session, with filter, scope, ordering, and limit applied first. |
 | litespec/backend/persistence#commit-each-command-pipeline-once | guidance | One command post-handler commits each pipeline, with no other committer in handlers, repositories, validators, reactions, or endpoints. |
+| litespec/backend/persistence#honor-the-declared-consistency-mode | guidance | Each command commits as its record's `consistency` mode states: one unit of work, per record, per step with compensation, or per receipt. |
 | litespec/backend/persistence#collect-events-without-a-public-unit-of-work | guidance | Repositories register touched aggregates with the internal buffer the post-handler drains. |
 | litespec/backend/persistence#keep-mappings-and-aliases-explicit | guidance | Store configuration declares a stable alias, identifier mapping, and index list for each stored aggregate. |
 | litespec/backend/persistence#keep-serialization-behavior-out-of-domain | guidance | Domain types carry no serialization metadata, with the stored JSON contract owned in Infrastructure. |

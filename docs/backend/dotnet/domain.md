@@ -10,7 +10,7 @@ The Domain project holds the business model of a .NET backend in C# types that d
 
 An aggregate is one unit of business state that stays consistent and changes in one step, and its root is the single type through which outside code changes it. Every aggregate exposes its lifecycle through one `State` property backed by an abstract state record with one sealed record per state. Each state record carries that state's own data, such as the publication time of a published post, and the aggregate's methods own the transitions between states.
 
-Child entities and value objects are design choices inside an aggregate: they appear in code and the glossary, never as records.
+Child entities and value objects are design choices inside an aggregate: they appear in code and the glossary, never as records. A `store` aggregate has no root, state record, or repository in Domain; it reaches code through a port.
 
 ### Closed Sets Without Enums
 
@@ -386,7 +386,7 @@ The amount serializes as a string, so no reader parses it as binary floating poi
 
 **Rationale:** One repository per aggregate keeps the write boundary aligned with the consistency boundary: the interface loads and stages complete aggregates of its own type, and nothing else. `GetByIdAsync` throws `{Aggregate}NotFoundException` for a required load, so handlers repeat no null check; a nullable `FindBy...Async` is reserved for lookups where absence is normal. `IQueryable`, sessions, and generic CRUD surfaces would leak query shaping and provider behavior into Domain, so the interface exposes none of them. This provision states the .NET form of `litespec/backend/domain#expose-repositories-for-one-aggregate-only`.
 
-This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent.
+This interface is the write side only. Reading for a Query uses a Read Model owned by Application and shaped by Infrastructure, and that path declares no Domain interface. A repository that gained a projection method would put query shapes in Domain, which is the coupling this layer exists to prevent. A `store` aggregate owns no repository interface; its port carries the state its owner holds.
 
 **Example:**
 

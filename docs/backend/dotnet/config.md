@@ -46,6 +46,14 @@ Backend settings bind to named options classes that the host validates at startu
 
 **Rationale:** A required setting read through a raw lookup fails on the first request that needs it, which may be hours after a bad deploy. Binding each section to a validated options class fails startup instead, with the field, range, or format named. This provision states the .NET form of `litespec/workspace/config#validate-backend-configuration-at-startup`.
 
+### Bind Setting Records to Options
+
+**Statement:** A setting record set by the founder or the operator MUST bind to a named options class validated at startup.
+
+**Rationale:** The setting record owns its value type, its default, its range, its unit, and what happens at the bound, and the options class carries them with checks for required fields, ranges, and formats. A `secret` setting binds from secret storage, never from a committed file. A tenant-set setting is stored data, not configuration: the handler reads it per tenant, and no options class carries it.
+
+**Example:** The return-queue cap binds to `ListingOptions` with its range; startup fails when the configured value leaves the range.
+
 ## Conventions
 
 None.
@@ -59,3 +67,4 @@ None.
 | litespec/backend/dotnet/config#centralize-nuget-versions | guidance | `apps/api/Directory.Packages.props` enables central management with the manifest pins, and project files carry no versions. |
 | litespec/backend/dotnet/config#commit-the-tool-manifest | guidance | The root `.config/dotnet-tools.json` pins each local tool a documented command invokes, including the Stryker.NET runner. |
 | litespec/backend/dotnet/config#validate-backend-options-at-startup | guidance | Each configuration section binds a named options class validated for required fields, ranges, and formats, failing startup on bad values. |
+| litespec/backend/dotnet/config#bind-setting-records-to-options | guidance | Each founder-set or operator-set setting binds a named options class validated at startup; tenant-set values live in stored tenant state. |

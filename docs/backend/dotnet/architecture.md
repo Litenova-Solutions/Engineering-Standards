@@ -40,9 +40,9 @@ apps/api/src/{ProjectName}.WebApi/
 
 ### Keep One Application Assembly
 
-**Statement:** An application MUST place commands, queries, results, validators, handlers, reactions, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
+**Statement:** An application MUST place commands, queries, results, validators, handlers, reaction classes, and module-owned ports in one Application project, and cross-module contracts in Application.Abstractions.
 
-**Rationale:** Splitting Application into Write, Read, Contracts, and event-handler assemblies would buy a deployment boundary the stack never uses, and every use case would pay for it with a project reference to cross. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): the command and query models differ, while one assembly holds them.
+**Rationale:** Splitting Application into Write, Read, Contracts, and event-handler assemblies would buy a deployment boundary the stack never uses, and every use case would pay for it with a project reference to cross. The separation this stack keeps is the one [Fowler describes as CQRS](https://www.martinfowler.com/bliki/CQRS.html): the command and query models differ, while one assembly holds them. Reaction classes live in Application folders named for their records; job classes live in Infrastructure with the scheduling concerns.
 
 This provision states the .NET form of `litespec/backend/architecture#keep-one-application-part`.
 
@@ -103,7 +103,7 @@ WebApiServiceRegistration.AddWebApi(...)
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/backend/dotnet/architecture#use-five-application-projects | guidance | The solution projects: exactly Domain, Application.Abstractions, Application, Infrastructure, and WebApi. |
-| litespec/backend/dotnet/architecture#keep-one-application-assembly | guidance | The Application project files: every command, query, result, validator, handler, reaction, and module-owned port, with cross-module contracts in Application.Abstractions. |
+| litespec/backend/dotnet/architecture#keep-one-application-assembly | guidance | The Application project files hold every command, query, result, validator, handler, and reaction class, with cross-module contracts in Application.Abstractions. |
 | litespec/backend/dotnet/architecture#mirror-modules-in-folders-and-namespaces | guidance | The module folders and namespaces in every project: one folder and namespace per module, named for the module. |
 | litespec/backend/dotnet/architecture#keep-implementation-types-internal | guidance | Handler, validator, definition, persistence, and endpoint implementation declarations: each `internal sealed`. |
 | litespec/backend/dotnet/architecture#keep-composition-in-hosts | guidance | Service registration calls: each one in `Program.cs` or a host registration module. |

@@ -130,9 +130,9 @@ This extension switches on no optional record type.
 
 ### Process Changed Aggregate Events
 
-**Statement:** An EF Core post-handler MUST collect domain events from changed aggregates and follow their documented delivery classification.
+**Statement:** An EF Core post-handler MUST collect domain events from changed aggregates and route each to the reaction its reaction record declares.
 
-**Rationale:** The post-handler collects domain events from the aggregates it changed and routes each by its documented delivery classification. Collecting from anywhere else drops events or delivers facts the commit did not store.
+**Rationale:** The post-handler collects domain events from the aggregates it changed and routes each to the reaction the reaction record declares, honoring its `onFailure`. Collecting from anywhere else drops events or delivers facts the commit did not store.
 
 ### Use Durable Outbox Delivery
 
@@ -296,7 +296,7 @@ Guides: None.
 | litespec/backend/dotnet/ext/efcore#avoid-per-aggregate-read-stores | checkable | `dotnet test` fails `EfCoreReadTests` when a per-aggregate read-store interface exists. |
 | litespec/backend/dotnet/ext/efcore#resolve-the-tenant-at-context-creation | checkable | `dotnet test` fails `EfCoreReadTests` when a context resolves the tenant after creation or misses a tenant filter on an owned set. |
 | litespec/backend/dotnet/ext/efcore#commit-ef-core-command-work-once | checkable | `dotnet test` fails `EfCoreCommitTests` when a post-handler calls `SaveChangesAsync` more than once for its owned command. |
-| litespec/backend/dotnet/ext/efcore#process-changed-aggregate-events | checkable | `dotnet test` fails `EfCoreCommitTests` when a domain event from a changed aggregate is dropped or misses its documented delivery classification. |
+| litespec/backend/dotnet/ext/efcore#process-changed-aggregate-events | checkable | `dotnet test` fails `EfCoreCommitTests` when a domain event from a changed aggregate is dropped or misses its declared `onFailure` handling. |
 | litespec/backend/dotnet/ext/efcore#use-durable-outbox-delivery | checkable | `dotnet test` fails `EfCoreCommitTests` when a durable EF Core command commits a Marten session. |
 | litespec/backend/dotnet/ext/efcore#stage-ef-core-outbox-records-together | checkable | `dotnet test` fails `EfCoreOutboxTests` when a command stages its outbox record outside its aggregate `DbContext`. |
 | litespec/backend/dotnet/ext/efcore#reject-cross-provider-outbox-storage | checkable | `dotnet test` fails `EfCoreOutboxTests` when an EF Core command stores its outbox record through a Marten session. |

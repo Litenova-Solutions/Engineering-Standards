@@ -8,7 +8,7 @@ The Domain layer holds a product's business rules in code that depends on nothin
 
 ### Aggregates and the Business Model
 
-In code, the [aggregate root](../reference/glossary.md) is the single type through which outside code changes the aggregate: it guards every mutation, holds the lifecycle state, and records domain events. Child entities live inside the boundary and expose no mutable state outside the root. One aggregate references another by typed identifier rather than by object reference, and one domain repository per aggregate loads and stages it.
+In code, the [aggregate root](../reference/glossary.md) is the single type through which outside code changes the aggregate: it guards every mutation, holds the lifecycle state, and records domain events. Child entities live inside the boundary and expose no mutable state outside the root. One aggregate references another by typed identifier rather than by object reference, and one domain repository per aggregate loads and stages it. A `store` aggregate has no root in code; it reaches code through a port under `litespec/backend/application#expose-store-state-through-ports`.
 
 ### Lifecycles as State Types
 
@@ -36,7 +36,7 @@ A closed set is a fixed menu of values where the type system knows every case, s
 
 **Statement:** An aggregate root MUST be the only public mutation entry point for every invariant its transaction protects.
 
-**Rationale:** If outside code could set properties or call child mutations, it could change data without passing the root's checks. The root stands as the only public mutation entry point, so every change passes the invariant the transaction protects. A command normally changes one aggregate, and the use case names the cross-aggregate rule before one command changes several in one transaction.
+**Rationale:** If outside code could set properties or call child mutations, it could change data without passing the root's checks. The root stands as the only public mutation entry point, so every change passes the invariant the transaction protects. A command with `consistency: atomic` changes every aggregate its `changes` names in one transaction, citing the rule in `because` when it changes more than one.
 
 ### Take Identity and Events from the Project Root Contract
 
@@ -168,7 +168,7 @@ The Infrastructure implementation owns that refusal. The command pipeline owns t
 
 **Statement:** A domain event MUST be immutable and carry business data only.
 
-**Rationale:** A domain event records a completed fact for reactions to consume. Its name states the aggregate and the completed fact, following `litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root` and `litespec/workspace/naming#use-architectural-suffixes`, so a reader knows which aggregate raised the fact without opening the file. The event carries business data only: typed identifiers and the values its reactions need, with no aggregate, session, service, mutable collection, or thrown error, because any of those would couple reactions to the raising process. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process.
+**Rationale:** A domain event records a completed fact for reactions to consume. Its name states the aggregate and the completed fact, following `litespec/workspace/naming#anchor-aggregate-owned-types-on-the-aggregate-root` and `litespec/workspace/naming#use-architectural-suffixes`, so a reader knows which aggregate raised the fact without opening the file. The event carries business data only: typed identifiers and the values its reactions need, with no aggregate, session, service, mutable collection, or thrown error, because any of those would couple reactions to the raising process. Envelope identity, such as message identity and causation identity, lives on the published integration event that carries the fact outside the process. That integration event names the domain event in `translates`.
 
 ### Reject Business Violations with Dedicated Refusals
 
@@ -186,7 +186,7 @@ Application validators handle malformed caller input through validity findings. 
 
 **Statement:** An aggregate MUST store another aggregate's typed identifier rather than an object reference.
 
-**Rationale:** An object reference between aggregates loads one aggregate's data through another, which couples their consistency boundaries and their storage. A typed identifier keeps each aggregate loadable on its own: Application loads each aggregate through its domain repository when a command coordinates several, and the use case names the cross-aggregate rule that needs one transaction.
+**Rationale:** An object reference between aggregates loads one aggregate's data through another, which couples their consistency boundaries and their storage. A typed identifier keeps each aggregate loadable on its own: Application loads each aggregate through its domain repository when a command coordinates several, with `consistency: atomic` citing the rule in `because`.
 
 ### Pass Nondeterministic Values into Domain
 

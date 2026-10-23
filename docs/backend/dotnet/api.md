@@ -51,7 +51,7 @@ At startup, WebApi scans its own assembly for non-abstract `IEndpoint` implement
 
 **Statement:** WebApi MUST map each refusal code to its HTTP status in one global handler.
 
-**Rationale:** The specification records each refusal with its stable `code` and no transport status, so the stack derives the status its transport needs. The handler uses ASP.NET Core `AddProblemDetails` with one `IExceptionHandler`: validation failures answer 400, missing targets answer through the operation's 404 policy, forbidden failures answer 403 or the declared 404 disclosure policy, conflicts and state rejections answer 409, and unexpected failures answer 500 with code `internal_error`. Known Domain exception types map individually, and a cancellation from a disconnected request is not reported as an application error. The outcome-to-status assignment lives in `litespec/backend/api#use-consistent-status-codes`; this provision states its .NET form.
+**Rationale:** The specification records each refusal with its stable `code` and no transport status, so the stack derives the status its transport needs. The handler uses ASP.NET Core `AddProblemDetails` with one `IExceptionHandler`: validation failures answer 400, missing targets answer through the operation's 404 policy, forbidden failures answer 403 or the declared 404 disclosure policy, conflicts and state rejections answer 409, and unexpected failures answer 500 with code `internal_error`. The derived `invalid-input` refusal answers 400 under the project's `refusals.invalidInput` code, and the derived `forbidden` refusal answers 403 or the declared 404 under the project's `refusals.forbidden` code. Known Domain exception types map individually, and a cancellation from a disconnected request is not reported as an application error. The outcome-to-status assignment lives in `litespec/backend/api#use-consistent-status-codes`; this provision states its .NET form.
 
 **Example:** The handler registers through the framework's Problem Details services:
 
@@ -84,7 +84,7 @@ The handler maps each known exception type to its status and code, and answers 5
 
 **Replacement:** A project names its endpoint layout in its WebApi documentation.
 
-**Rationale:** The folder path matches the specification path, so a reader locates an operation from its use-case identifier without searching. Transport types take the names their boundary roles assign under `litespec/backend/api#name-transport-types-by-their-boundary-role`, and transport mapping lives in WebApi under `litespec/backend/application#keep-mappings-at-the-owning-boundary`. Module nesting, including the single-aggregate flat form, follows `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
+**Rationale:** The folder path matches the specification path, so a reader locates an operation from its use-case identifier without searching. Transport types take the names their boundary roles assign under `litespec/backend/api#name-transport-types-by-their-boundary-role`, and transport mapping lives in WebApi under `litespec/backend/application#keep-mappings-at-the-owning-boundary`. Response models carry the query's declared `include` groups. Module nesting, including the single-aggregate flat form, follows `litespec/backend/architecture#organize-every-layer-by-module-and-use-case`.
 
 **Example:** The endpoint layout is:
 
