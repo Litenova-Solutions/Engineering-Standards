@@ -82,9 +82,9 @@ Chosen by the owner on 2026-10-21. The site is a static-assets-only Worker on th
 
 Chosen by the owner on 2026-10-21. Every docs section and folder has a `README.md` index titled `Overview`, listed first in the sidebar. Where it appears without its section (browser tab, search, Previous and Next) it carries the section name, such as Backend Overview. A page's title is its only name: the sidebar, breadcrumb and link text all use it. Analyzers is its own section beside CLI, with one reference page per rule, and Example is a section that follows one product end to end.
 
-### D20. The worked example is the Expenses product in examples/expenses/
+### D20. The worked example is the Claimwick product in examples/claimwick/
 
-Chosen by the owner on 2026-10-21, replacing the library example: library words (reader, book, record, copy, hold) collide with LiteSpec's own terms. Expenses is a small SaaS product where employees submit expenses with receipts, managers approve them and finance reimburses them. It lives in `examples/expenses/` as a consumer project that `litespec model check` passes, checked by a test, so the Example pages show real output from it. Its code shows the shape the stack pages require and is not a compiled solution.
+Chosen by the owner on 2026-10-21, replacing the library example: library words (reader, book, record, copy, hold) collide with LiteSpec's own terms. Claimwick is a small SaaS product where employees submit expenses with receipts, managers approve them and finance reimburses them. It lives in `examples/claimwick/` as a consumer project that `litespec model check` passes, checked by a test, so the Example pages show real output from it. Its code shows the shape the stack pages require and is not a compiled solution.
 
 ## Open items for the owner
 
