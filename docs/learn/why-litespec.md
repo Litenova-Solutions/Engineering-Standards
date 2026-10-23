@@ -24,19 +24,21 @@ LiteSpec makes the written record durable and the person or agent doing the work
 
 It does that with three parts:
 
-- **A standard.** A versioned set of rules for building one [bounded-context business application](../core/scope.md): how the backend is layered, how the domain is modeled, and how APIs, frontends, tests, security, operations, and releases work. Each rule carries a stable ID, so a person, an agent, or a tool cites exactly one rule. [Read the standard](reading-the-standard.md) explains how the standard is organized.
-- **Records.** A project writes its intent as small pages of fixed types: the product, its requirements, its modules, aggregates, rules, use cases with their results, and the decisions behind them. Each record has an owner and a status. [Records and the project model](records-and-the-model.md) explains what a project writes down.
-- **A model builder.** A command-line tool reads the records, the code, the screens, and the test results, and works out how they connect: which handler implements which use case, which screen calls it, and which test proves it. It reports what is missing. [How the tools fit together](the-tooling.md) explains when each tool runs.
+- **A standard.** A versioned set of rules for building one [bounded-context business application](../core/scope.md): how Intent states promises, how Behavior keeps them, and how code, tests, security, operations, and releases work. Each rule carries a stable ID, so a person, an agent, or a tool cites exactly one rule. [Read the standard](reading-the-standard.md) explains how the standard is organized.
+- **Records.** A project writes its intent as small pages of fixed types: the product, its requirements and journeys, its modules, aggregates, rules, use cases with their results, the reactions, jobs, notifications, and settings around them, and the decisions behind them. Each record has an owner and a status. [Records and the project model](records-and-the-model.md) explains what a project writes down.
+- **A model builder.** A command-line tool reads the records, follows the anchors by which code and tests point up to them, and works out how they connect: which handler implements which use case, which screen calls it, and which test proves it. It reports what is missing, and it renders the book product people read. [How the tools fit together](the-tooling.md) explains when each tool runs.
 
-The standard tells everyone how to build. The records say what to build. The model shows whether the two match.
+The standard tells everyone how to build. The records say what to build, top down from promises to behavior to code. The model shows whether the two match.
 
 ## The End Goal
 
-LiteSpec aims at one end goal: a specification so clear and structured that a person who is not a developer can review it, and that review is enough.
+LiteSpec aims at one end goal: Intent so clear and structured that a person who is not a developer can read it, and that reading is enough to approve it.
 
-The specification runs top-down. People start from goals and intent and refine them, level by level, in plain language, down to a fixed line. Below that line, agents fulfill everything: design, code, tests, and the stack rules that govern them, checked by tools instead of by people. People review and approve what sits above the line; the tools prove that what sits below it matches.
+Work runs top down through four layers. People and agents write Intent first: why the product exists and what it promises. Agents write Behavior from Intent: how the system acts to keep the promises. Agents write code from Behavior, and tests prove each promised example through the public boundary. Nothing above code is computed from code: each layer is written from the layer above it, and code points up to the record it serves.
 
-The same shape makes a specification easy to learn and easy to use: a reader always knows where they are in the tree, what sits above (why) and what sits below (how), and which records they are expected to read. [Records and the project model](records-and-the-model.md) states the review line: what people approve, what tools check, and the six conditions that make review enough.
+Review follows the same layers. Product people read Intent as journey chapters and ballots: what each journey promises, what changes, and which questions await a decision. Developers review Behavior: the modules, aggregates, use cases, reactions, jobs, notifications, and settings that carry the promises out. A security reviewer reads access widenings, new outside calls, and new personal-data flows separately. The tools prove that code matches Behavior and that every promised example passes.
+
+The same shape makes a specification easy to learn and easy to use: a reader always knows where they are, what sits above (why) and what sits below (how), and which records they are expected to read. [Records and the project model](records-and-the-model.md) states the four layers, who reviews each, and what the builder computes.
 
 ## Non-Goals
 

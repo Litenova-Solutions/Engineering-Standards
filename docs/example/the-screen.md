@@ -12,7 +12,7 @@ A route file holds its input, its load, and its component, with no reusable logi
 
 ## Reading Through the Generated Client
 
-The screen never duplicates the API contract. The workspace generates its client, types, schemas, and query options from the published OpenAPI document, per `litespec/frontend/web/data#generate-the-client-from-the-published-contract` on [Web Data and State](../frontend/web/data.md), which follows `litespec/frontend/data#generate-the-client-from-the-published-contract` on [Frontend Data and State](../frontend/data.md). The generated client lives in `packages/api`, and the list reads through its `listExpenses` operation in `packages/api/src/generated/sdk.gen.ts`:
+The screen never duplicates the API contract. The workspace generates its client, types, schemas, and query options from the published OpenAPI document, per `litespec/frontend/web/data#generate-the-client-from-the-published-contract` on [Web Data and State](../frontend/web/data.md), which follows `litespec/frontend/data#generate-the-client-from-the-published-contract` on [Frontend Data and State](../frontend/data.md). The generated client lives in `packages/api`, and the list reads through its `listExpenses` operation in `packages/api/src/generated/sdk.gen.ts`, which returns the `rows` include group the List expenses query declares: identity, amount, state, and submission time, newest first, read fresh:
 
 ```ts
 export const listExpenses = <ThrowOnError extends boolean = false>(options: Options<never, ThrowOnError> = {}) =>

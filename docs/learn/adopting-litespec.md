@@ -14,11 +14,11 @@ Teams usually adopt LiteSpec in six steps, from the install to the checks. For t
 
 ### 1. Install the Release
 
-Install the `litespec` command line as a local .NET tool at the release the team adopts, such as `2.0.0`:
+Install the `litespec` command line as a local .NET tool at the release the team adopts, such as `3.0.0`:
 
 ```bash
 dotnet new tool-manifest
-dotnet tool install LiteSpec.Cli --version 2.0.0
+dotnet tool install LiteSpec.Cli --version 3.0.0
 dotnet tool restore
 ```
 
@@ -32,7 +32,7 @@ Run `dotnet litespec init` with the preset closest to the stack and the size:
 dotnet litespec init --preset dotnet-react --size small
 ```
 
-It writes `litespec.project.json` with the size, shape, and stacks, records the release the team reviewed in `reviewedLiteSpecVersion`, and writes the starting agent context, glossary, and example cast beside it. Fill in the owners and paths, and select the extensions the project needs. The [selection page](https://litespec.dev/2.0.0/select/) shows which pages the choices apply.
+It writes `litespec.project.json` with the size, shape, and stacks, records the release the team reviewed in `reviewedLiteSpecVersion`, and writes the starting agent context, glossary, and example cast beside it. Fill in the owners and paths, point `paths.behaviorDocs` at the Behavior root, name the security reviewer and the veto window in `review`, name the decision that ends transcription in `adoption`, and select the extensions the project needs. The [selection page](https://litespec.dev/3.0.0/select/) shows which pages the choices apply.
 
 ### 3. Tell the Agents
 
@@ -40,7 +40,7 @@ It writes `litespec.project.json` with the size, shape, and stacks, records the 
 
 ### 4. Write the First Records
 
-Start with the product: one `docs/product/brief.md` that says what the product is, who it is for, and what it never does. Then work one slice at a time, one feature from problem to scenario, then the next, as the [model page](../core/model.md) describes. A first module, its aggregates, and the use cases about to be built are enough to start. Each record has a template in the release.
+Start with the product: one `docs/product/brief.md` that says what the product is, who it is for, and what it never does. Then work one slice at a time, one feature from problem to scenario, then the next, as the [model page](../core/model.md) describes: Intent first, then Behavior specified from it, then code, then Proof. A first module, its aggregates, and the use cases about to be built are enough to start. Each record has a template in the release.
 
 ### 5. Build to the Standard
 
@@ -48,7 +48,7 @@ Build the first use case the way the standard describes: the backend projects, t
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="LiteSpec.Analyzers" Version="2.0.0" PrivateAssets="all" />
+  <PackageReference Include="LiteSpec.Analyzers" Version="3.0.0" PrivateAssets="all" />
 </ItemGroup>
 ```
 
@@ -61,7 +61,7 @@ dotnet litespec model check
 
 ### 6. Add the Checks to CI
 
-Run `dotnet litespec consumer`, `dotnet litespec model check`, and the gates the [CI page](../quality/ci.md) lists for each area on every pull request. A gap then shows up in the change that caused it, not months later.
+Run `dotnet litespec consumer`, `dotnet litespec model check`, and the gates the [CI page](../quality/ci.md) lists for each area on every pull request, and publish the intent diff with a book preview so reviewers read each change in product words. A gap then shows up in the change that caused it, not months later.
 
 ## Departures During Adoption
 
@@ -69,8 +69,9 @@ Existing code rarely meets every rule at the start. Record each departure instea
 
 - A **Deviation record** for a provision the project will not follow, with its reason and a review date.
 - A **Known gap** for one the project will fix later, with an owner and an end date.
+- A **transcribed record** for Behavior written from existing code during adoption, marked with `source: transcribed`. It stays in draft until its Intent parent is approved, and the mode ends at the decision `adoption.transcriptionEndsWith` names.
 
-Both keep the checks honest. A deviation holds until its review date, when someone looks at it again. A known gap is reported without failing the build until its end date, and fails after it.
+All three keep the checks honest. A deviation holds until its review date, when someone looks at it again. A known gap is reported without failing the build until its end date, and fails after it. A transcribed record can never reach reviewed on its own.
 
 ## Next Steps
 

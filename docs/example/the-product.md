@@ -2,7 +2,7 @@
 
 ## Intent
 
-Claimwick is the small product the example follows: employees submit work expenses with receipts, managers approve or reject them, and finance reimburses the approved ones. This page states what that product is and why through 9 records, each a short page stating one piece of product intent: the product brief, the goal, the problem, the feature, the requirements, the research, the decision, the constraint, and the journey. Each record below shows the shape a project writes, with JSON taken from `examples/claimwick/docs/`, so a team sees what written intent looks like before the example turns it into modules, code, and checks.
+Claimwick is the small product the example follows: employees submit work expenses with receipts, managers approve or reject them, and finance reimburses the approved ones. This page states what that product is and why through 9 Intent records, each a short page stating one piece of product intent: the product brief, the goal, the problem, the feature, the requirements, the research, the decision, the constraint, and the journey. Each record below shows the shape a project writes, with JSON taken from `examples/claimwick/docs/`, so a team sees what written intent looks like before the example turns it into Behavior, code, and checks.
 
 ## The Product Brief
 
@@ -32,7 +32,7 @@ The block above opens the page between two lines that carry only `---`, the spec
 
 ## The Goal
 
-A goal record states one measurable outcome the product serves, with the measure, the target, and the date it serves it by. Claimwick keeps one: every submitted expense is decided within five business days. It lives at `docs/product/goals/decided-in-days.md`, which applies `litespec/core/intent#state-each-goal-with-its-measure` on [Product Intent](../core/intent.md).
+A goal record states one measurable outcome the product serves, with the measure, the target, and the date it serves it by. Claimwick keeps one: every submitted expense is decided within five business days. It lives at `docs/product/goals/decided-in-days.md`, which applies `litespec/core/intent#state-each-goal-with-its-measure` on [Intent Layer](../core/intent.md).
 
 ```json
 {
@@ -91,11 +91,11 @@ A feature record states what the product offers against a problem, with its stat
 }
 ```
 
-The body below the block holds one Offering section: the reminder names the expense and its waiting time, and expenses decided in time never trigger one. The feature is the thread this example follows down the tree: the requirements below name it in their `feature` links, and the reminder reaction in [Modules and Records](modules-and-records.md) carries it out.
+The body below the block holds one Offering section: the reminder names the expense and its waiting time, and expenses decided in time never trigger one. The feature is the thread this example follows down the tree: the requirements below name it in their `feature` links, and the reminder job and notification in [Modules and Records](modules-and-records.md) carry it out.
 
 ## The Requirements
 
-A requirement states one behavior the product shows or one guarantee it keeps. Claimwick groups its 4 approval requirements as entries on one requirement page at `docs/product/spending/approval.md`. Each entry carries its own identifier, title, kind, statement, one-line rationale, and links, which applies `litespec/core/intent#identify-every-requirement` and `litespec/core/intent#explain-each-requirement-in-one-line`.
+A requirement states one behavior the product shows or one guarantee it keeps. Claimwick groups its 6 approval requirements as entries on one requirement page at `docs/product/spending/approval.md`. Each entry carries its own identifier, title, kind, statement, one-line rationale, exceptions with their fallback, who sets its values, and links, which applies `litespec/core/intent#identify-every-requirement`, `litespec/core/intent#explain-each-requirement-in-one-line`, and `litespec/core/intent#state-each-exception-with-its-fallback`.
 
 ```json
 {
@@ -110,9 +110,19 @@ A requirement states one behavior the product shows or one guarantee it keeps. C
       "title": "Decided within five days",
       "owner": "claimwick-team",
       "status": "approved",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-03-01",
+      "approvedHash": "a3f9c1e07b2d...",
       "kind": "functional",
       "statement": "Each submitted expense is decided within five business days.",
       "rationale": "Late decisions stall employees and payouts.",
+      "except": [
+        {
+          "when": "The expense is submitted during the year-end close.",
+          "fallback": "requirement/approval.extended-decision-in-close"
+        }
+      ],
+      "setBy": "founder",
       "feature": [
         "feature/approval-reminders"
       ],
@@ -129,6 +139,7 @@ A requirement states one behavior the product shows or one guarantee it keeps. C
       "kind": "functional",
       "statement": "An expense above the receipt threshold carries a receipt.",
       "rationale": "Proof above the line keeps the tax file defensible.",
+      "setBy": "founder",
       "feature": [
         "feature/approval-reminders"
       ],
@@ -138,37 +149,43 @@ A requirement states one behavior the product shows or one guarantee it keeps. C
     },
     {
       "type": "requirement",
-      "id": "requirement/approval.no-self-approval",
-      "title": "No self approval",
+      "id": "requirement/approval.erasure-on-request",
+      "title": "Erasure on request",
       "owner": "claimwick-team",
       "status": "approved",
       "kind": "functional",
-      "statement": "Nobody approves their own expense.",
-      "rationale": "A second pair of eyes keeps approvals honest.",
+      "statement": "The personal data of a decided expense is erased when its employee asks.",
+      "rationale": "The company keeps no personal data past its need.",
+      "setBy": "founder",
+      "risk": ["personal-data"],
       "feature": [
         "feature/approval-reminders"
       ],
-      "basedOn": []
-    },
-    {
-      "type": "requirement",
-      "id": "requirement/approval.single-reimbursement",
-      "title": "Single reimbursement",
-      "owner": "claimwick-team",
-      "status": "approved",
-      "kind": "functional",
-      "statement": "An approved expense is reimbursed at most once.",
-      "rationale": "A double payment is hard to take back.",
-      "feature": [
-        "feature/approval-reminders"
-      ],
-      "basedOn": []
+      "basedOn": [],
+      "questions": [
+        {
+          "question": "May finance keep anonymized totals after erasure?",
+          "decider": "claimwick-team",
+          "decideBy": "2026-04-01",
+          "recommended": "Yes, totals without employee links.",
+          "ballot": "erasure-terms",
+          "tier": 1
+        }
+      ]
     }
   ]
 }
 ```
 
-All 4 requirements are functional requirements: each states something the product does. Their identifiers carry the topic name, so `requirement/approval.decided-within-five-days` belongs to approval. The page body tells the story around them in 9 sections, from Summary through an Example in which Ava submits a 48.90 EUR train fare on Monday, Ben approves it on Tuesday, and Cara reimburses it on Friday. Rules and use cases point back at these identifiers with `fulfills` links, which [Modules and Records](modules-and-records.md) shows.
+The five-day requirement states its exception beside the rule: during the year-end close, the fallback requirement `requirement/approval.extended-decision-in-close` holds instead, and the fallback carries no exception of its own. The approval data on the entry shows who approved it, on which date, and the semantic hash the builder wrote; rewording prose never changes that hash. The erasure requirement carries `personal-data` risk, which makes it tier 1, and its open question joins the `erasure-terms` ballot with a recommendation for the founder to decide. The remaining entries follow the same shape:
+
+| Requirement | Statement |
+|:---|:---|
+| `requirement/approval.no-self-approval` | Nobody approves their own expense. |
+| `requirement/approval.single-reimbursement` | An approved expense is reimbursed at most once. |
+| `requirement/approval.extended-decision-in-close` | An expense submitted during the year-end close is decided within ten business days. |
+
+All 6 requirements are functional requirements: each states something the product does. Their identifiers carry the topic name, so `requirement/approval.decided-within-five-days` belongs to approval. The page body tells the story around them in 9 sections, from Summary through an Example in which Ava submits a 48.90 EUR train fare on Monday, Ben approves it on Tuesday, and Cara reimburses it on Friday. Rules and use cases point back at these identifiers with `fulfills` links, which [Modules and Records](modules-and-records.md) shows. (Example blocks in these pages omit the approval data the builder writes, except where shown.)
 
 ## The Research
 
@@ -255,7 +272,7 @@ The `applies` field answers whether the outside rule covers this product, and `a
 
 ## The Journey
 
-A journey record orders use cases toward one goal for one actor. Claimwick keeps one: an employee submits an expense and receives reimbursement. It lives at `docs/product/journeys/submit-and-reimburse.md`, it fulfills the five-day requirement, and each step names what it produces in `gives`, which applies `litespec/core/intent#order-each-journey-toward-one-goal`.
+A journey record holds product sentences with ids toward one goal for one actor. Claimwick keeps one: an employee submits an expense and receives reimbursement. It lives at `docs/product/journeys/submit-and-reimburse.md`, it states its goal and its observable end, and it fulfills the five-day requirement, which applies `litespec/core/intent#order-each-journey-toward-one-goal`, `litespec/core/intent#write-journey-steps-as-sentences-with-ids`, and `litespec/core/intent#state-when-each-journey-finishes`.
 
 ```json
 {
@@ -266,60 +283,28 @@ A journey record orders use cases toward one goal for one actor. Claimwick keeps
   "status": "approved",
   "actor": "actor/employee",
   "goal": "Submit an expense and receive reimbursement.",
+  "finishedWhen": "The employee holds the reimbursement, and the expense record shows every step.",
   "steps": [
     {
-      "useCase": "use-case/spending.submit-expense",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "A submitted expense."
+      "id": "s1",
+      "says": "The employee submits the expense with its receipt.",
+      "actor": "actor/employee"
     },
     {
-      "useCase": "use-case/spending.attach-receipt",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "A receipt on the expense."
-    },
-    {
-      "useCase": "use-case/spending.approve-expense",
+      "id": "s2",
+      "says": "The manager approves the expense within five days.",
       "actor": "actor/manager",
-      "requires": [],
-      "gives": "An approved expense."
+      "ifItGoesWrong": "Past three days the manager gets a reminder; past five the wait is reported."
     },
     {
-      "useCase": "use-case/spending.reject-expense",
-      "actor": "actor/manager",
-      "requires": [],
-      "gives": "A rejected expense."
+      "id": "s3",
+      "says": "Finance reimburses the approved expense.",
+      "actor": "actor/finance"
     },
     {
-      "useCase": "use-case/spending.reimburse-expense",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "A reimbursed expense."
-    },
-    {
-      "useCase": "use-case/spending.list-expenses",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "The employee expense list."
-    },
-    {
-      "useCase": "use-case/spending.set-receipt-threshold",
-      "actor": "actor/manager",
-      "requires": [],
-      "gives": "A new receipt threshold."
-    },
-    {
-      "useCase": "use-case/spending.export-expenses",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "An export batch."
-    },
-    {
-      "useCase": "use-case/spending.erase-personal-data",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "An expense without personal data."
+      "id": "s4",
+      "says": "The employee sees the reimbursement land.",
+      "actor": "actor/employee"
     }
   ],
   "fulfills": [
@@ -328,6 +313,6 @@ A journey record orders use cases toward one goal for one actor. Claimwick keeps
 }
 ```
 
-The 9 steps run from submission to erasure: the employee submits, attaches, and lists; the manager approves or rejects and sets the threshold; finance reimburses, exports, and erases. The page body holds an Example section following Ava, Ben, and Cara through one week, a Before It Starts section with the state preconditions, and a Between the Steps section with the failure branches.
+The 4 steps run from submission to reimbursement in product words: the employee submits, the manager decides, finance reimburses, and the employee sees the money land. Steps name no use case: each use case points up to the steps it serves, so Submit expense serves `journey/submit-and-reimburse#s1` and Approve expense serves `#s2`. The page body holds an Example section following Ava, Ben, and Cara through one week, a Before It Starts section with the state preconditions, and a Between the Steps section with the failure branches.
 
-Next, [Modules and Records](modules-and-records.md) organizes this intent into the spending module and its records, rules, and access chain.
+Next, [Modules and Records](modules-and-records.md) specifies this intent into the spending module: its aggregates, rules, access chain, use cases, and the reaction, jobs, notifications, and setting around them.

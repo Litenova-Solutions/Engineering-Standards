@@ -2,13 +2,13 @@
 
 ## Intent
 
-A use case is one command, query, or reaction with its permissions, results, and scenarios. Implementing one means turning its written record into code in the layer that owns each part. Claimwick is the example product the docs follow, in which employees submit work expenses with receipts; this page follows its Submit expense use case from the written record into .NET code, naming where each file lives across the backend projects, then showing the Expense aggregate, the command and its handler, the endpoint, and the acceptance scenario that proves the code matches the record.
+A use case is one command or query with its access, results, and scenarios. Implementing one means turning its written record into code in the layer that owns each part. Claimwick is the example product the docs follow, in which employees submit work expenses with receipts; this page follows its Submit expense use case from the written record into .NET code, naming where each file lives across the backend projects, then showing the Expense aggregate, the command and its handler, the endpoint, and the acceptance scenario that proves the code matches the record.
 
 ## Where Each File Lives
 
 A .NET backend holds 5 projects: Domain, Application.Abstractions, Application, Infrastructure, and WebApi (`litespec/backend/dotnet/architecture#use-five-application-projects`). The [.NET Architecture](../backend/dotnet/architecture.md) page states the 5 projects. The use-case record itself, with its results and scenarios, is shown on [Modules and Records](modules-and-records.md).
 
-Every layer organizes its folders by module, then aggregate, then use case (`litespec/backend/architecture#organize-every-layer-by-module-and-use-case`). The [Backend Architecture](../backend/architecture.md) page states the folder rule. The example groups Spending into Expenses, Policies, and Receipts folders, so Submit expense nests under Spending, then Expenses, then SubmitExpense. The project's `litespec.project.json` points the model builder at these roots through its `application`, `domain`, and `webapi` stack paths with `testRoots` beside them. The folders below sit under `examples/claimwick/apps/api/`.
+Every layer organizes its folders by module, then aggregate, then use case (`litespec/backend/architecture#organize-every-layer-by-module-and-use-case`). The [Backend Architecture](../backend/architecture.md) page states the folder rule. The example groups Spending into Expenses, Policies, and Receipts folders, so Submit expense nests under Spending, then Expenses, then SubmitExpense. The folders are the anchors by which code points up to the records it serves (`litespec/core/system#point-code-and-tests-up-to-records`). The project's `litespec.project.json` points the model builder at the solution through its `stackConfig` with `testRoots` beside it. The folders below sit under `examples/claimwick/apps/api/`.
 
 | Project | Submit expense files |
 |:---|:---|
@@ -49,7 +49,7 @@ public sealed record ExpenseRejectedState(Guid RejectedBy, DateTimeOffset Decide
 public sealed record ExpenseReimbursedState(DateTimeOffset ReimbursedAt) : ExpenseState;
 ```
 
-The named factory `Submit` is the only way to create an expense. It creates one submitted expense for one employee, names the employee by ID only (`litespec/backend/domain#reference-other-aggregates-by-id`), and starts the expense in the submitted state. It refuses an expense above the receipt threshold that carries no receipt, and the threshold it checks against is the active policy's `ReceiptThreshold`, the 25 EUR that `decision/0001-receipt-threshold` sets.
+The named factory `Submit` is the only way to create an expense. It creates one submitted expense for one employee, names the employee by ID only (`litespec/backend/domain#reference-other-aggregates-by-id`), and starts the expense in the submitted state. It refuses an expense above the receipt threshold that carries no receipt, and the threshold it checks against is the policy store's `ReceiptThreshold`, defaulted to the 25 EUR that `decision/0001-receipt-threshold` sets and bounded by `setting/spending.receipt-threshold`.
 
 ```csharp
     /// <summary>Submits one expense, refusing one above the receipt threshold that carries no receipt.</summary>
@@ -87,7 +87,7 @@ namespace Claimwick.Domain.Spending.Expenses.Events;
 public sealed record ExpenseSubmittedEvent(Guid ExpenseId, decimal Amount, string Currency, Guid EmployeeId) : IDomainEvent;
 ```
 
-Domain owns one repository interface per aggregate serving that aggregate only, with Domain types and no query surface (`litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain`). `IExpenseRepository` loads, stages, and deletes expenses, and `IPolicyRepository` loads the active policy that carries the receipt threshold.
+Domain owns one repository interface per aggregate serving that aggregate only, with Domain types and no query surface (`litespec/backend/dotnet/domain#keep-repository-interfaces-in-domain`). `IExpenseRepository` loads, stages, and deletes expenses, and `IPolicyRepository` loads the stored policy that carries the current threshold.
 
 ```csharp
 namespace Claimwick.Domain.Spending.Expenses;
@@ -130,7 +130,7 @@ namespace Claimwick.Application.Spending.Expenses.SubmitExpense;
 public sealed record SubmitExpenseCommand(Guid ExpenseId, Guid EmployeeId, decimal Amount, string Currency, Guid? ReceiptId);
 ```
 
-The receipt precondition is enforced where the aggregate is created: the `Expense.Submit` factory throws, so the handler carries no rule logic of its own. The record needs `permission/submit-expense`, and the authorization guard checks that permission from the message, so the handler holds no authorization logic either (`litespec/backend/application#enforce-target-authorization-in-the-pipeline`).
+The receipt precondition is enforced where the aggregate is created: the `Expense.Submit` factory throws, so the handler carries no rule logic of its own. The record grants `permission/submit-expense` in its access, and the authorization guard checks that permission from the message, so the handler holds no authorization logic either (`litespec/backend/application#enforce-target-authorization-in-the-pipeline`).
 
 The handler is internal and sealed (`litespec/backend/dotnet/architecture#keep-implementation-types-internal`). Its method ends in `Async` and takes its cancellation token last (`litespec/backend/dotnet/naming#name-asynchronous-methods-completely`). The handler loads the active policy through its repository (`litespec/backend/dotnet/persistence#stage-aggregate-writes-through-repositories`), calls `Expense.Submit`, stages the new expense, and returns a `SubmitExpenseCommandResult`, leaving commit, error mapping, and authorization to their owners (`litespec/backend/application#keep-command-handlers-narrow`). Exactly one post-handler commits after it (`litespec/backend/dotnet/persistence#commit-once-in-the-command-pipeline`).
 
@@ -220,7 +220,7 @@ The operation declares a stable operation ID, a summary, and its success and fai
 
 A large backend proves its behavior with an Acceptance suite (`litespec/backend/testing#keep-the-test-suites-the-size-requires`). The [Backend Testing](../backend/testing.md) page states the suites, and the [.NET Testing](../backend/dotnet/testing.md) page states their .NET form. The scenario path mirrors the production folders (`litespec/backend/testing#mirror-production-module-names`): `examples/claimwick/apps/api/tests/Claimwick.Acceptance.Tests/Spending/Expenses/SubmitExpense/SubmitExpenseScenarios.cs`.
 
-The scenario below is the example's file. Its `proves` tag names the scenario, and its When step belongs to the `SubmitExpenseSteps` use case steps class (`litespec/backend/testing#tag-the-test-that-proves-each-scenario`, `litespec/backend/dotnet/testing#prove-each-scenario-with-a-test-that-calls-its-use-case`). The tag is the test's only record citation.
+The scenario below is the example's file. Its `proves` tag points the test up to its scenario, and its When step belongs to the `SubmitExpenseSteps` use case steps class (`litespec/backend/testing#tag-the-test-that-proves-each-scenario`, `litespec/backend/dotnet/testing#prove-each-scenario-with-a-test-that-calls-its-use-case`). The tag is the test's only record citation, and the tier S checks confirm the claim by reading the code: the handler writes only inside `changes`, the codes it returns stay inside the declared results and refusals, and it honors the declared effects.
 
 ```csharp
 namespace Claimwick.Acceptance.Tests.Spending.Expenses.SubmitExpense;

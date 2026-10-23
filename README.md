@@ -18,8 +18,8 @@ A project names its size (small or large), its shape (server or client-only) and
 
 ## What It Defines
 
-- Project records that own approved intent, from why through how the business works.
-- A model builder that joins those records to code, screens, tests, and test runs.
+- Project records in four layers: Intent people approve, Behavior developers review, Implementation code, and Proof of tests and checks.
+- A model builder that follows code and test anchors up to records, checks them in tiers, and renders the book.
 - Domain, Application.Abstractions, Application, Infrastructure, and WebApi boundaries.
 - Implementation conventions for backend and frontend work.
 - Verification, security, operations, and release evidence.
@@ -46,7 +46,7 @@ Install the adopted release as a local .NET tool:
 
 ```bash
 dotnet new tool-manifest
-dotnet tool install LiteSpec.Cli --version 2.0.0
+dotnet tool install LiteSpec.Cli --version 3.0.0
 dotnet tool restore
 ```
 

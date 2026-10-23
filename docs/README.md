@@ -21,7 +21,7 @@ A project applies only some folders below. [Read the Standard](learn/reading-the
 - [Why LiteSpec Exists](learn/why-litespec.md): the problem LiteSpec solves, for a team that is deciding whether LiteSpec fits.
 - [How LiteSpec Works](learn/how-litespec-works.md): the standard, the records, the model, and the tools, traced through one Claimwick use case.
 - [Read the Standard](learn/reading-the-standard.md): project selections, page arrangement, and provision IDs; how to find the rules that apply to a project.
-- [Records and the Project Model](learn/records-and-the-model.md): what a project writes down, and what the model builder works out from the code.
+- [Records and the Project Model](learn/records-and-the-model.md): the four layers, what a project writes down, who reviews each layer, and what the model builder computes.
 - [Reading Tracks](learn/reading-tracks.md): which records to read in which order: why before how, one journey end to end, one module end to end, and the structural words.
 - [How the Tools Fit Together](learn/the-tooling.md): the CLI, the analyzers, and the site, in the order one change moves through them.
 - [How LiteSpec Compares](learn/how-litespec-compares.md): LiteSpec beside ten other approaches to spec-driven development, and when each fits.
@@ -34,27 +34,27 @@ A project applies only some folders below. [Read the Standard](learn/reading-the
 One product worked end to end, from its first record to a passing check.
 
 - [Example overview](example/README.md): the Claimwick product the example follows, and the reading order for its pages.
-- [The Claimwick Product](example/the-product.md): the product brief, problem, requirements, decision, and constraint records.
-- [Modules and Records](example/modules-and-records.md): the spending module, its records, rules, access chain, and the Submit expense use case.
+- [The Claimwick Product](example/the-product.md): the Intent records: brief, goal, problem, feature, requirements, research, decision, constraint, and journey.
+- [Modules and Records](example/modules-and-records.md): the Behavior records: module, aggregates, rules, access chain, use cases, and the reaction, jobs, notifications, and setting around them.
 - [A Use Case in Code](example/a-use-case-in-code.md): Submit expense from its record into .NET code and tests.
 - [The Claimwick Screen](example/the-screen.md): the expenses list screen, the generated client it reads through, and the UI pattern it starts from.
-- [The Model and Its Checks](example/model-and-checks.md): model build, check, and query runs, the known gap, and the CI jobs that run the checks.
+- [The Model and Its Checks](example/model-and-checks.md): model build, check, and query runs, the book chapter and ballots, the diffs, and the CI jobs that run the checks.
 
 ## Core
 
 - [Core overview](core/README.md): the system all projects share, and how its pages fit together.
 - [LiteSpec](core/system.md): what LiteSpec coordinates and the parts it combines.
-- [Supported Scope](core/scope.md): the one size, one shape, and stacks each project selects.
+- [Supported Scope](core/scope.md): the size, shape, and stacks each project selects, with review and adoption settings.
 - [Technology Stacks](core/stacks.md): what selecting a stack applies, and what each stack folder holds.
 - [Engineering Principles](core/principles.md): the rules of thumb for choices no narrower rule covers.
-- [Project Model](core/model.md): the record types, their links, and what the builder computes.
-- [Product Intent](core/intent.md): where a consumer states its business intent and in what form.
-- [Domain Model](core/behavior.md): the bounded context, the glossary, and the modules, aggregates, rules, events, use cases, results, and scenarios inside it.
-- [Access](core/access.md): the actors, roles, permissions, entry points, and external systems that govern who may do what and how it is reached.
-- [Agent Operating Protocol](core/agent.md): how agents select context, resolve standards, and report completion.
+- [Project Model](core/model.md): the four layers, the record types, their links, statuses, approval, questions, checks, and the book and diffs.
+- [Intent Layer](core/intent.md): where a consumer states why it exists and what it promises, and what Intent never holds.
+- [Behavior Records](core/behavior.md): how the system behaves to keep the promises: modules, aggregates, rules, events, use cases, reactions, jobs, notifications, and settings.
+- [Access](core/access.md): the actors, roles, permissions, access each use case declares, entry points, and external systems.
+- [Agent Operating Protocol](core/agent.md): how agents select context, write below decided Intent, raise questions, and report completion.
 - [Authoring Standard](core/authoring.md): page styles, provision contracts, identifiers, and prose style; what `litespec validate` checks.
 - [Maintaining the Standards](core/maintaining.md): the maintainer manual for provision lifecycle, renames, citations, and releases.
-- [Product Release](core/release.md): what a release joins to its evidence, and what a maintainer operates.
+- [Product Release](core/release.md): who reviews each diff, how tiers and the veto window work, which checks each boundary runs, and what the release record lists.
 
 ## Workspace
 
@@ -170,6 +170,13 @@ This folder holds extensions any stack can select. An extension for one stack si
 - [Static Marketing Site](ext/site.md): the static build for marketing pages, pricing, and help articles beside the application.
 - [Release Stage](ext/stage.md): the pre-customer-data stage, what it defers, and the promotion that ends it.
 - [Agent Delegation](ext/delegation.md): briefs and containment for one agent starting another on the same tree.
+- [Privacy](ext/privacy.md): erasure positions, requested reach, export-first guards, restore sweeps, and conflict rules in depth.
+- [Devices](ext/devices.md): the entry-point protocol block: messages, version rule, client rules, nonce, and offline uploads.
+- [Customer Automation](ext/automation.md): customer-composed rules and hooks with a may and may-not contract.
+- [Workflow Engine](ext/workflow-engine.md): engine-carried processes where each step maps to one use case with its compensation.
+- [Ingest Pipelines](ext/pipeline.md): ingest steps, drop reasons, and buffer policy.
+- [Human Queues](ext/queues.md): human work queues: claim, score, preview, and confirm-by.
+- [Model Assistance](ext/ai.md): model-mediated queries with a closed tools set, structure-only scenarios, and a pinned stub.
 
 ## Guides
 
@@ -177,7 +184,7 @@ Tutorials take a reader to a first working result; how-to guides solve one state
 
 - [Guides overview](guide/README.md): which to read when: tutorials for a first result, how-to guides for one goal.
 - [Start a Consumer Repository](tutorial/getting-started.md): start a small consumer repository through one implemented use case.
-- [Model a Domain Module](tutorial/model-domain.md): model one spending module the builder reads.
+- [Model a Behavior Module](tutorial/model-domain.md): specify one spending module the builder reads.
 - [Add a Svelte Frontend](guide/add-a-svelte-frontend.md): declare a Svelte frontend on the web stack.
 - [Add a Blazor Frontend](guide/add-a-blazor-frontend.md): declare a Blazor frontend outside the controlled UI contract.
 - [Build an Audit Trail](guide/audit-trail.md): the audit extension on the .NET LiteBus pipeline, step by step.
@@ -190,8 +197,8 @@ Tutorials take a reader to a first working result; how-to guides solve one state
 - [Generate Provisions](tools/provisions.md): rebuilds the provision index from the active standards.
 - [Validate Consumer](tools/consumer.md): checks a consumer's pages, project record, and vocabulary.
 - [Validate Controlled UI](tools/ui.md): checks the shared UI package and each controlled web frontend.
-- [Model Builder](tools/model.md): builds and checks the project model, renders generated regions, and answers record queries.
-- [Book](tools/book.md): generates a static site from `model.json` for founders and reviewers.
+- [Model Builder](tools/model.md): builds, checks, and diffs the project model, renders generated regions, and answers record queries.
+- [Book](tools/book.md): builds the project book from `model.json`: journey chapters, record pages, and the ballots inbox.
 - [Draw Patterns](tools/patterns.md): draws, prints, and checks the UI pattern wireframes.
 
 ## Analyzers

@@ -16,7 +16,7 @@ The two sides combine: a team can run a per-feature workflow or behavior example
 
 ### LiteSpec
 
-LiteSpec ([Why LiteSpec Exists](why-litespec.md)) is a standard for building one bounded-context business application. It has three parts: versioned rules, project records of intent, and a model builder that joins records to code, screens, tests, and test runs.
+LiteSpec ([Why LiteSpec Exists](why-litespec.md)) is a standard for building one bounded-context business application. It has three parts: versioned rules, project records written top down through Intent, Behavior, Implementation, and Proof, and a model builder that follows the anchors by which code and tests point up to records and renders the book product people read.
 
 A project selects one size, one shape, and its stacks from .NET, React, Svelte, and Blazor, and the standard states concrete rules for that selection. Every rule carries a stable provision ID, and conformance is checked by the `litespec` CLI, Roslyn analyzers, and model findings. A project pins one release, as [How the Tools Fit Together](the-tooling.md) describes.
 
@@ -90,7 +90,7 @@ The table summarizes each approach on the same dimensions, as described on the o
 
 | Approach | Unit of specification | Ships rules or process | Stable rule IDs | Verified by tools | Versioned rules | Intent linked to code | Stack coverage |
 |:---|:---|:---|:---|:---|:---|:---|:---|
-| LiteSpec | Bounded-context application | Versioned rulebook | Provision IDs | CLI, analyzers, model | Pinned releases | Implements, calls, proves | .NET, React, Svelte, Blazor |
+| LiteSpec | Bounded-context application | Versioned rulebook | Provision IDs | CLI, analyzers, tiered model checks | Pinned releases | Anchors up, computed Proof statuses | .NET, React, Svelte, Blazor |
 | GitHub Spec Kit | Feature, bug, idea | Process, templates | None described | Converge gates, review | Pinned CLI; specs in the repository | None described | Neutral; Linux, macOS, Windows |
 | Kiro | Feature, bug fix | Process, design docs | None described | Requirements analysis, correctness tests | Project files | Tasks tracked in IDE | Neutral |
 | Tessl tile | Task; org-wide skills | Process, format rules, library tiles | Named skills, rules | Spec lint, link checks, evals | Tiles versioned in registry | `[@test]` links, `targets` | Neutral; MCP agents |
@@ -112,7 +112,7 @@ Each property below names the page that states it.
 
 - A standing product standard. LiteSpec ships the whole rulebook for one bounded-context application, while per-feature approaches ship a workflow the team fills in. The [supported scope page](../core/scope.md) states the boundary.
 - Citable rules. Every rule has a provision ID of page plus heading slug, so a review comment, an agent report, or a deviation cites exactly one rule, such as `litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums`. The [authoring page](../core/authoring.md) defines the grammar.
-- Automated verification in three layers. The CLI checks records and the model, Roslyn analyzer rules flag breaches in the editor and build with links to their provisions, and model findings report unimplemented use cases, unthrown refusals, unresolved references, and expired gaps. Its `implements`, `calls`, and `proves` links are recomputed on every build, so they cannot go stale. The [analyzer reference](../analyzers/README.md) documents every rule, and the [model page](../tools/model.md) lists every finding code.
+- Automated verification in three tiers. The CLI checks records and the model, Roslyn analyzer rules flag breaches in the editor and build with links to their provisions, and model findings report unimplemented use cases, unthrown refusals, undeclared edges, unresolved references, and expired gaps, each with a tier: record checks always block, code checks block where the stack reader is qualified, and advisory checks never block. Code and tests point up to records, and the builder computes Proof statuses from those anchors on every build, so they cannot go stale. The [analyzer reference](../analyzers/README.md) documents every rule, and the [model page](../tools/model.md) lists every finding code.
 - A versioned contract. Each release states every active provision, a project pins one release, and adoption is recorded in `reviewedLiteSpecVersion`. The [authoring page](../core/authoring.md) states the release model, and [How LiteSpec Works](how-litespec-works.md) shows the pin.
 - Stack depth where it applies. The fixed application shape allows concrete rules such as five backend projects, one way to model a lifecycle, and one way to report a refused command. The [supported scope page](../core/scope.md) states the selection, and the [.NET](../backend/dotnet/stack.md), [React](../frontend/web/react/stack.md), [Svelte](../frontend/web/svelte/stack.md), and [Blazor](../frontend/blazor/stack.md) stack pages carry the per-stack rules.
 - An enforced agent protocol. Agents start from per-selection `llms.txt` indexes, query one record with `litespec model query`, and finish with check-backed reports, stopping on conflicts with both rule IDs quoted. [Work with Agents](working-with-agents.md) describes how an agent finds the rules, and the [agent page](../core/agent.md) states the task order.

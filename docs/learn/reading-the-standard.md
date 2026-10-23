@@ -15,7 +15,7 @@ Your project does not adopt all of LiteSpec. It makes four choices in `litespec.
 | Stacks | One backend stack for a server project, and one stack per frontend | Which technology pages apply: `dotnet` for the backend, and `react`, `svelte`, or `blazor` for a frontend. |
 | Extensions | Any of the listed extensions, or none | Extra capabilities with their own rules, such as audit, multitenancy, an outbox, or realtime updates. |
 
-`litespec init --preset dotnet-react --size small` writes a first project file with a common selection. The [selection page](https://litespec.dev/2.0.0/select/) on the site does the same in a form and shows which pages apply.
+`litespec init --preset dotnet-react --size small` writes a first project file with a common selection. The [selection page](https://litespec.dev/3.0.0/select/) on the site does the same in a form and shows which pages apply.
 
 The Claimwick example in `examples/claimwick/` declares its own selection in `litespec.project.json`:
 
@@ -29,6 +29,8 @@ The Claimwick example in `examples/claimwick/` declares its own selection in `li
 ```
 
 Read it as four answers: size large, shape server, the dotnet and svelte stacks, and no extensions. That selection applies `backend/dotnet/` and `frontend/web/svelte/`, and it does not apply `frontend/web/react/` or `frontend/blazor/`.
+
+The project file holds more than the selection: `paths.behaviorDocs` points at the Behavior root, `review` names the veto window in days and the security reviewer, `adoption` names the decision that ends transcription mode, `refusals` names the codes the two derived generic results carry, and `reviewedLiteSpecVersion` records the release the team reviewed, `3.0.0`. The [project file page](../reference/project-file.md) lists every field.
 
 ## The Page Arrangement
 
@@ -68,11 +70,11 @@ A standards page carries the same sections every time:
 Each rule is a heading, and the heading is also its ID. Here is one from the [domain page](../backend/domain.md):
 
 ```markdown
-### Keep Domain independent of outer layers
+### Keep Domain Independent of Outer Layers
 
 **Statement:** The Domain code MUST reference only the language standard library and project-owned Domain types.
 
-**Rationale:** No persistence, web, mediator, logging, configuration, injection, serialization, or provider package enters Domain. Infrastructure registers a persisted discriminator rather than Domain carrying a serialization attribute.
+**Rationale:** Domain that references only the language standard library and its own types compiles and tests with no infrastructure at all.
 ```
 
 Its ID is `litespec/backend/domain#keep-domain-independent-of-outer-layers`: the page path, then the heading. The **Statement** is the rule itself, one sentence with one capitalized word that sets its strength, as in internet standards: `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT` or `MAY`. Everything under **Rationale** and **Example** explains it and adds no obligation.

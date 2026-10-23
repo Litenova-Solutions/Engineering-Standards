@@ -10,6 +10,7 @@ Start with:
 
 - The `audit` extension selected in the consumer's `litespec.project.json`.
 - The audit adoption decision that `litespec/ext/audit#record-the-audit-adoption-decision` requires.
+- The `audit` field on each command record, set to its reason and target or left at its default of audited with reason `none`.
 - A LiteBus command pipeline that commits once for each command.
 - A database account reserved for audit writes, separate from the account that writes business data.
 - The LiteBus release pinned for the `LiteBus.*` packages in `litespec.manifest.json`.
@@ -53,7 +54,7 @@ The shape carries no person name, no address, no message body, and no state snap
 
 ### Declare the Selection on Each Command
 
-Attach the values fixed per use case (action identity, target kind, category) to the command type with an attribute, as `litespec/ext/audit#declare-audit-selection-beside-the-command` requires.
+Attach the values fixed per use case (action identity, target kind, category) to the command type with an attribute, as `litespec/ext/audit#declare-audit-selection-beside-the-command` requires. The command record's `audit` field selects which use cases are audited and why; async work audits at request time.
 
 ```csharp
 [Audited("catalog.add-product", TargetKind = "product", Category = AuditCategory.Configuration)]

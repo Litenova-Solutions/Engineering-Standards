@@ -11,7 +11,7 @@ Without LiteSpec, an agent decides architecture, naming, and testing from its tr
 An agent gets three things:
 
 - **Rules it can cite.** Every rule has an ID, so the agent says exactly which rule a change follows, or why it stopped.
-- **Records it can trust.** Approved records say what to build, and draft records say what is still open.
+- **Records it can trust.** Approved and reviewed records say what to build, and draft records say what is still open.
 - **Checks it can run.** `dotnet litespec consumer`, `dotnet litespec model check`, and the CI gates tell the agent whether its change holds before you review it.
 
 ## Rule Sources
@@ -24,17 +24,17 @@ The project installs the `litespec` command line as a local .NET tool at the ado
 
 ### The Published Site
 
-An agent that can fetch URLs reads the standard from litespec.dev. The [selection page](https://litespec.dev/2.0.0/select/) produces the block that `litespec init` writes into a new project's `AGENTS.md`:
+An agent that can fetch URLs reads the standard from litespec.dev. The [selection page](https://litespec.dev/3.0.0/select/) produces the block that `litespec init` writes into a new project's `AGENTS.md`:
 
 ```markdown
 ## LiteSpec
-This project follows LiteSpec 2.0.0: size small, shape server, stacks dotnet and react, extensions none.
-Before a task, read https://litespec.dev/2.0.0/select/server.dotnet.react/llms.txt and fetch only the pages the task touches.
+This project follows LiteSpec 3.0.0: size small, shape server, stacks dotnet and react, extensions none.
+Before a task, read https://litespec.dev/3.0.0/select/server.dotnet.react/llms.txt and fetch only the pages the task touches.
 Selected extensions: none
 UI work: the pattern pages listed in that index.
 ```
 
-That index lists every page the selection applies, with a one-line description and a raw Markdown link for each. An agent reads the index, then fetches the few pages a task needs. Every page also exists as plain Markdown at the same path with an `.md` extension, such as `https://litespec.dev/2.0.0/backend/domain.md`.
+That index lists every page the selection applies, with a one-line description and a raw Markdown link for each. An agent reads the index, then fetches the few pages a task needs. Every page also exists as plain Markdown at the same path with an `.md` extension, such as `https://litespec.dev/3.0.0/backend/domain.md`.
 
 ## The Agent Task Sequence
 
@@ -44,7 +44,7 @@ The [agent page](../core/agent.md) states the order, and the project's `AGENTS.m
 2. Query the model for the records the task touches, with `dotnet litespec model query <id>`.
 3. Read those records, then the full standards pages they cite.
 4. Look at neighboring code and follow a pattern that complies.
-5. Change the records, code, tests, and contracts that belong together, in one change.
+5. Write pages below decided Intent: change the records, code, tests, and contracts that belong together, in one change.
 6. Run the checks, and report each command, its result, and anything skipped.
 
 Before editing, the agent also reads `git status`, so unrelated work in the tree stays untouched. When the change touches an extension's boundary, the agent reads the selected extension before it edits.
@@ -65,7 +65,9 @@ When two rules conflict and nothing decides between them, the agent stops and as
 
 ## Agent Decisions and Open Questions
 
-An agent makes the decisions the standard has already made: where a type goes, how a lifecycle is modeled, how a refusal is reported, and which tests to write. It does not decide product policy, legal questions, money, or risk. When a record leaves one of those open, the agent names the question and its decider instead of answering it.
+An agent makes the decisions the standard has already made: where a type goes, how a lifecycle is modeled, how a refusal is reported, and which tests to write. It drafts Intent and Behavior records, and the founder and reviewers decide them. It does not decide product policy, legal questions, money, or risk. When a lower layer needs what the upper layer does not say, the agent raises a draft question with a decider, a date, a recommendation, and a ballot, instead of answering it.
+
+During adoption, an agent may write Behavior records from existing code. Each one carries `source: transcribed` and stays in draft until its Intent parent is approved, so transcription never passes review on its own.
 
 UI design works the same way. For each recurring interface question, LiteSpec offers drawn options and a default. An agent shows the options with `dotnet litespec patterns preview`, recommends one, and builds the one you choose with your own components and style. If it sees a better option while working, it finishes on your choice and proposes the idea in its report, instead of changing your decision.
 

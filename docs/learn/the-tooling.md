@@ -36,41 +36,43 @@ The running example is a team building a small shop: shape `server`, stacks `dot
 
 The diagram below shows where each tool runs in that one change.
 
-![One change runs litespec init, records, litespec consumer, code with analyzers, litespec model build and check, CI gates, and litespec book, in that order.](../assets/diagrams/learn-tool-flow.svg)
+![One change runs litespec init, Intent records, Behavior records, litespec consumer, code with analyzers, litespec model build and check, CI gates, and litespec book, in that order.](../assets/diagrams/learn-tool-flow.svg)
 
 1. Install the tool at the adopted release, then start the project once with `dotnet litespec init --preset dotnet-react --size small`. The command writes `litespec.project.json` with shape `server`, stacks `dotnet` and `react`, and one frontend `web` at `apps/web`, stamped with the reviewed release, with the agent context, glossary, and example cast beside it. It never overwrites an existing file. The [init page](../tools/init.md) lists the three presets and their selections.
-2. Write the records. You add a product brief, a module, aggregates, and the new use case with its results, each as a short page with a JSON header. The release holds a starting template for each type. [Records and the project model](records-and-the-model.md) explains what the team writes down.
-3. Choose the interface. For each recurring interface question, LiteSpec offers drawn options and a default. You draw them locally with `dotnet litespec patterns preview <group>`, pick one with the team, and record the choice in your pattern catalog, the project list of chosen options. The [patterns page](../tools/patterns.md) describes the `preview`, `svg`, and `check` subcommands.
-4. Validate the records with `dotnet litespec consumer`. The command reads `litespec.project.json` and every page under your documentation root, checks the project record, the stacks and extensions, each page header, the glossary, and the controlled web UI contract. The [consumer page](../tools/consumer.md) lists what it reads, and the [controlled UI page](../tools/ui.md) lists what the UI check covers.
-5. Build the code to the standard. A use case runs in one command handler in the Application project, in a folder that mirrors the record, and the analyzers flag slips as you work. If you model a closed set of values as an enum, the build reports `LS1002` and points at `litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums` on the [domain page](../backend/dotnet/domain.md), which shows the record hierarchy that replaces the enum.
-6. Compute the model with `dotnet litespec model build`. The builder reads your records, the backend code, the frontend routes, the tests, and the latest test run, and writes `.model/model.json` with the computed `implements`, `calls`, and `proves` links. You inspect one record with `dotnet litespec model query <id>`, refresh the marked regions of your pages with `dotnet litespec model render`, and list the gaps with `dotnet litespec model check`. The [model page](../tools/model.md) lists every finding code.
-7. Share the result with `dotnet litespec book --model .model/model.json --out .book`. The command writes a static site with one page per record, one index per record type, one lens per actor, and a review page, and the site needs no server. The [book page](../tools/book.md) describes each page the site holds.
+2. Write the Intent records first. You add the requirement the cancellation keeps and the journey step it serves, each as a short page with a JSON header. The release holds a starting template for each type. [Records and the project model](records-and-the-model.md) explains what the team writes down.
+3. Specify the Behavior records from Intent. You add the module, the aggregates with their data classes, and the new use case with its access, consistency, results, and scenarios, plus any reaction, job, notification, or setting the change needs. Every use case serves a journey step or goal and fulfills a requirement, and every edge between records is declared.
+4. Choose the interface. For each recurring interface question, LiteSpec offers drawn options and a default. You draw them locally with `dotnet litespec patterns preview <group>`, pick one with the team, and record the choice in your pattern catalog, the project list of chosen options. The [patterns page](../tools/patterns.md) describes the `preview`, `svg`, and `check` subcommands.
+5. Validate the records with `dotnet litespec consumer`. The command reads `litespec.project.json` and every page under your documentation root, checks the project record, the stacks and extensions, each page header, the glossary, and the controlled web UI contract. The [consumer page](../tools/consumer.md) lists what it reads, and the [controlled UI page](../tools/ui.md) lists what the UI check covers.
+6. Build the code to the standard. A use case runs in one command handler in the Application project, in a folder that mirrors the record, and the analyzers flag slips as you work. If you model a closed set of values as an enum, the build reports `LS1002` and points at `litespec/backend/dotnet/domain#model-every-closed-set-of-domain-values-without-enums` on the [domain page](../backend/dotnet/domain.md), which shows the record hierarchy that replaces the enum.
+7. Compute the model with `dotnet litespec model build`. The builder reads your records and follows the anchors in the backend code, the frontend routes, the tests, and the latest test run, and writes `.model/model.json` with the computed `implements`, `calls`, and `proves` links. You inspect one record with `dotnet litespec model query <id>`, refresh the marked regions of your pages with `dotnet litespec model render`, and list the gaps with `dotnet litespec model check`, which prints a tier beside each finding. The [model page](../tools/model.md) lists every finding code.
+8. Review the change in the diffs. `dotnet litespec model diff <base> --intent` shows Intent changes in product words for the founder, and `--behavior` shows Behavior changes with the security queue for developers. Without a flag, it shows both.
+9. Share the result with `dotnet litespec book --model .model/model.json --out .book`. The command writes a static site with one chapter per journey, one page per record, a ballots inbox of open questions, one index per record type, one lens per actor, and a review page, and the site needs no server. The [book page](../tools/book.md) describes each page the site holds.
 
-Every pull request then runs the gates the [CI page](../quality/ci.md) selects for the changed areas, such as `dotnet litespec model check` for a record, code, or test change and `dotnet litespec consumer` for a documentation change, under `litespec/quality/ci#run-applicable-gates-on-every-pull-request`. A gap shows up in the change that introduced it.
+Every pull request then runs the gates the [CI page](../quality/ci.md) selects for the changed areas, such as `dotnet litespec model check` for a record, code, or test change and `dotnet litespec consumer` for a documentation change, under `litespec/quality/ci#run-applicable-gates-on-every-pull-request`. It also publishes the intent diff and a book preview, so reviewers read the change in product words. A gap shows up in the change that introduced it.
 
-For example, if the shop team removed the cancel-order handler without retiring the record, `dotnet litespec model check` reports `use-case-unimplemented` for `use-case/orders.cancel-order`, and CI fails the pull request until the handler returns or an open known gap covers it.
+For example, if the shop team removed the cancel-order handler without retiring the record, `dotnet litespec model check` reports `[S use-case-unimplemented]` for `use-case/orders.cancel-order`, and CI fails the pull request until the handler returns or an open known gap covers it.
 
 ## Agent and Reader Paths
 
 You and your agent read the same release in different forms.
 
-You read the HTML pages, starting from the [standard overview](reading-the-standard.md) and the [selection page](https://litespec.dev/2.0.0/select/) that shows which pages your shape and stacks apply. An agent starts from the selection index for your project:
+You read the HTML pages, starting from the [standard overview](reading-the-standard.md) and the [selection page](https://litespec.dev/3.0.0/select/) that shows which pages your shape and stacks apply. An agent starts from the selection index for your project:
 
 ```text
-https://litespec.dev/2.0.0/select/server.dotnet.react/llms.txt
+https://litespec.dev/3.0.0/select/server.dotnet.react/llms.txt
 ```
 
 That index lists the pages the `server.dotnet.react` selection applies, grouped by layer, with a raw Markdown link for each one. Your project `AGENTS.md` carries the block the index suggests, so the agent fetches only the pages a task touches:
 
 ```markdown
 ## LiteSpec
-This project follows LiteSpec 2.0.0: size small, shape server, stacks dotnet and react, extensions none.
-Before a task, read https://litespec.dev/2.0.0/select/server.dotnet.react/llms.txt and fetch only the pages the task touches.
+This project follows LiteSpec 3.0.0: size small, shape server, stacks dotnet and react, extensions none.
+Before a task, read https://litespec.dev/3.0.0/select/server.dotnet.react/llms.txt and fetch only the pages the task touches.
 Selected extensions: none
 UI work: the pattern pages listed in that index.
 ```
 
-Every page also exists as raw Markdown at `/<version>/<page>.md`, such as `https://litespec.dev/2.0.0/backend/domain.md`, and every layer ships as one bundle at `/<version>/layers/<key>.md`. The schemas in `schemas/` ship as JSON at `/<version>/schemas/<file>`, so a tool reads the same contracts the validators enforce. An agent that needs one fact queries the model instead of reading pages: `dotnet litespec model query <id>` prints one record with its links in both directions.
+Every page also exists as raw Markdown at `/<version>/<page>.md`, such as `https://litespec.dev/3.0.0/backend/domain.md`, and every layer ships as one bundle at `/<version>/layers/<key>.md`. The schemas in `schemas/` ship as JSON at `/<version>/schemas/<file>`, so a tool reads the same contracts the validators enforce. An agent that needs one fact queries the model instead of reading pages: `dotnet litespec model query <id>` prints one record with its links in both directions.
 
 ## Command Locations
 
@@ -83,8 +85,8 @@ Some commands belong to the LiteSpec repository, most belong to a consumer, and 
 | `litespec init` | Consumer | Release template and preset | `litespec.project.json` |
 | `litespec consumer` | Consumer | Project file, pages, glossary | Diagnostics only |
 | `litespec ui` | Consumer | Shared UI package, frontends | Diagnostics only |
-| `litespec model` | Consumer | Records, code, routes, test runs | `model.json`, findings, rendered regions |
-| `litespec book` | Consumer | `model.json`, optional findings | A static site folder |
+| `litespec model` | Consumer | Records, code anchors, routes, test runs | `model.json`, tiered findings, diffs, rendered regions |
+| `litespec book` | Consumer | `model.json`, optional findings | A static site folder with chapters and ballots |
 | `litespec patterns` | Anywhere | Pattern pages and wireframes | An HTML preview, SVG, or diagnostics |
 
 `litespec validate` and `litespec provisions --check` guard the standard itself: the LiteSpec workflow runs them on every change with `git diff --check` and a site build. `dotnet litespec consumer`, `dotnet litespec model check`, and the analyzers guard your project: your CI runs them on every pull request.
@@ -101,6 +103,9 @@ Each question below names the tool that answers it and the command you run.
 | Does this code follow the .NET rules | The analyzers | `dotnet build` |
 | Which handler implements this use case | The CLI | `dotnet litespec model query` |
 | What is still missing | The CLI | `dotnet litespec model check` |
+| What changed in product words | The CLI | `dotnet litespec model diff <base> --intent` |
+| What Behavior changed, and what needs security review | The CLI | `dotnet litespec model diff <base> --behavior` |
+| Which questions await a decision | The CLI | `dotnet litespec book` (the ballots page) |
 | Is the standard itself consistent | The CLI | `dotnet litespec validate` |
 | How do I read my project as a site | The CLI | `dotnet litespec book` |
 | What does an interface option look like | The CLI | `dotnet litespec patterns preview` |

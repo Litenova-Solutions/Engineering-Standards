@@ -9,7 +9,7 @@ The Learn pages explain LiteSpec, the standard for building one business applica
 - [Why LiteSpec Exists](why-litespec.md): the problem LiteSpec solves, for a team that is deciding whether LiteSpec fits.
 - [How LiteSpec Works](how-litespec-works.md): the standard, the records, the model, and the tools, traced through one Claimwick use case.
 - [Read the Standard](reading-the-standard.md): project selections, page arrangement, and provision IDs; how to find the rules that apply to a project.
-- [Records and the Project Model](records-and-the-model.md): what a project writes down, and what the model builder works out from the code.
+- [Records and the Project Model](records-and-the-model.md): the four layers, what a project writes down, who reviews each layer, and what the model builder computes.
 - [Reading Tracks](reading-tracks.md): which records to read in which order: why before how, one journey end to end, one module end to end, and the structural words.
 - [How the Tools Fit Together](the-tooling.md): the CLI, the analyzers, and the site, in the order one change moves through them.
 - [How LiteSpec Compares](how-litespec-compares.md): LiteSpec beside ten other approaches to spec-driven development, and when each fits.

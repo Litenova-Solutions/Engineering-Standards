@@ -12,22 +12,22 @@ LiteSpec has four parts. Each one answers a different question.
 |:---|:---|:---|
 | The standard | The pages of one LiteSpec release, carried by the installed tool | How do we build? |
 | Records | Short Markdown pages in your project, each with a small JSON header | What do we build, and why? |
-| The model | A file the `litespec model` command computes from your records and code | Does what we built match what we wrote? |
+| The model | A file the `litespec model` command computes from your records and the anchors in code and tests | Does what we built match what we wrote? |
 | The tools | The `litespec` command line | Is everything consistent, and what is missing? |
 
 Your project installs one LiteSpec release as a local .NET tool. The installed release never changes under you. When you want a newer one, you move the version.
 
-The diagram below shows how the four parts connect in a loop, with the checks sending their findings back to the records.
+The diagram below shows how the four parts connect, with each layer written from the layer above it and the checks sending their findings back to the records.
 
-![The standard governs the records, the records are implemented by code and tests, the build reads code into the model, and the checks send findings back to the records.](../assets/diagrams/learn-how-it-works.svg)
+![The standard governs the records, the records are implemented by code and tests that point up to them, the build joins records to code in the model, and the checks send findings back to the records.](../assets/diagrams/learn-how-it-works.svg)
 
 ## A Use Case from Record to Code
 
-Claimwick lets employees submit work expenses with receipts. In LiteSpec, that behavior is a use case: one command, query, or reaction with its permissions, results, and scenarios.
+Claimwick lets employees submit work expenses with receipts. In LiteSpec, that behavior is a use case: one command or query with its access, results, and scenarios. Reactions to events, scheduled jobs, person-facing messages, and tunables are their own record types beside it.
 
 ### 1. the Written Record
 
-The record lives in the project at `docs/domain/modules/spending/expenses/submit-expense.md`. Its JSON header states what the use case is, who owns it, and how it connects to other records:
+The record lives in the project at `docs/behavior/modules/spending/expenses/submit-expense.md`. Its JSON header states what the use case is, who owns it, and how it connects to other records:
 
 ```json
 {
@@ -35,19 +35,26 @@ The record lives in the project at `docs/domain/modules/spending/expenses/submit
   "id": "use-case/spending.submit-expense",
   "title": "Submit expense",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": ["permission/submit-expense"],
-  "anonymous": false,
+  "serves": ["journey/submit-and-reimburse#s1"],
+  "fulfills": ["requirement/approval.receipt-over-threshold"],
+  "access": {
+    "auth": ["session"],
+    "grant": "permission/submit-expense",
+    "tenant": "own"
+  },
   "reachedThrough": ["entry-point/claimwick-app"],
-  "raises": ["event/expense.submitted"],
-  "fulfills": ["requirement/approval.receipt-over-threshold"]
+  "changes": ["aggregate/spending.expense"],
+  "reads": ["aggregate/spending.policy"],
+  "consistency": { "mode": "atomic" },
+  "raises": ["event/expense.submitted"]
 }
 ```
 
-Read it as a set of facts: submitting an expense is a command, a message that changes business state; it needs the `submit-expense` permission, one allowed action from the shared list; employees reach it through the expenses app; it raises an `expense-submitted` event, one statement that the submission completed; and it exists to satisfy a requirement that an expense above the receipt threshold carries a receipt. The body of the page says the rest in plain words: "An employee submits a work expense."
+Read it as a set of facts: submitting an expense is a command, a message that changes business state; it serves the first step of the submit-and-reimburse journey and fulfills the requirement that an expense above the receipt threshold carries a receipt; callers authenticate with a session, the grant names the `submit-expense` permission from the shared list, and the tenant scope stays inside one tenant; employees reach it through the expenses app; it changes the expense aggregate, reads the policy store for the threshold, and commits atomically; and it raises an `expense.submitted` event, one statement that the submission completed. The body of the page states the goal in one sentence: "An employee submits a work expense."
 
-Each result is an entry on the page: one way the use case ends. The refusal names the stable code the API returns:
+Each result is an entry on the page: one way the use case ends. Refusals are listed in precedence order, first match wins, and each refusal names the stable code the API returns:
 
 ```json
 {
@@ -59,7 +66,9 @@ Each result is an entry on the page: one way the use case ends. The refusal name
 }
 ```
 
-The record's `status` is `approved`, so the owner has agreed to it. An agent builds approved records and does not invent the parts a draft leaves open.
+Two generic refusals are derived and never written: a use case whose grant is a permission derives a forbidden result, and a use case with rules on its input derives an invalid-input result. Their codes come from the `refusals` block in `litespec.project.json`.
+
+The record's `status` is `reviewed`, so developers have reviewed this Behavior record. An agent builds reviewed records and does not invent the parts a draft leaves open. Reviewed records also carry approval data: who approved, on which date, and the semantic hash the builder wrote over the statements, results, output names, rules, and steps. Prose may be reworded without reopening approval; a changed semantic hash reopens it.
 
 The use case page also carries a scenario: one worked example that leads from a given situation through an action to one named result.
 
@@ -84,7 +93,7 @@ The standard states where the code goes and what shape it takes. A use case is i
 apps/api/src/Claimwick.Application/Spending/Expenses/SubmitExpense/SubmitExpenseCommandHandler.cs
 ```
 
-The handler refuses an expense above the threshold that carries no receipt with the refusal code the result entry names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
+The folder is the anchor: code points up to the record it serves through its folder or one anchor tag. The handler refuses an expense above the threshold that carries no receipt with the refusal code the result entry names. Because every project follows the same layout, any developer or agent knows where to look, and the model builder can find the handler without being told.
 
 ### 3. the Computed Links
 
@@ -94,10 +103,10 @@ Run the model builder from the project root:
 dotnet litespec model build
 ```
 
-It reads every record, the C# code, the frontend routes, and the test results, and writes `.model/model.json`. It reports one summary line with the totals, for example:
+It reads every record and follows the anchors in the C# code, the frontend routes, and the test runs, and writes `.model/model.json`. It reports one summary line with the totals, for example:
 
 ```text
-.model/model.json: 80 records, 7 handlers, 1 screens, 9 scenarios.
+.model/model.json: 96 records, 9 handlers, 1 screen, 10 scenarios.
 ```
 
 Then ask about one record:
@@ -106,7 +115,7 @@ Then ask about one record:
 dotnet litespec model query use-case/spending.submit-expense
 ```
 
-Alongside the record's own fields, the answer holds what the builder worked out from the code:
+Alongside the record's own fields, the answer holds what the builder computed from the anchors:
 
 ```json
 "computed": {
@@ -133,13 +142,13 @@ Alongside the record's own fields, the answer holds what the builder worked out 
 }
 ```
 
-The use case is implemented: the builder found its handler. Two tests claim its scenario: the test `Submitting_with_a_receipt_succeedsAsync`, whose `when` step belongs to the `SubmitExpenseSteps` class, and an integration test through a helper. Both claims check out, so each entry reads `confirmed`. The use case is still not verified: no test run exists yet, so `passing` is null. Nobody maintains those links by hand, and they cannot go stale, because the builder computes them again on every build.
+The use case is implemented: the builder found its handler through the folder anchor. Two tests claim its scenario: the test `Submitting_with_a_receipt_succeedsAsync`, whose `when` step belongs to the `SubmitExpenseSteps` class, and an integration test through a helper. Both claims check out, so each entry reads `confirmed`. The use case is still not verified: no test run exists yet, so `passing` is null. Nobody maintains those links by hand, and they cannot go stale, because the builder computes them again on every build. Nothing flows the other way: no record above Implementation is ever computed from code.
 
 ### 4. the Reported Gaps
 
-`dotnet litespec model check` turns gaps into findings: a use case with no handler, a result the code never returns, a link to a record that does not exist, or a requirement nothing fulfills. `dotnet litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
+`dotnet litespec model check` turns gaps into findings with a tier beside each one: `G` checks read records only and always block, `S` checks read code through a stack reader and block where that reader is qualified, and `A` checks advise without blocking. A use case with no handler, a result the code never returns, a link to a record that does not exist, a journey step nothing serves, or a requirement nothing fulfills each becomes a finding. `dotnet litespec consumer` checks the project file and every record's header. Both run in CI, so a gap shows up in the pull request that introduced it.
 
-For example, if the submit-expense page named no success result, `dotnet litespec model check` reports `use-case-without-success` against `docs/domain/modules/spending/expenses/submit-expense.md`, and the pull request fails until the record names one.
+For example, if the submit-expense page named no success result, `dotnet litespec model check` reports `[G use-case-without-success]` against `docs/behavior/modules/spending/expenses/submit-expense.md`, and the pull request fails until the record names one.
 
 ## The Provision Identifier
 
