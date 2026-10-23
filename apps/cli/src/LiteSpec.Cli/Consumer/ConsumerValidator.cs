@@ -119,6 +119,12 @@ static partial class ConsumerValidator
 
         public Dictionary<string, JsonNode?> SchemaCache { get; } = new(StringComparer.Ordinal);
 
+        // The per-file checks run in parallel, so both caches guard with a lock.
+        // The file read and parse stay outside the lock; a race re-reads one file.
+        readonly object TextLock = new();
+
+        readonly object SchemaLock = new();
+
         public string StandardsRoot { get; set; } = "";
 
         public string ProjectSchemaFile { get; set; } = "";
@@ -277,19 +283,31 @@ static partial class ConsumerValidator
         /// </summary>
         public string ReadText(string file)
         {
-            if (!TextCache.TryGetValue(file, out var text))
+            lock (TextLock)
             {
-                text = File.ReadAllText(file);
-
-                if (text.Length > 0 && text[0] == '\uFEFF')
+                if (TextCache.TryGetValue(file, out var cached))
                 {
-                    text = text[1..];
+                    return cached;
+                }
+            }
+
+            var text = File.ReadAllText(file);
+
+            if (text.Length > 0 && text[0] == '\uFEFF')
+            {
+                text = text[1..];
+            }
+
+            lock (TextLock)
+            {
+                if (TextCache.TryGetValue(file, out var raced))
+                {
+                    return raced;
                 }
 
                 TextCache[file] = text;
+                return text;
             }
-
-            return text;
         }
 
         public JsonNode? ReadJson(string file) => JsonNode.Parse(ReadText(file));
@@ -301,13 +319,26 @@ static partial class ConsumerValidator
         /// </summary>
         public JsonNode? ReadSchema(string file)
         {
-            if (!SchemaCache.TryGetValue(file, out var schema))
+            lock (SchemaLock)
             {
-                schema = JsonNode.Parse(File.ReadAllText(file));
-                SchemaCache[file] = schema;
+                if (SchemaCache.TryGetValue(file, out var cached))
+                {
+                    return cached;
+                }
             }
 
-            return schema;
+            var schema = JsonNode.Parse(File.ReadAllText(file));
+
+            lock (SchemaLock)
+            {
+                if (SchemaCache.TryGetValue(file, out var raced))
+                {
+                    return raced;
+                }
+
+                SchemaCache[file] = schema;
+                return schema;
+            }
         }
 
         public string Relative(string file) => ConsumerValidator.Relative(Root, file);

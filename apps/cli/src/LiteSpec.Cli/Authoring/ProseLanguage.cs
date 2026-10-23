@@ -13,9 +13,6 @@ static partial class Prose
     static readonly Regex InlineCodeSpan = new(@"`[^`\n]*`", RegexOptions.Compiled);
     static readonly Regex LinkDestination = new(@"\]\([^)\n]*\)", RegexOptions.Compiled);
     static readonly Regex RejectionTableSeparator = new(@"^\s*\|?[\s:|-]+$", RegexOptions.Compiled);
-    static readonly Regex CamelBoundary = new(@"([a-z0-9])([A-Z])", RegexOptions.Compiled);
-    static readonly Regex AcronymBoundary = new(@"([A-Z]+)([A-Z][a-z])", RegexOptions.Compiled);
-    static readonly Regex IdentifierSeparator = new(@"[_./]", RegexOptions.Compiled);
 
     // The term and gate patterns run once per term on every file of a large
     // consumer, so each one compiles once. Compilation changes only the speed,
@@ -41,7 +38,8 @@ static partial class Prose
             {
                 if (node is not JsonObject entry) continue;
                 if (LanguageString(entry["term"]) is not string term) continue;
-                mannered.Add(new CompiledLanguage.ManneredTerm(term, LanguageText(entry["instead"]), TermPattern(term)));
+                var filter = term.Contains(' ') ? FirstWord(term) : term;
+                mannered.Add(new CompiledLanguage.ManneredTerm(term, LanguageText(entry["instead"]), TermPattern(term), filter, IsAscii(filter), IsAscii(term)));
             }
         }
 
@@ -65,13 +63,17 @@ static partial class Prose
                     if (synonymNode is not JsonObject synonym) continue;
                     if (LanguageString(synonym["word"]) is not string word) continue;
                     var except = synonym["except"] is JsonArray ? ExceptPatterns(synonym["except"]) : termExcept;
+                    var filter = word.Contains(' ') ? FirstWord(word) : word;
                     rejected.Add(new CompiledLanguage.RejectedSynonym(
                         LanguageText(entry["term"]),
                         word,
                         ScopePattern(LanguageString(synonym["scope"]) ?? termScope),
                         LanguageReason(synonym["reason"]),
                         except,
-                        TermPattern(word)));
+                        TermPattern(word),
+                        filter,
+                        IsAscii(filter),
+                        IsAscii(word)));
                 }
             }
         }
@@ -167,13 +169,66 @@ static partial class Prose
         if (compiled is null) return;
 
         // A scope is written against the path, so entries out of scope are dropped
-        // once per file instead of once per line.
-        var inScope = compiled.RejectedTerms.Where(entry => entry.Scope is null || entry.Scope.IsMatch(relative)).ToList();
+        // once per file instead of once per line. Distinct scope patterns run once
+        // per file; the terms stay in record order so findings keep their order.
+        var scopeHits = new Dictionary<string, bool>(StringComparer.Ordinal);
+        var inScope = new List<CompiledLanguage.RejectedSynonym>(compiled.RejectedTerms.Count);
+
+        foreach (var entry in compiled.RejectedTerms)
+        {
+            if (entry.Scope is null)
+            {
+                inScope.Add(entry);
+                continue;
+            }
+
+            var pattern = entry.Scope.ToString();
+
+            if (!scopeHits.TryGetValue(pattern, out var hit))
+            {
+                hit = entry.Scope.IsMatch(relative);
+                scopeHits[pattern] = hit;
+            }
+
+            if (hit)
+            {
+                inScope.Add(entry);
+            }
+        }
 
         // A file holding none of the words holds no finding: every match contains
         // its term, and an opened match contains the term's first word in the raw
         // text.
         if (compiled.CanGate && (compiled.FileGate is null || !compiled.FileGate.IsMatch(raw)))
+        {
+            return;
+        }
+
+        // A file without a term's filter holds no match for that term: the filter
+        // is the term itself for a single word and the first word for a phrase,
+        // which an opened match still carries in the raw text. The per-term loops
+        // below then run only for the terms this file can report.
+        var manneredCandidates = new List<CompiledLanguage.ManneredTerm>(compiled.ManneredTerms.Count);
+
+        foreach (var entry in compiled.ManneredTerms)
+        {
+            if (!entry.FileFilterIsAscii || raw.IndexOf(entry.FileFilter, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                manneredCandidates.Add(entry);
+            }
+        }
+
+        var rejectedCandidates = new List<CompiledLanguage.RejectedSynonym>(inScope.Count);
+
+        foreach (var entry in inScope)
+        {
+            if (!entry.FileFilterIsAscii || raw.IndexOf(entry.FileFilter, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                rejectedCandidates.Add(entry);
+            }
+        }
+
+        if (manneredCandidates.Count == 0 && rejectedCandidates.Count == 0)
         {
             return;
         }
@@ -213,8 +268,13 @@ static partial class Prose
 
             void Scan(string text)
             {
-                foreach (var entry in compiled.ManneredTerms)
+                foreach (var entry in manneredCandidates)
                 {
+                    if (entry.TermIsAscii && text.IndexOf(entry.Term, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        continue;
+                    }
+
                     foreach (Match match in entry.Pattern.Matches(text))
                     {
                         if (!seen.Add("m:" + match.Value.ToLowerInvariant())) continue;
@@ -223,8 +283,13 @@ static partial class Prose
                     }
                 }
 
-                foreach (var entry in inScope)
+                foreach (var entry in rejectedCandidates)
                 {
+                    if (entry.TermIsAscii && text.IndexOf(entry.Synonym, StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        continue;
+                    }
+
                     var matches = entry.Pattern.Matches(text);
 
                     if (matches.Count == 0)
@@ -306,6 +371,22 @@ static partial class Prose
         while (end < term.Length && term[end] != ' ') end++;
 
         return term[start..end];
+    }
+
+    // Whether a prefilter may use an ordinal case-insensitive search for the text:
+    // ASCII folds the same under every comparison, while other scripts stay on the
+    // regex so no finding is lost to a folding difference.
+    static bool IsAscii(string text)
+    {
+        foreach (var character in text)
+        {
+            if (character > 127)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Blanks the cells that sit under a rejection column, keeping every other
@@ -410,12 +491,186 @@ static partial class Prose
     // Turns `SellerOrderId`, `seller_order_id` and `seller-order-id` into separate
     // words so a whole-word pattern reaches the word inside a name. Run as the
     // second of two passes, never the only one, because it also separates the two
-    // halves of a hyphenated phrase the first pass needs intact.
+    // halves of a hyphenated phrase the first pass needs intact. The three passes
+    // below match the three expressions they replace character for character, but
+    // scan once each without the expression engine: this runs on every kept line
+    // of every scanned source file.
     static string OpenIdentifiers(string line)
     {
-        line = CamelBoundary.Replace(line, "$1 $2");
-        line = AcronymBoundary.Replace(line, "$1 $2");
-        return IdentifierSeparator.Replace(line, " ");
+        var hasUpperOrSeparator = false;
+
+        for (var scan = 0; scan < line.Length; scan++)
+        {
+            var character = line[scan];
+
+            if ((character >= 'A' && character <= 'Z') || character == '_' || character == '.' || character == '/')
+            {
+                hasUpperOrSeparator = true;
+                break;
+            }
+        }
+
+        if (!hasUpperOrSeparator)
+        {
+            return line;
+        }
+
+        var camel = OpenCamelBoundary(line);
+        var acronym = OpenAcronymBoundary(camel);
+
+        var hasSeparator = false;
+
+        for (var scan = 0; scan < acronym.Length; scan++)
+        {
+            var character = acronym[scan];
+
+            if (character == '_' || character == '.' || character == '/')
+            {
+                hasSeparator = true;
+                break;
+            }
+        }
+
+        if (!hasSeparator)
+        {
+            return acronym;
+        }
+
+        var chars = acronym.ToCharArray();
+
+        for (var index = 0; index < chars.Length; index++)
+        {
+            if (chars[index] == '_' || chars[index] == '.' || chars[index] == '/')
+            {
+                chars[index] = ' ';
+            }
+        }
+
+        return new string(chars);
+    }
+
+    // Inserts a space between a lower-case letter or digit and an upper-case
+    // letter, exactly as `([a-z0-9])([A-Z])` replaced with `$1 $2`.
+    static string OpenCamelBoundary(string text)
+    {
+        var boundary = -1;
+
+        for (var index = 1; index < text.Length; index++)
+        {
+            var previous = text[index - 1];
+            var current = text[index];
+
+            if ((previous >= 'a' && previous <= 'z' || previous >= '0' && previous <= '9')
+                && current >= 'A' && current <= 'Z')
+            {
+                boundary = index;
+                break;
+            }
+        }
+
+        if (boundary < 0)
+        {
+            return text;
+        }
+
+        var grown = new StringBuilder(text.Length + 8);
+
+        for (var index = 0; index < boundary; index++)
+        {
+            grown.Append(text[index]);
+        }
+
+        for (var index = boundary; index < text.Length; index++)
+        {
+            var previous = text[index - 1];
+            var current = text[index];
+
+            if ((previous >= 'a' && previous <= 'z' || previous >= '0' && previous <= '9')
+                && current >= 'A' && current <= 'Z')
+            {
+                grown.Append(' ');
+            }
+
+            grown.Append(current);
+        }
+
+        return grown.ToString();
+    }
+
+    // Inserts a space before the last upper-case letter of a run of two or more
+    // that a lower-case letter follows, exactly as `([A-Z]+)([A-Z][a-z])`
+    // replaced with `$1 $2`: `HTMLParser` opens to `HTML Parser`.
+    static string OpenAcronymBoundary(string text)
+    {
+        var split = -1;
+
+        for (var index = 0; index < text.Length; index++)
+        {
+            if (text[index] < 'A' || text[index] > 'Z')
+            {
+                continue;
+            }
+
+            var runEnd = index;
+
+            while (runEnd + 1 < text.Length && text[runEnd + 1] >= 'A' && text[runEnd + 1] <= 'Z')
+            {
+                runEnd++;
+            }
+
+            if (runEnd - index + 1 >= 2
+                && runEnd + 1 < text.Length
+                && text[runEnd + 1] >= 'a' && text[runEnd + 1] <= 'z')
+            {
+                split = runEnd;
+                break;
+            }
+
+            index = runEnd;
+        }
+
+        if (split < 0)
+        {
+            return text;
+        }
+
+        var grown = new StringBuilder(text.Length + 8);
+        var cursor = 0;
+
+        while (cursor < text.Length)
+        {
+            if (text[cursor] < 'A' || text[cursor] > 'Z')
+            {
+                grown.Append(text[cursor]);
+                cursor++;
+                continue;
+            }
+
+            var runEnd = cursor;
+
+            while (runEnd + 1 < text.Length && text[runEnd + 1] >= 'A' && text[runEnd + 1] <= 'Z')
+            {
+                runEnd++;
+            }
+
+            var breaks = runEnd - cursor + 1 >= 2
+                && runEnd + 1 < text.Length
+                && text[runEnd + 1] >= 'a' && text[runEnd + 1] <= 'z';
+
+            for (var index = cursor; index <= runEnd; index++)
+            {
+                if (breaks && index == runEnd)
+                {
+                    grown.Append(' ');
+                }
+
+                grown.Append(text[index]);
+            }
+
+            cursor = runEnd + 1;
+        }
+
+        return grown.ToString();
     }
 
     static string? LanguageString(JsonNode? node)
@@ -461,7 +716,10 @@ sealed class CompiledLanguage
     /// <param name="Term">The metaphor or stock phrase.</param>
     /// <param name="Instead">The literal replacement named in the diagnostic.</param>
     /// <param name="Pattern">The whole-word matcher.</param>
-    internal sealed record ManneredTerm(string Term, string Instead, Regex Pattern);
+    /// <param name="FileFilter">The term, or its first word when it holds a space: a file without it holds no match.</param>
+    /// <param name="FileFilterIsAscii">Whether the file filter holds ASCII only, so an ordinal search prefilters it.</param>
+    /// <param name="TermIsAscii">Whether the term holds ASCII only, so an ordinal search prefilters it.</param>
+    internal sealed record ManneredTerm(string Term, string Instead, Regex Pattern, string FileFilter, bool FileFilterIsAscii, bool TermIsAscii);
 
     /// <summary>
     ///     A rejected synonym with its scope, reason, compound exemptions and matcher.
@@ -472,7 +730,10 @@ sealed class CompiledLanguage
     /// <param name="Reason">Why the synonym is rejected, or null for no suffix.</param>
     /// <param name="Except">The compounds in which the word names a different concept.</param>
     /// <param name="Pattern">The whole-word matcher.</param>
-    internal sealed record RejectedSynonym(string Term, string Synonym, Regex? Scope, string? Reason, IReadOnlyList<Regex> Except, Regex Pattern);
+    /// <param name="FileFilter">The synonym, or its first word when it holds a space: a file without it holds no match.</param>
+    /// <param name="FileFilterIsAscii">Whether the file filter holds ASCII only, so an ordinal search prefilters it.</param>
+    /// <param name="TermIsAscii">Whether the synonym holds ASCII only, so an ordinal search prefilters it.</param>
+    internal sealed record RejectedSynonym(string Term, string Synonym, Regex? Scope, string? Reason, IReadOnlyList<Regex> Except, Regex Pattern, string FileFilter, bool FileFilterIsAscii, bool TermIsAscii);
 
     /// <summary>
     ///     The mannered terms in record order.

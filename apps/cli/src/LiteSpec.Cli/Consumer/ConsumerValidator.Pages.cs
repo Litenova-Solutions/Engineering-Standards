@@ -105,43 +105,78 @@ static partial class ConsumerValidator
     }
 
     /// <summary>
-    ///     Validates each page's frontmatter, headings, and required sections.
+    ///     Validates each page's frontmatter, headings, and required sections. Pages
+    ///     are independent, so both phases run in parallel and merge in file order,
+    ///     keeping every finding exactly where the sequential scan reported it.
     /// </summary>
     static void CheckPages(RunState run)
     {
         var exampleLimit = ExampleWordLimit(run);
-        var schemaWatch = new System.Diagnostics.Stopwatch();
-        var sectionsWatch = new System.Diagnostics.Stopwatch();
+        var count = run.Files.Count;
+        var relatives = new string[count];
+        var raws = new string[count];
+        var metas = new JsonNode?[count];
+        var firstErrors = new List<string>[count];
+        var secondErrors = new List<string>[count];
+        var isPage = new bool[count];
 
-        foreach (var file in run.Files)
+        for (var slot = 0; slot < count; slot++)
         {
+            firstErrors[slot] = [];
+            secondErrors[slot] = [];
+            relatives[slot] = "";
+            raws[slot] = "";
+        }
+
+        var schemaWatch = System.Diagnostics.Stopwatch.StartNew();
+
+        Parallel.For(0, count, index =>
+        {
+            var file = run.Files[index];
             var relative = run.Relative(file);
+            relatives[index] = relative;
             var raw = run.ReadText(file);
-            var meta = ParseBlock(raw, relative, run);
+            raws[index] = raw;
+            var errors = firstErrors[index];
+            var meta = ParseBlock(raw, relative, errors.Add);
 
             if (IsFalsy(meta))
             {
-                continue;
+                return;
             }
 
-            run.Pages += 1;
-
-            schemaWatch.Start();
+            isPage[index] = true;
+            metas[index] = meta;
 
             // Frontmatter is validated through the shared schema module against the
             // record schema, so the schema is the one statement of every record shape.
             foreach (var problem in JsonSchema.Problems(run.RecordSchemaFile, meta, relative, run.ReadSchema))
             {
-                run.Err(problem);
+                errors.Add(problem);
+            }
+        });
+
+        schemaWatch.Stop();
+        Timing.Report($"[time] consumer-pages-schema {schemaWatch.Elapsed.TotalSeconds:0.0}s");
+
+        var sectionsWatch = System.Diagnostics.Stopwatch.StartNew();
+
+        Parallel.For(0, count, index =>
+        {
+            if (!isPage[index])
+            {
+                return;
             }
 
-            schemaWatch.Stop();
-            sectionsWatch.Start();
+            var relative = relatives[index];
+            var raw = raws[index];
+            var meta = metas[index];
+            var errors = secondErrors[index];
 
             // The lines split once and the sections collect in one pass: each lookup
             // below used to re-split the whole page for one section name.
             var lines = SplitLines(raw);
-            CheckHeadings(run, relative, lines);
+            CheckHeadings(relative, lines, errors.Add);
 
             var type = PropString(meta as JsonObject, "type");
             var required = type is not null && RequiredSections.TryGetValue(type, out var names) ? names : Array.Empty<string>();
@@ -151,7 +186,7 @@ static partial class ConsumerValidator
             {
                 if (bodies[name] is null)
                 {
-                    run.Err($"{relative}: type '{type}' requires an H2 '{name}'");
+                    errors.Add($"{relative}: type '{type}' requires an H2 '{name}'");
                 }
             }
 
@@ -161,7 +196,7 @@ static partial class ConsumerValidator
                 && PropString(meta as JsonObject, "kind") is "command" or "reaction"
                 && bodies["What Happens"] is null)
             {
-                run.Err($"{relative}: type 'use-case' requires an H2 'What Happens'");
+                errors.Add($"{relative}: type 'use-case' requires an H2 'What Happens'");
             }
 
             // The Example section stays a narrative, not a second specification: it
@@ -172,15 +207,33 @@ static partial class ConsumerValidator
 
                 if (words > exampleLimit)
                 {
-                    run.Err($"{relative}: Example section has {words} words, over the {exampleLimit} word bound");
+                    errors.Add($"{relative}: Example section has {words} words, over the {exampleLimit} word bound");
                 }
             }
+        });
 
-            sectionsWatch.Stop();
-        }
-
-        Timing.Report($"[time] consumer-pages-schema {schemaWatch.Elapsed.TotalSeconds:0.0}s");
+        sectionsWatch.Stop();
         Timing.Report($"[time] consumer-sections-headings {sectionsWatch.Elapsed.TotalSeconds:0.0}s");
+
+        for (var index = 0; index < count; index++)
+        {
+            foreach (var problem in firstErrors[index])
+            {
+                run.Err(problem);
+            }
+
+            if (!isPage[index])
+            {
+                continue;
+            }
+
+            run.Pages += 1;
+
+            foreach (var problem in secondErrors[index])
+            {
+                run.Err(problem);
+            }
+        }
     }
 
     /// <summary>
@@ -235,7 +288,7 @@ static partial class ConsumerValidator
     ///     Headings inside fenced blocks and generated regions are tool output or
     ///     quoted examples rather than authored headings, so they are skipped.
     /// </summary>
-    static void CheckHeadings(RunState run, string relative, string[] lines)
+    static void CheckHeadings(string relative, string[] lines, Action<string> add)
     {
         var inFence = false;
         var inGenerated = false;
@@ -278,7 +331,7 @@ static partial class ConsumerValidator
 
                 if (title.Length > 0 && !TitleCase(title))
                 {
-                    run.Err($"{relative}: H1 '{title}' must use Title Case");
+                    add($"{relative}: H1 '{title}' must use Title Case");
                 }
             }
             else if (trimmed.StartsWith("## ", StringComparison.Ordinal))
@@ -287,7 +340,7 @@ static partial class ConsumerValidator
 
                 if (name.Length > 0 && !TitleCase(name))
                 {
-                    run.Err($"{relative}: H2 '{name}' must use Title Case");
+                    add($"{relative}: H2 '{name}' must use Title Case");
                 }
             }
         }
@@ -299,7 +352,7 @@ static partial class ConsumerValidator
     ///     because a silently skipped page is an unvalidated page: the run passes while
     ///     that page sits unchecked beside every page that was checked.
     /// </summary>
-    static JsonNode? ParseBlock(string raw, string relative, RunState run)
+    static JsonNode? ParseBlock(string raw, string relative, Action<string> add)
     {
         if (!raw.StartsWith("---", StringComparison.Ordinal))
         {
@@ -307,11 +360,11 @@ static partial class ConsumerValidator
 
             if (FencedBlock.IsMatch(head))
             {
-                run.Err($"{relative}: frontmatter block is not delimited by '---'");
+                add($"{relative}: frontmatter block is not delimited by '---'");
             }
             else
             {
-                run.Err($"{relative}: no frontmatter block; every page opens with a '---' JSON block carrying its record type or page style");
+                add($"{relative}: no frontmatter block; every page opens with a '---' JSON block carrying its record type or page style");
             }
 
             return null;
@@ -321,7 +374,7 @@ static partial class ConsumerValidator
 
         if (end < 0)
         {
-            run.Err($"{relative}: unterminated frontmatter block");
+            add($"{relative}: unterminated frontmatter block");
             return null;
         }
 
@@ -331,7 +384,7 @@ static partial class ConsumerValidator
         }
         catch (Exception cause)
         {
-            run.Err($"{relative}: JSON parse error: {cause.Message}");
+            add($"{relative}: JSON parse error: {cause.Message}");
             return null;
         }
     }

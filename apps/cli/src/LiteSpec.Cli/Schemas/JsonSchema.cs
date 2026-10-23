@@ -252,28 +252,83 @@ static class JsonSchema
         // the message carries the first reason from each branch that rejected.
         if (obj.TryGetPropertyValue("oneOf", out var oneOfNode) && oneOfNode is JsonArray oneOf)
         {
-            var rejections = new List<string>();
-            var matched = 0;
+            var dispatch = DispatchIndex(value, oneOf, root);
 
-            for (var index = 0; index < oneOf.Count; index++)
+            if (dispatch >= 0)
             {
-                var branchErrors = new List<string>();
-                Validate(value, oneOf[index], root, location, branchErrors);
+                var fastErrors = new List<string>();
+                Validate(value, oneOf[dispatch], root, location, fastErrors);
 
-                if (branchErrors.Count == 0)
+                if (fastErrors.Count == 0)
                 {
-                    matched++;
+                    // Every other branch pins a different type const, so each one
+                    // rejects a value whose type matches this branch. The value
+                    // matches exactly one shape and reports nothing.
                 }
                 else
                 {
-                    rejections.Add($"shape {index + 1}: {StripLocationPrefix(branchErrors[0], location)}");
+                    // The matching shape failed, so the value matches none. The
+                    // loop below reproduces the exact message, reusing the
+                    // dispatched branch's errors instead of validating it twice.
+                    var rejections = new List<string>();
+                    var matched = 0;
+
+                    for (var index = 0; index < oneOf.Count; index++)
+                    {
+                        List<string> branchErrors;
+
+                        if (index == dispatch)
+                        {
+                            branchErrors = fastErrors;
+                        }
+                        else
+                        {
+                            branchErrors = new List<string>();
+                            Validate(value, oneOf[index], root, location, branchErrors);
+                        }
+
+                        if (branchErrors.Count == 0)
+                        {
+                            matched++;
+                        }
+                        else
+                        {
+                            rejections.Add($"shape {index + 1}: {StripLocationPrefix(branchErrors[0], location)}");
+                        }
+                    }
+
+                    if (matched != 1)
+                    {
+                        var because = matched == 0 && rejections.Count > 0 ? $" ({string.Join("; ", rejections)})" : "";
+                        errors.Add($"{location}: value matches {matched} of {oneOf.Count} allowed shapes, expected exactly 1{because}");
+                    }
                 }
             }
-
-            if (matched != 1)
+            else
             {
-                var because = matched == 0 && rejections.Count > 0 ? $" ({string.Join("; ", rejections)})" : "";
-                errors.Add($"{location}: value matches {matched} of {oneOf.Count} allowed shapes, expected exactly 1{because}");
+                var rejections = new List<string>();
+                var matched = 0;
+
+                for (var index = 0; index < oneOf.Count; index++)
+                {
+                    var branchErrors = new List<string>();
+                    Validate(value, oneOf[index], root, location, branchErrors);
+
+                    if (branchErrors.Count == 0)
+                    {
+                        matched++;
+                    }
+                    else
+                    {
+                        rejections.Add($"shape {index + 1}: {StripLocationPrefix(branchErrors[0], location)}");
+                    }
+                }
+
+                if (matched != 1)
+                {
+                    var because = matched == 0 && rejections.Count > 0 ? $" ({string.Join("; ", rejections)})" : "";
+                    errors.Add($"{location}: value matches {matched} of {oneOf.Count} allowed shapes, expected exactly 1{because}");
+                }
             }
         }
 
@@ -655,6 +710,138 @@ static class JsonSchema
 
     static string RequiredName(JsonNode? node) =>
         node is JsonValue candidate && candidate.TryGetValue<string>(out var name) && name is not null ? name : Stringify(node);
+
+    /// <summary>
+    ///     The one branch of a <c>oneOf</c> whose pinned type const equals the value's
+    ///     type, or -1 when the shape does not dispatch. A dispatch needs an object
+    ///     value with a string type, every branch pinning a type const through its
+    ///     properties, and exactly one branch pinning this value's type. Anything
+    ///     else falls back to validating every branch, so every message reads as before.
+    /// </summary>
+    static int DispatchIndex(JsonNode? value, JsonArray oneOf, JsonNode root)
+    {
+        if (value is not JsonObject fields)
+        {
+            return -1;
+        }
+
+        if (!fields.TryGetPropertyValue("type", out var typeNode))
+        {
+            return -1;
+        }
+
+        if (typeNode is not JsonValue typeValue)
+        {
+            return -1;
+        }
+
+        if (!typeValue.TryGetValue<string>(out var typeName) || typeName is null)
+        {
+            return -1;
+        }
+
+        var match = -1;
+
+        for (var index = 0; index < oneOf.Count; index++)
+        {
+            var pinned = BranchTypeConst(oneOf[index], root);
+
+            if (pinned is null)
+            {
+                return -1;
+            }
+
+            if (pinned == typeName)
+            {
+                if (match >= 0)
+                {
+                    return -1;
+                }
+
+                match = index;
+            }
+        }
+
+        return match;
+    }
+
+    /// <summary>
+    ///     The type const a <c>oneOf</c> branch pins, following local references to
+    ///     the shape that carries <c>properties.type.const</c>, or null when the
+    ///     branch pins none. A branch that cannot be read this way disables the
+    ///     dispatch for its whole <c>oneOf</c>.
+    /// </summary>
+    static string? BranchTypeConst(JsonNode? branch, JsonNode root)
+    {
+        var current = branch;
+
+        for (var depth = 0; depth < 10; depth++)
+        {
+            if (current is not JsonObject currentObject)
+            {
+                return null;
+            }
+
+            if (currentObject.TryGetPropertyValue("$ref", out var refNode)
+                && refNode is JsonValue refValue
+                && refValue.TryGetValue<string>(out var reference)
+                && !string.IsNullOrEmpty(reference))
+            {
+                JsonNode? target;
+
+                try
+                {
+                    target = CachedRef(root, reference);
+                }
+                catch
+                {
+                    return null;
+                }
+
+                if (target is null)
+                {
+                    return null;
+                }
+
+                current = target;
+                continue;
+            }
+
+            break;
+        }
+
+        if (current is not JsonObject effective)
+        {
+            return null;
+        }
+
+        if (!effective.TryGetPropertyValue("properties", out var propertiesNode))
+        {
+            return null;
+        }
+
+        if (propertiesNode is not JsonObject properties)
+        {
+            return null;
+        }
+
+        if (!properties.TryGetPropertyValue("type", out var typeSchema))
+        {
+            return null;
+        }
+
+        if (typeSchema is not JsonObject typeObject)
+        {
+            return null;
+        }
+
+        if (!typeObject.TryGetPropertyValue("const", out var constNode))
+        {
+            return null;
+        }
+
+        return constNode is JsonValue constValue && constValue.TryGetValue<string>(out var pinned) ? pinned : null;
+    }
 
     static string StripLocationPrefix(string message, string location)
     {

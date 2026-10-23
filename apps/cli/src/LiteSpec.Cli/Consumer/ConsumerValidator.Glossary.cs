@@ -169,15 +169,33 @@ static partial class ConsumerValidator
                 continue;
             }
 
-            foreach (var relativePath in matched)
+            // Source files are independent, so they scan in parallel and merge in
+            // match order, keeping every finding exactly where the sequential
+            // scan reported it.
+            var perFile = new List<string>[matched.Count];
+
+            Parallel.For(0, matched.Count, fileIndex =>
             {
+                var relativePath = matched[fileIndex];
                 var relative = relativePath.Replace('\\', '/');
-                scannedSurfaces += 1;
+                var findings = new List<string>();
 
                 Prose.CheckLanguageInSource(relative, run.ReadText(Path.Join(run.Root, relativePath)), compiled, (_, line, code, message) =>
                 {
-                    languageFindings.Add($"{relative}:{line}: {code} {message}");
+                    findings.Add($"{relative}:{line}: {code} {message}");
                 });
+
+                perFile[fileIndex] = findings;
+            });
+
+            for (var fileIndex = 0; fileIndex < matched.Count; fileIndex++)
+            {
+                scannedSurfaces += 1;
+
+                foreach (var finding in perFile[fileIndex])
+                {
+                    languageFindings.Add(finding);
+                }
             }
         }
 
