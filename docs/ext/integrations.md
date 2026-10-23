@@ -8,7 +8,7 @@ External integrations connect the product to providers it does not control, whic
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`.
+Applicable specification kinds: `use-case`, `rule`, `journey`.
 
 The consumer enables `integrations` for each use case that calls or publishes to an external system, receives an inbound integration event, or uses a provider SDK.
 

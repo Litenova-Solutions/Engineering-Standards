@@ -208,7 +208,7 @@ Intent never contains Behavior field names, code identifiers, or mechanism: no s
 
 **Example:** Ballot `resale-terms`, due 2026-11-01: how many tickets one buyer may hold in the return queue at once, recommended 4 as an organizer listing setting; and whether the organizer may charge a handling fee on a return, recommended yes, organizer-set and shown before the buyer confirms.
 
-### Let the Founder Decide Business Choices
+### Leave Business Choices to the Founder
 
 **Statement:** The founder MUST decide each draft question that sets a price, fee, rate, term, market, payer, retention period, observable freshness, or tenant-varying figure.
 
@@ -275,7 +275,7 @@ docs/product/
 
 ## Reference Example
 
-This informative example demonstrates `litespec/core/intent#order-each-journey-toward-one-goal`, `litespec/core/intent#write-journey-steps-as-sentences-with-ids`, `litespec/core/intent#state-when-each-journey-finishes`, `litespec/core/intent#identify-every-requirement`, `litespec/core/intent#state-each-exception-with-its-fallback`, `litespec/core/intent#group-questions-into-ballots`, `litespec/core/intent#let-the-founder-decide-business-choices`, and `litespec/core/intent#treat-tenant-set-values-as-data`.
+This informative example demonstrates `litespec/core/intent#order-each-journey-toward-one-goal`, `litespec/core/intent#write-journey-steps-as-sentences-with-ids`, `litespec/core/intent#state-when-each-journey-finishes`, `litespec/core/intent#identify-every-requirement`, `litespec/core/intent#state-each-exception-with-its-fallback`, `litespec/core/intent#group-questions-into-ballots`, `litespec/core/intent#leave-business-choices-to-the-founder`, and `litespec/core/intent#treat-tenant-set-values-as-data`.
 
 The book renders journey `journey/hand-a-ticket-back` as one chapter. No field name, JSON, or Behavior page appears.
 
@@ -346,7 +346,7 @@ For step 3, the serving use case `use-case/sales.complete-ticket-resale` contrib
 | litespec/core/intent#write-journey-steps-as-sentences-with-ids | checkable | `litespec consumer` fails a journey step missing `id` or `says`, or naming a use case. |
 | litespec/core/intent#state-when-each-journey-finishes | checkable | `litespec consumer` fails a journey missing `finishedWhen`. |
 | litespec/core/intent#group-questions-into-ballots | checkable | `litespec model check` reports no `draft-without-decider` finding on Intent questions. |
-| litespec/core/intent#let-the-founder-decide-business-choices | guidance | The founder's answer on each business draft question beside its `approvedBy`. |
+| litespec/core/intent#leave-business-choices-to-the-founder | guidance | The founder's answer on each business draft question beside its `approvedBy`. |
 | litespec/core/intent#treat-tenant-set-values-as-data | guidance | Each `setBy: tenant` value stored as tenant data with no founder approval beside it. |
 | litespec/core/intent#group-product-records-by-area | guidance | The `docs/product/` layout beside the project's recorded layout. |
 | litespec/core/intent#name-product-decisions-in-one-numbered-sequence | guidance | Each decision file named `<number>-<name>.md` beside its matching identifier. |

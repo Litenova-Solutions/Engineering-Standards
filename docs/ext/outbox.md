@@ -8,7 +8,7 @@ The outbox pattern makes a business change and the message it owes the outside w
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`.
+Applicable specification kinds: `use-case`, `journey`.
 
 A use case selects this extension when a committed change needs delivery that survives a process failure. That delivery can carry an integration event to another system, a command that advances a journey step, or a side effect on an outside provider. Selecting it also activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the dispatcher.
 

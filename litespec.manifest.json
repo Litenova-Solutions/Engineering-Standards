@@ -200,6 +200,7 @@
       "path": "docs/ext/jobs.md",
       "activationScope": "local",
       "applicableKinds": [
+        "job",
         "use-case",
         "journey"
       ],
@@ -237,19 +238,14 @@
       "path": "docs/ext/devices.md",
       "activationScope": "local",
       "applicableKinds": [
-        "entry-point",
-        "use-case"
+        "entry-point"
       ],
       "replaces": [],
       "switchesOn": []
     },
     "automation": {
       "path": "docs/ext/automation.md",
-      "activationScope": "local",
-      "applicableKinds": [
-        "rule",
-        "use-case"
-      ],
+      "activationScope": "project",
       "replaces": [],
       "switchesOn": []
     },
@@ -257,8 +253,7 @@
       "path": "docs/ext/workflow-engine.md",
       "activationScope": "local",
       "applicableKinds": [
-        "aggregate",
-        "use-case"
+        "aggregate"
       ],
       "replaces": [],
       "switchesOn": []
@@ -267,7 +262,7 @@
       "path": "docs/ext/pipeline.md",
       "activationScope": "local",
       "applicableKinds": [
-        "use-case"
+        "job"
       ],
       "replaces": [],
       "switchesOn": []

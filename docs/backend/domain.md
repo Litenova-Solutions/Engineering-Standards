@@ -30,7 +30,7 @@ A closed set is a fixed menu of values where the type system knows every case, s
 
 **Statement:** A Domain name MUST match a term in the project glossary.
 
-**Rationale:** When code and specification share names, a reader moves between them without translation. A business action named `Publish` in the glossary is not `SetStatus` in code, because the second name hides which business action ran. The glossary holds each term meaning, labels per language, rejected words, and broader and narrower links; records cite the terms they use, following `litespec/core/behavior#define-every-domain-term-in-the-glossary`.
+**Rationale:** When code and specification share names, a reader moves between them without translation. A business action named `Publish` in the glossary is not `SetStatus` in code, because the second name hides which business action ran. The glossary holds each term meaning, labels per language, rejected words, and broader and narrower links; records cite the terms they use, following `litespec/core/behavior#define-every-behavior-term-in-the-glossary`.
 
 ### Treat Aggregates as Consistency Boundaries
 

@@ -8,7 +8,7 @@ Scheduled jobs start work from a timetable instead of from a request, such as ni
 
 Activation scope: `local`.
 
-Applicable specification kinds: `job`.
+Applicable specification kinds: `job`, `use-case`, `journey`.
 
 The consumer enables `jobs` for recurring, delayed, or calendar-based work. Each schedule lives on a job record of kind `scheduled`, `one-off`, or `operator`, as `litespec/core/behavior#declare-every-job-with-kind-and-structured-schedule` states. Selecting it activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the scheduler.
 

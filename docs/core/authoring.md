@@ -515,7 +515,7 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 The figures below render from the retention schedule at build time.
 ```
 
-### Keep Code out of Intent and Behavior Fields
+### Keep Code Out of Intent and Behavior Fields
 
 **Statement:** No field on an Intent or Behavior record MUST be filled from code.
 

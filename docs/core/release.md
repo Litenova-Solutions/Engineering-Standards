@@ -132,7 +132,7 @@ A consumer adopts one LiteSpec release by installing the `LiteSpec.Cli` tool pac
 
 **Example:** A reviewed staff search with cross scope waits in the queue until the security reviewer accepts the grant.
 
-### Auto Approve Tier 3 Questions After the Veto Window
+### Approve Tier 3 Questions Automatically After the Veto Window
 
 **Statement:** A tier 3 draft question with a recommendation MUST auto-approve after its decideBy plus the veto window.
 
@@ -358,7 +358,7 @@ A resale cap change shows one Intent sentence in the founder ballot, a two-line 
 | litespec/core/release#sample-tier-3-behavior-reviews | guidance | Which tier 3 samples lack a recorded developer read? Look at the sampled Behavior diffs beside the gate. |
 | litespec/core/release#name-the-security-reviewer-in-the-project-file | checkable | `litespec model check` reports `record-shape` for a project file without `securityReviewer`. |
 | litespec/core/release#review-the-security-queue-separately-from-reviewed | guidance | Which cross, calls, or data class changes shipped without a recorded security decision? Look at the security queue beside the Behavior diff. |
-| litespec/core/release#auto-approve-tier-3-questions-after-the-veto-window | guidance | Which tier 3 questions past the veto window lack an auto decision? Look at the ballots with their decideBy dates and approvers. |
+| litespec/core/release#approve-tier-3-questions-automatically-after-the-veto-window | guidance | Which tier 3 questions past the veto window lack an auto decision? Look at the ballots with their decideBy dates and approvers. |
 | litespec/core/release#report-aged-drafts-as-known-gaps-with-owners | guidance | Which drafts past decideBy lack a known gap with an owner? Look at the drafts beside the known gaps. |
 | litespec/core/release#verify-connected-journeys | guidance | Which completed journeys lack a passing test through the deployed boundary? Look at the journey tests beside each included journey. |
 | litespec/core/release#run-boundary-selected-checks | guidance | Which changes lack a passing result for a check their boundaries select? Look at the change report beside the boundary table. |

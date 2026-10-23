@@ -22,7 +22,7 @@
     "securityReviewer": "__OWNER__"
   },
   "adoption": {
-    "transcriptionEndsWith": "decision/<name>"
+    "transcriptionEndsWith": "decision/0001-promote-to-production"
   },
   "paths": {
     "docs": "docs",
