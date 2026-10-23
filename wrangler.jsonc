@@ -2,7 +2,11 @@
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
   "name": "litespec-site",
   "compatibility_date": "2026-10-01",
-  // The site build writes apps/site/dist; the Worker serves it as static assets.
+  // `wrangler deploy` and `wrangler preview` build the site first, so the Worker needs no build command of its own.
+  // The build writes apps/site/dist, which the Worker serves as static assets.
+  "build": {
+    "command": "npx --yes pnpm@11.28.5 --dir apps/site install --frozen-lockfile && npx --yes pnpm@11.28.5 --dir apps/site build"
+  },
   "assets": {
     "directory": "./apps/site/dist",
     "html_handling": "auto-trailing-slash",
