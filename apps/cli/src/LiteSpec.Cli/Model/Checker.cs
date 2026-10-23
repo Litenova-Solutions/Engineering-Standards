@@ -1318,6 +1318,15 @@ static partial class Checker
                 .Select(record => Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : "")
                 .ToList();
 
+            // A use case in another module covers the aggregate when a rule governs both: a
+            // project that erases and exports centrally states which aggregates that covers.
+            moduleCases.AddRange(model.Records
+                .Where(record => record.Type == "rule" && record.Ids("governs").Contains(aggregate.Id))
+                .SelectMany(record => record.Ids("governs"))
+                .Where(id => id.StartsWith("use-case/", StringComparison.Ordinal)
+                    && model.Records.Any(record => record.Id == id && record.Status != "retired"))
+                .Select(id => Identifiers.TrySplit(id, out _, out _, out var name) ? name : ""));
+
             if (!moduleCases.Any(name => ContainsWord(name, ErasureWords)))
             {
                 findings.Add(new Finding("personal-data-uncovered", $"Aggregate '{aggregate.Id}' holds personal data no erasure use case covers: {string.Join(", ", personal)}.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));

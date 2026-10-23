@@ -106,7 +106,7 @@ The specification names only what carries business meaning. Child entities and v
 
 **Statement:** Each aggregate MUST list its data fields with their meaning and classification in its Data table.
 
-**Rationale:** Data without a classification is handled by guess: personal facts sit beside public ones with nothing marking which is which. A meaning with a classification of public, internal, personal, or sensitive tells every later reader how each field is handled, and shows which fields the erasure and export behavior covers.
+**Rationale:** Data without a classification is handled by guess: personal facts sit beside public ones with nothing marking which is which. A meaning with a classification of public, internal, personal, or sensitive tells every later reader how each field is handled, and shows which fields the erasure and export behavior covers. A project that erases and exports in one module states which aggregates that behavior covers with a rule that governs both the aggregate and the erasure or export use case.
 
 ### State Each Rule with Its Kind
 

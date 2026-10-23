@@ -79,6 +79,23 @@ public sealed class PersonalDataCheckTests
     }
 
     [Fact]
+    public void Cover_In_Another_Module_Counts_When_A_Rule_Governs_Both()
+    {
+        using var temp = Cli.Temp("checks");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            Loan(temp.Path, "personal"),
+            TestModel.Record("use-case", "use-case/archive.erase-reader-data", Path.Combine(temp.Path, "erase.md"), """{"kind": "command"}"""),
+            TestModel.Record("use-case", "use-case/archive.export-reader-data", Path.Combine(temp.Path, "export.md"), """{"kind": "query"}"""),
+            TestModel.Record("rule", "rule/loan.reader-data-leaves-through-the-archive", Path.Combine(temp.Path, "rule.md"), """
+                {"kind": "invariant", "statement": "Reader data on a loan is erased and exported through the archive.",
+                 "governs": ["aggregate/lending.loan", "use-case/archive.erase-reader-data", "use-case/archive.export-reader-data"]}
+                """));
+
+        Assert.DoesNotContain("personal-data-uncovered", TestModel.Codes(model));
+    }
+
+    [Fact]
     public void Retired_Cover_Does_Not_Count()
     {
         using var temp = Cli.Temp("checks");

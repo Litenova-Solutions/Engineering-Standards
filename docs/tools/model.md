@@ -86,7 +86,7 @@ The finding codes are:
 | `behavior-unrecorded` | A handler, endpoint, reaction, domain event, or refusal code in code is named by no record. |
 | `state-unreachable` | A state is reached by no transition. |
 | `transition-unresolved` | A transition names a missing state or use case. |
-| `personal-data-uncovered` | A personal or sensitive field stands outside an erasure or export use case. |
+| `personal-data-uncovered` | A personal or sensitive field stands outside an erasure or export use case: one in its aggregate's module, or one a rule governs together with the aggregate. |
 | `calculation-without-table` | A calculation rule has no scenario examples table. |
 | `reaction-without-trigger` | A reaction names no trigger. |
 | `open-questions` | A record stands approved with open questions. |
