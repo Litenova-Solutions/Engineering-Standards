@@ -2,35 +2,47 @@
 
 ## Intent
 
-Scheduled jobs start work from a timetable instead of from a request, such as nightly statements, delayed reminders, and calendar-based billing. This page states how a project records each schedule as a reaction trigger, runs it in a Worker with leases that survive restarts and overlapping replicas, and recovers missed occurrences (planned runs the outage skipped); durable event dispatch belongs to the outbox extension. A team applies it for recurring, delayed, or calendar-based work, so each occurrence runs once even when a replica fails mid-job.
+Scheduled jobs start work from a timetable instead of from a request, such as nightly statements, delayed reminders, and calendar-based billing. This page states how a project records each schedule on a job record with its kind, scope, lease, and issued use cases, and runs it in a Worker with leases that survive restarts and overlapping replicas. A team applies it for recurring, delayed, or calendar-based work, so each occurrence runs once even when a replica fails mid-job.
 
 ## Activation
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `journey`.
+Applicable specification kinds: `job`.
 
-The consumer enables `jobs` for recurring, delayed, or calendar-based work. Selecting it activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the scheduler.
+The consumer enables `jobs` for recurring, delayed, or calendar-based work. Each schedule lives on a job record of kind `scheduled`, `one-off`, or `operator`, as `litespec/core/behavior#declare-every-job-with-kind-and-structured-schedule` states. Selecting it activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the scheduler.
 
 ## Baseline Relationship
 
 This extension replaces no baseline provision.
 
-This extension switches on `limit` and `runbook`: schedules bound their retention with Limit records and operators recover through Runbook records.
+This extension switches on no optional record type: the job, setting, and runbook records belong to the core. Schedules bound their retention with setting records and operators recover through runbook records.
 
 ## Standards
 
-### State Schedules as Reaction Triggers
+### Carry the Schedule on the Job Record
 
-**Statement:** A scheduled job MUST run from a reaction whose trigger states its schedule in words.
+**Statement:** A scheduled or one-off job MUST carry its schedule in structured form with its timezone on its job record.
 
-**Rationale:** The trigger states when the behavior answers: `litespec/core/behavior#trigger-every-reaction` names the events, or the schedule or deadline in plain words. A schedule kept outside the trigger runs with no reviewed moment attached, and misfire behavior has no stated time to measure against.
+**Rationale:** The job record states when the work runs: `every` or `cron` with its timezone, so tools read the rhythm instead of parsing prose. A schedule kept outside the record runs with no reviewed moment attached, and misfire behavior has no stated time to measure against. `litespec/core/behavior#declare-every-job-with-kind-and-structured-schedule` states the record fields, and the `schedule-unstructured` check reports a schedule no tool can read.
 
-### Record Schedule Behavior
+### Issue One Run per Item in Scope
 
-**Statement:** A scheduled-job record MUST name schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status, with a draft naming decider and decide-by date.
+**Statement:** A job MUST run its `issues` once per item in its `scope` within its `batchSize`.
 
-**Rationale:** The schedule record states when work may run and how it recovers from normal scheduling faults: schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status. The owners are the operating owner and the record owner, and a draft names its decider and decide-by date. A schedule without that record leaves each fault for the on-call operator to invent around.
+**Rationale:** The scope states what each run selects, the batch size bounds how many items one batch takes, and `issues` names the use cases run per item. One run per item keeps retries, evidence, and idempotency per item: a failed item replays without replaying its batch.
+
+### Resume Driven Work Through the Cursor
+
+**Statement:** A job driving a process MUST name where resume state lives in its `cursor`.
+
+**Rationale:** A batch that fails halfway resumes instead of restarting: the cursor holds where the run stopped, beside the process state it drives. Without it, the next run replays finished items or skips unfinished ones, and a scenario covering the remainder resumes has no stated position to assert.
+
+### Run Operator Jobs Under Their Guard
+
+**Statement:** An operator job run MUST stay inside its `runsWhere` under its `guard`.
+
+**Rationale:** Operator work is interactive platform work with no aggregate, such as a rehearsal harness, so no model bounds where it runs or who runs it. `runsWhere` names the deployment scope it may touch and the guard names who may run it and when. `litespec/core/behavior#guard-every-operator-job` states the record fields, and the `operator-job-without-guard` check reports an operator job with no guard.
 
 ### Run Jobs in Worker
 
@@ -60,7 +72,7 @@ This extension switches on `limit` and `runbook`: schedules bound their retentio
 
 **Statement:** A scheduled-job store MUST record lease owner, expiry, and fencing value in PostgreSQL.
 
-**Rationale:** Each planned occurrence carries a lease with its owner, expiry, and fencing value in PostgreSQL. The lease names the one replica that may complete that occurrence. The outbox extension cites this definition for its own claims.
+**Rationale:** Each planned occurrence carries a lease with its owner, expiry, and fencing value in PostgreSQL. The lease names the one replica that may complete that occurrence. The `lease` field on the job record names the lock each run claims. The outbox extension cites this definition for its own claims.
 
 ### Renew Only Owned Leases
 
@@ -90,7 +102,7 @@ This extension switches on `limit` and `runbook`: schedules bound their retentio
 
 **Statement:** A scheduled job MUST dispatch an Application Command or approved Application port.
 
-**Rationale:** The schedule triggers a use case, and the use case boundary lives in Application. Each job therefore dispatches an Application Command or an approved Application port. The schedule stays a trigger while the behavior stays owned.
+**Rationale:** The job record names the use cases its run issues, and the use case boundary lives in Application. Each job therefore dispatches an Application Command or an approved Application port. The schedule stays a trigger while the behavior stays owned.
 
 ### Exclude Direct Storage and HTTP Execution
 
@@ -146,9 +158,9 @@ Each procedure names the interface that performs it. A procedure that says "disa
 
 ### Remove Occurrences Past Retention
 
-**Statement:** A scheduled-job store MUST remove occurrences older than the schedule's retention Limit record.
+**Statement:** A scheduled-job store MUST remove occurrences older than the schedule's retention setting record.
 
-**Rationale:** Occurrences older than the retention Limit record leave the store so the key space stays bounded.
+**Rationale:** Occurrences older than the retention setting record leave the store so the key space stays bounded.
 
 The key space grows with the schedule's frequency and its retention. A per-second schedule kept for a year holds more than 30 million rows. [Quartz states the same practice](https://quartz-scheduler.net/documentation/best-practices.html) for a persistent job store.
 
@@ -240,8 +252,10 @@ Guides: `None.`
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/jobs#state-schedules-as-reaction-triggers | guidance | Each scheduled reaction page names its schedule or deadline in its trigger, in words. |
-| litespec/ext/jobs#record-schedule-behavior | guidance | Each schedule record names schedule, time zone, delay, overlap, misfire, idempotency, retry, owners, and status, with decider and decide-by date on a draft. |
+| litespec/ext/jobs#carry-the-schedule-on-the-job-record | guidance | Each scheduled and one-off job record carries a structured schedule with its timezone. |
+| litespec/ext/jobs#issue-one-run-per-item-in-scope | guidance | Each job run executes its issued use cases once per item in its scope within its batch size. |
+| litespec/ext/jobs#resume-driven-work-through-the-cursor | guidance | Each job driving a process names its resume position in its cursor, with a scenario covering the remainder after a halfway failure. |
+| litespec/ext/jobs#run-operator-jobs-under-their-guard | guidance | Each operator job run stays inside its runsWhere under its guard. |
 | litespec/ext/jobs#run-jobs-in-worker | guidance | Worker sources hold every scheduled job, and WebApi request handling holds none. |
 | litespec/ext/jobs#observe-job-cancellation | guidance | Each job handler threads cancellation into its waits and stops its current step when cancellation fires. |
 | litespec/ext/jobs#bound-job-duration | guidance | Each job handler carries a duration bound, and the occurrence store shows completions inside it. |
@@ -260,7 +274,7 @@ Guides: `None.`
 | litespec/ext/jobs#define-misfire-recovery | guidance | Each schedule states skipped, once-replayed, or interval-replayed behavior for missed occurrences. |
 | litespec/ext/jobs#provide-operational-recovery-procedures | guidance | Runbook records cover inspection, manual replay, and disable for each schedule. |
 | litespec/ext/jobs#derive-stable-occurrence-identity | guidance | Occurrence identities in the store combine schedule ID with scheduled instant. |
-| litespec/ext/jobs#remove-occurrences-past-retention | guidance | The store holds no occurrence older than its schedule's retention Limit record. |
+| litespec/ext/jobs#remove-occurrences-past-retention | guidance | The store holds no occurrence older than its schedule's retention setting record. |
 | litespec/ext/jobs#persist-occurrence-state | guidance | Each occurrence row carries scheduled, processing, completed, or dead-letter state with safe execution details. |
 | litespec/ext/jobs#scope-command-idempotency-by-occurrence | guidance | Retries of one occurrence share the idempotency scope of its occurrence identity. |
 | litespec/ext/jobs#restrict-completion-by-fencing-value | guidance | Completion writes fail on a stale fencing value in the store. |

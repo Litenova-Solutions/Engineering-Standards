@@ -54,13 +54,21 @@ It switches on no record type: tenant scope applies to records every project req
 
 **Statement:** A protected multi-tenant operation MUST confirm actor and target tenancy, with the needed permission held at the resolved scope and the target belonging to it.
 
-**Rationale:** Checking the caller alone leaves the target unchecked: an authorized caller can still name a resource from another tenant. The operation confirms both sides through one chain: the actor holds a role at the resolved scope, the role allows the permission, the use case needs that permission, and the target belongs to the same scope.
+**Rationale:** Checking the caller alone leaves the target unchecked: an authorized caller can still name a resource from another tenant. The operation confirms both sides through one chain: the actor holds a role at the resolved scope, the role allows the permission, the use case declares that permission in its grant, and the target belongs to the same scope.
+
+### Scope Every Use Case to Its Tenant Reach
+
+**Statement:** Every use case in a multi-tenant product MUST declare its tenant scope as own, cross, public, or none in `access`.
+
+**Rationale:** The tenant scope bounds which tenant data the call may touch: own stays inside the caller tenant, cross reaches across tenants, public works beyond tenant boundaries, and none touches no tenant data. Without the scope, a read inside one tenant and a read across all tenants look the same. `litespec/core/access#scope-every-grant-to-its-tenant-reach` states the values, and `litespec/core/access#review-cross-tenant-access-as-tier-1` routes cross scope to the security queue.
+
+**Example:** An organizer report declares `own`, a staff search across organizers declares `cross`, a public catalog declares `public`, and a health check declares `none`.
 
 ### Isolate Administrative Cross-Tenant Access
 
 **Statement:** An administrative cross-tenant operation MUST require a permission the actor holds through a role at platform scope, writing an audit record.
 
-**Rationale:** Support and operations sometimes reach across tenants, and that exceptional reach needs exceptional control: a permission held through a role at platform scope, with an audit record for every use. Without both, one support login becomes an unscoped key to every customer's data.
+**Rationale:** Support and operations sometimes reach across tenants, and that exceptional reach needs exceptional control: a permission held through a role at platform scope, with an audit record for every use. Without both, one support login becomes an unscoped key to every customer's data. Grants that let one tenant act for another follow the delegation extension instead.
 
 ### Use Selected Tenant Storage Support
 
@@ -130,7 +138,7 @@ It switches on no record type: tenant scope applies to records every project req
 
 Packages: Tenancy support for Marten ships in the baseline persistence package. A project that isolates tenants with another provider records a decision and pins that provider in the manifest.
 
-Related extensions: The `audit` extension owns tamper-resistant evidence when an all-tenant run needs an audit record. The `plans` extension owns entitlements when tenants buy different tiers.
+Related extensions: The `audit` extension owns tamper-resistant evidence when an all-tenant run needs an audit record. The `plans` extension owns entitlements when tenants buy different tiers. The `delegation` extension owns grants that let one tenant act for another.
 
 Guides: None.
 
@@ -144,6 +152,7 @@ Guides: None.
 | litespec/ext/tenancy#resolve-tenant-identity-from-trusted-context | guidance | Each trusted host boundary resolves the tenant from verified claims, host mapping, or another authenticated source. |
 | litespec/ext/tenancy#reject-unrestricted-tenant-input | guidance | The tenant resolver code accepts a tenant identifier only from an authenticated source, never from request data. |
 | litespec/ext/tenancy#verify-actor-and-target-tenancy | guidance | The authorization tests fail a protected operation whose actor and target tenants mismatch. |
+| litespec/ext/tenancy#scope-every-use-case-to-its-tenant-reach | guidance | Each use case declares own, cross, public, or none in its access tenant scope, with cross grants in the security queue. |
 | litespec/ext/tenancy#isolate-administrative-cross-tenant-access | guidance | Each administrative cross-tenant use case names a platform-scope permission, and the audit trail holds a record for every cross-tenant run. |
 | litespec/ext/tenancy#use-selected-tenant-storage-support | guidance | The session-creation code of each provider resolves the tenant through that provider's tenancy support. |
 | litespec/ext/tenancy#scope-tenant-owned-records | guidance | The documents, queries, constraints, cache keys, outbox records, jobs, exports, and storage paths in code each carry tenant scope. |

@@ -16,7 +16,7 @@ The consumer enables `compat` for public APIs, partner clients, mobile clients, 
 
 This extension replaces no baseline provision.
 
-The core `event` stays inside the product; this extension owns each event consumed outside it, as the [domain page](../core/behavior.md) states.
+Each domain event stays inside the product; each fact consumed outside it is an integration event, as the [behavior page](../core/behavior.md) states.
 
 This extension switches on no optional record type.
 
@@ -33,6 +33,12 @@ This extension switches on no optional record type.
 **Statement:** An API change reviewer MUST classify removal, rename, required input, narrowed value, response, status, or authentication changes as breaking.
 
 **Rationale:** A consumer can depend on any element of the contract: a field it reads, a status it branches on, an authentication scheme it implements. Removing, renaming, narrowing, or retyping any of them breaks the consumer that depended on it. Calling each such change breaking routes it to versioning instead of silent release.
+
+### Treat Removed Behavior Fields as Breaking
+
+**Statement:** An API change reviewer MUST classify removal of a query output field, a refusal code, or an integration-event payload field as breaking.
+
+**Rationale:** Consumers read query output fields, branch on refusal codes, and parse integration-event payloads, so a removed field breaks every consumer that relied on it while the route stays green. Calling each such removal breaking routes it to versioning and notice instead of silent release.
 
 ### Classify Compatible Additions
 
@@ -57,6 +63,12 @@ This extension switches on no optional record type.
 **Statement:** An API change reviewer MUST classify an unclear contract change as breaking and require consumer review.
 
 **Rationale:** A structural diff cannot prove every change compatible: some changes need a person to judge their effect on consumers. Classifying the unclear ones as breaking routes them to consumer review instead of release. The cost of a needless review is smaller than the cost of a broken consumer.
+
+### Raise Breaking Behavior Changes as Intent Questions
+
+**Statement:** After production, a breaking Behavior change MUST travel as an Intent question naming its consumer impact.
+
+**Rationale:** A breaking change past production breaks promises consumers release against, so the decision belongs to the founder with the impact stated: which consumers break, what they must change, and when the old shape leaves. The question carries its decider, decide-by date, and ballot, as `litespec/core/intent#group-questions-into-ballots` states. A developer review alone cannot accept breaking what the product promised.
 
 ### Retain Release Baselines
 
@@ -150,27 +162,27 @@ This extension switches on no optional record type.
 
 **Rationale:** A structural diff compares documents; it never compiles a client. Testing each first-party generated client against the changed document compiles it and exercises its changed operations. The client's compiler and its exhaustive switches catch the breaks the diff cannot see.
 
-### Declare Published Events
+### Declare Published Facts as Integration Events
 
-**Statement:** An event consumed outside the product MUST be declared as a published event with a versioned schema.
+**Statement:** A fact consumed outside the product MUST be declared as an integration event with its direction, payload, and trust.
 
-**Rationale:** A consumer outside the product reads the event without reading the product's code, so the declaration states what the consumer may rely on: the published name, the versioned schema, and the owning team. An undeclared event reaches outside consumers as an implementation detail that changes without notice.
+**Rationale:** A consumer outside the product reads the fact without reading the product's code, so the integration-event record states what the consumer may rely on: the direction, the payload with its classifications, and the trust readers place in it. `litespec/core/behavior#describe-every-integration-event-for-its-direction` states the record. An undeclared fact reaches outside consumers as an implementation detail that changes without notice.
 
-### Classify Published Event Changes
+### Classify Integration Event Changes
 
-**Statement:** An API change reviewer MUST classify each published-event change as breaking, compatible, or needing consumer review under `litespec/ext/compat#classify-breaking-contract-changes`, `litespec/ext/compat#classify-compatible-additions`, and `litespec/ext/compat#review-exhaustive-consumer-changes`.
+**Statement:** An API change reviewer MUST classify each integration-event change as breaking, compatible, or needing consumer review under `litespec/ext/compat#classify-breaking-contract-changes`, `litespec/ext/compat#classify-compatible-additions`, and `litespec/ext/compat#review-exhaustive-consumer-changes`.
 
-**Rationale:** A published event is a contract with consumers the project does not deploy, so its changes need the same verdicts as HTTP contract changes. Reusing the contract classification keeps one meaning of breaking, compatible, and needs-review across both surfaces. A separate event verdict would let one change read as compatible for events and breaking for HTTP.
+**Rationale:** An integration event is a contract with consumers the project does not deploy, so its changes need the same verdicts as HTTP contract changes. Reusing the contract classification keeps one meaning of breaking, compatible, and needs-review across both surfaces. A separate event verdict would let one change read as compatible for events and breaking for HTTP.
 
-### Version Breaking Published Events
+### Version Breaking Integration Events
 
-**Statement:** An API owner MUST carry a breaking published-event change in a new event version beside the retained version.
+**Statement:** An API owner MUST carry a breaking integration-event change in a new event version beside the retained version.
 
 **Rationale:** Outside consumers move on their own release cadence, so the breaking change ships beside the retained version instead of replacing it. Each consumer moves to the new version on its own schedule. Without the retained version, one event serves two incompatible expectations.
 
-### Retire Published Events with Notice
+### Retire Integration Events with Notice
 
-**Statement:** An API owner MUST retire a published event version only after its declared support window with a deprecation notice to its consumers.
+**Statement:** An API owner MUST retire an integration event version only after its declared support window with a deprecation notice to its consumers.
 
 **Rationale:** A retired version strands every consumer still reading it, so the declared support window states how long the version stays available and the notice tells consumers when to move. Retiring early or silently turns a planned removal into an outage for the consumers that kept to the published plan.
 
@@ -222,10 +234,12 @@ Guides: None.
 |:---|:---|:---|
 | litespec/ext/compat#classify-independent-consumer-changes | guidance | Which independent-consumer contract changes lack a classification? Look at the change reviews. |
 | litespec/ext/compat#classify-breaking-contract-changes | guidance | Which removed, renamed, narrowed, retyped, or authentication changes lack a breaking verdict? Look at the change reviews. |
+| litespec/ext/compat#treat-removed-behavior-fields-as-breaking | guidance | Which removed output fields, refusal codes, or integration-event payload fields lack a breaking verdict? Look at the change reviews. |
 | litespec/ext/compat#classify-compatible-additions | guidance | Which optional additions lack a record of why existing behavior stays? Look at the change reviews. |
 | litespec/ext/compat#review-exhaustive-consumer-changes | guidance | Which added enum values or discriminator cases shipped without consumer review? Look at the consumer reviews. |
 | litespec/ext/compat#preserve-stable-error-codes | guidance | Which removed or reassigned stable codes lack a breaking verdict? Look at the change reviews. |
 | litespec/ext/compat#resolve-uncertain-classifications-safely | guidance | Which unclear changes shipped as compatible without consumer review? Look at the change reviews. |
+| litespec/ext/compat#raise-breaking-behavior-changes-as-intent-questions | guidance | Which breaking Behavior changes past production lack an Intent question naming their consumer impact? Look at the ballots. |
 | litespec/ext/compat#retain-release-baselines | guidance | Which releases lack a retained OpenAPI baseline? Look at the release artifacts. |
 | litespec/ext/compat#diff-release-contracts | guidance | Which changes skipped the local or continuous integration diff against the baseline? Look at the local runs and the CI runs. |
 | litespec/ext/compat#reject-unapproved-breaking-diffs | guidance | Which breaking diffs passed without a new version or an approved decision? Look at the CI runs. |
@@ -241,10 +255,10 @@ Guides: None.
 | litespec/ext/compat#treat-errors-as-contracts | guidance | Which type, code, field-code, or status changes shipped outside versioning? Look at the versioned error surface. |
 | litespec/ext/compat#gate-new-error-outcomes | guidance | Which added error outcomes break existing consumers on unknown codes? Look at the consumer error handling. |
 | litespec/ext/compat#exercise-generated-consumers | guidance | Which first-party clients skip compiling or exercising the changed contract? Look at the client test runs. |
-| litespec/ext/compat#declare-published-events | guidance | Which outside-consumed events lack a published declaration with a versioned schema? Look at the event entries beside the outside consumers. |
-| litespec/ext/compat#classify-published-event-changes | guidance | Which published-event changes lack a breaking, compatible, or needs-review verdict? Look at the event reviews. |
-| litespec/ext/compat#version-breaking-published-events | guidance | Which breaking event changes ship without a new version beside the retained one? Look at the published event versions. |
-| litespec/ext/compat#retire-published-events-with-notice | guidance | Which retired event versions left before their support window or without notice? Look at the retirement records beside the event consumers. |
+| litespec/ext/compat#declare-published-facts-as-integration-events | guidance | Which outside-consumed facts lack an integration-event record with direction, payload, and trust? Look at the integration-event records beside the outside consumers. |
+| litespec/ext/compat#classify-integration-event-changes | guidance | Which integration-event changes lack a breaking, compatible, or needs-review verdict? Look at the event reviews. |
+| litespec/ext/compat#version-breaking-integration-events | guidance | Which breaking event changes ship without a new version beside the retained one? Look at the integration event versions. |
+| litespec/ext/compat#retire-integration-events-with-notice | guidance | Which retired event versions left before their support window or without notice? Look at the retirement records beside the event consumers. |
 | litespec/ext/compat#store-current-openapi-source | guidance | Which current OpenAPI artifacts live outside the documented path or the recorded local convention? Look at `apps/api/openapi/`. |
 | litespec/ext/compat#keep-baseline-references-immutable | guidance | Which baselines move, or live outside the recorded local convention? Look at the baseline references. |
 | litespec/ext/compat#use-one-diff-tool | guidance | Which local runs or CI runs use a different diff tool than the recorded local convention? Look at the local runs and the CI runs. |

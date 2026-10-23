@@ -2,29 +2,37 @@
 
 ## Intent
 
-External integrations connect the product to providers it does not control, which can fail, change their responses, or deliver one message twice. This page states how a use case (one command, query, or reaction the product offers) names the outside behavior it needs, where provider details live, how failures map to project-owned results with stable refusal codes, and how tests simulate the network boundary. A team applies it for each use case that calls a provider, receives a webhook, or imports provider-shaped data, so a provider change touches one folder instead of the whole codebase.
+External integrations connect the product to providers it does not control, which can fail, change their responses, or deliver one message twice. This page states how a use case (one command or query the product offers) names the outside behavior it needs, where provider details live, how failures map to project-owned results with stable refusal codes, and how tests simulate the network boundary. A team applies it for each use case that calls a provider, receives a webhook, or imports provider-shaped data, so a provider change touches one folder instead of the whole codebase.
 
 ## Activation
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `rule`, `journey`.
+Applicable specification kinds: `use-case`.
 
-The consumer enables `integrations` for each use case that calls or publishes to an external service, receives a webhook, or uses a provider SDK.
+The consumer enables `integrations` for each use case that calls or publishes to an external system, receives an inbound integration event, or uses a provider SDK.
 
 ## Baseline Relationship
 
 This extension replaces no baseline provision.
 
-This extension switches on no optional record type. Each provider is recorded as an external system, the core record that names sends, receives, and failure behavior.
+This extension switches on no optional record type. Each provider is recorded as an external system, the core record that names its actor, operations, and erasure.
 
 ## Standards
 
 ### Record Each Provider as an External System
 
-**Statement:** An integration MUST record its provider as an external system naming sends, receives, failure, and actor.
+**Statement:** An integration MUST record its provider as an external system naming actor, operations, and erasure.
 
-**Rationale:** The external system record bounds the dependency both ways: `litespec/core/access#name-what-an-external-system-sends`, `litespec/core/access#name-what-an-external-system-receives`, and `litespec/core/access#state-the-failure-behavior-of-every-external-system` name what crosses the boundary, and `litespec/core/access#name-the-actor-for-every-external-system` names the party behind it. A provider with no record gains new messages and fallbacks without review.
+**Rationale:** The external-system record bounds the dependency: `litespec/core/access#name-the-actor-for-every-external-system` names the party behind it, `litespec/core/access#declare-every-operation-on-every-external-system` names every operation the product may call, and `litespec/core/access#declare-erasure-for-every-external-system` names how personal data leaves it. A provider with no record gains new messages and fallbacks without review.
+
+### Call Only Declared Operations
+
+**Statement:** A `calls` effect MUST name an operation the cited external system declares.
+
+**Rationale:** Each outside call is a declared edge: the effect names the system and its operation, and the operation states the direction, timeout, retry, response, and cache. A call to an undeclared operation ships as an unreviewed dependency, and the security queue has no stated edge to review. `litespec/core/behavior#declare-every-effect-with-one-verb-and-its-timing` states the effect verbs, and the `effect-undeclared` check reports an edge the records never declared.
+
+**Example:** The refund effect cites `calls` on the payment provider `refund` operation with its timeout and retry count.
 
 ### Define Business-Action Ports
 
@@ -87,6 +95,12 @@ The project's own error catalog holds the stable codes. `litespec/backend/api#re
 **Statement:** An API MUST NOT expose provider bodies, credentials, headers, exception types, or internal account identifiers.
 
 **Rationale:** Provider bodies, headers, exception types, and account identifiers carry secrets, implementation details, and sometimes another account's data. An API that returns them leaks all three to its callers. The mapped project-owned outcome carries the meaning without the internals.
+
+### Trust Inbound Integration Events by Declared Trust
+
+**Statement:** An inbound integration event MUST declare `trust` as trigger-only or payload with its correlation.
+
+**Rationale:** Readers place one of two trusts in an inbound fact: trigger-only wakes a read of the source, while payload is fit to act on. The trust states which one, and the correlation states how the event matches, so no handler guesses how far to follow a stranger's fields. `litespec/core/behavior#describe-every-integration-event-for-its-direction` states the record, and `litespec/core/behavior#reach-every-inbound-integration-event-through-a-webhook` gives each inbound fact one door.
 
 ### Verify Inbound Provider Messages
 
@@ -164,7 +178,8 @@ Guides: `None.`
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/integrations#record-each-provider-as-an-external-system | guidance | Each provider has an external system page under `docs/domain/systems/` naming sends, receives, failure, and actor. |
+| litespec/ext/integrations#record-each-provider-as-an-external-system | guidance | Each provider has an external system page in the Behavior systems home naming actor, operations, and erasure. |
+| litespec/ext/integrations#call-only-declared-operations | guidance | Each calls effect names an operation the cited external system declares. |
 | litespec/ext/integrations#define-business-action-ports | guidance | Each Application port names a business action with no provider in its name or signature. |
 | litespec/ext/integrations#isolate-provider-implementations | checkable | `ExternalPortTests` assert the Application assembly references no provider SDK or transport type. |
 | litespec/ext/integrations#bind-client-configuration | checkable | `ExternalClientTests` reject missing or invalid external client configuration. |
@@ -174,6 +189,7 @@ Guides: `None.`
 | litespec/ext/integrations#protect-non-idempotent-calls | checkable | `ExternalRetryTests` show no retry without documented provider protection. |
 | litespec/ext/integrations#translate-provider-failure-outcomes | checkable | `ExternalFailureTests` assert provider failures map to project-owned results and stable diagnostics. |
 | litespec/ext/integrations#exclude-provider-internals | checkable | `ExternalFailureTests` expose no provider body, credential, header, type, or account identifier. |
+| litespec/ext/integrations#trust-inbound-integration-events-by-declared-trust | guidance | Each inbound integration event declares trigger-only or payload trust with its correlation. |
 | litespec/ext/integrations#verify-inbound-provider-messages | checkable | `ExternalInboundTests` reject invalid signatures, timestamps, content, size, schema, and identities. |
 | litespec/ext/integrations#process-duplicate-messages-safely | checkable | `ExternalInboundTests` leave one accepted external effect. |
 | litespec/ext/integrations#reject-formula-leading-import-values | checkable | `ExternalInboundTests` reject or neutralize formula-leading import values. |

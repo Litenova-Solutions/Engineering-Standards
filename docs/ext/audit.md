@@ -40,11 +40,17 @@ A domain event cannot substitute for an audit record. A domain event carries dom
 
 ### Declare Audit Selection on Every Command
 
-**Statement:** Every Command MUST declare that it is audited, or declare that it is excluded together with the reason for exclusion.
+**Statement:** Every command use case MUST declare its audit position in its `audit` field, or declare an exemption with its justification.
 
-**Rationale:** An audit selection that lives only in code is invisible: a reader cannot tell an unaudited Command from an audited one whose call is missing. A declaration on every Command turns each omission into a visible statement with a reason. Review then reads the selection instead of hunting for missing calls.
+**Rationale:** An audit selection that lives only in code is invisible: a reader cannot tell an unaudited command from an audited one whose call is missing. The `audit` field states the reason of `required`, `optional`, or `none` with its target, or the exemption with its justification, so each omission becomes a visible statement. Commands are audited by default with reason `none`. `litespec/core/behavior#state-the-audit-position-of-every-command` states the field, and review reads the selection instead of hunting for missing calls.
 
-**Example:** A storefront browse Command declares exclusion because a public catalog read is not a sensitive action.
+**Example:** A storefront browse command declares an exemption because a public catalog read is not a sensitive action.
+
+### Audit Async Work at Request Time
+
+**Statement:** Work that runs after its request MUST write its audit record at request time.
+
+**Rationale:** The actor, the origin, and the grant exist when the request arrives; the later run carries worker identity under system auth, which says nothing about who asked. Writing the record at request time ties the attempt to the caller who made it. A record written when the background run starts would attribute every scheduled and deferred act to the worker instead of the requester.
 
 ### Cover the Required Audit Categories
 
@@ -258,9 +264,9 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Give the Trail a Read Path
 
-**Statement:** An audited system MUST provide a trail read as a use case needing a permission, filtered by tenant, actor, action, target, and outcome.
+**Statement:** An audited system MUST provide a trail read as a use case with its access grant, filtered by tenant, actor, action, target, and outcome.
 
-**Rationale:** A trail no use case reads is storage, not a control. The read path is a use case with its own permission: the actor holds a role at a scope, the role allows the permission, and the guard permits the read. Tenant, actor, action, target, and outcome filters keep each reader inside the records they may see.
+**Rationale:** A trail no use case reads is storage, not a control. The read path is a use case with its own access grant: the actor holds a role at a scope, the role allows the permission, and the grant permits the read. Tenant, actor, action, target, and outcome filters keep each reader inside the records they may see.
 
 ### Audit Reads of the Trail
 
@@ -290,7 +296,7 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Reject an Undeclared Command
 
-**Statement:** An automated check MUST fail when a Command declares neither audited nor excluded status, with a composition refusal at startup satisfying this rule.
+**Statement:** An automated check MUST fail when a Command declares neither an audit position nor an exemption, with a composition refusal at startup satisfying this rule.
 
 **Rationale:** The next Command is written by someone who did not read this page. Only an automated gate catches it: the build or startup fails while the declaration is missing. A selection that depends on every author remembering is a selection with holes.
 
@@ -306,11 +312,11 @@ The algorithm is named because two implementations that each choose their own ca
 
 ### Declare Audit Selection Beside the Command
 
-**Default:** Declare the action, target kind, category, and exclusion reason as an attribute on the Command type.
+**Default:** Declare the action, target kind, and category as an attribute on the Command type, beside the use-case `audit` field.
 
 **Replacement:** A consumer records a selection-declaration convention naming where each Command declares its audit selection.
 
-**Rationale:** The declaration stays with the code it describes, so a review reads both at once. A selection kept in a separate file drifts from the Commands it names.
+**Rationale:** The declaration stays with the code it describes, so a review reads both at once. The use-case page carries the audit position or exemption, and the attribute carries the action, target kind, and category the producer writes. A selection kept in a separate file drifts from the Commands it names.
 
 ### Use a Fixed Category Vocabulary
 
@@ -349,7 +355,8 @@ Guides: [Build an audit trail](../guide/audit-trail.md).
 | ID | Mark | Evidence |
 |:---|:---|:---|
 | litespec/ext/audit#record-the-audit-adoption-decision | guidance | Which adoption decisions lack owner, status, decider, decideBy, categories, threshold, access model, integrity method, or records entry? Look at the adoption decision behind the audited Commands. |
-| litespec/ext/audit#declare-audit-selection-on-every-command | guidance | Which Commands lack an audited declaration or an exclusion reason? Look at the Command types. |
+| litespec/ext/audit#declare-audit-selection-on-every-command | guidance | Which command use cases lack an audit position or an exemption with its justification in their `audit` field? Look at the use case pages. |
+| litespec/ext/audit#audit-async-work-at-request-time | guidance | Which deferred runs write their audit record at run time instead of request time? Look at the audit rows beside the requesting calls. |
 | litespec/ext/audit#cover-the-required-audit-categories | guidance | Which required categories have no selection entry? Look at the declared selection beside the eight listed categories. |
 | litespec/ext/audit#exclude-indiscriminate-auditing | guidance | Which audited categories lack a recorded selection reason? Look at the declared selection. |
 | litespec/ext/audit#emit-audit-records-at-the-mediation-boundary | guidance | Which audit writes run inside handlers instead of the mediation pipeline? Look at the producer stages and the handler code. |
@@ -381,12 +388,12 @@ Guides: [Build an audit trail](../guide/audit-trail.md).
 | litespec/ext/audit#add-a-correcting-record | guidance | Which corrections edit history instead of adding a referencing record? Look at the correction records. |
 | litespec/ext/audit#retain-each-category-for-its-declared-period | guidance | Which records outlive the declared retention of their category? Look at the stored rows beside the adoption decision. |
 | litespec/ext/audit#remove-the-identity-mapping-on-erasure | guidance | Which erasures leave the actor mapping or delete audit records? Look at the erasure handling and the retained rows. |
-| litespec/ext/audit#give-the-trail-a-read-path | guidance | Which trail reads lack permission gating or a declared filter? Look at the trail read use case. |
+| litespec/ext/audit#give-the-trail-a-read-path | guidance | Which trail reads lack an access grant or a declared filter? Look at the trail read use case. |
 | litespec/ext/audit#audit-reads-of-the-trail | guidance | Which completed trail reads produced no audit record? Look at the trail read path. |
 | litespec/ext/audit#record-personal-data-reads | guidance | Which cross-boundary personal-data queries produced no record? Look at the query paths beside the trail. |
 | litespec/ext/audit#record-a-bulk-read-inside-its-own-boundary | guidance | Which above-threshold queries produced no record with the subject count? Look at the bulk query paths. |
 | litespec/ext/audit#record-bulk-export | guidance | Which exports produced no record naming the requested scope? Look at the export paths. |
-| litespec/ext/audit#reject-an-undeclared-command | guidance | Which Commands build or start with no declaration? Look at the build or startup gate. |
+| litespec/ext/audit#reject-an-undeclared-command | guidance | Which Commands build or start with no audit position or exemption? Look at the build or startup gate. |
 | litespec/ext/audit#keep-audit-infrastructure-in-one-location | guidance | Which audit parts live outside the documented location or the recorded local convention? Look under `Infrastructure/Auditing/`. |
 | litespec/ext/audit#declare-audit-selection-beside-the-command | guidance | Which Commands lack the declaration attribute or the recorded local convention? Look at the Command types. |
 | litespec/ext/audit#use-a-fixed-category-vocabulary | guidance | Which category values fall outside the eight-value vocabulary or the recorded local convention? Look at the declared selection. |

@@ -2,23 +2,35 @@
 
 ## Intent
 
-The outbox pattern makes a business change and the message it owes the outside world durable together, so no crash between the two loses the message. This page states how the product stages that message in the same database transaction as the business commit and how a background Worker delivers it later with retry, idempotency, visibility, and safe replay. A team selects it for each use case (one command, query, or reaction the product offers) or journey (steps toward one goal) whose committed change needs delivery that survives process failure, so no accepted change silently drops its consequence.
+The outbox pattern makes a business change and the message it owes the outside world durable together, so no crash between the two loses the message. This page states how the product stages that message in the same database transaction as the business commit and how a background Worker delivers it later with retry, idempotency, visibility, and safe replay. A team selects it for each use case whose committed change needs delivery that survives process failure, so no accepted change silently drops its consequence.
 
 ## Activation
 
 Activation scope: `local`.
 
-Applicable specification kinds: `use-case`, `journey`.
+Applicable specification kinds: `use-case`.
 
-A use case or journey selects this extension when a committed change needs delivery that survives a process failure. That delivery can carry an integration event to another system, a command that advances a journey step, or a side effect on an outside provider. Selecting it also activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the dispatcher.
+A use case selects this extension when a committed change needs delivery that survives a process failure. That delivery can carry an integration event to another system, a command that advances a journey step, or a side effect on an outside provider. Selecting it also activates `litespec/backend/architecture#declare-the-execution-host-for-work-that-outlives-a-request`: the project declares the execution host that runs the dispatcher.
 
 ## Baseline Relationship
 
 This extension replaces `litespec/backend/persistence#collect-events-without-a-public-unit-of-work`.
 
-Selecting it switches on the Event, Limit, and Runbook record types. The project writes an Event record for each integration event it delivers, Limit records for the delivery bounds, and Runbook records for recovery and rollback.
+This extension switches on no optional record type: integration events, settings, and runbooks belong to the core. The project writes an integration-event record for each integration event it delivers, setting records for the delivery bounds, and runbook records for recovery and rollback.
 
 ## Standards
+
+### Stage After-Commit Effects in the Outbox
+
+**Statement:** A use case declaring `after-commit` `publishes` or `issues` effects MUST stage each effect in the outbox in the same transaction as its changes.
+
+**Rationale:** After-commit timing promises the message follows the commit: staged in the same transaction, the change and its message share one fate. An effect sent from memory instead would vanish on a crash between the commit and the send. `litespec/core/behavior#declare-every-effect-with-one-verb-and-its-timing` states the effect verbs and their timing, and `async` effects dispatch without the transaction.
+
+### Declare Published Facts as Integration Events
+
+**Statement:** Each `publishes` effect MUST name an integration-event record carrying direction, payload, and trust.
+
+**Rationale:** A published fact without a record is a promise nobody versioned: readers depend on fields no page states, and a field change breaks them without a diff. The integration-event record states the direction, the payload with its classifications, and the trust readers place in it. `litespec/core/behavior#publish-every-outbound-integration-event-from-effects` states the declaration, and `litespec/core/behavior#describe-every-integration-event-for-its-direction` states the record.
 
 ### Record Durable Delivery Behavior
 
@@ -30,7 +42,7 @@ Selecting it switches on the Event, Limit, and Runbook record types. The project
 
 **Statement:** A project MUST NOT activate outbox for a reaction whose delivery guarantee is best-effort and which operators can repeat manually.
 
-**Rationale:** Outbox storage, dispatch, retries, and replay exist to prevent loss; a reaction whose loss the operators accept and can repeat by hand needs none of that machinery. The reaction's declaration states its best-effort guarantee, and the use case page records it.
+**Rationale:** Outbox storage, dispatch, retries, and replay exist to prevent loss; a reaction whose loss the operators accept and can repeat by hand needs none of that machinery. The reaction's `onFailure` states its best-effort handling, and the use case page records the accepted gap.
 
 ### Publish Best-Effort Reactions After Commit
 
@@ -64,9 +76,9 @@ Selecting it switches on the Event, Limit, and Runbook record types. The project
 
 ### Classify Message Kinds
 
-**Statement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect, with an integration event citing its Event record.
+**Statement:** An outbox record MUST name its message kind as integration event, journey-step command, or provider side effect, with an integration event citing its integration-event record.
 
-**Rationale:** An integration event, a journey-step command, and a provider side effect dispatch through different owners and transports, so the record names which one it holds. The integration event cites its Event record, reached through the `raises` link the model uses to trace the flow.
+**Rationale:** An integration event, a journey-step command, and a provider side effect dispatch through different owners and transports, so the record names which one it holds. The integration event cites its integration-event record, so the staged message traces to the published fact it carries.
 
 ### Reject Independent Outbox Commits
 
@@ -136,9 +148,9 @@ Selecting it switches on the Event, Limit, and Runbook record types. The project
 
 ### Classify Permanent Delivery Failure
 
-**Statement:** An outbox dispatcher MUST classify permanent failures, stop automatic retry at its configured limit, and retain safe investigation and replay data.
+**Statement:** An outbox dispatcher MUST classify permanent failures, stop automatic retry at its retry bound, and retain safe investigation and replay data.
 
-**Rationale:** Some failures never clear on retry: a deleted destination, a rejected payload, a revoked credential. Retrying those forever burns resources and buries the real backlog, so the dispatcher classifies them, stops at its configured limit, and keeps the evidence an operator needs to investigate and replay safely.
+**Rationale:** Some failures never clear on retry: a deleted destination, a rejected payload, a revoked credential. Retrying those forever burns resources and buries the real backlog, so the dispatcher classifies them, stops at its retry bound, and keeps the evidence an operator needs to investigate and replay safely.
 
 ### Distinguish Dependency Outage
 
@@ -186,9 +198,9 @@ Each message record therefore carries its own shape version, and the dispatcher 
 
 ### Set Delivery Alerts
 
-**Statement:** An outbox deployment MUST set alert thresholds as Limit records from its use-case delivery target.
+**Statement:** An outbox deployment MUST set alert thresholds as setting records from its use-case delivery target.
 
-**Rationale:** A shipment notice delayed an hour and a receipt delayed a week carry different business consequences, so each use case sets alert thresholds from its own delivery target. Limit records hold those thresholds, so the alert fires when delay passes what the business accepted.
+**Rationale:** A shipment notice delayed an hour and a receipt delayed a week carry different business consequences, so each use case sets alert thresholds from its own delivery target. Setting records hold those thresholds, so the alert fires when delay passes what the business accepted.
 
 ### Model Outbox Lifecycle States
 
@@ -282,6 +294,8 @@ Guides: `None.`
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
+| litespec/ext/outbox#stage-after-commit-effects-in-the-outbox | guidance | Each after-commit publishes and issues effect stages in the outbox in the same transaction as its changes. |
+| litespec/ext/outbox#declare-published-facts-as-integration-events | guidance | Each publishes effect names an integration-event record carrying direction, payload, and trust. |
 | litespec/ext/outbox#record-durable-delivery-behavior | guidance | Each delivery specification documents guarantee, downstream boundary, duplicate behavior, retry horizon, recovery owner, record owner, and status. |
 | litespec/ext/outbox#exclude-manually-repeatable-reactions | guidance | Best-effort reactions that operators can repeat manually carry no outbox records. |
 | litespec/ext/outbox#publish-best-effort-reactions-after-commit | guidance | Excluded reactions publish after commit success with no staged outbox record. |
@@ -289,7 +303,7 @@ Guides: `None.`
 | litespec/ext/outbox#serialize-durable-messages | guidance | Each pending durable message lands serialized in an outbox record. |
 | litespec/ext/outbox#store-required-message-fields | guidance | Each outbox record carries identity, kind, type, schema version, time, payload, tenant, state, attempt, and next-attempt data. |
 | litespec/ext/outbox#store-failure-and-completion-evidence | guidance | Each outbox record retains its last error summary and completion time. |
-| litespec/ext/outbox#classify-message-kinds | guidance | Each outbox record names integration event, journey-step command, or provider side effect, with integration events citing their Event record. |
+| litespec/ext/outbox#classify-message-kinds | guidance | Each outbox record names integration event, journey-step command, or provider side effect, with integration events citing their integration-event record. |
 | litespec/ext/outbox#reject-independent-outbox-commits | guidance | Writer sources stage through the business session with no separate connection or commit. |
 | litespec/ext/outbox#dispatch-claimed-records-in-worker | guidance | The Worker claims pending records, dispatches bounded batches, and records each outcome. |
 | litespec/ext/outbox#exclude-request-transaction-dispatch | guidance | Request paths commit eligibility only, with dispatch living in the Worker. |
@@ -301,7 +315,7 @@ Guides: `None.`
 | litespec/ext/outbox#identify-repeated-delivery | guidance | Each consumer checks message ID or business key at its Command or side-effect boundary. |
 | litespec/ext/outbox#await-target-acceptance | guidance | Completion records follow target acceptance, with no early completion. |
 | litespec/ext/outbox#bound-delivery-retries | guidance | Retries run bounded exponential backoff with jitter. |
-| litespec/ext/outbox#classify-permanent-delivery-failure | guidance | Permanent failures stop at the configured limit with safe investigation and replay data retained. |
+| litespec/ext/outbox#classify-permanent-delivery-failure | guidance | Permanent failures stop at the retry bound with safe investigation and replay data retained. |
 | litespec/ext/outbox#distinguish-dependency-outage | guidance | Store availability reads as a gauge while claimed-message outcomes read as a counter. |
 | litespec/ext/outbox#back-off-unavailable-store-polling | guidance | Polling during a store outage backs off with rate-limited logging. |
 | litespec/ext/outbox#restrict-message-retry-to-claimed-records | guidance | Retry and poison handling touch claimed records only. |
@@ -309,7 +323,7 @@ Guides: `None.`
 | litespec/ext/outbox#version-message-types | guidance | Each message carries a stable type name with an explicit schema version. |
 | litespec/ext/outbox#support-coexisting-message-producers | guidance | The dispatcher reads records from every coexisting application version. |
 | litespec/ext/outbox#publish-backlog-indicators | guidance | The deployment publishes pending count, failed count, oldest pending age, attempts, dispatch duration, and success rate. |
-| litespec/ext/outbox#set-delivery-alerts | guidance | Alert thresholds sit in Limit records derived from each use-case delivery target. |
+| litespec/ext/outbox#set-delivery-alerts | guidance | Alert thresholds sit in setting records derived from each use-case delivery target. |
 | litespec/ext/outbox#model-outbox-lifecycle-states | guidance | Outbox lifecycle states form sealed records over an abstract base with documented transitions. |
 | litespec/ext/outbox#preserve-message-identity-during-retry | guidance | Message ID stays identical across retry and replay. |
 | litespec/ext/outbox#audit-outbox-replay | guidance | Each replay records actor, reason, time, and failure without editing the payload. |
