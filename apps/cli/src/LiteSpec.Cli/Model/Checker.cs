@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace LiteSpec.Model;
 
 /// <summary>
-///     Every model check: schema, identifiers, citations, gates, proof and reach.
+///     Every model check: schema, identifiers, citations, gates, proof, reach, graph and tiers.
 /// </summary>
 static partial class Checker
 {
@@ -19,12 +19,21 @@ static partial class Checker
         "rule-name-negation", "use-case-without-success", "scenario-result-unresolved",
         "refusal-not-thrown", "use-case-unimplemented", "proves-unconfirmed",
         "size-type-missing", "product-not-singleton",
-        "journey-reach", "use-case-access", "region-unknown",
+        "journey-reach", "use-case-access",
         "use-case-without-scenario", "requirement-unfulfilled",
         "aggregate-name-clash", "decision-decides-nothing", "link-unresolved",
         "behavior-unrecorded", "state-unreachable", "transition-unresolved",
-        "personal-data-uncovered", "calculation-without-table",
-        "reaction-without-trigger", "requirement-unmeasured", "open-questions",
+        "erasure-undeclared", "calculation-without-table",
+        "reaction-trigger-unresolved", "requirement-unmeasured",
+        "record-orphaned", "step-unserved", "effect-loop", "consistency-unexplained",
+        "query-output-missing", "paging-undeclared", "widening-unjustified",
+        "retention-without-enforcement", "risk-without-acceptance", "exemption-expired",
+        "setting-default-without-requirement", "reservation-without-release",
+        "notification-without-sender", "except-without-fallback", "approval-reopened",
+        "transcribed-reviewed", "transcribed-after-adoption",
+        "operator-job-without-guard", "schedule-unstructured",
+        "write-undeclared", "result-undeclared", "effect-undeclared",
+        "prose-missing", "many-aggregates", "question-aged",
     };
 
     /// <summary>Requirement kinds that code makes true, so some rule, use case or journey fulfills them.</summary>
@@ -52,17 +61,37 @@ static partial class Checker
         Time("proof", () => CheckProof(model, findings));
         Time("fulfillment", () => CheckFulfilment(model, findings));
         Time("links", () => CheckLinks(model, findings));
-        Time("access", () => CheckAccess(model, findings));
-        Time("regions", () => CheckRegions(model, findings));
         Time("profile", () => CheckSizeTypes(model, findings));
         Time("reach", () => CheckJourneyReach(model, findings));
         Time("behavior", () => CheckBehaviorUnrecorded(model, findings));
+        Time("code", () => CheckCode(model, findings));
         Time("lifecycle", () => CheckLifecycle(model, findings));
-        Time("data", () => CheckPersonalData(model, findings));
+        Time("erasure", () => CheckErasure(model, findings));
+        Time("retention", () => CheckRetention(model, findings));
+        Time("acceptance", () => CheckRiskAcceptance(model, findings));
+        Time("exemption", () => CheckExemption(model, findings));
         Time("calculations", () => CheckCalculations(model, findings));
-        Time("reactions", () => CheckReactions(model, findings));
+        Time("reactions", () => CheckReactionTrigger(model, findings));
         Time("measured", () => CheckMeasured(model, findings));
         Time("questions", () => CheckQuestions(model, findings));
+        Time("aged", () => CheckQuestionAged(model, findings));
+        Time("orphaned", () => CheckOrphaned(model, findings));
+        Time("steps", () => CheckStepUnserved(model, findings));
+        Time("loops", () => CheckEffectLoop(model, findings));
+        Time("consistency", () => CheckConsistency(model, findings));
+        Time("output", () => CheckQueryOutput(model, findings));
+        Time("paging", () => CheckPaging(model, findings));
+        Time("widening", () => CheckWidening(model, findings));
+        Time("settings", () => CheckSettingDefault(model, findings));
+        Time("reservations", () => CheckReservation(model, findings));
+        Time("senders", () => CheckNotificationSender(model, findings));
+        Time("except", () => CheckExceptFallback(model, findings));
+        Time("approval", () => CheckApproval(model, findings));
+        Time("transcribed", () => CheckTranscribed(model, findings));
+        Time("operator", () => CheckOperatorJob(model, findings));
+        Time("schedule", () => CheckSchedule(model, findings));
+        Time("prose", () => CheckProse(model, findings));
+        Time("groups", () => CheckManyAggregates(model, findings));
 
         findings.Sort((left, right) =>
         {
@@ -139,10 +168,24 @@ static partial class Checker
         return (kept, known);
     }
 
+    /// <summary>Record types using the Behavior status vocabulary.</summary>
+    private static readonly HashSet<string> BehaviorTypes = new(StringComparer.Ordinal)
+    {
+        "module", "aggregate", "rule", "use-case", "result", "scenario", "event",
+        "integration-event", "reaction", "job", "notification", "setting",
+        "role", "permission", "entry-point", "external-system", "runbook",
+    };
+
     private static void CheckSchema(ProjectModel model, List<Finding> findings, Codeowners owners)
     {
         foreach (var record in model.Records)
         {
+            // A derived generic result inherits its shape from its use case.
+            if (record.Derived)
+            {
+                continue;
+            }
+
             if (record.Type.Length == 0)
             {
                 findings.Add(new Finding("record-shape", "The record has no type.", record.File, record.Line, null));
@@ -181,9 +224,9 @@ static partial class Checker
             {
                 findings.Add(new Finding("record-shape", $"Record '{record.Id}' has no status.", record.File, record.Line, SubjectOf(record)));
             }
-            else if (record.Status is not ("draft" or "approved" or "retired"))
+            else if (!ValidStatus(record))
             {
-                findings.Add(new Finding("invalid-field", $"Record '{record.Id}' has status '{record.Status}'; draft, approved or retired.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("invalid-field", $"Record '{record.Id}' has status '{record.Status}'; {StatusVocabulary(record)}.", record.File, record.Line, SubjectOf(record)));
             }
 
             if (record.Status == "draft")
@@ -210,6 +253,38 @@ static partial class Checker
             CheckTypeFields(model, record, findings);
             CheckReplaces(model, record, findings);
         }
+    }
+
+    /// <summary>Whether the status fits the record layer vocabulary.</summary>
+    private static bool ValidStatus(Record record)
+    {
+        if (record.Status is "draft" or "retired")
+        {
+            return true;
+        }
+
+        // Terms span both layers, so either live status fits.
+        if (record.Type == "term")
+        {
+            return record.Status is "approved" or "reviewed";
+        }
+
+        return BehaviorTypes.Contains(record.Type)
+            ? record.Status == "reviewed"
+            : record.Status == "approved";
+    }
+
+    /// <summary>The status words the record layer vocabulary allows.</summary>
+    private static string StatusVocabulary(Record record)
+    {
+        if (record.Type == "term")
+        {
+            return "draft, approved, reviewed or retired";
+        }
+
+        return BehaviorTypes.Contains(record.Type)
+            ? "draft, reviewed or retired"
+            : "draft, approved or retired";
     }
 
     private static void CheckTypeFields(ProjectModel model, Record record, List<Finding> findings)
@@ -322,18 +397,23 @@ static partial class Checker
                 break;
 
             case "aggregate":
-                RequireArray(record, "states", 1, findings);
-                RequireStateEntries(record, findings);
+                // A store carries no lifecycle, so it carries no states.
+                if (record.Field("kind") is not "store")
+                {
+                    RequireArray(record, "states", 1, findings);
+                    RequireStateEntries(record, findings);
+                }
+
                 break;
 
             case "rule":
-                RequireEnum(record, "kind", ["invariant", "precondition", "calculation", "cross-aggregate"], findings);
+                RequireEnum(record, "kind", ["invariant", "precondition", "calculation", "cross-aggregate", "atomicity", "reservation", "commercial-data", "default"], findings);
                 RequireString(record, "statement", findings);
                 RequireIds(record, "governs", 1, findings);
                 break;
 
             case "use-case":
-                RequireEnum(record, "kind", ["command", "query", "reaction"], findings);
+                RequireEnum(record, "kind", ["command", "query"], findings);
                 // A retired use case names no entry point, so only a live one must be reached.
                 if (record.Status != "retired")
                 {
@@ -377,13 +457,7 @@ static partial class Checker
                 break;
 
             case "entry-point":
-                RequireEnum(record, "kind", ["app", "api", "cli", "job", "reaction"], findings);
-                break;
-
-            case "limit":
-                RequireString(record, "bound", findings);
-                RequireString(record, "value", findings);
-                RequireIds(record, "runbook", 1, findings);
+                RequireEnum(record, "kind", ["browser", "api", "webhook", "device", "cli", "mcp", "served-content", "reaction", "job"], findings);
                 break;
 
             case "runbook":
@@ -449,7 +523,9 @@ static partial class Checker
 
             foreach (var target in ModelBuilder.TargetsOf(property.Value))
             {
-                if (!model.ById.TryGetValue(target, out var resolved))
+                var baseId = Identifiers.BaseId(target);
+
+                if (!model.ById.TryGetValue(baseId, out var resolved))
                 {
                     continue;
                 }
@@ -458,6 +534,8 @@ static partial class Checker
                 {
                     findings.Add(new Finding("invalid-field", $"Record '{record.Id}' links {property.Name} to '{target}', which is a {resolved.Type}.", record.File, record.Line, SubjectOf(record)));
                 }
+
+                CheckFragment(model, record, target, baseId, resolved, findings);
             }
         }
 
@@ -493,6 +571,59 @@ static partial class Checker
         }
     }
 
+    /// <summary>
+    ///     Whether the link fragment names a journey step or an external-system
+    ///     operation its record holds. The citation check reads only the base id,
+    ///     so a missing step or operation is reported here.
+    /// </summary>
+    private static void CheckFragment(
+        ProjectModel model, Record record, string target, string baseId, Record resolved, List<Finding> findings)
+    {
+        if (target == baseId)
+        {
+            return;
+        }
+
+        if (Identifiers.TrySplitStep(target, out _, out _))
+        {
+            if (resolved.Type == "journey" && !resolved.StepIds().Contains(target, StringComparer.Ordinal))
+            {
+                findings.Add(new Finding("reference-unresolved", $"Record '{record.Id}' serves '{target}', which names no step of the journey.", record.File, record.Line, SubjectOf(record)));
+            }
+
+            return;
+        }
+
+        if (resolved.Type == "external-system")
+        {
+            var operation = target[(target.IndexOf('#', StringComparison.Ordinal) + 1)..];
+
+            if (!OperationNames(resolved).Contains(operation, StringComparer.Ordinal))
+            {
+                findings.Add(new Finding("reference-unresolved", $"Record '{record.Id}' calls '{target}', which names no operation of the system.", record.File, record.Line, SubjectOf(record)));
+            }
+        }
+    }
+
+    private static IReadOnlyList<string> OperationNames(Record system)
+    {
+        if (system.Raw.ValueKind != JsonValueKind.Object
+            || !system.Raw.TryGetProperty("operations", out var operations)
+            || operations.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        return
+        [
+            .. operations.EnumerateArray()
+                          .Where(entry => entry.ValueKind == JsonValueKind.Object
+                              && entry.TryGetProperty("name", out var name)
+                              && name.ValueKind == JsonValueKind.String)
+                          .Select(entry => entry.GetProperty("name").GetString()!),
+        ];
+    }
+
     private static void CheckReplaces(ProjectModel model, Record record, List<Finding> findings)
     {
         if (record.Type != "decision" && record.Ids("replaces").Any())
@@ -518,7 +649,8 @@ static partial class Checker
 
         foreach (var record in model.Records)
         {
-            if (record.Id.Length == 0)
+            // A derived generic result carries its use case home and name, not the grammar.
+            if (record.Id.Length == 0 || record.Derived)
             {
                 continue;
             }
@@ -599,7 +731,7 @@ static partial class Checker
 
             var known = prefix switch
             {
-                "use-case" or "aggregate" => moduleNames.Contains(home),
+                "use-case" or "aggregate" or "reaction" or "job" or "notification" or "setting" => moduleNames.Contains(home),
                 "rule" => moduleNames.Contains(home) || recordNames.Contains(home),
                 "result" or "scenario" => useCaseNames.ContainsKey(home),
                 "event" => recordNames.Contains(home),
@@ -750,16 +882,22 @@ static partial class Checker
 
     private static void CheckGates(ProjectModel model, List<Finding> findings)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        // A tier-3 draft with a recommendation past its decide-by date plus the veto
+        // window counts as auto-approved. A tier-1 draft is never auto-approved, so it blocks.
         var drafts = model.Records
-            .Where(record => record.Type == "decision" && record.Status == "draft")
+            .Where(record => record.Type == "decision"
+                && record.Status == "draft"
+                && !AutoApproved(record.Raw, record, model.Config, today))
             .SelectMany(decision => decision.Ids("decides"))
             .ToHashSet(StringComparer.Ordinal);
 
         foreach (var record in model.Records)
         {
-            if (record.Status == "approved" && drafts.Contains(record.Id))
+            if ((record.Status == "approved" || record.Status == "reviewed") && drafts.Contains(record.Id))
             {
-                findings.Add(new Finding("draft-gate", $"Record '{record.Id}' is approved while its decision is a draft.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("draft-gate", $"Record '{record.Id}' is {record.Status} while its decision is a draft.", record.File, record.Line, SubjectOf(record)));
             }
         }
 
@@ -770,8 +908,6 @@ static partial class Checker
                 findings.Add(new Finding("decision-decides-nothing", $"Decision '{decision.Id}' names nothing it decides.", decision.File, decision.Line, SubjectOf(decision)));
             }
         }
-
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         foreach (var gap in model.Records.Where(record => record.Type == "known-gap"))
         {
@@ -882,12 +1018,9 @@ static partial class Checker
                 continue;
             }
 
-            var scenarioHome = Identifiers.TrySplit(scenario.Id, out _, out var left, out _) ? left : null;
-            var resultHome = Identifiers.TrySplit(result.Id, out _, out var right, out _) ? right : null;
-
-            if (scenarioHome is null || scenarioHome != resultHome)
+            if (!ResultBelongsToScenario(model, scenario, result))
             {
-                findings.Add(new Finding("scenario-result-unresolved", $"Scenario '{scenario.Id}' ends in '{resultId}' of another use case.", scenario.File, scenario.Line, SubjectOf(scenario)));
+                findings.Add(new Finding("scenario-result-unresolved", $"Scenario '{scenario.Id}' ends in '{resultId}' outside its use case.", scenario.File, scenario.Line, SubjectOf(scenario)));
             }
         }
 
@@ -913,6 +1046,41 @@ static partial class Checker
                 }
             }
         }
+    }
+
+    /// <summary>
+    ///     Whether the scenario ends where it may: a reaction scenario in a result of
+    ///     the use case its reaction issues, any other scenario in a written result of
+    ///     its own use case or a derived generic result its use case carries.
+    /// </summary>
+    private static bool ResultBelongsToScenario(ProjectModel model, Record scenario, Record result)
+    {
+        if (scenario.PageId is not null
+            && model.ById.TryGetValue(scenario.PageId, out var page)
+            && page.Type == "reaction"
+            && page.Ids("issues").FirstOrDefault() is { } issued
+            && model.ById.TryGetValue(issued, out var target)
+            && target.Type == "use-case"
+            && Identifiers.TrySplit(issued, out _, out _, out var operation))
+        {
+            return (!result.Derived
+                    && Identifiers.TrySplit(result.Id, out _, out var home, out _)
+                    && home == operation)
+                || (result.Derived && result.PageId == issued);
+        }
+
+        var scenarioHome = Identifiers.TrySplit(scenario.Id, out _, out var left, out _) ? left : null;
+
+        if (result.Derived)
+        {
+            return result.PageId is not null
+                && Identifiers.TrySplit(result.PageId, out _, out _, out var holder)
+                && holder == scenarioHome;
+        }
+
+        var resultHome = Identifiers.TrySplit(result.Id, out _, out var right, out _) ? right : null;
+
+        return scenarioHome is not null && scenarioHome == resultHome;
     }
 
     private static void CheckLinks(ProjectModel model, List<Finding> findings)
@@ -971,40 +1139,6 @@ static partial class Checker
     [GeneratedRegex(@"`[^`\r\n]*`")]
     private static partial Regex InlineCode();
 
-    private static void CheckAccess(ProjectModel model, List<Finding> findings)
-    {
-        foreach (var useCase in model.Records.Where(record => record.Type == "use-case"))
-        {
-            if (useCase.Ids("needs").Count > 0 || ModelBuilder.Anonymous(useCase))
-            {
-                continue;
-            }
-
-            if (ModelBuilder.BackgroundOnly(model, useCase))
-            {
-                continue;
-            }
-
-            findings.Add(new Finding("use-case-access", $"Use case '{useCase.Id}' names no permission, is not anonymous, and is reached beyond reactions and jobs.", useCase.File, useCase.Line, SubjectOf(useCase)));
-        }
-    }
-
-    private static void CheckRegions(ProjectModel model, List<Finding> findings)
-    {
-        foreach (var body in model.Bodies)
-        {
-            var starts = LineStarts(body.Body);
-
-            foreach (var region in Renderer.Regions(body.Body))
-            {
-                if (!Renderer.KnownRegions.Contains(region.Name))
-                {
-                    findings.Add(new Finding("region-unknown", $"Region '{region.Name}' is not a region the model builder renders.", body.File, body.BodyStartLine + LineOf(starts, region.Index) - 1, body.PageId));
-                }
-            }
-        }
-    }
-
     private static void CheckSizeTypes(ProjectModel model, List<Finding> findings)
     {
         var declaration = Path.Combine(model.Config.Root, "litespec.project.json");
@@ -1014,7 +1148,7 @@ static partial class Checker
 
         foreach (var type in required.Concat(model.Config.OptionalTypes).Distinct(StringComparer.Ordinal))
         {
-            if (type is "limit" or "runbook" && !model.Config.OptionalTypes.Contains(type, StringComparer.Ordinal))
+            if (type is "runbook" && !model.Config.OptionalTypes.Contains(type, StringComparer.Ordinal))
             {
                 continue;
             }
@@ -1038,24 +1172,26 @@ static partial class Checker
             return;
         }
 
-        var stepped = model.Records
-            .Where(record => record.Type == "journey")
-            .SelectMany(journey => ModelBuilder.TargetsOf(JourneySteps(journey)))
-            .ToHashSet(StringComparer.Ordinal);
-
         foreach (var useCase in model.Records.Where(record => record.Type == "use-case"))
         {
-            var entries = useCase.Ids("reachedThrough");
-            var background = entries.Count > 0 && entries.All(entry =>
-                model.ById.TryGetValue(entry, out var point)
-                && RecordTypes.BackgroundEntryKinds.Contains(point.Field("kind") ?? ""));
+            if (ModelBuilder.BackgroundOnly(model, useCase))
+            {
+                continue;
+            }
 
-            if (!background && !stepped.Contains(useCase.Id))
+            var servesStep = useCase.Ids("serves")
+                .Any(id => Identifiers.TrySplitStep(id, out _, out _));
+
+            if (!servesStep)
             {
                 findings.Add(new Finding("journey-reach", $"Use case '{useCase.Id}' sits in no journey.", useCase.File, useCase.Line, SubjectOf(useCase)));
             }
         }
     }
+
+    /// <summary>The remedy every behavior-unrecorded finding carries.</summary>
+    private const string UnrecordedRemedy =
+        "delete the code, or write its parent record from a requirement, drafting the requirement if none exists";
 
     private static void CheckBehaviorUnrecorded(ProjectModel model, List<Finding> findings)
     {
@@ -1063,7 +1199,7 @@ static partial class Checker
         {
             if (!IsUseCase(model, handler.UseCaseId))
             {
-                findings.Add(new Finding("behavior-unrecorded", $"Handler for '{handler.UseCaseId}' has no use case record.", handler.File, 1, handler.UseCaseId));
+                findings.Add(new Finding("behavior-unrecorded", $"Handler for '{handler.UseCaseId}' has no use case record; {UnrecordedRemedy}.", handler.File, 1, handler.UseCaseId));
             }
         }
 
@@ -1071,7 +1207,7 @@ static partial class Checker
         {
             if (!IsUseCase(model, endpoint.UseCaseId))
             {
-                findings.Add(new Finding("behavior-unrecorded", $"Endpoint for '{endpoint.UseCaseId}' has no use case record.", endpoint.File, 1, endpoint.UseCaseId));
+                findings.Add(new Finding("behavior-unrecorded", $"Endpoint for '{endpoint.UseCaseId}' has no use case record; {UnrecordedRemedy}.", endpoint.File, 1, endpoint.UseCaseId));
             }
         }
 
@@ -1083,12 +1219,12 @@ static partial class Checker
             {
                 if (!HasImplements(model, reaction))
                 {
-                    findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names no use case.", reaction.File, reaction.Line, null));
+                    findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names no use case; {UnrecordedRemedy}.", reaction.File, reaction.Line, null));
                 }
             }
             else if (!IsUseCase(model, reaction.UseCaseId))
             {
-                findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names '{reaction.UseCaseId}', which no use case record holds.", reaction.File, reaction.Line, reaction.UseCaseId));
+                findings.Add(new Finding("behavior-unrecorded", $"{kind} '{reaction.Class}' names '{reaction.UseCaseId}', which no use case record holds; {UnrecordedRemedy}.", reaction.File, reaction.Line, reaction.UseCaseId));
             }
         }
 
@@ -1096,7 +1232,7 @@ static partial class Checker
         {
             if (domainEvent.EventId is null)
             {
-                findings.Add(new Finding("behavior-unrecorded", $"Domain event '{domainEvent.Class}' is named by no event record.", domainEvent.File, domainEvent.Line, null));
+                findings.Add(new Finding("behavior-unrecorded", $"Domain event '{domainEvent.Class}' is named by no event record; {UnrecordedRemedy}.", domainEvent.File, domainEvent.Line, null));
             }
         }
 
@@ -1116,7 +1252,7 @@ static partial class Checker
         {
             if (!declared.Contains(literal.Value))
             {
-                findings.Add(new Finding("behavior-unrecorded", $"Code '{literal.Value}' in code is declared by no refusal result.", literal.File, literal.Line, null));
+                findings.Add(new Finding("behavior-unrecorded", $"Code '{literal.Value}' in code is declared by no refusal result; {UnrecordedRemedy}.", literal.File, literal.Line, null));
             }
         }
 
@@ -1175,7 +1311,7 @@ static partial class Checker
 
                 findings.Add(new Finding(
                     "behavior-unrecorded",
-                    $"Screen '{screen.Frontend} {screen.Route}' calls '{operation.Name}', which matches no endpoint.",
+                    $"Screen '{screen.Frontend} {screen.Route}' calls '{operation.Name}', which matches no endpoint; {UnrecordedRemedy}.",
                     ScreenFile(model, screen.File),
                     1,
                     null));
@@ -1292,59 +1428,6 @@ static partial class Checker
             .ToHashSet(StringComparer.Ordinal);
     }
 
-    /// <summary>Words in a use case name that erase personal data.</summary>
-    private static readonly string[] ErasureWords =
-        ["erase", "erasure", "delete", "deletion", "remove", "removal", "forget", "anonymize", "anonymise"];
-
-    /// <summary>Words in a use case name that export personal data.</summary>
-    private static readonly string[] ExportWords = ["export", "download", "extract", "portability"];
-
-    private static void CheckPersonalData(ProjectModel model, List<Finding> findings)
-    {
-        foreach (var aggregate in model.Records.Where(record => record.Type == "aggregate"))
-        {
-            var personal = DataOf(aggregate)
-                .Where(field => field.Classification is "personal" or "sensitive")
-                .Select(field => field.Name)
-                .Order(StringComparer.Ordinal)
-                .ToList();
-
-            if (personal.Count == 0)
-            {
-                continue;
-            }
-
-            var home = Identifiers.TrySplit(aggregate.Id, out _, out var module, out _) ? module : null;
-            var moduleCases = model.Records
-                .Where(record => record.Type == "use-case"
-                    && record.Status != "retired"
-                    && home is not null
-                    && Identifiers.TrySplit(record.Id, out _, out var useCaseHome, out _)
-                    && useCaseHome == home)
-                .Select(record => Identifiers.TrySplit(record.Id, out _, out _, out var name) ? name : "")
-                .ToList();
-
-            // A use case in another module covers the aggregate when a rule governs both: a
-            // project that erases and exports centrally states which aggregates that covers.
-            moduleCases.AddRange(model.Records
-                .Where(record => record.Type == "rule" && record.Ids("governs").Contains(aggregate.Id))
-                .SelectMany(record => record.Ids("governs"))
-                .Where(id => id.StartsWith("use-case/", StringComparison.Ordinal)
-                    && model.Records.Any(record => record.Id == id && record.Status != "retired"))
-                .Select(id => Identifiers.TrySplit(id, out _, out _, out var name) ? name : ""));
-
-            if (!moduleCases.Any(name => ContainsWord(name, ErasureWords)))
-            {
-                findings.Add(new Finding("personal-data-uncovered", $"Aggregate '{aggregate.Id}' holds personal data no erasure use case covers: {string.Join(", ", personal)}.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
-            }
-
-            if (!moduleCases.Any(name => ContainsWord(name, ExportWords)))
-            {
-                findings.Add(new Finding("personal-data-uncovered", $"Aggregate '{aggregate.Id}' holds personal data no export use case covers: {string.Join(", ", personal)}.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
-            }
-        }
-    }
-
     /// <summary>One aggregate data field: its name and classification.</summary>
     sealed record AggregateField(string Name, string Classification);
 
@@ -1376,10 +1459,6 @@ static partial class Checker
 
         return found;
     }
-
-    /// <summary>Whether the kebab-case name holds one of the words.</summary>
-    private static bool ContainsWord(string name, string[] words) =>
-        words.Any(word => name.Contains(word, StringComparison.OrdinalIgnoreCase));
 
     private static void CheckCalculations(ProjectModel model, List<Finding> findings)
     {
@@ -1444,45 +1523,6 @@ static partial class Checker
         && value.ValueKind == JsonValueKind.Array
         && value.GetArrayLength() > 0;
 
-    private static void CheckReactions(ProjectModel model, List<Finding> findings)
-    {
-        foreach (var useCase in model.Records.Where(record => record.Type == "use-case" && record.Field("kind") == "reaction"))
-        {
-            if (!HasTrigger(useCase))
-            {
-                findings.Add(new Finding("reaction-without-trigger", $"Reaction '{useCase.Id}' names no trigger.", useCase.File, useCase.Line, SubjectOf(useCase)));
-            }
-        }
-    }
-
-    /// <summary>Whether the reaction names what sets it off: events, a schedule or a deadline, in any trigger shape.</summary>
-    private static bool HasTrigger(Record useCase)
-    {
-        if (useCase.Raw.ValueKind != JsonValueKind.Object
-            || !useCase.Raw.TryGetProperty("trigger", out var trigger))
-        {
-            return false;
-        }
-
-        return trigger.ValueKind switch
-        {
-            JsonValueKind.String => trigger.GetString() is { Length: > 0 },
-            JsonValueKind.Array => trigger.GetArrayLength() > 0,
-            JsonValueKind.Object => HasTriggerEvents(trigger) || HasTriggerText(trigger, "schedule") || HasTriggerText(trigger, "deadline"),
-            _ => false,
-        };
-    }
-
-    private static bool HasTriggerEvents(JsonElement trigger) =>
-        trigger.TryGetProperty("events", out var events)
-        && events.ValueKind == JsonValueKind.Array
-        && events.GetArrayLength() > 0;
-
-    private static bool HasTriggerText(JsonElement trigger, string field) =>
-        trigger.TryGetProperty(field, out var value)
-        && value.ValueKind == JsonValueKind.String
-        && value.GetString() is { Length: > 0 };
-
     private static void CheckMeasured(ProjectModel model, List<Finding> findings)
     {
         foreach (var requirement in model.Records.Where(record => record.Type == "requirement" && record.Field("measure") is { Length: > 0 }))
@@ -1507,21 +1547,26 @@ static partial class Checker
 
     private static void CheckQuestions(ProjectModel model, List<Finding> findings)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
         foreach (var record in model.Records)
         {
-            if (record.Status == "approved" && HasQuestions(record))
+            if ((record.Status == "approved" || record.Status == "reviewed") && HasOpenQuestions(record, model.Config, today))
             {
-                findings.Add(new Finding("open-questions", $"Record '{record.Id}' is approved with open questions.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("record-shape", $"Record '{record.Id}' is {record.Status} with open questions.", record.File, record.Line, SubjectOf(record)));
             }
         }
     }
 
-    /// <summary>Whether the record carries open questions.</summary>
-    private static bool HasQuestions(Record record) =>
+    /// <summary>
+    ///     Whether the record carries open questions: entries that are not
+    ///     auto-approved. An auto-approved question is closed, not open.
+    /// </summary>
+    private static bool HasOpenQuestions(Record record, ConsumerConfig config, DateOnly today) =>
         record.Raw.ValueKind == JsonValueKind.Object
         && record.Raw.TryGetProperty("questions", out var value)
         && value.ValueKind == JsonValueKind.Array
-        && value.GetArrayLength() > 0;
+        && value.EnumerateArray().Any(entry => !AutoApproved(entry, record, config, today));
 
     /// <summary>One CODEOWNERS line: the paths it owns and the owners it names.</summary>
     sealed record CodeownerRule(Regex Matcher, IReadOnlyList<string> Owners);
@@ -1673,12 +1718,6 @@ static partial class Checker
             return built.ToString();
         }
     }
-
-    private static JsonElement JourneySteps(Record journey) =>
-        journey.Raw.ValueKind == JsonValueKind.Object
-        && journey.Raw.TryGetProperty("steps", out var steps)
-            ? steps
-            : default;
 
     private static string? SubjectOf(Record record) => record.Id.Length > 0 ? record.Id : null;
 
