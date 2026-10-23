@@ -7,51 +7,58 @@
   "status": "approved",
   "actor": "actor/reader",
   "goal": "Borrow and return a copy.",
+  "finishedWhen": "The reader holds the copy, then the copy sits back on its shelf.",
   "steps": [
     {
-      "useCase": "use-case/lending.register-copy",
-      "actor": "actor/reader",
-      "requires": []
+      "id": "s1",
+      "says": "The librarian registers the copy on its home shelf.",
+      "actor": "actor/librarian"
     },
     {
-      "useCase": "use-case/lending.borrow-copy",
+      "id": "s2",
+      "says": "The reader borrows the copy from the shelf.",
       "actor": "actor/reader",
-      "requires": []
+      "ifItGoesWrong": "The copy is lent out, so the reader places a hold instead."
     },
     {
-      "useCase": "use-case/lending.extend-loan",
+      "id": "s3",
+      "says": "The reader renews the loan before it ends.",
       "actor": "actor/reader",
-      "requires": []
+      "ifItGoesWrong": "The loan already ended, so the reader returns the copy late."
     },
     {
-      "useCase": "use-case/lending.list-loans",
-      "actor": "actor/reader",
-      "requires": []
+      "id": "s4",
+      "says": "The reader reviews their loans and due dates.",
+      "actor": "actor/reader"
     },
     {
-      "useCase": "use-case/lending.return-copy",
+      "id": "s5",
+      "says": "The reader returns the copy to the desk.",
       "actor": "actor/reader",
-      "requires": []
+      "ifItGoesWrong": "The copy is damaged, so the librarian retires it."
     },
     {
-      "useCase": "use-case/lending.place-hold",
-      "actor": "actor/reader",
-      "requires": []
+      "id": "s6",
+      "says": "The reader places a hold on a lent copy.",
+      "actor": "actor/reader"
     },
     {
-      "useCase": "use-case/lending.cancel-hold",
-      "actor": "actor/reader",
-      "requires": []
+      "id": "s7",
+      "says": "The reader cancels a hold they no longer need.",
+      "actor": "actor/reader"
     },
     {
-      "useCase": "use-case/lending.retire-copy",
-      "actor": "actor/reader",
-      "requires": []
+      "id": "s8",
+      "says": "The librarian retires a worn copy.",
+      "actor": "actor/librarian"
     }
   ],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "db5cb3b0"
 }
 ---
 

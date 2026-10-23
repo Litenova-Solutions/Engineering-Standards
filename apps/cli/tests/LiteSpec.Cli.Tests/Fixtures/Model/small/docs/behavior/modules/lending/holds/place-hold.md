@@ -4,12 +4,15 @@
   "id": "use-case/lending.place-hold",
   "title": "Place hold",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/place-hold"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/place-hold",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
@@ -26,7 +29,10 @@
       "title": "Placed",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The hold is placed."
+      "meaning": "The hold is placed.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "f1314eda"
     },
     {
       "type": "result",
@@ -35,9 +41,15 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.hold-already-waiting",
-      "meaning": "A hold is already waiting."
+      "meaning": "A hold is already waiting.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "7b186cbc"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "b3ee3c96"
 }
 ---
 

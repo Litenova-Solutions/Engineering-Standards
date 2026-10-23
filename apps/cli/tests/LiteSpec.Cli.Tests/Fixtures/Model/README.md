@@ -16,50 +16,69 @@ litespec model check --root apps/cli/tests/LiteSpec.Cli.Tests/Fixtures/Model/sma
 
 ## Fixtures
 
-- `small/` is a library loans system at size small. It holds one module, three aggregates, eight use cases, results, rules, events, actors, roles, permissions, entry points, terms, one deviation, and one known gap. It has no problems, features, journeys, scenarios, constraints, research, limits, or runbooks. Seven use cases have handlers. The eighth is covered by the open known gap.
-- `large/` holds the same records plus problems, features, journeys, one scenario per use case, constraints, research, limits, runbooks, one goal, one external system, and a frontend route that imports a generated client operation. Each scenario has one proving test.
+- `small/` is a library loans system at size small. It holds one module, three aggregates, eight use cases, results, rules, events, actors, roles, permissions, entry points, terms, one deviation, and one known gap. It has no goals, problems, features, journeys, scenarios, constraints, research, settings, reactions, jobs, notifications, or runbooks. Seven use cases have handlers. The eighth is covered by the open known gap.
+- `large/` holds the same records plus one goal, problems, features, one journey, one scenario per use case, constraints, research, one setting, one reaction, one job, one notification, runbooks, one external system, and a frontend route that imports a generated client operation. Each scenario has one proving test.
 
-Both fixtures exit 0 under `check`. Each names the same owner, approves every record, and resolves every citation.
+Both fixtures exit 0 under `check`. Each names the same owner, reviews every Behavior record, approves every Intent record, stamps every approval hash, and resolves every citation.
 
 ## Finding codes
 
 The builder and the suite use these codes:
 
-- `record-shape`
-- `invalid-field`
-- `identifier-form`
-- `identifier-duplicate`
-- `use-case-name-clash`
-- `reference-unresolved`
-- `draft-gate`
-- `owner-unknown`
-- `draft-without-decider`
-- `known-gap-expired`
-- `gap-unknown-check`
-- `rule-name-negation`
-- `use-case-without-success`
-- `use-case-without-scenario`
-- `requirement-unfulfilled`
-- `scenario-result-unresolved`
-- `refusal-not-thrown`
-- `use-case-unimplemented`
-- `proves-unconfirmed`
-- `size-type-missing`
-- `product-not-singleton`
-- `journey-reach`
-- `use-case-access`
-- `region-unknown`
 - `aggregate-name-clash`
-- `decision-decides-nothing`
-- `link-unresolved`
+- `approval-reopened`
 - `behavior-unrecorded`
-- `state-unreachable`
-- `transition-unresolved`
-- `personal-data-uncovered`
 - `calculation-without-table`
-- `reaction-without-trigger`
+- `consistency-unexplained`
+- `decision-decides-nothing`
+- `draft-gate`
+- `draft-without-decider`
+- `effect-loop`
+- `effect-undeclared`
+- `erasure-undeclared`
+- `except-without-fallback`
+- `exemption-expired`
+- `gap-unknown-check`
+- `identifier-duplicate`
+- `identifier-form`
+- `invalid-field`
+- `journey-reach`
+- `known-gap-expired`
+- `link-unresolved`
+- `notification-without-sender`
+- `operator-job-without-guard`
+- `owner-unknown`
+- `paging-undeclared`
+- `product-not-singleton`
+- `proves-unconfirmed`
+- `query-output-missing`
+- `reaction-trigger-unresolved`
+- `record-orphaned`
+- `record-shape`
+- `reference-unresolved`
+- `refusal-not-thrown`
+- `requirement-unfulfilled`
 - `requirement-unmeasured`
-- `open-questions`
+- `reservation-without-release`
+- `result-undeclared`
+- `retention-without-enforcement`
+- `risk-without-acceptance`
+- `rule-name-negation`
+- `scenario-result-unresolved`
+- `schedule-unstructured`
+- `setting-default-without-requirement`
+- `size-type-missing`
+- `state-unreachable`
+- `step-unserved`
+- `transcribed-after-adoption`
+- `transcribed-reviewed`
+- `transition-unresolved`
+- `use-case-name-clash`
+- `use-case-unimplemented`
+- `use-case-without-scenario`
+- `use-case-without-success`
+- `widening-unjustified`
+- `write-undeclared`
 
 ## Broken overlays
 

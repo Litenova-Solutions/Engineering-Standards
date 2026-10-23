@@ -1,24 +1,32 @@
 ---
 {
-  "type": "limit-set",
-  "title": "Limits",
+  "type": "setting-set",
+  "title": "Settings",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "records": [
     {
-      "type": "limit",
-      "id": "limit/active-loans-per-reader",
+      "type": "setting",
+      "id": "setting/lending.active-loans-per-reader",
       "title": "Active loans per reader",
       "owner": "lending-team",
-      "status": "approved",
-      "bound": "Active loans per reader",
-      "value": "5",
-      "runbook": "runbook/clear-stuck-holds"
+      "status": "reviewed",
+      "valueType": "integer",
+      "default": 5,
+      "range": "1 to 20",
+      "unit": "loans",
+      "setBy": "founder",
+      "fulfills": [
+        "requirement/borrowing.max-active-loans"
+      ],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "19e6bb03"
     }
   ]
 }
 ---
 
-# Limits
+# Settings
 
-Lending runs within these bounds.
+Lending runs within these settings.

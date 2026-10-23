@@ -5,8 +5,6 @@
   "title": "Loan period",
   "owner": "lending-team",
   "status": "draft",
-  "decider": "lending-team",
-  "decideBy": "2027-01-01",
   "options": [
     {
       "name": "14 days",
@@ -28,7 +26,9 @@
   "decides": [
     "requirement/borrowing.loan-period-days"
   ],
-  "basedOn": []
+  "basedOn": [],
+  "decider": "lending-team",
+  "decideBy": "2027-01-01"
 }
 ---
 

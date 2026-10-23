@@ -10,8 +10,8 @@
       "id": "entry-point/library-app",
       "title": "Library app",
       "owner": "lending-team",
-      "status": "approved",
-      "kind": "app"
+      "status": "reviewed",
+      "kind": "browser"
     }
   ]
 }

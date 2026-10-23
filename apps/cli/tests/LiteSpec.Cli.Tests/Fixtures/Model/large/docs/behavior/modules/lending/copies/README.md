@@ -4,7 +4,7 @@
   "id": "aggregate/lending.copy",
   "title": "Copy",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "states": [
     {
       "name": "Available",
@@ -25,7 +25,7 @@
       "id": "rule/copy.has-one-home-shelf",
       "title": "Has one home shelf",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "invariant",
       "statement": "A copy has one home shelf.",
       "governs": [
@@ -34,32 +34,44 @@
       "basedOn": [],
       "fulfills": [
         "requirement/borrowing.copy-shelf-home"
-      ]
+      ],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "975318c6"
     },
     {
       "type": "event",
       "id": "event/copy.copy-registered",
       "title": "Copy registered",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "meaning": "A copy was registered.",
       "carries": [
         "copyId",
         "shelf"
-      ]
+      ],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "8acc02e9"
     },
     {
       "type": "event",
       "id": "event/copy.copy-retired",
       "title": "Copy retired",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "meaning": "A copy was retired.",
       "carries": [
         "copyId"
-      ]
+      ],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "60f77ccc"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "de73cbaa"
 }
 ---
 

@@ -11,7 +11,10 @@
       "read": "2026-01-15"
     }
   ],
-  "question": "How long do city libraries lend?"
+  "question": "How long do city libraries lend?",
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "0262212f"
 }
 ---
 

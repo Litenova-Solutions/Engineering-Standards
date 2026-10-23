@@ -48,7 +48,7 @@ public sealed class ProofIdentityTests
     }
 
     static void WriteScenario(string root) =>
-        Write(root, "docs/domain/modules/lending/loans/borrow-copy-proof-scenario.md", ScenarioPage);
+        Write(root, "docs/behavior/modules/lending/loans/borrow-copy-proof-scenario.md", ScenarioPage);
 
     static void WriteProof(string root) =>
         Write(root, "apps/api/tests/Library.Acceptance.Tests/Proof/ProofScenarios.cs", ProofFile);
@@ -104,7 +104,7 @@ public sealed class ProofIdentityTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",

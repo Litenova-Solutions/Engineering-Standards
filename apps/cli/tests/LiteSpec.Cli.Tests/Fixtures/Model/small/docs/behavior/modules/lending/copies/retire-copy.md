@@ -4,12 +4,15 @@
   "id": "use-case/lending.retire-copy",
   "title": "Retire copy",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/manage-copies"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/manage-copies",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
@@ -26,7 +29,10 @@
       "title": "Retired",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The copy is retired."
+      "meaning": "The copy is retired.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "a2b8df6a"
     },
     {
       "type": "result",
@@ -35,9 +41,15 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.copy-on-loan",
-      "meaning": "The copy is on loan."
+      "meaning": "The copy is on loan.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "a8f80bec"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "cdce0b82"
 }
 ---
 

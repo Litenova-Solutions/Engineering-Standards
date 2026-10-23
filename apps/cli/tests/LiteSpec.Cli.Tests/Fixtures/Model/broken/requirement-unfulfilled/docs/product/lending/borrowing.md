@@ -14,7 +14,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A reader holds at most five active loans.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "5de82a4d"
     },
     {
       "type": "requirement",
@@ -24,7 +27,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A loan lasts 21 days.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "5a16abaa"
     },
     {
       "type": "requirement",
@@ -34,7 +40,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A ready hold waits seven days.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "d41032c8"
     },
     {
       "type": "requirement",
@@ -44,14 +53,23 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A copy lives on one home shelf.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "f39ea9be"
     },
     {
       "type": "requirement",
       "id": "requirement/borrowing.renewal-by-text-message",
       "title": "Renewal by text message",
+      "owner": "lending-team",
+      "status": "approved",
       "kind": "functional",
-      "statement": "A member renews a loan by replying to a text message."
+      "statement": "A member renews a loan by replying to a text message.",
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "3f1076e1"
     }
   ]
 }

@@ -81,6 +81,50 @@ public sealed class DiffTests
         Assert.DoesNotContain("Maximum active loans", result.Output);
     }
 
+    /// <summary>--intent shows the intent changes alone: the requirement removals and edits.</summary>
+    [Fact]
+    public void Intent_View_Shows_Intent_Changes_Alone()
+    {
+        using var folders = Prepare("breaking");
+        var result = Cli.Run("model", "diff", folders.Base.Path, "--root", folders.Head.Path, "--intent");
+
+        Assert.Equal(0, result.Status);
+        Assert.Contains("Intent diff:", result.Output);
+        Assert.Contains("(3 breaking, 2 removed, 2 modified, 0 added)", result.Output);
+        Assert.Contains("Max active loans", result.Output);
+        Assert.DoesNotContain("Borrow copy", result.Output);
+    }
+
+    /// <summary>--behavior shows the behavior changes alone: states, rules, results and scenarios.</summary>
+    [Fact]
+    public void Behavior_View_Shows_Behavior_Changes_Alone()
+    {
+        using var folders = Prepare("breaking");
+        var result = Cli.Run("model", "diff", folders.Base.Path, "--root", folders.Head.Path, "--behavior");
+
+        Assert.Equal(0, result.Status);
+        Assert.Contains("Behavior diff:", result.Output);
+        Assert.Contains("(11 breaking, 5 removed, 4 modified, 3 added)", result.Output);
+        Assert.Contains("Borrow copy", result.Output);
+        Assert.DoesNotContain("Max active loans", result.Output);
+    }
+
+    /// <summary>The security queue lists tenant widening, new calls effects and new personal classes.</summary>
+    [Fact]
+    public void Security_Queue_Lists_Tenant_Widening_Calls_And_Personal_Classes()
+    {
+        using var folders = Prepare("security");
+        var result = Cli.Run("model", "diff", folders.Base.Path, "--root", folders.Head.Path, "--fail-on", "breaking");
+
+        Assert.Equal(0, result.Status);
+        Assert.Contains("(0 breaking, 0 removed, 2 modified, 0 added)", result.Output);
+        Assert.Contains("Tenant scope changed from own to cross.", result.Output);
+        Assert.Contains("SECURITY QUEUE (3)", result.Output);
+        Assert.Contains("Access tenant scope widened from own to cross.", result.Output);
+        Assert.Contains("New calls effect: calls external-system/sms-gateway (async).", result.Output);
+        Assert.Contains("New personal data class: Borrower identity.", result.Output);
+    }
+
     /// <summary>Markdown renders the comment surfaces: a title, sections and families.</summary>
     [Fact]
     public void Markdown_Renders_Comment_Surfaces()

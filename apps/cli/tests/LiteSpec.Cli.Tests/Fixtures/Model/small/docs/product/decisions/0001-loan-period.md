@@ -28,7 +28,10 @@
   "decides": [
     "requirement/borrowing.loan-period-days"
   ],
-  "basedOn": []
+  "basedOn": [],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "5a49c44d"
 }
 ---
 

@@ -11,7 +11,10 @@
       "role": "role/reader",
       "scope": "self"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "2dfb0ac5"
 }
 ---
 

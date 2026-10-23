@@ -12,7 +12,7 @@ public sealed class ProofStrengthTests
     public void Steps_Test_Without_Then_Step_Does_Not_Confirm()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Acceptance.Tests/Strength/NoThenScenarios.cs", NoThenFile);
 
         using var document = Build(temp.Path);
@@ -25,7 +25,7 @@ public sealed class ProofStrengthTests
     public void Refusal_Code_Outside_An_Assertion_Does_Not_Confirm()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/refusal-scenario.md", RefusalScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/refusal-scenario.md", RefusalScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Acceptance.Tests/Strength/SetupCodeScenarios.cs", SetupCodeFile);
 
         using var document = Build(temp.Path);
@@ -38,7 +38,7 @@ public sealed class ProofStrengthTests
     public void Refusal_Code_Inside_An_Assertion_Confirms()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/refusal-scenario.md", RefusalScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/refusal-scenario.md", RefusalScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Integration.Tests/Strength/RefusalAssertionTests.cs", RefusalAssertionFile);
 
         using var document = Build(temp.Path);
@@ -51,7 +51,7 @@ public sealed class ProofStrengthTests
     public void Test_Constructing_A_Handler_Does_Not_Confirm()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Acceptance.Tests/Strength/DirectScenarios.cs", DirectFile);
 
         using var document = Build(temp.Path);
@@ -76,7 +76,7 @@ public sealed class ProofStrengthTests
     public void Rule_Claim_With_A_Proving_Scenario_Confirms()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/success-scenario.md", SuccessScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Acceptance.Tests/Strength/RuleAndScenarioScenarios.cs", RuleAndScenarioFile);
 
         using var document = Build(temp.Path);
@@ -122,7 +122,7 @@ public sealed class ProofStrengthTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",
@@ -142,7 +142,7 @@ public sealed class ProofStrengthTests
           "id": "scenario/borrow-copy.borrowing-an-unavailable-copy-refuses",
           "title": "Borrowing an unavailable copy refuses",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy is lent out.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.copy-unavailable",

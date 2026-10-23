@@ -13,7 +13,10 @@
   "audience": [
     "actor/reader",
     "actor/librarian"
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "6ef64bf9"
 }
 ---
 

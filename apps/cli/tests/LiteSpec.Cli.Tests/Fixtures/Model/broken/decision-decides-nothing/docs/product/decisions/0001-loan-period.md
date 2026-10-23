@@ -26,7 +26,10 @@
   "chosen": "21 days",
   "changeWhen": "Reader demand shifts.",
   "decides": [],
-  "basedOn": []
+  "basedOn": [],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "e89a7c6c"
 }
 ---
 

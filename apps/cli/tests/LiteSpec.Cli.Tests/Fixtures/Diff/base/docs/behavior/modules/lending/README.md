@@ -4,7 +4,7 @@
   "id": "module/lending",
   "title": "Lending",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "dependsOn": []
 }
 ---

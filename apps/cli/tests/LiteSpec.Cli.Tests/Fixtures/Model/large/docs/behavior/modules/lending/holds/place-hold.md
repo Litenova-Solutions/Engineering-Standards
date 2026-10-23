@@ -4,17 +4,23 @@
   "id": "use-case/lending.place-hold",
   "title": "Place hold",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/place-hold"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/place-hold",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
   "raises": [
     "event/hold.hold-placed"
+  ],
+  "serves": [
+    "journey/borrow-and-return#s6"
   ],
   "fulfills": [
     "requirement/borrowing.hold-pickup-window"
@@ -26,7 +32,10 @@
       "title": "Placed",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The hold is placed."
+      "meaning": "The hold is placed.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "f1314eda"
     },
     {
       "type": "result",
@@ -35,20 +44,29 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.hold-already-waiting",
-      "meaning": "A hold is already waiting."
+      "meaning": "A hold is already waiting.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "7b186cbc"
     },
     {
       "type": "scenario",
       "id": "scenario/place-hold.placing-a-hold-succeeds",
       "title": "Placing a hold succeeds",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "A copy is on loan to another reader.",
       "when": "The reader places a hold.",
       "result": "result/place-hold.placed",
-      "then": "The hold is placed."
+      "then": "The hold is placed.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "19e264b2"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "10f96c49"
 }
 ---
 

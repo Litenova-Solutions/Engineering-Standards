@@ -11,7 +11,10 @@
   ],
   "serves": [
     "goal/faster-pickup"
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "5c053966"
 }
 ---
 

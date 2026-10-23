@@ -5,11 +5,11 @@
   "size": "large",
   "shape": "server",
   "stacks": ["dotnet", "svelte"],
-  "reviewedLiteSpecVersion": "2.0.0",
+  "reviewedLiteSpecVersion": "3.0.0",
   "optionalTypes": [
     "constraint",
     "research",
-    "limit",
+    "setting",
     "runbook"
   ],
   "constraints": {
@@ -20,7 +20,7 @@
   ],
   "paths": {
     "docs": "docs",
-    "domainDocs": "docs/domain",
+    "behaviorDocs": "docs/behavior",
     "uiDocs": "docs/ui",
     "glossary": "docs/glossary.json",
     "testRoots": [

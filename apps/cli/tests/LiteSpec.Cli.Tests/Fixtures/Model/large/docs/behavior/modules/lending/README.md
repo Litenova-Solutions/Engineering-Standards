@@ -4,8 +4,11 @@
   "id": "module/lending",
   "title": "Lending",
   "owner": "lending-team",
-  "status": "approved",
-  "dependsOn": []
+  "status": "reviewed",
+  "dependsOn": [],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "5b0aab2b"
 }
 ---
 

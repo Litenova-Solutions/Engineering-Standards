@@ -8,7 +8,10 @@
   "provision": "litespec/backend/application#enforce-target-authorization-in-the-pipeline",
   "reason": "The import runs before opening.",
   "reviewBy": "2027-01-01",
-  "removeWhen": "The import moves after opening."
+  "removeWhen": "The import moves after opening.",
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "f6e3c7d2"
 }
 ---
 

@@ -3,7 +3,7 @@
     {
       "code": "use-case-unimplemented",
       "message": "Use case \u0027use-case/lending.list-loans\u0027 has no handler, reaction or job.",
-      "path": "docs/domain/modules/lending/loans/list-loans.md",
+      "path": "docs/behavior/modules/lending/loans/list-loans.md",
       "line": 3,
       "subject": "use-case/lending.list-loans"
     }
@@ -12,7 +12,7 @@
     {
       "code": "use-case-unimplemented",
       "message": "Use case \u0027use-case/lending.retire-copy\u0027 has no handler, reaction or job.",
-      "path": "docs/domain/modules/lending/copies/retire-copy.md",
+      "path": "docs/behavior/modules/lending/copies/retire-copy.md",
       "line": 3,
       "subject": "use-case/lending.retire-copy"
     }

@@ -4,12 +4,15 @@
   "id": "use-case/lending.borrow-copy",
   "title": "Borrow copy",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/borrow-copy"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/borrow-copy",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
@@ -26,7 +29,10 @@
       "title": "Borrowed",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The copy is lent."
+      "meaning": "The copy is lent.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "a1559ff6"
     },
     {
       "type": "result",
@@ -35,9 +41,15 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.copy-not-available",
-      "meaning": "The copy is unavailable."
+      "meaning": "The copy is unavailable.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "198ca19a"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "57c2b9d9"
 }
 ---
 

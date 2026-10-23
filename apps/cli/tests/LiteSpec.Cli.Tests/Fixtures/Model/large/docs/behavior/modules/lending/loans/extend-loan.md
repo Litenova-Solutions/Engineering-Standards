@@ -4,17 +4,23 @@
   "id": "use-case/lending.extend-loan",
   "title": "Extend loan",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/borrow-copy"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/borrow-copy",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
   "raises": [
     "event/loan.loan-extended"
+  ],
+  "serves": [
+    "journey/borrow-and-return#s3"
   ],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
@@ -26,7 +32,10 @@
       "title": "Extended",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The loan is extended."
+      "meaning": "The loan is extended.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "51ed9b1a"
     },
     {
       "type": "result",
@@ -35,20 +44,29 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.extension-refused",
-      "meaning": "The extension is refused."
+      "meaning": "The extension is refused.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "982f84f8"
     },
     {
       "type": "scenario",
       "id": "scenario/extend-loan.extending-an-active-loan-succeeds",
       "title": "Extending an active loan succeeds",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "A reader holds an active loan.",
       "when": "The reader extends the loan.",
       "result": "result/extend-loan.extended",
-      "then": "The loan is extended."
+      "then": "The loan is extended.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "e339eece"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "7dce9abf"
 }
 ---
 

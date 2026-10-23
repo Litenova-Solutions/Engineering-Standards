@@ -11,7 +11,10 @@
       "role": "role/librarian",
       "scope": "platform"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "844a4dab"
 }
 ---
 

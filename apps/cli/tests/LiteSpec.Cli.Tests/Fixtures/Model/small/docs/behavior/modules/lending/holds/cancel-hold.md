@@ -4,12 +4,15 @@
   "id": "use-case/lending.cancel-hold",
   "title": "Cancel hold",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/place-hold"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/place-hold",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
@@ -26,7 +29,10 @@
       "title": "Canceled",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The hold is canceled."
+      "meaning": "The hold is canceled.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "04cfe11e"
     },
     {
       "type": "result",
@@ -35,9 +41,15 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.hold-not-waiting",
-      "meaning": "The hold already left the queue."
+      "meaning": "The hold already left the queue.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "fcfc0b84"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "bad41e2c"
 }
 ---
 

@@ -36,7 +36,7 @@ public sealed class ReachabilityTests
 
     static void AddTransitions(string root)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "README.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "README.md");
         var text = File.ReadAllText(page);
 
         File.WriteAllText(page, text.Replace("  \"records\": [", Transitions + "\n  \"records\": ["));

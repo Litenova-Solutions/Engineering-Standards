@@ -4,12 +4,15 @@
   "id": "use-case/lending.register-copy",
   "title": "Register copy",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/manage-copies"
-  ],
-  "anonymous": false,
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/manage-copies",
+    "tenant": "own"
+  },
   "reachedThrough": [
     "entry-point/library-app"
   ],
@@ -26,7 +29,10 @@
       "title": "Registered",
       "owner": "lending-team",
       "outcome": "success",
-      "meaning": "The copy is registered."
+      "meaning": "The copy is registered.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "30ca4281"
     },
     {
       "type": "result",
@@ -35,9 +41,15 @@
       "owner": "lending-team",
       "outcome": "refusal",
       "code": "lending.copy-already-registered",
-      "meaning": "The copy is already registered."
+      "meaning": "The copy is already registered.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "71afb1ee"
     }
-  ]
+  ],
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "54134e07"
 }
 ---
 

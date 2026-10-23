@@ -213,16 +213,89 @@ public sealed class BookViewsTests
         Assert.Contains("Everything fulfilling this requirement is verified.", fulfilled, StringComparison.Ordinal);
     }
 
-    /// <summary>A reaction page renders its trigger events and its schedule words.</summary>
+    /// <summary>A reaction page renders its trigger events and what it sends.</summary>
     [Fact]
-    public void Reaction_Page_Renders_Trigger_Words_And_Events()
+    public void Reaction_Page_Renders_On_And_Sends()
     {
         using var temp = Cli.Temp("book-views");
         var result = Cli.Run("book", "--model", Cli.Fixture("Book/review.json"), "--out", temp.Path);
         Assert.Equal(0, result.Status);
-        var html = File.ReadAllText(Path.Combine(temp.Path, "use-case", "lending", "send-due-reminder.html"));
-        Assert.Contains("every morning at eight", html, StringComparison.Ordinal);
+        var html = File.ReadAllText(Path.Combine(temp.Path, "reaction", "lending", "send-due-reminder.html"));
         Assert.Contains(">Loan Due</a>", html, StringComparison.Ordinal);
+        Assert.Contains(">Due Reminder</a>", html, StringComparison.Ordinal);
+
+        var notification = File.ReadAllText(Path.Combine(temp.Path, "notification", "lending", "due-reminder.html"));
+        Assert.Contains(">Channel</dt><dd>email</dd>", notification, StringComparison.Ordinal);
+        Assert.Contains(">Member</a>", notification, StringComparison.Ordinal);
+    }
+
+    /// <summary>A journey page renders its chapter: steps, serving, promises, outcomes, consequences and questions.</summary>
+    [Fact]
+    public void Journey_Page_Renders_Its_Chapter()
+    {
+        using var temp = Cli.Temp("book-views");
+        var result = Cli.Run("book", "--model", Cli.Fixture("Book/review.json"), "--out", temp.Path);
+        Assert.Equal(0, result.Status);
+        var html = File.ReadAllText(Path.Combine(temp.Path, "journey", "borrowing.html"));
+        Assert.Contains("<p class=\"lede\">Borrow before closing</p>", html, StringComparison.Ordinal);
+        Assert.Contains("Finished when: The member leaves the desk with the copy before closing.", html, StringComparison.Ordinal);
+        Assert.Contains("The member borrows a copy before closing.", html, StringComparison.Ordinal);
+        Assert.Contains("(Member)", html, StringComparison.Ordinal);
+        Assert.Contains("If it goes wrong: The desk renews the loan.", html, StringComparison.Ordinal);
+        Assert.Contains("How Each Step Is Served", html, StringComparison.Ordinal);
+        Assert.Contains(">Borrow Copy</a>", html, StringComparison.Ordinal);
+        Assert.Contains("no use case serves this step yet.", html, StringComparison.Ordinal);
+        Assert.Contains("A member waits less than two minutes at the desk.", html, StringComparison.Ordinal);
+        Assert.Contains("Then The loan is active.", html, StringComparison.Ordinal);
+        Assert.Contains("New refusal a reader can meet", html, StringComparison.Ordinal);
+        Assert.Contains("The copy stays unavailable and the member is told it is on loan.", html, StringComparison.Ordinal);
+        Assert.Contains("Do kiosk users count toward the wait?", html, StringComparison.Ordinal);
+        Assert.Contains("Recommended: Count kiosk users separately.", html, StringComparison.Ordinal);
+        Assert.Contains("Context: this box is rendered from Behavior", html, StringComparison.Ordinal);
+    }
+
+    /// <summary>The ballots page groups open questions by ballot, tier 1 first, with auto-approval dates.</summary>
+    [Fact]
+    public void Ballots_Page_Groups_Questions_Tier_First_With_Auto_Approval()
+    {
+        using var temp = Cli.Temp("book-views");
+        var result = Cli.Run("book", "--model", Cli.Fixture("Book/review.json"), "--out", temp.Path);
+        Assert.Equal(0, result.Status);
+        var html = File.ReadAllText(Path.Combine(temp.Path, "ballots", "index.html"));
+        Assert.Contains("2 questions, 1 tier 1", html, StringComparison.Ordinal);
+        Assert.Contains("7 days after its decide-by date", html, StringComparison.Ordinal);
+        Assert.Contains("Needs explicit approval", html, StringComparison.Ordinal);
+        Assert.Contains("Auto-approves 2026-11-08", html, StringComparison.Ordinal);
+        Assert.True(
+            html.IndexOf("Must the kiosk serve members without cards?", StringComparison.Ordinal)
+            < html.IndexOf("Do kiosk users count toward the wait?", StringComparison.Ordinal),
+            "The tier-1 question sorts before the tier-3 question.");
+    }
+
+    /// <summary>A setting page renders its meaning and default.</summary>
+    [Fact]
+    public void Setting_Page_Renders_Meaning_And_Default()
+    {
+        using var temp = Cli.Temp("book-views");
+        var result = Cli.Run("book", "--model", Cli.Fixture("Book/review.json"), "--out", temp.Path);
+        Assert.Equal(0, result.Status);
+        var html = File.ReadAllText(Path.Combine(temp.Path, "setting", "lending", "max-active-loans.html"));
+        Assert.Contains("Active loans per member.", html, StringComparison.Ordinal);
+        Assert.Contains(">Default</dt><dd>5</dd>", html, StringComparison.Ordinal);
+    }
+
+    /// <summary>A use-case page renders its access grant and tenant scope, and what it serves.</summary>
+    [Fact]
+    public void Use_Case_Page_Renders_Access_And_Serves()
+    {
+        using var temp = Cli.Temp("book-views");
+        var result = Cli.Run("book", "--model", Cli.Fixture("Book/review.json"), "--out", temp.Path);
+        Assert.Equal(0, result.Status);
+        var html = File.ReadAllText(Path.Combine(temp.Path, "use-case", "lending", "borrow-copy.html"));
+        Assert.Contains("<dt>Grant</dt>", html, StringComparison.Ordinal);
+        Assert.Contains(">Borrow Copy</a>", html, StringComparison.Ordinal);
+        Assert.Contains("<dt>Tenant</dt><dd>own</dd>", html, StringComparison.Ordinal);
+        Assert.Contains(">Borrowing</a>", html, StringComparison.Ordinal);
     }
 
     /// <summary>The search index covers statements, meanings and scenario text.</summary>

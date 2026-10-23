@@ -70,13 +70,13 @@ public sealed class TransitionTableTests
 
     static void AppendTable(string root, string table)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "README.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "README.md");
         File.AppendAllText(page, table);
     }
 
     static void AddFrontMatterTransitions(string root)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "README.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "README.md");
         var text = File.ReadAllText(page);
 
         File.WriteAllText(page, text.Replace(

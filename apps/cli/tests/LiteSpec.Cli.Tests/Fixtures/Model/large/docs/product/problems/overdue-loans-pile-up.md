@@ -8,7 +8,10 @@
   "affects": [
     "actor/reader"
   ],
-  "statement": "Readers lose track of due dates."
+  "statement": "Readers lose track of due dates.",
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "435ee9f1"
 }
 ---
 

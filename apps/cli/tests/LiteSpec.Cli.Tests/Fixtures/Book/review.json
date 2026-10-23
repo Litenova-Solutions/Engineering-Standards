@@ -1,965 +1,1319 @@
 {
-  "version": 1,
-  "root": ".",
-  "records": [
-    {
-      "type": "product",
-      "id": "product/library",
-      "title": "Riverside Library",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/brief.md",
-      "line": 3,
-      "fields": {
-        "type": "product",
-        "id": "product/library",
-        "title": "Riverside Library",
-        "owner": "lending-team",
-        "status": "approved",
-        "boundary": "Lending for one branch.",
-        "neverDoes": ["Sell books."],
-        "audience": ["actor/member"]
-      },
-      "links": {}
-    },
-    {
-      "type": "goal",
-      "id": "goal/faster-borrowing",
-      "title": "Faster Borrowing",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/goals/faster-borrowing.md",
-      "line": 3,
-      "body": "## Why It Matters\n\nShort waits bring members back.",
-      "fields": {
-        "type": "goal",
-        "id": "goal/faster-borrowing",
-        "title": "Faster Borrowing",
-        "owner": "lending-team",
-        "status": "approved",
-        "statement": "Members borrow in under two minutes.",
-        "measure": "p95 desk wait",
-        "target": "under 2 minutes",
-        "by": "2026-12-31"
-      },
-      "links": {}
-    },
-    {
-      "type": "goal",
-      "id": "goal/quiet-study",
-      "title": "Quiet Study",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/goals/quiet-study.md",
-      "line": 3,
-      "fields": {
-        "type": "goal",
-        "id": "goal/quiet-study",
-        "title": "Quiet Study",
-        "owner": "lending-team",
-        "status": "approved",
-        "statement": "Readers find a quiet seat."
-      },
-      "links": {}
-    },
-    {
-      "type": "problem",
-      "id": "problem/slow-desk-queues",
-      "title": "Slow Desk Queues",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/problems/slow-desk-queues.md",
-      "line": 3,
-      "fields": {
-        "type": "problem",
-        "id": "problem/slow-desk-queues",
-        "title": "Slow Desk Queues",
-        "owner": "lending-team",
-        "status": "approved",
-        "statement": "Members queue at the desk on Saturdays."
-      },
-      "links": {
-        "affects": ["actor/member"]
-      }
-    },
-    {
-      "type": "feature",
-      "id": "feature/self-checkout",
-      "title": "Self Checkout",
-      "owner": "lending-team",
-      "status": "draft",
-      "effectiveStatus": "draft",
-      "decider": "Ada",
-      "decideBy": "2026-11-15",
-      "file": "docs/product/features/self-checkout.md",
-      "line": 3,
-      "body": "## Offering\n\nMembers scan and go; the desk keeps helping with holds.",
-      "fields": {
-        "type": "feature",
-        "id": "feature/self-checkout",
-        "title": "Self Checkout",
-        "owner": "lending-team",
-        "status": "draft",
-        "decider": "Ada",
-        "decideBy": "2026-11-15",
-        "state": "planned",
-        "by": "2026-12-31",
-        "solves": ["problem/slow-desk-queues"],
-        "serves": ["goal/faster-borrowing"]
-      },
-      "links": {
-        "solves": ["problem/slow-desk-queues"],
-        "serves": ["goal/faster-borrowing"]
-      }
-    },
-    {
-      "type": "constraint",
-      "id": "constraint/opening-hours",
-      "title": "Opening Hours",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/constraints/opening-hours.md",
-      "line": 3,
-      "fields": {
-        "type": "constraint",
-        "id": "constraint/opening-hours",
-        "title": "Opening Hours",
-        "owner": "lending-team",
-        "status": "approved",
-        "source": "Branch lease",
-        "category": "organizational",
-        "applies": "Opening hours",
-        "appliesBecause": "The lease sets them."
-      },
-      "links": {}
-    },
-    {
-      "type": "research",
-      "id": "research/member-survey",
-      "title": "Member Survey",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/research/member-survey.md",
-      "line": 3,
-      "fields": {
-        "type": "research",
-        "id": "research/member-survey",
-        "title": "Member Survey",
-        "owner": "lending-team",
-        "status": "approved",
-        "question": "Why do members queue?",
-        "sources": [{ "url": "https://example.com/survey", "read": "2026-09-30" }]
-      },
-      "links": {}
-    },
-    {
-      "type": "decision",
-      "id": "decision/self-checkout-kiosk",
-      "title": "Self Checkout Kiosk",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/decisions/1-self-checkout-kiosk.md",
-      "line": 3,
-      "fields": {
-        "type": "decision",
-        "id": "decision/self-checkout-kiosk",
-        "title": "Self Checkout Kiosk",
-        "owner": "lending-team",
-        "status": "approved",
-        "decided": "2026-10-01",
-        "options": [
-          { "name": "Kiosk", "for": "Short queues", "against": "Hardware cost" },
-          { "name": "More desks", "for": "No hardware", "against": "Staff cost" }
-        ],
-        "chosen": "Kiosk",
-        "changeWhen": "Queues persist.",
-        "decides": ["feature/self-checkout"],
-        "basedOn": ["research/member-survey"]
-      },
-      "links": {
-        "decides": ["feature/self-checkout"],
-        "basedOn": ["research/member-survey"]
-      }
-    },
-    {
-      "type": "requirement",
-      "id": "requirement/borrowing.max-wait",
-      "title": "Max Wait",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/borrowing.md",
-      "line": 12,
-      "fields": {
-        "type": "requirement",
-        "id": "requirement/borrowing.max-wait",
-        "title": "Max Wait",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "quality",
-        "statement": "A member waits less than two minutes at the desk.",
-        "rationale": "Queues drive members away.",
-        "measure": "p95 desk wait",
-        "target": "under 2 minutes",
-        "by": "2026-12-31",
-        "conditions": "Saturday morning, two desks open",
-        "check": "k6 desk-wait p(95)<120",
-        "runsOn": "nightly",
-        "evidence": "https://example.com/runs/desk-wait",
-        "feature": ["feature/self-checkout"],
-        "questions": [
-          { "question": "Do kiosk users count toward the wait?", "decider": "Ada", "decideBy": "2026-11-01" }
-        ]
-      },
-      "links": {
-        "feature": ["feature/self-checkout"]
-      }
-    },
-    {
-      "type": "requirement",
-      "id": "requirement/borrowing.copy-shelf-home",
-      "title": "Copy Shelf Home",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/borrowing.md",
-      "line": 30,
-      "fields": {
-        "type": "requirement",
-        "id": "requirement/borrowing.copy-shelf-home",
-        "title": "Copy Shelf Home",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "functional",
-        "statement": "Every copy has one home shelf.",
-        "feature": ["feature/self-checkout"]
-      },
-      "links": {
-        "feature": ["feature/self-checkout"]
-      }
-    },
-    {
-      "type": "requirement",
-      "id": "requirement/borrowing.late-fee",
-      "title": "Late Fee",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/borrowing.md",
-      "line": 44,
-      "fields": {
-        "type": "requirement",
-        "id": "requirement/borrowing.late-fee",
-        "title": "Late Fee",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "business",
-        "statement": "Late fees fund new copies.",
-        "values": [{ "value": "50 cents per day", "effectiveFrom": "2026-01-01" }],
-        "feature": ["feature/self-checkout"]
-      },
-      "links": {
-        "feature": ["feature/self-checkout"]
-      }
-    },
-    {
-      "type": "journey",
-      "id": "journey/borrowing",
-      "title": "Borrowing",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/product/journeys/borrowing.md",
-      "line": 3,
-      "fields": {
-        "type": "journey",
-        "id": "journey/borrowing",
-        "title": "Borrowing",
-        "owner": "lending-team",
-        "status": "approved",
-        "actor": "actor/member",
-        "goal": "Borrow before closing",
-        "steps": [
-          { "useCase": "use-case/lending.borrow-copy", "actor": "actor/member", "requires": "member card", "gives": "a loan" }
-        ],
-        "fulfills": ["requirement/borrowing.max-wait"]
-      },
-      "links": {
-        "actor": ["actor/member"],
-        "fulfills": ["requirement/borrowing.max-wait"]
-      }
-    },
-    {
-      "type": "module",
-      "id": "module/lending",
-      "title": "Lending",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/README.md",
-      "line": 3,
-      "body": "## Known Limits\n\nThe branch lends its own copies only.",
-      "fields": {
-        "type": "module",
-        "id": "module/lending",
-        "title": "Lending",
-        "owner": "lending-team",
-        "status": "approved",
-        "summary": "Loans, holds and copies."
-      },
-      "links": {}
-    },
-    {
-      "type": "aggregate",
-      "id": "aggregate/lending.loan",
-      "title": "Loan",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/README.md",
-      "line": 3,
-      "body": "## Bounds\n\nA loan covers **one copy** and *one member*. The desk kiosk prints the due slip; see use-case/lending.borrow-copy for the flow.\n\nBorrowing rules:\n\n- One copy lends to one member at a time.\n- A loan lasts `three weeks`.\n\nCounts:\n\n1. Scan the member card.\n2. Scan the copy.\n\n| Week | Loans |\n| --- | ---: |\n| First | 120 |\n| Second | 140 |\n\n```\nscan member, scan copy, print slip\n```\n\n> A loan is a promise to bring the copy back.\n\n---\n\nRead the [lending guide](https://example.com/lending) or visit https://example.com/desks.",
-      "fields": {
-        "type": "aggregate",
-        "id": "aggregate/lending.loan",
-        "title": "Loan",
-        "owner": "lending-team",
-        "status": "approved",
-        "summary": "One copy lent to one member.",
-        "states": [
-          { "name": "OnShelf", "meaning": "The copy waits on its shelf." },
-          { "name": "OnLoan", "meaning": "A member holds the copy." },
-          { "name": "Retired", "meaning": "The copy left lending." }
-        ],
-        "transitions": [
-          { "from": "OnShelf", "to": "OnLoan", "by": "use-case/lending.borrow-copy" },
-          { "from": "OnLoan", "to": "OnShelf", "by": "use-case/lending.return-copy" }
-        ],
-        "data": [
-          { "name": "memberId", "meaning": "Who holds the copy.", "classification": "personal" },
-          { "name": "dueDate", "meaning": "When the copy returns.", "classification": "internal" },
-          { "name": "title", "meaning": "The copy title.", "classification": "public" }
-        ]
-      },
-      "links": {}
-    },
-    {
-      "type": "rule",
-      "id": "rule/loan.one-loan-per-copy",
-      "title": "One Loan Per Copy",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/README.md",
-      "line": 17,
-      "fields": {
-        "type": "rule",
-        "id": "rule/loan.one-loan-per-copy",
-        "title": "One Loan Per Copy",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "invariant",
-        "statement": "One copy lends to one member at a time.",
-        "governs": ["use-case/lending.borrow-copy"],
-        "fulfills": ["requirement/borrowing.copy-shelf-home"],
-        "refusal": ["result/borrow-copy.copy-unavailable"]
-      },
-      "links": {
-        "governs": ["use-case/lending.borrow-copy"],
-        "fulfills": ["requirement/borrowing.copy-shelf-home"],
-        "refusal": ["result/borrow-copy.copy-unavailable"]
-      }
-    },
-    {
-      "type": "rule",
-      "id": "rule/loan.late-fee",
-      "title": "Late Fee",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/README.md",
-      "line": 30,
-      "fields": {
-        "type": "rule",
-        "id": "rule/loan.late-fee",
-        "title": "Late Fee",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "calculation",
-        "statement": "A late fee is 50 cents per day past the due date.",
-        "governs": ["use-case/lending.borrow-copy"],
-        "fulfills": ["requirement/borrowing.late-fee"]
-      },
-      "links": {
-        "governs": ["use-case/lending.borrow-copy"],
-        "fulfills": ["requirement/borrowing.late-fee"]
-      }
-    },
-    {
-      "type": "use-case",
-      "id": "use-case/lending.borrow-copy",
-      "title": "Borrow Copy",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "aggregate": "aggregate/lending.loan",
-      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
-      "line": 3,
-      "body": "## Goal\n\nThe member leaves the desk with the copy in under two minutes.\n\n## What Happens\n\nThe kiosk scans the member card and the copy, then prints the due slip.",
-      "fields": {
-        "type": "use-case",
-        "id": "use-case/lending.borrow-copy",
-        "title": "Borrow Copy",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "command",
-        "anonymous": false,
-        "needs": ["permission/borrow-copy"],
-        "reachedThrough": ["entry-point/library-app"],
-        "raises": ["event/loan.loan-borrowed"],
-        "fulfills": ["requirement/borrowing.max-wait"],
-        "input": [{ "name": "memberId", "meaning": "Who borrows.", "rules": "A registered member." }],
-        "output": [{ "name": "loanId", "meaning": "The new loan.", "rules": "Unique per loan." }]
-      },
-      "links": {
-        "needs": ["permission/borrow-copy"],
-        "reachedThrough": ["entry-point/library-app"],
-        "raises": ["event/loan.loan-borrowed"],
-        "fulfills": ["requirement/borrowing.max-wait"]
-      }
-    },
-    {
-      "type": "use-case",
-      "id": "use-case/lending.return-copy",
-      "title": "Return Copy",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "aggregate": "aggregate/lending.loan",
-      "file": "docs/domain/modules/lending/loans/return-copy.md",
-      "line": 3,
-      "fields": {
-        "type": "use-case",
-        "id": "use-case/lending.return-copy",
-        "title": "Return Copy",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "command",
-        "anonymous": false,
-        "fulfills": ["requirement/borrowing.copy-shelf-home"]
-      },
-      "links": {
-        "fulfills": ["requirement/borrowing.copy-shelf-home"]
-      }
-    },
-    {
-      "type": "use-case",
-      "id": "use-case/lending.send-due-reminder",
-      "title": "Send Due Reminder",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "aggregate": "aggregate/lending.loan",
-      "file": "docs/domain/modules/lending/loans/send-due-reminder.md",
-      "line": 3,
-      "fields": {
-        "type": "use-case",
-        "id": "use-case/lending.send-due-reminder",
-        "title": "Send Due Reminder",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "reaction",
-        "trigger": ["event/loan.loan-due", "every morning at eight"],
-        "fulfills": ["requirement/borrowing.max-wait"]
-      },
-      "links": {
-        "trigger": ["event/loan.loan-due"],
-        "fulfills": ["requirement/borrowing.max-wait"]
-      }
-    },
-    {
-      "type": "result",
-      "id": "result/borrow-copy.borrowed",
-      "title": "Borrowed",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
-      "line": 14,
-      "fields": {
-        "type": "result",
-        "id": "result/borrow-copy.borrowed",
-        "title": "Borrowed",
-        "owner": "lending-team",
-        "outcome": "success",
-        "meaning": "The copy is lent."
-      },
-      "links": {}
-    },
-    {
-      "type": "result",
-      "id": "result/borrow-copy.copy-unavailable",
-      "title": "Copy Unavailable",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
-      "line": 20,
-      "fields": {
-        "type": "result",
-        "id": "result/borrow-copy.copy-unavailable",
-        "title": "Copy Unavailable",
-        "owner": "lending-team",
-        "outcome": "refusal",
-        "code": "lending.copy-not-available",
-        "meaning": "The copy stays unavailable and the member is told it is on loan."
-      },
-      "links": {}
-    },
-    {
-      "type": "scenario",
-      "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
-      "title": "Borrowing An Available Copy Succeeds",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
-      "line": 28,
-      "fields": {
-        "type": "scenario",
-        "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
-        "title": "Borrowing An Available Copy Succeeds",
-        "owner": "lending-team",
-        "status": "approved",
-        "given": "A copy sits available on its shelf.",
-        "when": "The member borrows the copy.",
-        "then": "The loan is active.",
-        "result": "result/borrow-copy.borrowed",
-        "examples": [
-          { "copy": "copy-1", "member": "member-9", "due": "2026-11-12" },
-          { "copy": "copy-2", "member": "member-3", "due": "2026-11-13" }
-        ]
-      },
-      "links": {
-        "result": ["result/borrow-copy.borrowed"]
-      }
-    },
-    {
-      "type": "scenario",
-      "id": "scenario/borrow-copy.borrowing-a-loaned-copy-is-refused",
-      "title": "Borrowing A Loaned Copy Is Refused",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "draft",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/borrow-copy.md",
-      "line": 44,
-      "fields": {
-        "type": "scenario",
-        "id": "scenario/borrow-copy.borrowing-a-loaned-copy-is-refused",
-        "title": "Borrowing A Loaned Copy Is Refused",
-        "owner": "lending-team",
-        "status": "approved",
-        "given": "A copy is on loan to another member.",
-        "when": "The member borrows the copy.",
-        "then": "The copy stays on loan and the member is told it is unavailable.",
-        "result": "result/borrow-copy.copy-unavailable"
-      },
-      "links": {
-        "result": ["result/borrow-copy.copy-unavailable"]
-      }
-    },
-    {
-      "type": "event",
-      "id": "event/loan.loan-borrowed",
-      "title": "Loan Borrowed",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/README.md",
-      "line": 52,
-      "fields": {
-        "type": "event",
-        "id": "event/loan.loan-borrowed",
-        "title": "Loan Borrowed",
-        "owner": "lending-team",
-        "status": "approved",
-        "meaning": "A copy was lent.",
-        "carries": ["copyId", "memberId"]
-      },
-      "links": {}
-    },
-    {
-      "type": "event",
-      "id": "event/loan.loan-due",
-      "title": "Loan Due",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/modules/lending/loans/README.md",
-      "line": 60,
-      "fields": {
-        "type": "event",
-        "id": "event/loan.loan-due",
-        "title": "Loan Due",
-        "owner": "lending-team",
-        "status": "approved",
-        "meaning": "A loan approaches its due date.",
-        "carries": ["loanId"]
-      },
-      "links": {}
-    },
-    {
-      "type": "actor",
-      "id": "actor/member",
-      "title": "Member",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/actors/member.md",
-      "line": 3,
-      "fields": {
-        "type": "actor",
-        "id": "actor/member",
-        "title": "Member",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "person",
-        "holds": [{ "role": "role/member", "scope": "platform" }]
-      },
-      "links": {
-        "holds": ["role/member"]
-      }
-    },
-    {
-      "type": "role",
-      "id": "role/member",
-      "title": "Member",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/roles/member.md",
-      "line": 3,
-      "fields": {
-        "type": "role",
-        "id": "role/member",
-        "title": "Member",
-        "owner": "lending-team",
-        "status": "approved",
-        "scope": "platform",
-        "allows": ["permission/borrow-copy"]
-      },
-      "links": {
-        "allows": ["permission/borrow-copy"]
-      }
-    },
-    {
-      "type": "permission",
-      "id": "permission/borrow-copy",
-      "title": "Borrow Copy",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/permissions.md",
-      "line": 8,
-      "fields": {
-        "type": "permission",
-        "id": "permission/borrow-copy",
-        "title": "Borrow Copy",
-        "owner": "lending-team",
-        "status": "approved",
-        "meaning": "Borrow a copy."
-      },
-      "links": {}
-    },
-    {
-      "type": "entry-point",
-      "id": "entry-point/library-app",
-      "title": "Library App",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/entry-points.md",
-      "line": 6,
-      "fields": {
-        "type": "entry-point",
-        "id": "entry-point/library-app",
-        "title": "Library App",
-        "owner": "lending-team",
-        "status": "approved",
-        "kind": "app",
-        "path": "/borrow"
-      },
-      "links": {}
-    },
-    {
-      "type": "external-system",
-      "id": "external-system/fine-payments",
-      "title": "Fine Payments",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/domain/systems/fine-payments.md",
-      "line": 3,
-      "body": "## Summary\n\nFine Payments takes card payments for overdue fines.",
-      "fields": {
-        "type": "external-system",
-        "id": "external-system/fine-payments",
-        "title": "Fine Payments",
-        "owner": "lending-team",
-        "status": "approved",
-        "actor": "actor/member",
-        "sends": ["fine owed"],
-        "receives": ["payment confirmed"],
-        "failure": "Fines wait until the system answers."
-      },
-      "links": {
-        "actor": ["actor/member"]
-      }
-    },
-    {
-      "type": "limit",
-      "id": "limit/max-active-loans",
-      "title": "Max Active Loans",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/operations/limits.md",
-      "line": 6,
-      "fields": {
-        "type": "limit",
-        "id": "limit/max-active-loans",
-        "title": "Max Active Loans",
-        "owner": "lending-team",
-        "status": "approved",
-        "bound": "active loans per member",
-        "value": "5",
-        "runbook": ["runbook/overdue-notice"]
-      },
-      "links": {
-        "runbook": ["runbook/overdue-notice"]
-      }
-    },
-    {
-      "type": "runbook",
-      "id": "runbook/overdue-notice",
-      "title": "Overdue Notice",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/runbooks/overdue-notice.md",
-      "line": 3,
-      "body": "## Impact\n\nMembers keep borrowing while notices wait.\n\n## Procedure\n\n1. List overdue loans.\n2. Send reminders.\n\nLabels print as `<code>LOAN-1</code>` from the template.",
-      "fields": {
-        "type": "runbook",
-        "id": "runbook/overdue-notice",
-        "title": "Overdue Notice",
-        "owner": "lending-team",
-        "status": "approved",
-        "trigger": "A loan passes its due date.",
-        "severity": "low"
-      },
-      "links": {}
-    },
-    {
-      "type": "deviation",
-      "id": "deviation/kiosk-cache",
-      "title": "Kiosk Cache",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/deviations/kiosk-cache.md",
-      "line": 3,
-      "fields": {
-        "type": "deviation",
-        "id": "deviation/kiosk-cache",
-        "title": "Kiosk Cache",
-        "owner": "lending-team",
-        "status": "approved",
-        "reason": "The kiosk caches the catalog for a day.",
-        "reviewBy": "2027-01-01",
-        "removeWhen": "The kiosk reads the catalog live.",
-        "provision": ["litespec/ext/cache#define-cache-invalidation"]
-      },
-      "links": {
-        "provision": ["litespec/ext/cache#define-cache-invalidation"]
-      }
-    },
-    {
-      "type": "known-gap",
-      "id": "known-gap/offline-kiosk",
-      "title": "Offline Kiosk",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/known-gaps/offline-kiosk.md",
-      "line": 3,
-      "fields": {
-        "type": "known-gap",
-        "id": "known-gap/offline-kiosk",
-        "title": "Offline Kiosk",
-        "owner": "lending-team",
-        "status": "approved",
-        "check": "kiosk-offline",
-        "endsBy": "2026-01-01",
-        "reason": "The kiosk cannot lend offline yet.",
-        "subject": ["feature/self-checkout"]
-      },
-      "links": {
-        "subject": ["feature/self-checkout"]
-      }
-    },
-    {
-      "type": "term",
-      "id": "term/loan",
-      "title": "Loan",
-      "owner": "lending-team",
-      "status": "approved",
-      "effectiveStatus": "approved",
-      "decider": null,
-      "decideBy": null,
-      "file": "docs/glossary.json",
-      "line": 4,
-      "fields": {
-        "type": "term",
-        "id": "term/loan",
-        "title": "Loan",
-        "owner": "lending-team",
-        "status": "approved",
-        "term": "Loan",
-        "meaning": "A copy lent to a member.",
-        "labels": { "fr": "emprunt" },
-        "rejected": [{ "word": "rental", "reason": "A loan is free.", "scope": "desk" }],
-        "values": [{ "code": "active", "label": "Active" }]
-      },
-      "links": {}
-    }
-  ],
-  "code": {
-    "handlers": [],
-    "reactions": [],
-    "jobs": [],
-    "codes": [],
-    "events": []
-  },
-  "screens": [],
-  "tests": [
-    {
-      "scenario": "Library.Tests.BorrowTests.Borrowing_An_Available_Copy_Succeeds",
-      "class": "BorrowTests",
-      "file": "tests/BorrowTests.cs",
-      "line": 41,
-      "claims": ["scenario/borrow-copy.borrowing-an-available-copy-succeeds"],
-      "steps": [],
-      "codes": [],
-      "outcome": "Passed"
-    }
-  ],
-  "testRun": {
-    "files": ["tests.trx"],
-    "total": 1,
-    "passed": 1,
-    "failed": 0,
-    "date": "2026-10-20"
-  },
-  "links": {
-    "implements": [
-      { "path": "src/Application/Lending/BorrowCopyHandler.cs", "to": "use-case/lending.borrow-copy", "kind": "handler" }
-    ],
-    "calls": [],
-    "proves": [
-      {
-        "scenario": "Library.Tests.BorrowTests.Borrowing_An_Available_Copy_Succeeds",
-        "claim": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
-        "confirmed": true,
-        "passing": true,
-        "indirect": false
-      }
-    ]
-  },
-  "status": {
-    "use-case/lending.borrow-copy": { "implemented": true, "verified": false },
-    "use-case/lending.return-copy": { "implemented": false, "verified": false },
-    "use-case/lending.send-due-reminder": { "implemented": true, "verified": true }
-  },
-  "requirementStatus": {
-    "requirement/borrowing.max-wait": { "verified": false, "measurePassed": false },
-    "requirement/borrowing.copy-shelf-home": { "verified": true, "measurePassed": null },
-    "requirement/borrowing.late-fee": { "verified": false, "measurePassed": null }
-  },
-  "reachableStates": {
-    "aggregate/lending.loan": ["OnShelf", "OnLoan"]
-  }
+    "version":  1,
+    "root":  ".",
+    "records":  [
+                    {
+                        "type":  "product",
+                        "id":  "product/library",
+                        "title":  "Riverside Library",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/brief.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "product",
+                                       "id":  "product/library",
+                                       "title":  "Riverside Library",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "boundary":  "Lending for one branch.",
+                                       "neverDoes":  [
+                                                         "Sell books."
+                                                     ],
+                                       "audience":  [
+                                                        "actor/member"
+                                                    ]
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "goal",
+                        "id":  "goal/faster-borrowing",
+                        "title":  "Faster Borrowing",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/goals/faster-borrowing.md",
+                        "line":  3,
+                        "body":  "## Why It Matters\n\nShort waits bring members back.",
+                        "fields":  {
+                                       "type":  "goal",
+                                       "id":  "goal/faster-borrowing",
+                                       "title":  "Faster Borrowing",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "statement":  "Members borrow in under two minutes.",
+                                       "measure":  "p95 desk wait",
+                                       "target":  "under 2 minutes",
+                                       "by":  "2026-12-31"
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "goal",
+                        "id":  "goal/quiet-study",
+                        "title":  "Quiet Study",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/goals/quiet-study.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "goal",
+                                       "id":  "goal/quiet-study",
+                                       "title":  "Quiet Study",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "statement":  "Readers find a quiet seat."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "problem",
+                        "id":  "problem/slow-desk-queues",
+                        "title":  "Slow Desk Queues",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/problems/slow-desk-queues.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "problem",
+                                       "id":  "problem/slow-desk-queues",
+                                       "title":  "Slow Desk Queues",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "statement":  "Members queue at the desk on Saturdays."
+                                   },
+                        "links":  {
+                                      "affects":  [
+                                                      "actor/member"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "feature",
+                        "id":  "feature/self-checkout",
+                        "title":  "Self Checkout",
+                        "owner":  "lending-team",
+                        "status":  "draft",
+                        "effectiveStatus":  "draft",
+                        "decider":  "Ada",
+                        "decideBy":  "2026-11-15",
+                        "file":  "docs/product/features/self-checkout.md",
+                        "line":  3,
+                        "body":  "## Offering\n\nMembers scan and go; the desk keeps helping with holds.",
+                        "fields":  {
+                                       "type":  "feature",
+                                       "id":  "feature/self-checkout",
+                                       "title":  "Self Checkout",
+                                       "owner":  "lending-team",
+                                       "status":  "draft",
+                                       "decider":  "Ada",
+                                       "decideBy":  "2026-11-15",
+                                       "state":  "planned",
+                                       "by":  "2026-12-31",
+                                       "solves":  [
+                                                      "problem/slow-desk-queues"
+                                                  ],
+                                       "serves":  [
+                                                      "goal/faster-borrowing"
+                                                  ],
+                                       "questions":  [
+                                                         {
+                                                             "question":  "Must the kiosk serve members without cards?",
+                                                             "decider":  "Ada",
+                                                             "decideBy":  "2026-10-30",
+                                                             "tier":  1,
+                                                             "ballot":  "desk-queue"
+                                                         }
+                                                     ]
+                                   },
+                        "links":  {
+                                      "solves":  [
+                                                     "problem/slow-desk-queues"
+                                                 ],
+                                      "serves":  [
+                                                     "goal/faster-borrowing"
+                                                 ]
+                                  }
+                    },
+                    {
+                        "type":  "constraint",
+                        "id":  "constraint/opening-hours",
+                        "title":  "Opening Hours",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/constraints/opening-hours.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "constraint",
+                                       "id":  "constraint/opening-hours",
+                                       "title":  "Opening Hours",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "source":  "Branch lease",
+                                       "category":  "organizational",
+                                       "applies":  "Opening hours",
+                                       "appliesBecause":  "The lease sets them."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "research",
+                        "id":  "research/member-survey",
+                        "title":  "Member Survey",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/research/member-survey.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "research",
+                                       "id":  "research/member-survey",
+                                       "title":  "Member Survey",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "question":  "Why do members queue?",
+                                       "sources":  [
+                                                       {
+                                                           "url":  "https://example.com/survey",
+                                                           "read":  "2026-09-30"
+                                                       }
+                                                   ]
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "decision",
+                        "id":  "decision/self-checkout-kiosk",
+                        "title":  "Self Checkout Kiosk",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/decisions/1-self-checkout-kiosk.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "decision",
+                                       "id":  "decision/self-checkout-kiosk",
+                                       "title":  "Self Checkout Kiosk",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "decided":  "2026-10-01",
+                                       "options":  [
+                                                       {
+                                                           "name":  "Kiosk",
+                                                           "for":  "Short queues",
+                                                           "against":  "Hardware cost"
+                                                       },
+                                                       {
+                                                           "name":  "More desks",
+                                                           "for":  "No hardware",
+                                                           "against":  "Staff cost"
+                                                       }
+                                                   ],
+                                       "chosen":  "Kiosk",
+                                       "changeWhen":  "Queues persist.",
+                                       "decides":  [
+                                                       "feature/self-checkout"
+                                                   ],
+                                       "basedOn":  [
+                                                       "research/member-survey"
+                                                   ]
+                                   },
+                        "links":  {
+                                      "decides":  [
+                                                      "feature/self-checkout"
+                                                  ],
+                                      "basedOn":  [
+                                                      "research/member-survey"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "requirement",
+                        "id":  "requirement/borrowing.max-wait",
+                        "title":  "Max Wait",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/borrowing.md",
+                        "line":  12,
+                        "fields":  {
+                                       "type":  "requirement",
+                                       "id":  "requirement/borrowing.max-wait",
+                                       "title":  "Max Wait",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "kind":  "quality",
+                                       "statement":  "A member waits less than two minutes at the desk.",
+                                       "rationale":  "Queues drive members away.",
+                                       "measure":  "p95 desk wait",
+                                       "target":  "under 2 minutes",
+                                       "by":  "2026-12-31",
+                                       "conditions":  "Saturday morning, two desks open",
+                                       "check":  "k6 desk-wait p(95)\u003c120",
+                                       "runsOn":  "nightly",
+                                       "evidence":  "https://example.com/runs/desk-wait",
+                                       "feature":  [
+                                                       "feature/self-checkout"
+                                                   ],
+                                       "questions":  [
+                                                         {
+                                                             "question":  "Do kiosk users count toward the wait?",
+                                                             "decider":  "Ada",
+                                                             "decideBy":  "2026-11-01",
+                                                             "recommended":  "Count kiosk users separately.",
+                                                             "ballot":  "desk-queue"
+                                                         }
+                                                     ]
+                                   },
+                        "links":  {
+                                      "feature":  [
+                                                      "feature/self-checkout"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "requirement",
+                        "id":  "requirement/borrowing.copy-shelf-home",
+                        "title":  "Copy Shelf Home",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/borrowing.md",
+                        "line":  30,
+                        "fields":  {
+                                       "type":  "requirement",
+                                       "id":  "requirement/borrowing.copy-shelf-home",
+                                       "title":  "Copy Shelf Home",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "kind":  "functional",
+                                       "statement":  "Every copy has one home shelf.",
+                                       "feature":  [
+                                                       "feature/self-checkout"
+                                                   ]
+                                   },
+                        "links":  {
+                                      "feature":  [
+                                                      "feature/self-checkout"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "requirement",
+                        "id":  "requirement/borrowing.late-fee",
+                        "title":  "Late Fee",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/borrowing.md",
+                        "line":  44,
+                        "fields":  {
+                                       "type":  "requirement",
+                                       "id":  "requirement/borrowing.late-fee",
+                                       "title":  "Late Fee",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "kind":  "business",
+                                       "statement":  "Late fees fund new copies.",
+                                       "values":  [
+                                                      {
+                                                          "value":  "50 cents per day",
+                                                          "effectiveFrom":  "2026-01-01"
+                                                      }
+                                                  ],
+                                       "feature":  [
+                                                       "feature/self-checkout"
+                                                   ]
+                                   },
+                        "links":  {
+                                      "feature":  [
+                                                      "feature/self-checkout"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "journey",
+                        "id":  "journey/borrowing",
+                        "title":  "Borrowing",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/product/journeys/borrowing.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "journey",
+                                       "id":  "journey/borrowing",
+                                       "title":  "Borrowing",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "actor":  "actor/member",
+                                       "goal":  "Borrow before closing",
+                                       "steps":  [
+                                                     {
+                                                         "id":  "s1",
+                                                         "says":  "The member borrows a copy before closing.",
+                                                         "actor":  "actor/member"
+                                                     },
+                                                     {
+                                                         "id":  "s2",
+                                                         "says":  "The member returns the copy.",
+                                                         "actor":  "actor/member",
+                                                         "ifItGoesWrong":  "The desk renews the loan."
+                                                     }
+                                                 ],
+                                       "fulfills":  [
+                                                        "requirement/borrowing.max-wait"
+                                                    ],
+                                       "finishedWhen":  "The member leaves the desk with the copy before closing."
+                                   },
+                        "links":  {
+                                      "actor":  [
+                                                    "actor/member"
+                                                ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.max-wait"
+                                                   ]
+                                  }
+                    },
+                    {
+                        "type":  "module",
+                        "id":  "module/lending",
+                        "title":  "Lending",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/README.md",
+                        "line":  3,
+                        "body":  "## Known Limits\n\nThe branch lends its own copies only.",
+                        "fields":  {
+                                       "type":  "module",
+                                       "id":  "module/lending",
+                                       "title":  "Lending",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "summary":  "Loans, holds and copies."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "aggregate",
+                        "id":  "aggregate/lending.loan",
+                        "title":  "Loan",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/README.md",
+                        "line":  3,
+                        "body":  "## Bounds\n\nA loan covers **one copy** and *one member*. The desk kiosk prints the due slip; see use-case/lending.borrow-copy for the flow.\n\nBorrowing rules:\n\n- One copy lends to one member at a time.\n- A loan lasts `three weeks`.\n\nCounts:\n\n1. Scan the member card.\n2. Scan the copy.\n\n| Week | Loans |\n| --- | ---: |\n| First | 120 |\n| Second | 140 |\n\n```\nscan member, scan copy, print slip\n```\n\n\u003e A loan is a promise to bring the copy back.\n\n---\n\nRead the [lending guide](https://example.com/lending) or visit https://example.com/desks.",
+                        "fields":  {
+                                       "type":  "aggregate",
+                                       "id":  "aggregate/lending.loan",
+                                       "title":  "Loan",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "summary":  "One copy lent to one member.",
+                                       "states":  [
+                                                      {
+                                                          "name":  "OnShelf",
+                                                          "meaning":  "The copy waits on its shelf."
+                                                      },
+                                                      {
+                                                          "name":  "OnLoan",
+                                                          "meaning":  "A member holds the copy."
+                                                      },
+                                                      {
+                                                          "name":  "Retired",
+                                                          "meaning":  "The copy left lending."
+                                                      }
+                                                  ],
+                                       "transitions":  [
+                                                           {
+                                                               "from":  "OnShelf",
+                                                               "to":  "OnLoan",
+                                                               "by":  "use-case/lending.borrow-copy"
+                                                           },
+                                                           {
+                                                               "from":  "OnLoan",
+                                                               "to":  "OnShelf",
+                                                               "by":  "use-case/lending.return-copy"
+                                                           }
+                                                       ],
+                                       "data":  [
+                                                    {
+                                                        "name":  "memberId",
+                                                        "meaning":  "Who holds the copy.",
+                                                        "classification":  "personal"
+                                                    },
+                                                    {
+                                                        "name":  "dueDate",
+                                                        "meaning":  "When the copy returns.",
+                                                        "classification":  "internal"
+                                                    },
+                                                    {
+                                                        "name":  "title",
+                                                        "meaning":  "The copy title.",
+                                                        "classification":  "public"
+                                                    }
+                                                ]
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "rule",
+                        "id":  "rule/loan.one-loan-per-copy",
+                        "title":  "One Loan Per Copy",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/README.md",
+                        "line":  17,
+                        "fields":  {
+                                       "type":  "rule",
+                                       "id":  "rule/loan.one-loan-per-copy",
+                                       "title":  "One Loan Per Copy",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "kind":  "invariant",
+                                       "statement":  "One copy lends to one member at a time.",
+                                       "governs":  [
+                                                       "use-case/lending.borrow-copy"
+                                                   ],
+                                       "fulfills":  [
+                                                        "requirement/borrowing.copy-shelf-home"
+                                                    ],
+                                       "refusal":  [
+                                                       "result/borrow-copy.copy-unavailable"
+                                                   ]
+                                   },
+                        "links":  {
+                                      "governs":  [
+                                                      "use-case/lending.borrow-copy"
+                                                  ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.copy-shelf-home"
+                                                   ],
+                                      "refusal":  [
+                                                      "result/borrow-copy.copy-unavailable"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "rule",
+                        "id":  "rule/loan.late-fee",
+                        "title":  "Late Fee",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/README.md",
+                        "line":  30,
+                        "fields":  {
+                                       "type":  "rule",
+                                       "id":  "rule/loan.late-fee",
+                                       "title":  "Late Fee",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "kind":  "calculation",
+                                       "statement":  "A late fee is 50 cents per day past the due date.",
+                                       "governs":  [
+                                                       "use-case/lending.borrow-copy"
+                                                   ],
+                                       "fulfills":  [
+                                                        "requirement/borrowing.late-fee"
+                                                    ]
+                                   },
+                        "links":  {
+                                      "governs":  [
+                                                      "use-case/lending.borrow-copy"
+                                                  ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.late-fee"
+                                                   ]
+                                  }
+                    },
+                    {
+                        "type":  "use-case",
+                        "id":  "use-case/lending.borrow-copy",
+                        "title":  "Borrow Copy",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "aggregate":  "aggregate/lending.loan",
+                        "file":  "docs/behavior/modules/lending/loans/borrow-copy.md",
+                        "line":  3,
+                        "body":  "## Goal\n\nThe member leaves the desk with the copy in under two minutes.\n\n## What Happens\n\nThe kiosk scans the member card and the copy, then prints the due slip.",
+                        "fields":  {
+                                       "type":  "use-case",
+                                       "id":  "use-case/lending.borrow-copy",
+                                       "title":  "Borrow Copy",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "kind":  "command",
+                                       "reachedThrough":  [
+                                                              "entry-point/library-app"
+                                                          ],
+                                       "raises":  [
+                                                      "event/loan.loan-borrowed"
+                                                  ],
+                                       "fulfills":  [
+                                                        "requirement/borrowing.max-wait"
+                                                    ],
+                                       "input":  [
+                                                     {
+                                                         "name":  "memberId",
+                                                         "meaning":  "Who borrows.",
+                                                         "rules":  "A registered member."
+                                                     }
+                                                 ],
+                                       "output":  [
+                                                      {
+                                                          "name":  "loanId",
+                                                          "meaning":  "The new loan.",
+                                                          "rules":  "Unique per loan."
+                                                      }
+                                                  ],
+                                       "access":  {
+                                                      "auth":  [
+                                                                   "session"
+                                                               ],
+                                                      "grant":  "permission/borrow-copy",
+                                                      "tenant":  "own"
+                                                  },
+                                       "serves":  [
+                                                      "journey/borrowing#s1"
+                                                  ]
+                                   },
+                        "links":  {
+                                      "reachedThrough":  [
+                                                             "entry-point/library-app"
+                                                         ],
+                                      "raises":  [
+                                                     "event/loan.loan-borrowed"
+                                                 ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.max-wait"
+                                                   ],
+                                      "serves":  [
+                                                     "journey/borrowing#s1"
+                                                 ]
+                                  }
+                    },
+                    {
+                        "type":  "use-case",
+                        "id":  "use-case/lending.return-copy",
+                        "title":  "Return Copy",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "aggregate":  "aggregate/lending.loan",
+                        "file":  "docs/behavior/modules/lending/loans/return-copy.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "use-case",
+                                       "id":  "use-case/lending.return-copy",
+                                       "title":  "Return Copy",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "kind":  "command",
+                                       "fulfills":  [
+                                                        "requirement/borrowing.copy-shelf-home"
+                                                    ],
+                                       "access":  {
+                                                      "auth":  [
+                                                                   "session"
+                                                               ],
+                                                      "grant":  "permission/borrow-copy",
+                                                      "tenant":  "own"
+                                                  }
+                                   },
+                        "links":  {
+                                      "fulfills":  [
+                                                       "requirement/borrowing.copy-shelf-home"
+                                                   ]
+                                  }
+                    },
+                    {
+                        "type":  "reaction",
+                        "id":  "reaction/lending.send-due-reminder",
+                        "title":  "Send Due Reminder",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "aggregate":  "aggregate/lending.loan",
+                        "file":  "docs/behavior/modules/lending/reactions/send-due-reminder.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "reaction",
+                                       "id":  "reaction/lending.send-due-reminder",
+                                       "title":  "Send Due Reminder",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "on":  [
+                                                  "event/loan.loan-due"
+                                              ],
+                                       "sends":  "notification/lending.due-reminder",
+                                       "fulfills":  [
+                                                        "requirement/borrowing.max-wait"
+                                                    ]
+                                   },
+                        "links":  {
+                                      "on":  [
+                                                 "event/loan.loan-due"
+                                             ],
+                                      "sends":  [
+                                                    "notification/lending.due-reminder"
+                                                ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.max-wait"
+                                                   ]
+                                  }
+                    },
+                    {
+                        "type":  "notification",
+                        "id":  "notification/lending.due-reminder",
+                        "title":  "Due Reminder",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "reviewed",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/notifications/due-reminder.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "notification",
+                                       "id":  "notification/lending.due-reminder",
+                                       "title":  "Due Reminder",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "audience":  [
+                                                        "actor/member"
+                                                    ],
+                                       "channel":  "email",
+                                       "template":  "due-reminder",
+                                       "fulfills":  [
+                                                        "requirement/borrowing.max-wait"
+                                                    ]
+                                   },
+                        "links":  {
+                                      "audience":  [
+                                                       "actor/member"
+                                                   ],
+                                      "fulfills":  [
+                                                       "requirement/borrowing.max-wait"
+                                                   ]
+                                  }
+                    },
+                    {
+                        "type":  "result",
+                        "id":  "result/borrow-copy.borrowed",
+                        "title":  "Borrowed",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/borrow-copy.md",
+                        "line":  14,
+                        "fields":  {
+                                       "type":  "result",
+                                       "id":  "result/borrow-copy.borrowed",
+                                       "title":  "Borrowed",
+                                       "owner":  "lending-team",
+                                       "outcome":  "success",
+                                       "meaning":  "The copy is lent."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "result",
+                        "id":  "result/borrow-copy.copy-unavailable",
+                        "title":  "Copy Unavailable",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/borrow-copy.md",
+                        "line":  20,
+                        "fields":  {
+                                       "type":  "result",
+                                       "id":  "result/borrow-copy.copy-unavailable",
+                                       "title":  "Copy Unavailable",
+                                       "owner":  "lending-team",
+                                       "outcome":  "refusal",
+                                       "code":  "lending.copy-not-available",
+                                       "meaning":  "The copy stays unavailable and the member is told it is on loan."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "scenario",
+                        "id":  "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
+                        "title":  "Borrowing An Available Copy Succeeds",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/borrow-copy.md",
+                        "line":  28,
+                        "fields":  {
+                                       "type":  "scenario",
+                                       "id":  "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
+                                       "title":  "Borrowing An Available Copy Succeeds",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "given":  "A copy sits available on its shelf.",
+                                       "when":  "The member borrows the copy.",
+                                       "then":  "The loan is active.",
+                                       "result":  "result/borrow-copy.borrowed",
+                                       "examples":  [
+                                                        {
+                                                            "copy":  "copy-1",
+                                                            "member":  "member-9",
+                                                            "due":  "2026-11-12"
+                                                        },
+                                                        {
+                                                            "copy":  "copy-2",
+                                                            "member":  "member-3",
+                                                            "due":  "2026-11-13"
+                                                        }
+                                                    ]
+                                   },
+                        "links":  {
+                                      "result":  [
+                                                     "result/borrow-copy.borrowed"
+                                                 ]
+                                  }
+                    },
+                    {
+                        "type":  "scenario",
+                        "id":  "scenario/borrow-copy.borrowing-a-loaned-copy-is-refused",
+                        "title":  "Borrowing A Loaned Copy Is Refused",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "draft",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/borrow-copy.md",
+                        "line":  44,
+                        "fields":  {
+                                       "type":  "scenario",
+                                       "id":  "scenario/borrow-copy.borrowing-a-loaned-copy-is-refused",
+                                       "title":  "Borrowing A Loaned Copy Is Refused",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "given":  "A copy is on loan to another member.",
+                                       "when":  "The member borrows the copy.",
+                                       "then":  "The copy stays on loan and the member is told it is unavailable.",
+                                       "result":  "result/borrow-copy.copy-unavailable"
+                                   },
+                        "links":  {
+                                      "result":  [
+                                                     "result/borrow-copy.copy-unavailable"
+                                                 ]
+                                  }
+                    },
+                    {
+                        "type":  "event",
+                        "id":  "event/loan.loan-borrowed",
+                        "title":  "Loan Borrowed",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/README.md",
+                        "line":  52,
+                        "fields":  {
+                                       "type":  "event",
+                                       "id":  "event/loan.loan-borrowed",
+                                       "title":  "Loan Borrowed",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "meaning":  "A copy was lent.",
+                                       "carries":  [
+                                                       "copyId",
+                                                       "memberId"
+                                                   ]
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "event",
+                        "id":  "event/loan.loan-due",
+                        "title":  "Loan Due",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/modules/lending/loans/README.md",
+                        "line":  60,
+                        "fields":  {
+                                       "type":  "event",
+                                       "id":  "event/loan.loan-due",
+                                       "title":  "Loan Due",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "meaning":  "A loan approaches its due date.",
+                                       "carries":  [
+                                                       "loanId"
+                                                   ]
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "actor",
+                        "id":  "actor/member",
+                        "title":  "Member",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/actors/member.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "actor",
+                                       "id":  "actor/member",
+                                       "title":  "Member",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "kind":  "person",
+                                       "holds":  [
+                                                     {
+                                                         "role":  "role/member",
+                                                         "scope":  "platform"
+                                                     }
+                                                 ]
+                                   },
+                        "links":  {
+                                      "holds":  [
+                                                    "role/member"
+                                                ]
+                                  }
+                    },
+                    {
+                        "type":  "role",
+                        "id":  "role/member",
+                        "title":  "Member",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/roles/member.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "role",
+                                       "id":  "role/member",
+                                       "title":  "Member",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "scope":  "platform",
+                                       "allows":  [
+                                                      "permission/borrow-copy"
+                                                  ]
+                                   },
+                        "links":  {
+                                      "allows":  [
+                                                     "permission/borrow-copy"
+                                                 ]
+                                  }
+                    },
+                    {
+                        "type":  "permission",
+                        "id":  "permission/borrow-copy",
+                        "title":  "Borrow Copy",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/permissions.md",
+                        "line":  8,
+                        "fields":  {
+                                       "type":  "permission",
+                                       "id":  "permission/borrow-copy",
+                                       "title":  "Borrow Copy",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "meaning":  "Borrow a copy."
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "entry-point",
+                        "id":  "entry-point/library-app",
+                        "title":  "Library App",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/entry-points.md",
+                        "line":  6,
+                        "fields":  {
+                                       "type":  "entry-point",
+                                       "id":  "entry-point/library-app",
+                                       "title":  "Library App",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "kind":  "browser",
+                                       "path":  "/borrow"
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "external-system",
+                        "id":  "external-system/fine-payments",
+                        "title":  "Fine Payments",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/behavior/systems/fine-payments.md",
+                        "line":  3,
+                        "body":  "## Summary\n\nFine Payments takes card payments for overdue fines.",
+                        "fields":  {
+                                       "type":  "external-system",
+                                       "id":  "external-system/fine-payments",
+                                       "title":  "Fine Payments",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "actor":  "actor/member",
+                                       "sends":  [
+                                                     "fine owed"
+                                                 ],
+                                       "receives":  [
+                                                        "payment confirmed"
+                                                    ],
+                                       "failure":  "Fines wait until the system answers."
+                                   },
+                        "links":  {
+                                      "actor":  [
+                                                    "actor/member"
+                                                ]
+                                  }
+                    },
+                    {
+                        "type":  "setting",
+                        "id":  "setting/lending.max-active-loans",
+                        "title":  "Max Active Loans",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/operations/limits.md",
+                        "line":  6,
+                        "fields":  {
+                                       "type":  "setting",
+                                       "id":  "setting/lending.max-active-loans",
+                                       "title":  "Max Active Loans",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "meaning":  "Active loans per member.",
+                                       "default":  5
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "runbook",
+                        "id":  "runbook/overdue-notice",
+                        "title":  "Overdue Notice",
+                        "owner":  "lending-team",
+                        "status":  "reviewed",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/runbooks/overdue-notice.md",
+                        "line":  3,
+                        "body":  "## Impact\n\nMembers keep borrowing while notices wait.\n\n## Procedure\n\n1. List overdue loans.\n2. Send reminders.\n\nLabels print as `\u003ccode\u003eLOAN-1\u003c/code\u003e` from the template.",
+                        "fields":  {
+                                       "type":  "runbook",
+                                       "id":  "runbook/overdue-notice",
+                                       "title":  "Overdue Notice",
+                                       "owner":  "lending-team",
+                                       "status":  "reviewed",
+                                       "trigger":  "A loan passes its due date.",
+                                       "severity":  "low"
+                                   },
+                        "links":  {
+
+                                  }
+                    },
+                    {
+                        "type":  "deviation",
+                        "id":  "deviation/kiosk-cache",
+                        "title":  "Kiosk Cache",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/deviations/kiosk-cache.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "deviation",
+                                       "id":  "deviation/kiosk-cache",
+                                       "title":  "Kiosk Cache",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "reason":  "The kiosk caches the catalog for a day.",
+                                       "reviewBy":  "2027-01-01",
+                                       "removeWhen":  "The kiosk reads the catalog live.",
+                                       "provision":  [
+                                                         "litespec/ext/cache#define-cache-invalidation"
+                                                     ]
+                                   },
+                        "links":  {
+                                      "provision":  [
+                                                        "litespec/ext/cache#define-cache-invalidation"
+                                                    ]
+                                  }
+                    },
+                    {
+                        "type":  "known-gap",
+                        "id":  "known-gap/offline-kiosk",
+                        "title":  "Offline Kiosk",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/known-gaps/offline-kiosk.md",
+                        "line":  3,
+                        "fields":  {
+                                       "type":  "known-gap",
+                                       "id":  "known-gap/offline-kiosk",
+                                       "title":  "Offline Kiosk",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "check":  "kiosk-offline",
+                                       "endsBy":  "2026-01-01",
+                                       "reason":  "The kiosk cannot lend offline yet.",
+                                       "subject":  [
+                                                       "feature/self-checkout"
+                                                   ]
+                                   },
+                        "links":  {
+                                      "subject":  [
+                                                      "feature/self-checkout"
+                                                  ]
+                                  }
+                    },
+                    {
+                        "type":  "term",
+                        "id":  "term/loan",
+                        "title":  "Loan",
+                        "owner":  "lending-team",
+                        "status":  "approved",
+                        "effectiveStatus":  "approved",
+                        "decider":  null,
+                        "decideBy":  null,
+                        "file":  "docs/glossary.json",
+                        "line":  4,
+                        "fields":  {
+                                       "type":  "term",
+                                       "id":  "term/loan",
+                                       "title":  "Loan",
+                                       "owner":  "lending-team",
+                                       "status":  "approved",
+                                       "term":  "Loan",
+                                       "meaning":  "A copy lent to a member.",
+                                       "labels":  {
+                                                      "fr":  "emprunt"
+                                                  },
+                                       "rejected":  [
+                                                        {
+                                                            "word":  "rental",
+                                                            "reason":  "A loan is free.",
+                                                            "scope":  "desk"
+                                                        }
+                                                    ],
+                                       "values":  [
+                                                      {
+                                                          "code":  "active",
+                                                          "label":  "Active"
+                                                      }
+                                                  ],
+                                       "layer":  "behavior",
+                                       "aliases":  [
+
+                                                   ]
+                                   },
+                        "links":  {
+
+                                  }
+                    }
+                ],
+    "code":  {
+                 "handlers":  [
+
+                              ],
+                 "reactions":  [
+
+                               ],
+                 "jobs":  [
+
+                          ],
+                 "codes":  [
+
+                           ],
+                 "events":  [
+
+                            ]
+             },
+    "screens":  [
+
+                ],
+    "tests":  [
+                  {
+                      "scenario":  "Library.Tests.BorrowTests.Borrowing_An_Available_Copy_Succeeds",
+                      "class":  "BorrowTests",
+                      "file":  "tests/BorrowTests.cs",
+                      "line":  41,
+                      "claims":  [
+                                     "scenario/borrow-copy.borrowing-an-available-copy-succeeds"
+                                 ],
+                      "steps":  [
+
+                                ],
+                      "codes":  [
+
+                                ],
+                      "outcome":  "Passed"
+                  }
+              ],
+    "testRun":  {
+                    "files":  [
+                                  "tests.trx"
+                              ],
+                    "total":  1,
+                    "passed":  1,
+                    "failed":  0,
+                    "date":  "2026-10-20"
+                },
+    "links":  {
+                  "implements":  [
+                                     {
+                                         "path":  "src/Application/Lending/BorrowCopyHandler.cs",
+                                         "to":  "use-case/lending.borrow-copy",
+                                         "kind":  "handler"
+                                     }
+                                 ],
+                  "calls":  [
+
+                            ],
+                  "proves":  [
+                                 {
+                                     "scenario":  "Library.Tests.BorrowTests.Borrowing_An_Available_Copy_Succeeds",
+                                     "claim":  "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
+                                     "confirmed":  true,
+                                     "passing":  true,
+                                     "indirect":  false
+                                 }
+                             ]
+              },
+    "status":  {
+                   "use-case/lending.borrow-copy":  {
+                                                        "implemented":  true,
+                                                        "verified":  false
+                                                    },
+                   "use-case/lending.return-copy":  {
+                                                        "implemented":  false,
+                                                        "verified":  false
+                                                    }
+               },
+    "requirementStatus":  {
+                              "requirement/borrowing.max-wait":  {
+                                                                     "verified":  false,
+                                                                     "measurePassed":  false
+                                                                 },
+                              "requirement/borrowing.copy-shelf-home":  {
+                                                                            "verified":  true,
+                                                                            "measurePassed":  null
+                                                                        },
+                              "requirement/borrowing.late-fee":  {
+                                                                     "verified":  false,
+                                                                     "measurePassed":  null
+                                                                 }
+                          },
+    "reachableStates":  {
+                            "aggregate/lending.loan":  [
+                                                           "OnShelf",
+                                                           "OnLoan"
+                                                       ]
+                        }
 }

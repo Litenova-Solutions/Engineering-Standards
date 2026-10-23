@@ -12,15 +12,16 @@ public sealed class ReactionTriggerTests
     public void Reaction_Without_A_Tag_Implements_The_Use_Case_Its_Trigger_Names()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/notify-overdue.md", UseCasePage);
-        Write(temp.Path, "apps/api/src/Library.Application/Lending/Loans/NotifyOverdue/LoanBorrowedReaction.cs", ReactionFile);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/notify-overdue.md", UseCasePage);
+        Write(temp.Path, "docs/behavior/modules/lending/reactions/notify-on-borrow.md", ReactionPage);
+        Write(temp.Path, "apps/api/src/Library.Application/Lending/Loans/LoanBorrowedReaction.cs", ReactionFile);
 
         using var document = Build(temp.Path);
         var root = document.RootElement;
 
         Assert.Contains(
             root.GetProperty("links").GetProperty("implements").EnumerateArray(),
-            link => link.GetProperty("path").GetString() == "apps/api/src/Library.Application/Lending/Loans/NotifyOverdue/LoanBorrowedReaction.cs"
+            link => link.GetProperty("path").GetString() == "apps/api/src/Library.Application/Lending/Loans/LoanBorrowedReaction.cs"
                 && link.GetProperty("to").GetString() == "use-case/lending.notify-overdue"
                 && link.GetProperty("kind").GetString() == "reaction");
         Assert.True(root.GetProperty("status").GetProperty("use-case/lending.notify-overdue").GetProperty("implemented").GetBoolean());
@@ -65,16 +66,21 @@ public sealed class ReactionTriggerTests
           "id": "use-case/lending.notify-overdue",
           "title": "Notify overdue",
           "owner": "lending-team",
-          "status": "approved",
-          "kind": "reaction",
+          "status": "reviewed",
+          "kind": "command",
+          "access": {
+            "auth": [
+              "system"
+            ],
+            "grant": "system",
+            "tenant": "own"
+          },
           "reachedThrough": [
             "entry-point/overdue-job"
           ],
-          "trigger": {
-            "events": [
-              "event/loan.loan-borrowed"
-            ]
-          },
+          "fulfills": [
+            "requirement/borrowing.loan-period-days"
+          ],
           "records": [
             {
               "type": "result",
@@ -93,8 +99,33 @@ public sealed class ReactionTriggerTests
         A reader learns a loan passed its due date.
         """;
 
+    const string ReactionPage = """
+        ---
+        {
+          "type": "reaction",
+          "id": "reaction/lending.notify-on-borrow",
+          "title": "Notify on borrow",
+          "owner": "lending-team",
+          "status": "reviewed",
+          "on": [
+            "event/loan.loan-borrowed"
+          ],
+          "issues": [
+            "use-case/lending.notify-overdue"
+          ],
+          "fulfills": [
+            "requirement/borrowing.loan-period-days"
+          ]
+        }
+        ---
+
+        # Notify on borrow
+
+        Every borrowed loan earns one notice for its reader.
+        """;
+
     const string ReactionFile = """
-        namespace Library.Application.Lending.Loans.NotifyOverdue;
+        namespace Library.Application.Lending.Loans;
 
         /// <summary>Notifies the reader when a loan is borrowed.</summary>
         public sealed class LoanBorrowedReaction : IEventHandler<LoanBorrowedEvent>

@@ -85,7 +85,7 @@ public sealed class BehaviorUnrecordedTests
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.ghost", Path.Combine(temp.Path, "ghost.md"), """{"kind": "reaction"}"""));
+            TestModel.Record("use-case", "use-case/lending.ghost", Path.Combine(temp.Path, "ghost.md"), """{"kind": "command"}"""));
         model.Code.Reactions.Add(new ReactionInfo(
             "GhostReaction", Path.Combine(temp.Path, "GhostReaction.cs"), 3, "reaction", "use-case/lending.ghost"));
 

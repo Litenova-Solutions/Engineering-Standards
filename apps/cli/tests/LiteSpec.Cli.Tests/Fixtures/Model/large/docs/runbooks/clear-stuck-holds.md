@@ -4,8 +4,11 @@
   "id": "runbook/clear-stuck-holds",
   "title": "Clear stuck holds",
   "owner": "lending-team",
-  "status": "approved",
-  "trigger": "A hold stays ready past its pickup window."
+  "status": "reviewed",
+  "trigger": "A hold stays ready past its pickup window.",
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "4da95f08"
 }
 ---
 

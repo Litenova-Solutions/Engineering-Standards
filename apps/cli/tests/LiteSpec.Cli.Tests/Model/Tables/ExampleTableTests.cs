@@ -91,13 +91,13 @@ public sealed class ExampleTableTests
 
     static void WritePage(string root, string name, string page)
     {
-        var folder = Path.Combine(root, "docs", "domain", "modules", "lending", "loans");
+        var folder = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans");
         File.WriteAllText(Path.Combine(folder, name), page);
     }
 
     static void AddEntries(string root, string entries)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "borrow-copy.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "borrow-copy.md");
         var text = File.ReadAllText(page);
 
         File.WriteAllText(page, text.Replace("  \"records\": [", "  \"records\": [\n" + entries + ","));
@@ -105,7 +105,7 @@ public sealed class ExampleTableTests
 
     static void AppendBody(string root, string body)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "borrow-copy.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "borrow-copy.md");
         File.AppendAllText(page, body);
     }
 
@@ -129,7 +129,7 @@ public sealed class ExampleTableTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",
@@ -156,7 +156,7 @@ public sealed class ExampleTableTests
           "id": "scenario/borrow-copy.late-fee-examples-hold",
           "title": "Late fee examples hold",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A loan stands overdue.",
           "when": "The fee is totaled.",
           "result": "result/borrow-copy.borrowed",
@@ -182,7 +182,7 @@ public sealed class ExampleTableTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",

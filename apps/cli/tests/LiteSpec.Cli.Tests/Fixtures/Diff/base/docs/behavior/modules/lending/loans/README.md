@@ -4,7 +4,7 @@
   "id": "aggregate/lending.loan",
   "title": "Loan",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "states": [
     {
       "name": "Active",
@@ -43,7 +43,7 @@
       "id": "rule/loan.has-one-borrower",
       "title": "Has one borrower",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "invariant",
       "statement": "A loan has one borrower.",
       "governs": [
@@ -59,7 +59,7 @@
       "id": "rule/loan.scan-before-leaving",
       "title": "Scan before leaving",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "precondition",
       "statement": "A borrowed copy never leaves unscanned.",
       "governs": [
@@ -75,7 +75,7 @@
       "id": "event/loan.loan-borrowed",
       "title": "Loan borrowed",
       "owner": "lending-team",
-      "status": "approved",
+      "status": "reviewed",
       "meaning": "A copy was lent.",
       "carries": [
         "loanId",

@@ -3,7 +3,7 @@ using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model.Tables;
 
-/// <summary>Proves aggregate data tables land in fields and drive the personal-data check.</summary>
+/// <summary>Proves aggregate data tables land in fields and drive the erasure check.</summary>
 public sealed class DataTableTests
 {
     /// <summary>A data table writes fields, lowercasing classifications.</summary>
@@ -14,7 +14,7 @@ public sealed class DataTableTests
         AppendTable(temp.Path, DataTable);
 
         using var document = Build(temp.Path);
-        var data = Record(document, "aggregate/lending.loan")
+        var data = Record(document, "aggregate/lending.hold")
             .GetProperty("fields").GetProperty("data").EnumerateArray().ToList();
 
         Assert.Equal(2, data.Count);
@@ -26,16 +26,16 @@ public sealed class DataTableTests
         Assert.Equal("personal", data[1].GetProperty("classification").GetString());
     }
 
-    /// <summary>A personal row from the table reports personal-data-uncovered.</summary>
+    /// <summary>A personal row from the table reports erasure-undeclared.</summary>
     [Fact]
-    public void Personal_Data_Table_Reports_Personal_Data_Uncovered()
+    public void Personal_Data_Table_Reports_Erasure_Undeclared()
     {
         using var temp = ModelFixture.Prepare("small");
         AppendTable(temp.Path, DataTable);
 
         var check = Cli.Run("model", "check", "--root", temp.Path, "--format", "json");
         Assert.Equal(1, check.Status);
-        Assert.Contains("personal-data-uncovered", check.Output);
+        Assert.Contains("erasure-undeclared", check.Output);
     }
 
     /// <summary>Front-matter data wins over the table.</summary>
@@ -47,7 +47,7 @@ public sealed class DataTableTests
         AppendTable(temp.Path, DataTable);
 
         using var document = Build(temp.Path);
-        var data = Record(document, "aggregate/lending.loan")
+        var data = Record(document, "aggregate/lending.hold")
             .GetProperty("fields").GetProperty("data").EnumerateArray().ToList();
 
         Assert.Single(data);
@@ -57,13 +57,13 @@ public sealed class DataTableTests
 
     static void AppendTable(string root, string table)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "README.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "holds", "README.md");
         File.AppendAllText(page, table);
     }
 
     static void AddFrontMatterData(string root)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "README.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "holds", "README.md");
         var text = File.ReadAllText(page);
 
         File.WriteAllText(page, text.Replace(

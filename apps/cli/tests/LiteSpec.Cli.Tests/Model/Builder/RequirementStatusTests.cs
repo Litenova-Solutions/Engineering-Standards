@@ -12,7 +12,7 @@ public sealed class RequirementStatusTests
     public void Measured_Requirement_With_A_Passing_Check_Verifies()
     {
         using var temp = ModelFixture.Prepare("small");
-        Write(temp.Path, "docs/domain/modules/lending/loans/borrow-copy-proof-scenario.md", ScenarioPage);
+        Write(temp.Path, "docs/behavior/modules/lending/loans/borrow-copy-proof-scenario.md", ScenarioPage);
         Write(temp.Path, "apps/api/tests/Library.Acceptance.Tests/JUnit/JUnitScenarios.cs", ScenariosFile);
         Write(temp.Path, "docs/product/lending/performance.md", RequirementPage);
         Write(temp.Path, "docs/product/journeys/borrow-and-return.md", JourneyPage);
@@ -47,12 +47,17 @@ public sealed class RequirementStatusTests
 
     static void Fulfill(string root, params string[] requirements)
     {
-        var page = Path.Combine(root, "docs", "domain", "modules", "lending", "loans", "borrow-copy.md");
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "borrow-copy.md");
         var text = File.ReadAllText(page);
         var joined = "\"requirement/borrowing.max-active-loans\",\n        \""
             + string.Join("\",\n        \"", requirements) + "\"";
 
-        File.WriteAllText(page, text.Replace("\"requirement/borrowing.max-active-loans\"", joined));
+        text = text.Replace("\"requirement/borrowing.max-active-loans\"", joined);
+        text = text.Replace(
+            "  \"fulfills\": [",
+            "  \"serves\": [\n    \"journey/borrow-and-return#s1\"\n  ],\n  \"fulfills\": [");
+
+        File.WriteAllText(page, text);
     }
 
     static JsonDocument Build(string root)
@@ -78,7 +83,7 @@ public sealed class RequirementStatusTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",
@@ -166,9 +171,12 @@ public sealed class RequirementStatusTests
           "status": "approved",
           "actor": "actor/reader",
           "goal": "Borrow a copy.",
+          "finishedWhen": "The reader holds the copy.",
           "steps": [
             {
-              "useCase": "use-case/lending.borrow-copy"
+              "id": "s1",
+              "says": "The reader borrows the copy from the shelf.",
+              "actor": "actor/reader"
             }
           ],
           "fulfills": [

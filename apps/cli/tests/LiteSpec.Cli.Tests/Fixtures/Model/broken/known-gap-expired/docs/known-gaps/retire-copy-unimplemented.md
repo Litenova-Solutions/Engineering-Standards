@@ -10,7 +10,10 @@
     "use-case/lending.retire-copy"
   ],
   "endsBy": "2020-01-01",
-  "reason": "Retirement waits for the weeding policy."
+  "reason": "Retirement waits for the weeding policy.",
+  "approvedBy": "lending-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "318fdd7b"
 }
 ---
 

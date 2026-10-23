@@ -3,39 +3,51 @@
   "type": "permission-list",
   "title": "Permissions",
   "owner": "lending-team",
-  "status": "approved",
+  "status": "reviewed",
   "records": [
     {
       "type": "permission",
       "id": "permission/borrow-copy",
       "title": "Borrow copy",
       "owner": "lending-team",
-      "status": "approved",
-      "meaning": "Borrow an available copy."
+      "status": "reviewed",
+      "meaning": "Borrow an available copy.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "024894ed"
     },
     {
       "type": "permission",
       "id": "permission/read-loans",
       "title": "Read loans",
       "owner": "lending-team",
-      "status": "approved",
-      "meaning": "Read own loans."
+      "status": "reviewed",
+      "meaning": "Read own loans.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "0727be70"
     },
     {
       "type": "permission",
       "id": "permission/manage-copies",
       "title": "Manage copies",
       "owner": "lending-team",
-      "status": "approved",
-      "meaning": "Register and retire copies."
+      "status": "reviewed",
+      "meaning": "Register and retire copies.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "c307df4a"
     },
     {
       "type": "permission",
       "id": "permission/place-hold",
       "title": "Place hold",
       "owner": "lending-team",
-      "status": "approved",
-      "meaning": "Place and cancel holds."
+      "status": "reviewed",
+      "meaning": "Place and cancel holds.",
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "e7f4de0a"
     }
   ]
 }

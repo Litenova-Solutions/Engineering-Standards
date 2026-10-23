@@ -1,0 +1,65 @@
+{
+  "project": {
+    "name": "Fixture Library"
+  },
+  "size": "large",
+  "shape": "server",
+  "stacks": ["dotnet", "svelte"],
+  "reviewedLiteSpecVersion": "3.0.0",
+  "adoption": {
+    "transcriptionEndsWith": "decision/0001-loan-period"
+  },
+  "optionalTypes": [
+    "constraint",
+    "research",
+    "setting",
+    "runbook"
+  ],
+  "constraints": {
+    "answered": true
+  },
+  "owners": [
+    "lending-team"
+  ],
+  "paths": {
+    "docs": "docs",
+    "behaviorDocs": "docs/behavior",
+    "uiDocs": "docs/ui",
+    "glossary": "docs/glossary.json",
+    "testRoots": [
+      "apps/api/tests"
+    ],
+    "frontends": [
+      {
+        "name": "catalog",
+        "path": "apps/catalog",
+        "platform": "svelte",
+        "ui": {
+          "profile": "application-balanced"
+        }
+      }
+    ],
+    "apiClient": "packages/api",
+    "uiPackage": {
+      "name": "@fixture/ui",
+      "path": "packages/ui",
+      "componentsJson": "packages/ui/components.json",
+      "primitives": "packages/ui/src/components",
+      "tokens": "packages/ui/src/styles/tokens.css",
+      "sourceLock": "packages/ui/ui-source-lock.json",
+      "designContract": "packages/ui/DESIGN.md",
+      "publicExports": [
+        "@fixture/ui/floorplans"
+      ]
+    },
+    "records": {}
+  },
+  "stackConfig": {
+    "dotnet": {
+      "application": "apps/api/src/Library.Application",
+      "domain": "apps/api/src/Library.Domain",
+      "webapi": "apps/api/src/Library.WebApi"
+    }
+  },
+  "selectedExtensions": []
+}

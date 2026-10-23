@@ -14,7 +14,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A reader holds at most five active loans.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "5de82a4d"
     },
     {
       "type": "requirement",
@@ -24,7 +27,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A loan lasts 21 days.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "5a16abaa"
     },
     {
       "type": "requirement",
@@ -34,7 +40,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A ready hold waits seven days.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "d41032c8"
     },
     {
       "type": "requirement",
@@ -44,7 +53,10 @@
       "status": "approved",
       "kind": "functional",
       "statement": "A copy lives on one home shelf.",
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "f39ea9be"
     },
     {
       "type": "requirement",
@@ -53,10 +65,13 @@
       "owner": "lending-team",
       "status": "approved",
       "kind": "quality",
-      "statement": "Listing loans answers within 300 milliseconds at p95.",
-      "measure": "p95 latency of listing loans",
-      "by": "2027-01-01",
-      "basedOn": []
+      "statement": "Listing loans answers quickly.",
+      "measure": "p95 latency",
+      "by": "under 200 ms",
+      "basedOn": [],
+      "approvedBy": "lending-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "fcb7bef8"
     }
   ]
 }

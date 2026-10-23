@@ -5,7 +5,7 @@
   "size": "small",
   "shape": "server",
   "stacks": ["dotnet"],
-  "reviewedLiteSpecVersion": "2.0.0",
+  "reviewedLiteSpecVersion": "3.0.0",
   "optionalTypes": [],
   "constraints": {
     "answered": true
@@ -15,7 +15,7 @@
   ],
   "paths": {
     "docs": "docs",
-    "domainDocs": "docs/domain",
+    "behaviorDocs": "docs/behavior",
     "uiDocs": "docs/ui",
     "glossary": "docs/glossary.json",
     "testRoots": [

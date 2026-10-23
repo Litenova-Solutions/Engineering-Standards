@@ -3,7 +3,7 @@ using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model.Checks;
 
-/// <summary>Proves the reaction-without-trigger check against hand-built models.</summary>
+/// <summary>Proves the reaction-trigger-unresolved check against hand-built models.</summary>
 public sealed class ReactionTriggerCheckTests
 {
     [Fact]
@@ -12,41 +12,56 @@ public sealed class ReactionTriggerCheckTests
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"kind": "reaction"}"""));
+            TestModel.Record("reaction", "reaction/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"status": "reviewed", "issues": ["use-case/lending.notify-overdue"]}"""));
 
-        Assert.Contains("reaction-without-trigger", TestModel.Codes(model));
+        Assert.Contains("reaction-trigger-unresolved", TestModel.Codes(model));
     }
 
-    [Theory]
-    [InlineData("\"event/loan.loan-borrowed\"")]
-    [InlineData("[\"event/loan.loan-borrowed\"]")]
-    [InlineData("{\"events\": [\"event/loan.loan-borrowed\"]}")]
-    [InlineData("{\"schedule\": \"nightly\"}")]
-    [InlineData("{\"deadline\": \"seven days after the loan starts\"}")]
-    [InlineData("\"nightly\"")]
-    public void Reaction_With_A_Trigger_Passes(string trigger)
+    [Fact]
+    public void Reaction_With_An_Unresolved_Trigger_Reports()
     {
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), "{\"kind\": \"reaction\", \"trigger\": " + trigger + "}"));
+            TestModel.Record("reaction", "reaction/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"status": "reviewed", "on": ["event/loan.no-such-event"], "issues": ["use-case/lending.notify-overdue"]}"""));
 
-        Assert.DoesNotContain("reaction-without-trigger", TestModel.Codes(model));
+        Assert.Contains("reaction-trigger-unresolved", TestModel.Codes(model));
     }
 
-    [Theory]
-    [InlineData("\"\"")]
-    [InlineData("[]")]
-    [InlineData("{}")]
-    [InlineData("{\"events\": []}")]
-    public void Reaction_With_An_Empty_Trigger_Reports(string trigger)
+    [Fact]
+    public void Reaction_With_A_Non_Event_Trigger_Reports()
     {
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), "{\"kind\": \"reaction\", \"trigger\": " + trigger + "}"));
+            TestModel.Record("reaction", "reaction/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"status": "reviewed", "on": ["use-case/lending.borrow-copy"], "issues": ["use-case/lending.notify-overdue"]}"""),
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "reviewed", "kind": "command"}"""));
 
-        Assert.Contains("reaction-without-trigger", TestModel.Codes(model));
+        Assert.Contains("reaction-trigger-unresolved", TestModel.Codes(model));
+    }
+
+    [Fact]
+    public void Reaction_With_An_Event_Trigger_Passes()
+    {
+        using var temp = Cli.Temp("checks");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("reaction", "reaction/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"status": "reviewed", "on": ["event/loan.loan-borrowed"], "issues": ["use-case/lending.notify-overdue"]}"""),
+            TestModel.Record("event", "event/loan.loan-borrowed", Path.Combine(temp.Path, "loan.md"), """{"status": "reviewed", "meaning": "A copy was lent.", "carries": []}"""));
+
+        Assert.DoesNotContain("reaction-trigger-unresolved", TestModel.Codes(model));
+    }
+
+    [Fact]
+    public void Reaction_With_An_Integration_Event_Trigger_Passes()
+    {
+        using var temp = Cli.Temp("checks");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("reaction", "reaction/lending.remind-overdue", Path.Combine(temp.Path, "remind.md"), """{"status": "reviewed", "on": ["integration-event/loan-exported"], "issues": ["use-case/lending.notify-overdue"]}"""),
+            TestModel.Record("integration-event", "integration-event/loan-exported", Path.Combine(temp.Path, "exported.md"), """{"status": "reviewed"}"""));
+
+        Assert.DoesNotContain("reaction-trigger-unresolved", TestModel.Codes(model));
     }
 
     [Fact]
@@ -55,8 +70,8 @@ public sealed class ReactionTriggerCheckTests
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"kind": "command"}"""));
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "reviewed", "kind": "command"}"""));
 
-        Assert.DoesNotContain("reaction-without-trigger", TestModel.Codes(model));
+        Assert.DoesNotContain("reaction-trigger-unresolved", TestModel.Codes(model));
     }
 }
