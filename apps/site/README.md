@@ -191,9 +191,9 @@ Pattern pages render each option as a card with `Preview` and `Wireframe` tabs a
 
 ## Deployment
 
-The site runs on Cloudflare Workers as a static-assets-only Worker named `litespec` on the LiteNova Solutions account, so no script runs and requests cost nothing on the free plan. `wrangler.jsonc` at the repository root names the Worker, serves `apps/site/dist/` with trailing-slash HTML handling and `404.html` for unknown paths, and attaches the custom domain `litespec.dev`; the `workers.dev` address is off, so search engines see one copy. A second Worker, `litespec-www` (`wrangler.www.jsonc` and `workers/www-redirect.js`), answers `www.litespec.dev` with a 301 to the same path and query on `litespec.dev`.
+The site runs on Cloudflare Workers as a static-assets-only Worker named `litespec-site` on the LiteNova Solutions account, so no script runs and requests cost nothing on the free plan. `wrangler.jsonc` at the repository root names the Worker, serves `apps/site/dist/` with trailing-slash HTML handling and `404.html` for unknown paths, and attaches the custom domain `litespec.dev`; the `workers.dev` address is off, so search engines see one copy. A second Worker, `litespec-www` (`wrangler.www.jsonc` and `workers/www-redirect.js`), answers `www.litespec.dev` with a 301 to the same path and query on `litespec.dev`.
 
-Workers Builds deploys the `litespec` Worker on every push to `main` and builds a Preview for every other branch. The Worker is connected to this repository with the repository root as its root directory, so it reads `wrangler.jsonc` and `.node-version` there. Its build command installs and builds the site with the pnpm the site pins, and its deploy and preview commands run the wrangler the site pins:
+Workers Builds deploys the `litespec-site` Worker on every push to `main` and builds a Preview for every other branch. The Worker is connected to this repository with the repository root as its root directory, so it reads `wrangler.jsonc` and `.node-version` there. Its build command installs and builds the site with the pnpm the site pins, and its deploy and preview commands run the wrangler the site pins:
 
 | Setting | Value |
 |:---|:---|

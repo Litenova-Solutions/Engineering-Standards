@@ -3,7 +3,7 @@
 // Workers Builds deploys it on every push to main and builds a Preview for every other branch.
 {
   "$schema": "./apps/site/node_modules/wrangler/config-schema.json",
-  "name": "litespec",
+  "name": "litespec-site",
   "account_id": "864f2fee2367d77cf443122378ca1366",
   "compatibility_date": "2026-10-01",
   "assets": {
