@@ -25,7 +25,6 @@ internal static class Descriptors
     private static readonly Provision DomainDocumentation = Provision.Of("backend/dotnet/domain", "document-every-public-domain-contract");
     private static readonly Provision TypedIdentifiers = Provision.Of("backend/dotnet/domain", "use-strongly-typed-version-7-identifiers");
     private static readonly Provision InternalImplementations = Provision.Of("backend/dotnet/architecture", "keep-implementation-types-internal");
-    private static readonly Provision OneCommandPipeline = Provision.Of("backend/dotnet/application", "keep-one-state-changing-use-case-in-one-command-pipeline");
     private static readonly Provision NoControllers = Provision.Of("backend/dotnet/api", "exclude-mvc-controllers-from-the-stack");
     private static readonly Provision RepositoryWrites = Provision.Of("backend/dotnet/persistence", "stage-aggregate-writes-through-repositories");
     private static readonly Provision AsyncNames = Provision.Of("backend/dotnet/naming", "name-asynchronous-methods-completely");
@@ -106,11 +105,6 @@ internal static class Descriptors
         "Implementation type is not internal sealed",
         "'{0}' is an implementation type and must be declared internal sealed",
         "A handler, validator, definition, persistence implementation, or endpoint implementation is declared internal sealed.");
-
-    public static readonly DiagnosticDescriptor LS2002 = Create("LS2002", LayersCategory, OneCommandPipeline,
-        "Command handler dispatches another command",
-        "Command handler '{0}' dispatches through ICommandMediator; one state-changing use case runs in one command pipeline",
-        "A command handler never dispatches another command through ICommandMediator.");
 
     public static readonly DiagnosticDescriptor LS2003 = Create("LS2003", LayersCategory, NoControllers,
         "WebApi uses an MVC controller",

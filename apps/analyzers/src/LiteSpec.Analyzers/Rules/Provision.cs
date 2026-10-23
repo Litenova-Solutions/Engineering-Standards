@@ -4,7 +4,7 @@ namespace LiteSpec.Analyzers.Rules;
 internal sealed class Provision
 {
     /// <summary>The release the help links point at.</summary>
-    public const string Release = "2.0.0";
+    public const string Release = "3.0.0";
 
     private Provision(string page, string slug)
     {

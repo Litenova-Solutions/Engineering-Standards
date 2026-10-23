@@ -2,7 +2,7 @@
 
 ## Intent
 
-The Analyzers section explains the LiteSpec.Analyzers package, which checks .NET server code against the LiteSpec standard while the compiler runs and reports each break as an error in the editor and the build. The package checks project boundaries, modeling in Domain, the project that holds the business rules, and naming across the 5 application projects, with one assertion rule in test projects, reporting 25 errors, one per rule, with a link from each error to the standard it enforces. A backend developer uses these pages to install the package once and to clear each finding by fixing the code it names.
+The Analyzers section explains the LiteSpec.Analyzers package, which checks .NET server code against the LiteSpec standard while the compiler runs and reports each break as an error in the editor and the build. The package checks project boundaries, modeling in Domain, the project that holds the business rules, and naming across the 5 application projects, with one assertion rule in test projects, reporting 24 errors, one per rule, with a link from each error to the standard it enforces. A backend developer uses these pages to install the package once and to clear each finding by fixing the code it names.
 
 ## How the Pages Fit Together
 
@@ -25,11 +25,11 @@ First, the analyzers work out the project layer from the `LiteSpecLayer` MSBuild
 
 Any other assembly name opts the project out, and so does an explicit `LiteSpecLayer` value of `None`. No rule runs in an opted-out project.
 
-Second, a rule registers only in the layers its provision covers. Domain rules run in Domain. `LS2001` runs in Application, Infrastructure, and WebApi. `LS2002`, `LS2004`, `LS2005`, and `LS2007` run in Application and Infrastructure. `LS2003` and `LS2006` run in WebApi. Style rules run in the five production projects. `LS4001` runs in test projects. The analyzers skip generated code.
+Second, a rule registers only in the layers its provision covers. Domain rules run in Domain. `LS2001` runs in Application, Infrastructure, and WebApi. `LS2004`, `LS2005`, and `LS2007` run in Application and Infrastructure. `LS2003` and `LS2006` run in WebApi. Style rules run in the five production projects. `LS4001` runs in test projects. The analyzers skip generated code.
 
 Third, most rules decide as the compiler reads each declaration. Rules `LS1003`, `LS1004`, and `LS3004` decide at the end of compilation, after every type is known.
 
-Each diagnostic carries a help link of the form `https://litespec.dev/2.0.0/<page>/#<slug>`, which opens the provision the rule enforces.
+Each diagnostic carries a help link of the form `https://litespec.dev/3.0.0/<page>/#<slug>`, which opens the provision the rule enforces.
 
 ## Severity and Compiler Support
 
@@ -81,7 +81,7 @@ Other name-based checks work the same way:
 - A child entity is any class that derives from a class named `Entity` with one type argument, in any namespace.
 - A Domain exception is any exception that derives from a class named `DomainException`, which itself derives from `System.Exception`.
 - A domain event is any type that implements an interface named `IDomainEvent`. `LS1013` additionally requires its file to sit under a folder named `Events`.
-- A command handler is any class whose name ends in `CommandHandler` or that implements an interface named `ICommandHandler`. A mediator call is any call whose target or receiver type is named `ICommandMediator`.
+- A command handler is any class whose name ends in `CommandHandler` or that implements an interface named `ICommandHandler`.
 - A query handler is any class that implements an interface named `IQueryHandler`.
 - An endpoint is any class that implements an interface named `IEndpoint`.
 - A reaction is any class that implements an interface named `IEventHandler` or `IDomainEventReaction`. A job is any class that derives from a class named `BackgroundService` or implements an interface named `IHostedService`.
@@ -93,4 +93,4 @@ The analyzer does not check that a `Guid` inside an identifier is a version 7 va
 ## Pages in This Section
 
 - [Check .NET Code with the Analyzers](check-dotnet-code-with-the-analyzers.md): install the package once, read the first findings, keep them as build errors, and lower one only where a deviation allows it.
-- [Analyzer rules overview](rules/README.md): find the reference page for each of the 25 rules, grouped by layer.
+- [Analyzer rules overview](rules/README.md): find the reference page for each of the 24 rules, grouped by layer.

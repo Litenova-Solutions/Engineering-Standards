@@ -2,7 +2,7 @@
 
 ## Intent
 
-This index lists the 25 analyzer rules, one reference page per rule, grouped by the projects each rule runs in. A developer who meets an error opens the page with the same ID to see what the rule reports, where the error sits, and how to fix the code. Each entry carries a 1-line summary of what the rule reports.
+This index lists the 24 analyzer rules, one reference page per rule, grouped by the projects each rule runs in. A developer who meets an error opens the page with the same ID to see what the rule reports, where the error sits, and how to fix the code. Each entry carries a 1-line summary of what the rule reports.
 
 ## Domain Rules
 
@@ -24,10 +24,9 @@ Rules `LS1001` to `LS1013` run in Domain only.
 
 ## Outer-Layer Rules
 
-Rules `LS2001` to `LS2007` run in Application, Infrastructure, or WebApi, as each page states.
+Rules `LS2001` and `LS2003` to `LS2007` run in Application, Infrastructure, or WebApi, as each page states.
 
 - [LS2001: Implementation Type Is Not Internal Sealed](ls2001.md): reports an implementation type that is not `internal sealed`.
-- [LS2002: Command Handler Dispatches Another Command](ls2002.md): reports a command handler that dispatches another command.
 - [LS2003: WebApi Uses an MVC Controller](ls2003.md): reports an MVC controller.
 - [LS2004: Command Handler Writes Through a Document Session](ls2004.md): reports a command handler that writes through a session.
 - [LS2005: Handler Name Lacks Its Command or Query Suffix](ls2005.md): reports a handler whose name lacks its command or query suffix.

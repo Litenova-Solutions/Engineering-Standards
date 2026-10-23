@@ -12,7 +12,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <PackageId>LiteSpec.Analyzers</PackageId>
-        <Version>2.0.0</Version>
+        <Version>3.0.0</Version>
         <Authors>Litenova Solutions</Authors>
         <Description>Roslyn analyzers that check a .NET application against the LiteSpec standard: layer boundaries, Domain modeling and naming. Every diagnostic links to the provision it enforces.</Description>
         <PackageTags>litespec;analyzers;roslyn;ddd;architecture</PackageTags>

@@ -3,32 +3,10 @@ using LiteSpec.Analyzers.Tests.Support;
 
 namespace LiteSpec.Analyzers.Tests.Layers;
 
-/// <summary>Tests for LS2002 and LS2004, the command pipeline rules.</summary>
+/// <summary>Tests for LS2004, the repository write rule.</summary>
 public sealed class CommandPipelineAnalyzerTests
 {
-    [Fact(DisplayName = "LS2002 reports a command handler dispatching through ICommandMediator")]
-    public Task ReportsMediatorDispatch() =>
-        Verify.AnalyzerAsync<CommandPipelineAnalyzer>("""
-            using System.Threading;
-            using System.Threading.Tasks;
-
-            namespace Shop.Orders;
-
-            public interface ICommandMediator
-            {
-                Task SendAsync(object command, CancellationToken cancellationToken);
-            }
-
-            public sealed record PlaceOrderCommand(int Quantity);
-
-            internal sealed class PlaceOrderCommandHandler(ICommandMediator mediator)
-            {
-                public Task HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken) =>
-                    mediator.{|LS2002:SendAsync|}(command, cancellationToken);
-            }
-            """, assemblyName: "Shop.Application");
-
-    [Fact(DisplayName = "LS2002 accepts a handler calling a repository")]
+    [Fact(DisplayName = "LS2004 accepts a handler calling a repository")]
     public Task AcceptsAHandlerCallingARepository() =>
         Verify.AnalyzerAsync<CommandPipelineAnalyzer>("""
             namespace Shop.Orders;
@@ -46,8 +24,8 @@ public sealed class CommandPipelineAnalyzerTests
             }
             """, assemblyName: "Shop.Application");
 
-    [Fact(DisplayName = "LS2002 follows ICommandHandler when the name has no suffix")]
-    public Task FollowsTheHandlerInterface() =>
+    [Fact(DisplayName = "No rule reports a command handler dispatching through the mediator")]
+    public Task AcceptsADispatchThroughTheMediator() =>
         Verify.AnalyzerAsync<CommandPipelineAnalyzer>("""
             using System.Threading;
             using System.Threading.Tasks;
@@ -59,18 +37,12 @@ public sealed class CommandPipelineAnalyzerTests
                 Task SendAsync(object command, CancellationToken cancellationToken);
             }
 
-            public interface ICommandHandler<TCommand, TResult> { }
-
             public sealed record PlaceOrderCommand(int Quantity);
 
-            internal sealed class PlaceOrderUseCase(ICommandMediator mediator)
-                : ICommandHandler<PlaceOrderCommand, int>
+            internal sealed class PlaceOrderCommandHandler(ICommandMediator mediator)
             {
-                public async Task<int> HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken)
-                {
-                    await mediator.{|LS2002:SendAsync|}(command, cancellationToken);
-                    return 0;
-                }
+                public Task HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken) =>
+                    mediator.SendAsync(command, cancellationToken);
             }
             """, assemblyName: "Shop.Application");
 
@@ -200,25 +172,22 @@ public sealed class CommandPipelineAnalyzerTests
             }
             """, assemblyName: "Shop.Application");
 
-    [Fact(DisplayName = "LS2002 stays silent in WebApi")]
+    [Fact(DisplayName = "LS2004 stays silent in WebApi")]
     public Task StaysSilentInWebApi() =>
         Verify.AnalyzerAsync<CommandPipelineAnalyzer>("""
-            using System.Threading;
-            using System.Threading.Tasks;
+            using Marten;
 
-            namespace Shop.Orders;
-
-            public interface ICommandMediator
+            namespace Marten
             {
-                Task SendAsync(object command, CancellationToken cancellationToken);
+                public interface IDocumentSession { }
             }
 
-            public sealed record PlaceOrderCommand(int Quantity);
-
-            internal sealed class PlaceOrderCommandHandler(ICommandMediator mediator)
+            namespace Shop.Orders
             {
-                public Task HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken) =>
-                    mediator.SendAsync(command, cancellationToken);
+                internal sealed class PlaceOrderCommandHandler
+                {
+                    private readonly IDocumentSession _session = null!;
+                }
             }
             """, assemblyName: "Shop.WebApi");
 
@@ -241,25 +210,22 @@ public sealed class CommandPipelineAnalyzerTests
             }
             """);
 
-    [Fact(DisplayName = "LS2002 follows the LiteSpecLayer property over the assembly name")]
+    [Fact(DisplayName = "LS2004 follows the LiteSpecLayer property over the assembly name")]
     public Task FollowsTheDeclaredLayer() =>
         Verify.AnalyzerAsync<CommandPipelineAnalyzer>("""
-            using System.Threading;
-            using System.Threading.Tasks;
+            using Marten;
 
-            namespace Shop.Core;
-
-            public interface ICommandMediator
+            namespace Marten
             {
-                Task SendAsync(object command, CancellationToken cancellationToken);
+                public interface IDocumentSession { }
             }
 
-            public sealed record PlaceOrderCommand(int Quantity);
-
-            internal sealed class PlaceOrderCommandHandler(ICommandMediator mediator)
+            namespace Shop.Core
             {
-                public Task HandleAsync(PlaceOrderCommand command, CancellationToken cancellationToken) =>
-                    mediator.{|LS2002:SendAsync|}(command, cancellationToken);
+                internal sealed class PlaceOrderCommandHandler
+                {
+                    private readonly {|LS2004:IDocumentSession|} _session = null!;
+                }
             }
             """, assemblyName: "Shop.Core", layer: "Infrastructure");
 }

@@ -8,13 +8,13 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace LiteSpec.Analyzers.Rules.Layers;
 
-/// <summary>LS2002 and LS2004: a command handler dispatches no nested command and writes only through repositories.</summary>
+/// <summary>LS2004: a command handler writes only through repositories.</summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class CommandPipelineAnalyzer : LayerAnalyzer
 {
     /// <inheritdoc />
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(Descriptors.LS2002, Descriptors.LS2004);
+        ImmutableArray.Create(Descriptors.LS2004);
 
     private protected override bool AppliesTo(Layer layer) =>
         layer == Layer.Application || layer == Layer.Infrastructure;
@@ -124,12 +124,6 @@ public sealed class CommandPipelineAnalyzer : LayerAnalyzer
             return;
         }
 
-        if (IsMediatorCall(invocation))
-        {
-            context.ReportDiagnostic(Diagnostic.Create(
-                Descriptors.LS2002, MemberLocation(invocation), handler.Name));
-        }
-
         var receiver = invocation.Instance;
         if (receiver?.Type != null)
         {
@@ -187,17 +181,6 @@ public sealed class CommandPipelineAnalyzer : LayerAnalyzer
         }
 
         return false;
-    }
-
-    private static bool IsMediatorCall(IInvocationOperation invocation)
-    {
-        if (invocation.TargetMethod.ContainingType.Name == "ICommandMediator")
-        {
-            return true;
-        }
-
-        var receiver = invocation.Instance;
-        return receiver?.Type != null && Unwrap(receiver.Type).Name == "ICommandMediator";
     }
 
     private static bool IsSessionOrContext(ITypeSymbol type)
