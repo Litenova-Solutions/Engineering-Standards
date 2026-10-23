@@ -1,5 +1,5 @@
 {
-  "$schema": "https://litespec.dev/2.0.0/schemas/litespec-project.schema.json",
+  "$schema": "https://litespec.dev/3.0.0/schemas/litespec-project.schema.json",
   "project": {
     "name": "__PROJECT__"
   },
@@ -9,7 +9,7 @@
     "dotnet",
     "react"
   ],
-  "reviewedLiteSpecVersion": "2.0.0",
+  "reviewedLiteSpecVersion": "3.0.0",
   "optionalTypes": [],
   "constraints": {
     "answered": true
@@ -17,9 +17,16 @@
   "owners": [
     "__OWNER__"
   ],
+  "review": {
+    "vetoWindowDays": 7,
+    "securityReviewer": "__OWNER__"
+  },
+  "adoption": {
+    "transcriptionEndsWith": "decision/<name>"
+  },
   "paths": {
     "docs": "docs",
-    "domainDocs": "docs/domain",
+    "behaviorDocs": "docs/behavior",
     "uiDocs": "docs/ui",
     "unstructuredDocs": [],
     "testRoots": [

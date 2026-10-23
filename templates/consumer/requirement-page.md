@@ -15,6 +15,14 @@
       "kind": "functional",
       "statement": "<The commitment in one sentence>",
       "rationale": "<Why this commitment holds, in one line>",
+      "except": [
+        {
+          "when": "<Condition in product words, or remove the except block>",
+          "fallback": "requirement/<topic>.<name>"
+        }
+      ],
+      "setBy": "<founder|tenant>",
+      "risk": ["<money|door|personal-data|access, or remove this line>"],
       "feature": ["feature/<name>"],
       "basedOn": ["<constraint or research id, or remove this line>"]
     },
@@ -32,6 +40,14 @@
       "check": "<The tool and assertion that confirm it, such as k6 http_req_duration p(95)<200>",
       "runsOn": "<pull-request, nightly, pre-release or production>",
       "evidence": "<Where the passing run is recorded>",
+      "except": [
+        {
+          "when": "<Condition in product words, or remove the except block>",
+          "fallback": "requirement/<topic>.<name>"
+        }
+      ],
+      "setBy": "<founder|tenant>",
+      "risk": ["<money|door|personal-data|access, or remove this line>"],
       "feature": ["feature/<name>"],
       "basedOn": ["<constraint or research id, or remove this line>"]
     },
@@ -48,6 +64,14 @@
           "effectiveFrom": "<YYYY-MM-DD>"
         }
       ],
+      "except": [
+        {
+          "when": "<Condition in product words, or remove the except block>",
+          "fallback": "requirement/<topic>.<name>"
+        }
+      ],
+      "setBy": "<founder|tenant>",
+      "risk": ["<money|door|personal-data|access, or remove this line>"],
       "feature": ["feature/<name>"],
       "basedOn": ["<constraint or research id, or remove this line>"]
     }

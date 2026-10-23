@@ -1,11 +1,13 @@
 {
-  "$schema": "https://litespec.dev/2.0.0/schemas/glossary.schema.json",
-  "schemaVersion": 2,
+  "$schema": "https://litespec.dev/3.0.0/schemas/glossary.schema.json",
+  "schemaVersion": 3,
   "terms": [
     {
       "id": "term/<name>",
       "term": "<English label>",
       "meaning": "<Meaning in at most 25 words>",
+      "layer": "<intent|behavior>",
+      "aliases": ["<established synonym, or remove this line>"],
       "labels": {
         "nl": "<Dutch label>",
         "de": "<German label>"
