@@ -111,6 +111,7 @@ sealed class DotnetBackendReader : IBackendReader
 
             var module = Naming.Kebab(parts[0]);
             var operation = parts[2];
+            var details = HandlerDetails(file);
 
             model.Handlers.Add(new HandlerInfo(
                 $"use-case/{module}.{Naming.Kebab(operation)}",
@@ -118,7 +119,13 @@ sealed class DotnetBackendReader : IBackendReader
                 Naming.Kebab(operation),
                 operation,
                 name.EndsWith("QueryHandler.cs", StringComparison.Ordinal) ? "query" : "command",
-                file));
+                file,
+                details.Class,
+                details.Line,
+                details.Repositories,
+                details.Refusals,
+                details.Thrown,
+                details.Dispatches));
         }
 
         model.Handlers.Sort((left, right) => string.Compare(left.UseCaseId, right.UseCaseId, StringComparison.Ordinal));
@@ -207,7 +214,12 @@ sealed class DotnetBackendReader : IBackendReader
                     file,
                     tree.GetLineSpan(declared.Span).StartLinePosition.Line + 1,
                     kind,
-                    tags.FirstOrDefault() ?? UseCaseOfFolder(config, file)));
+                    tags.FirstOrDefault() ?? UseCaseOfFolder(config, file),
+                    RecordTag(declared),
+                    RepositoriesOf(declared, tree, file),
+                    RefusalsOf(declared, tree, file),
+                    ThrownOf(declared, tree, file),
+                    DispatchesOf(declared, tree, file)));
             }
         }
     }
@@ -429,5 +441,422 @@ sealed class DotnetBackendReader : IBackendReader
             && literal.Token.Value is string text
                 ? text
                 : null;
+    }
+
+    /// <summary>One class's collected details: its repositories, refusals, thrown types and dispatches.</summary>
+    sealed record ClassDetails(
+        string Class,
+        int Line,
+        List<CodeRepository> Repositories,
+        List<CodeRefusal> Refusals,
+        List<CodeThrown> Thrown,
+        List<CodeDispatch> Dispatches);
+
+    /// <summary>A written anchor on a reaction or job record.</summary>
+    private static readonly System.Text.RegularExpressions.Regex RecordImplementsTag = new(
+        @"<implements>\s*(?<id>(?:reaction|job)/[A-Za-z0-9][A-Za-z0-9._-]*)\s*</implements>",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>The reaction or job record id a class's anchor tag names, or null when it names none.</summary>
+    private static string? RecordTag(BaseTypeDeclarationSyntax declared) =>
+        RecordImplementsTag.Match(declared.GetLeadingTrivia().ToString()) is { Success: true } match
+            ? match.Groups["id"].Value
+            : null;
+
+    /// <summary>The collected details of a handler file's handler class, or empty details when none parses.</summary>
+    private static ClassDetails HandlerDetails(string file)
+    {
+        SyntaxTree tree;
+
+        try
+        {
+            tree = CSharpSyntaxTree.ParseText(SourceTree.Read(file), new CSharpParseOptions(LanguageVersion.Preview), file);
+        }
+        catch (IOException)
+        {
+            return new ClassDetails("", 1, [], [], [], []);
+        }
+
+        var declared = tree.GetRoot().DescendantNodes().OfType<BaseTypeDeclarationSyntax>()
+            .FirstOrDefault(type => type.Identifier.ValueText.EndsWith("Handler", StringComparison.Ordinal));
+
+        if (declared is null)
+        {
+            return new ClassDetails("", 1, [], [], [], []);
+        }
+
+        return new ClassDetails(
+            declared.Identifier.ValueText,
+            tree.GetLineSpan(declared.Span).StartLinePosition.Line + 1,
+            RepositoriesOf(declared, tree, file),
+            RefusalsOf(declared, tree, file),
+            ThrownOf(declared, tree, file),
+            DispatchesOf(declared, tree, file));
+    }
+
+    /// <summary>The repository interfaces a class takes in its primary or explicit constructors.</summary>
+    private static List<CodeRepository> RepositoriesOf(BaseTypeDeclarationSyntax declared, SyntaxTree tree, string file)
+    {
+        var found = new List<CodeRepository>();
+
+        foreach (var (type, line) in ConstructorTypes(declared, tree))
+        {
+            var simple = type.Contains('<') ? type[..type.IndexOf('<')] : type;
+
+            if (simple.EndsWith("Repository", StringComparison.Ordinal))
+            {
+                found.Add(new CodeRepository(type, file, line));
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>Every constructor parameter type with its line: the primary constructor first, then each explicit one.</summary>
+    private static List<(string Type, int Line)> ConstructorTypes(BaseTypeDeclarationSyntax declared, SyntaxTree tree)
+    {
+        var found = new List<(string Type, int Line)>();
+
+        if (declared is not TypeDeclarationSyntax typed)
+        {
+            return found;
+        }
+
+        if (typed.ParameterList is { } primary)
+        {
+            foreach (var parameter in primary.Parameters)
+            {
+                if (parameter.Type is not null)
+                {
+                    found.Add((SimpleTypeName(parameter.Type), tree.GetLineSpan(parameter.Span).StartLinePosition.Line + 1));
+                }
+            }
+        }
+
+        foreach (var constructor in typed.Members.OfType<ConstructorDeclarationSyntax>())
+        {
+            foreach (var parameter in constructor.ParameterList.Parameters)
+            {
+                if (parameter.Type is not null)
+                {
+                    found.Add((SimpleTypeName(parameter.Type), tree.GetLineSpan(parameter.Span).StartLinePosition.Line + 1));
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>The refusal codes a class produces in declaring positions, earliest line first.</summary>
+    private static List<CodeRefusal> RefusalsOf(BaseTypeDeclarationSyntax declared, SyntaxTree tree, string file)
+    {
+        var found = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (var token in declared.DescendantTokens())
+        {
+            if (LiteralText(token) is not { } literal || !Declares(token))
+            {
+                continue;
+            }
+
+            foreach (System.Text.RegularExpressions.Match match in Identifiers.RefusalCode().Matches(literal))
+            {
+                if (match.Value == literal)
+                {
+                    found.TryAdd(match.Value, tree.GetLineSpan(token.Span).StartLinePosition.Line + 1);
+                }
+            }
+        }
+
+        return [.. found
+            .OrderBy(entry => entry.Value)
+            .ThenBy(entry => entry.Key, StringComparer.Ordinal)
+            .Select(entry => new CodeRefusal(entry.Key, file, entry.Value))];
+    }
+
+    /// <summary>The exception and failure types a class constructs, earliest line first.</summary>
+    private static List<CodeThrown> ThrownOf(BaseTypeDeclarationSyntax declared, SyntaxTree tree, string file)
+    {
+        var found = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (var creation in declared.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
+        {
+            var name = SimpleTypeName(creation.Type);
+            var simple = name.Contains('<') ? name[..name.IndexOf('<')] : name;
+
+            if (simple.EndsWith("Exception", StringComparison.Ordinal)
+                || simple.EndsWith("Failure", StringComparison.Ordinal)
+                || simple.EndsWith("Refusal", StringComparison.Ordinal))
+            {
+                found.TryAdd(simple, tree.GetLineSpan(creation.Span).StartLinePosition.Line + 1);
+            }
+        }
+
+        return [.. found
+            .OrderBy(entry => entry.Value)
+            .ThenBy(entry => entry.Key, StringComparer.Ordinal)
+            .Select(entry => new CodeThrown(entry.Key, file, entry.Value))];
+    }
+
+    /// <summary>
+    ///     The dispatch calls a class makes: commands through <c>ICommandMediator</c>, events
+    ///     through a publisher or the outbox, notifications through a messenger, notifier or
+    ///     sender, and any other call on an injected interface as an external port call.
+    /// </summary>
+    private static List<CodeDispatch> DispatchesOf(BaseTypeDeclarationSyntax declared, SyntaxTree tree, string file)
+    {
+        var receivers = ReceiverTypes(declared);
+
+        if (receivers.Count == 0)
+        {
+            return [];
+        }
+
+        var found = new List<CodeDispatch>();
+
+        foreach (var invocation in declared.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (invocation.Expression is not MemberAccessExpressionSyntax member)
+            {
+                continue;
+            }
+
+            var receiver = member.Expression switch
+            {
+                IdentifierNameSyntax plain => plain.Identifier.ValueText,
+                MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax } access => access.Name.Identifier.ValueText,
+                _ => null,
+            };
+
+            if (receiver is null || !receivers.TryGetValue(receiver, out var type))
+            {
+                continue;
+            }
+
+            var kind = type.Contains('<') ? type[..type.IndexOf('<')] : type;
+            var method = member.Name.Identifier.ValueText;
+            var line = tree.GetLineSpan(invocation.Span).StartLinePosition.Line + 1;
+
+            if (kind == "ICommandMediator" && method == "SendAsync")
+            {
+                if (MessageTarget(invocation, templateCounts: false) is { } issues)
+                {
+                    found.Add(new CodeDispatch("issues", issues.Target, "", file, line));
+                }
+            }
+            else if (kind.EndsWith("Publisher", StringComparison.Ordinal)
+                || kind.Contains("Outbox", StringComparison.Ordinal))
+            {
+                if (MessageTarget(invocation, templateCounts: false) is { } publishes)
+                {
+                    found.Add(new CodeDispatch("publishes", publishes.Target, "", file, line));
+                }
+            }
+            else if (kind.Contains("Messenger", StringComparison.Ordinal)
+                || kind.EndsWith("Notifier", StringComparison.Ordinal)
+                || kind.EndsWith("Sender", StringComparison.Ordinal))
+            {
+                if (MessageTarget(invocation, templateCounts: true) is { } sends)
+                {
+                    found.Add(new CodeDispatch("sends", sends.Target, sends.Detail, file, line));
+                }
+            }
+            else if (!ExcludedReceiver(kind))
+            {
+                found.Add(new CodeDispatch("calls", method, kind, file, line));
+            }
+        }
+
+        found.Sort((left, right) =>
+        {
+            var line = left.Line.CompareTo(right.Line);
+            return line != 0 ? line : string.Compare(left.Target, right.Target, StringComparison.Ordinal);
+        });
+
+        return found;
+    }
+
+    /// <summary>
+    ///     The injected names a class may call: its constructor parameters plus the fields and
+    ///     properties an explicit constructor assigns from them, each with its simple type name.
+    /// </summary>
+    private static Dictionary<string, string> ReceiverTypes(BaseTypeDeclarationSyntax declared)
+    {
+        var types = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        if (declared is not TypeDeclarationSyntax typed)
+        {
+            return types;
+        }
+
+        if (typed.ParameterList is { } primary)
+        {
+            foreach (var parameter in primary.Parameters)
+            {
+                AddParameter(parameter);
+            }
+        }
+
+        foreach (var constructor in typed.Members.OfType<ConstructorDeclarationSyntax>())
+        {
+            foreach (var parameter in constructor.ParameterList.Parameters)
+            {
+                AddParameter(parameter);
+            }
+
+            if (constructor.Body is null)
+            {
+                continue;
+            }
+
+            foreach (var assignment in constructor.Body.DescendantNodes().OfType<AssignmentExpressionSyntax>())
+            {
+                if (assignment.Right is not IdentifierNameSyntax source
+                    || !types.TryGetValue(source.Identifier.ValueText, out var type))
+                {
+                    continue;
+                }
+
+                var target = assignment.Left switch
+                {
+                    IdentifierNameSyntax plain => plain.Identifier.ValueText,
+                    MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax } member => member.Name.Identifier.ValueText,
+                    _ => null,
+                };
+
+                if (target is not null)
+                {
+                    types.TryAdd(target, type);
+                }
+            }
+        }
+
+        return types;
+
+        void AddParameter(ParameterSyntax parameter)
+        {
+            if (parameter.Type is not null && parameter.Identifier.ValueText.Length > 0)
+            {
+                types.TryAdd(parameter.Identifier.ValueText, SimpleTypeName(parameter.Type));
+            }
+        }
+    }
+
+    /// <summary>
+    ///     The message a dispatch call carries: the constructed type, or the template key when
+    ///     the call sends through the messenger. A topic or key first with the message second
+    ///     reads the message. Null when the call names neither.
+    /// </summary>
+    private static (string Target, string Detail)? MessageTarget(InvocationExpressionSyntax invocation, bool templateCounts)
+    {
+        var args = invocation.ArgumentList.Arguments;
+
+        if (args.Count == 0)
+        {
+            return null;
+        }
+
+        if (args.Count > 1
+            && args[0].Expression is LiteralExpressionSyntax
+            && ConstructionOf(args[1].Expression, invocation) is { } second)
+        {
+            return (second, "type");
+        }
+
+        if (ConstructionOf(args[0].Expression, invocation) is { } first)
+        {
+            return (first, "type");
+        }
+
+        if (templateCounts
+            && args[0].Expression is LiteralExpressionSyntax literal
+            && literal.Token.Value is string text
+            && text.Length > 0)
+        {
+            return (text, "template");
+        }
+
+        return null;
+    }
+
+    /// <summary>The constructed type an argument carries, directly or through a local it names.</summary>
+    private static string? ConstructionOf(ExpressionSyntax expression, InvocationExpressionSyntax invocation) =>
+        expression switch
+        {
+            ObjectCreationExpressionSyntax creation => SimpleTypeName(creation.Type),
+            IdentifierNameSyntax variable => LocalConstruction(invocation, variable.Identifier.ValueText),
+            _ => null,
+        };
+
+    /// <summary>The type a local builds before the call, for a message held in a local.</summary>
+    private static string? LocalConstruction(InvocationExpressionSyntax invocation, string name)
+    {
+        var scope = invocation.Ancestors().OfType<MemberDeclarationSyntax>().FirstOrDefault();
+
+        if (scope is null)
+        {
+            return null;
+        }
+
+        foreach (var declarator in scope.DescendantNodes().OfType<VariableDeclaratorSyntax>())
+        {
+            if (declarator.Identifier.ValueText == name
+                && declarator.Initializer?.Value is ObjectCreationExpressionSyntax creation)
+            {
+                return SimpleTypeName(creation.Type);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>The simple type name: unqualified, without nullability, keeping generic arguments.</summary>
+    private static string SimpleTypeName(TypeSyntax type) => type switch
+    {
+        GenericNameSyntax generic => $"{generic.Identifier.ValueText}<{string.Join(",", generic.TypeArgumentList.Arguments.Select(argument => argument.ToString()))}>",
+        IdentifierNameSyntax plain => plain.Identifier.ValueText,
+        QualifiedNameSyntax qualified => SimpleTypeName(qualified.Right),
+        NullableTypeSyntax nullable => SimpleTypeName(nullable.ElementType),
+        ArrayTypeSyntax array => SimpleTypeName(array.ElementType),
+        _ => type.ToString(),
+    };
+
+    /// <summary>
+    ///     Whether an injected type is infrastructure rather than an external port: repositories,
+    ///     mediators, publishers, messengers, sessions, clocks, loggers, validators and the rest
+    ///     a handler takes without taking an edge to an external system.
+    /// </summary>
+    private static bool ExcludedReceiver(string type)
+    {
+        if (type.EndsWith("Repository", StringComparison.Ordinal)
+            || type.EndsWith("Mediator", StringComparison.Ordinal)
+            || type.EndsWith("Publisher", StringComparison.Ordinal)
+            || type.Contains("Messenger", StringComparison.Ordinal)
+            || type.EndsWith("Notifier", StringComparison.Ordinal)
+            || type.EndsWith("Sender", StringComparison.Ordinal)
+            || type.Contains("Outbox", StringComparison.Ordinal))
+        {
+            return true;
+        }
+
+        if (type is "IClock" or "Clock" or "TimeProvider"
+            or "IQuerySession" or "IDocumentSession" or "IApplicationDbContext"
+            or "IMapper" or "IConfiguration"
+            or "ICurrentUser" or "IUserContext" or "ICurrentActor" or "IActorAccessor" or "IActorContext"
+            or "IMemoryCache" or "IDistributedCache"
+            or "IGuidGenerator" or "IGuidFactory" or "IIdGenerator"
+            or "ISerializer" or "IJsonSerializer"
+            or "IMetrics" or "IMeterFactory" or "ActivitySource")
+        {
+            return true;
+        }
+
+        return type.StartsWith("ILogger", StringComparison.Ordinal)
+            || type.EndsWith("DbContext", StringComparison.Ordinal)
+            || type.EndsWith("Validator", StringComparison.Ordinal)
+            || type.StartsWith("IOptions", StringComparison.Ordinal)
+            || type.EndsWith("Environment", StringComparison.Ordinal)
+            || type.EndsWith("Accessor", StringComparison.Ordinal)
+            || type.Contains("Localiz", StringComparison.Ordinal);
     }
 }

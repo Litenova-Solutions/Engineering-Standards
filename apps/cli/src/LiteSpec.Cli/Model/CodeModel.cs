@@ -7,7 +7,13 @@ sealed record HandlerInfo(
     string Name,
     string Operation,
     string Kind,
-    string File);
+    string File,
+    string Class = "",
+    int Line = 1,
+    IReadOnlyList<CodeRepository>? Repositories = null,
+    IReadOnlyList<CodeRefusal>? Refusals = null,
+    IReadOnlyList<CodeThrown>? Thrown = null,
+    IReadOnlyList<CodeDispatch>? Dispatches = null);
 
 /// <summary>One reaction or job class.</summary>
 sealed record ReactionInfo(
@@ -15,7 +21,12 @@ sealed record ReactionInfo(
     string File,
     int Line,
     string Kind,
-    string? UseCaseId);
+    string? UseCaseId,
+    string? RecordId = null,
+    IReadOnlyList<CodeRepository>? Repositories = null,
+    IReadOnlyList<CodeRefusal>? Refusals = null,
+    IReadOnlyList<CodeThrown>? Thrown = null,
+    IReadOnlyList<CodeDispatch>? Dispatches = null);
 
 /// <summary>One domain event class.</summary>
 sealed record DomainEventInfo(string Class, string File, int Line, string? EventId);
@@ -32,6 +43,24 @@ sealed record CodeComment(string Text, string File, int Line);
 
 /// <summary>One endpoint operation mapped to its use case.</summary>
 sealed record EndpointOperation(string Operation, string UseCaseId, string Method, string Route, string File);
+
+/// <summary>One repository interface a handler, reaction or job class takes in its constructor.</summary>
+sealed record CodeRepository(string Interface, string File, int Line);
+
+/// <summary>One refusal code a handler, reaction or job class produces in a declaring position.</summary>
+sealed record CodeRefusal(string Code, string File, int Line);
+
+/// <summary>One exception or failure type a handler, reaction or job class constructs.</summary>
+sealed record CodeThrown(string Type, string File, int Line);
+
+/// <summary>
+///     One dispatch call a handler, reaction or job class makes. <paramref name="Verb" /> is
+///     <c>issues</c>, <c>publishes</c>, <c>sends</c> or <c>calls</c>. <paramref name="Target" />
+///     is the message type, the template key, or the port method. <paramref name="Detail" />
+///     is the port type for <c>calls</c>, <c>type</c> or <c>template</c> for <c>sends</c>,
+///     and empty otherwise.
+/// </summary>
+sealed record CodeDispatch(string Verb, string Target, string Detail, string File, int Line);
 
 /// <summary>What the backend source says.</summary>
 sealed class CodeModel
