@@ -1,16 +1,16 @@
-# Product Intent
+# Intent Layer
 
 ## Intent
 
-Product intent is what a business commits to: what it sells, to whom, at what price, and in which markets. It is written before specification and code, apart from what the software does today, so that every rule and use case answers to a commitment somebody approved. This page states where that intent lives, what shape each part takes, and how behavior records trace back to it.
+Intent is why the product exists and what it promises: the product, its goals, problems, features, requirements, constraints, decisions, research, and journeys. Agents draft these records and the founder decides them, before Behavior states how the system keeps the promises. This page states where Intent lives, what shape each record takes, and what Intent never holds.
 
 ## Concepts
 
 ### Product Intent and Its Parts
 
-Business intent is what the product commits to as a business: what it sells, to whom, at what price, and in which markets, plus how the company runs and what comes next.
+Product intent is what the business commits to: what it sells, to whom, at what price, and in which markets, plus how the company runs and what comes next.
 
-Business intent is not behavior. A rule, use case, or journey states what the software does today and matches the code. A requirement page states what the business decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: behavior records name the requirements they fulfill, and a product page never describes behavior.
+Intent is not Behavior. A rule or use case states what the system does today and matches the code. A requirement states what the business decided and why, and it can describe a position the code does not carry yet. The two connect in one direction: Behavior records name the requirements they fulfill and the steps they serve, and an Intent record never describes Behavior.
 
 The [model page](model.md) defines the record types and links. The table names the terms this page uses most.
 
@@ -23,22 +23,58 @@ The [model page](model.md) defines the record types and links. The table names t
 | Constraint | An outside rule binding the product, with its source and whether it applies. |
 | Research | An outside fact behind a choice, with the question asked and the sources read. |
 | Decision | A dated choice with options, decider, evidence, and what would change it. |
-| Requirement | One commitment: what the product does, how well it does it, or what the business holds. |
+| Requirement | One commitment: what the product does, how well it does it, or what the business holds, with its exception and fallback where one applies. |
 | Requirement page | One page of business intent holding requirement entries. |
-| Journey | Ordered steps walking one actor toward one goal. |
+| Journey | Ordered product sentences walking one actor toward one goal. |
+| Actor | A person, group, or system that touches the product. |
+| Business term | A word of the business with its meaning, kept in the glossary with `layer: intent`. |
 | Source material | Generated records outside `docs/` carrying no authority until cited. |
 
-Business intent has three parts that age differently: the present is the position a reader acts on, the future is the next planned change, and the past is the decision that set each choice. A requirement page keeps the present and the future in its chapter and its commitments, while the book lists the requirement entries and the decisions behind them.
+A requirement page keeps the present and the future in its chapter and its commitments, while the book lists the requirement entries and the decisions behind them.
 
-### How Intent Reaches Code
+### How Intent Reaches Behavior
 
 The [model page](model.md) states the authority order that settles conflicts between records. Decisions explain choices, and research and prose inform without deciding.
 
-A decision sets the position, and a requirement page states it as requirements. Behavior records name the requirements they fulfill, and the code records what happens today. When behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business means a new decision, approved by a person, before any page or code moves.
+A decision sets the position, and a requirement page states it as requirements. Behavior records name the requirements they fulfill and the journey steps they serve, and the code carries what happens today. When Behavior contradicts a requirement, either the code carries a defect or the business changed. A changed business means a new decision, approved by a person, before any page or code moves.
+
+What a lower layer needs and the upper layer does not say travels up as a draft question with a decider and a date. A fact learned from the world enters Intent as research or a constraint, cited and dated. Nothing travels up from code: where Intent is silent, working code is evidence for a question, not a defect to delete and not a source to transcribe silently.
+
+### Requirements with Except and Fallback
+
+A requirement carries `kind` (functional, quality, or business), `statement`, `rationale`, and `measure` with `by` where its statement names a number. `setBy` names who sets its value: `founder` or `tenant`. `risk` names what makes it tier 1: `money`, `door`, `personal-data`, or `access`; a requirement with no risk is tier 3.
+
+An `except` entry states in product words when the commitment does not hold, and `fallback` names the requirement that covers what happens then. The fallback carries no `except` of its own: exceptions stay one deep, so every exception ends in a promise.
+
+Approved requirements carry `approvedBy`, `approvedOn`, and the builder-written `approvedHash`. Tier 1 needs explicit approval; a tier-3 draft with a recommended answer auto-approves after its `decideBy` plus the veto window.
+
+### Journeys as Product Sentences
+
+A journey carries `actor`, `goal`, `finishedWhen`, ordered `steps`, and `fulfills`. `finishedWhen` states the observable end in one sentence. Each step carries its `id` (`s1`, `s2`, and so on), its product sentence in `says`, the actor walking it, and what the person experiences when it fails in `ifItGoesWrong`. A step id reads `journey/<name>#s1`.
+
+Steps name no use case. Use cases point up with `serves`, naming the steps they serve. The book renders each journey as one chapter: the goal, `finishedWhen`, the steps as sentences with `ifItGoesWrong`, the requirements it fulfills with their statements and their `except` and fallback inline, the serving use case goals, the Then clauses of their scenarios as context, a consequences box as context, and the open questions. Field names never render literally in Intent chapters.
+
+### Staff and System Journeys
+
+Journeys are not only buyer walks. A staff journey walks a staff actor, such as box office recording a replacement sale, through the same shape of goal, `finishedWhen`, and steps. A system journey walks `actor/recurring-job` through scheduled work the product promises, such as expiring lapsed returns. Staff and system steps read as product sentences too, so the founder approves them the same way.
+
+### Questions and Ballots
+
+A question carries `question`, `decider`, `decideBy`, `recommended`, `ballot`, and `tier`. Questions ask in product words and carry recommended answers, so the founder approves or answers without opening a Behavior page. The `ballot` groups questions in the inbox by a decision id or a short topic slug.
+
+Tier-1 questions need explicit approval. A tier-3 draft carrying `recommended` auto-approves after its `decideBy` plus the project's veto window (`review.vetoWindowDays` in `litespec.project.json`, default 7), recorded as `approvedBy: auto (veto window)`. A draft past its `decideBy` that cannot auto-approve is reported as a known gap with its owner. It never silently blocks. The ballots page lists questions grouped by `ballot`, tier 1 first, with each question's recommendation and auto-approval date.
+
+### The Consequences Summary
+
+Intent is enough to approve. Each ballot and book chapter carries a consequences summary rendered from Behavior: new refusals in product words, data kept and for how long, and money effects. The summary is marked as context and stays outside the approval hash, which covers semantic fields such as statements, results, output names, rules, and steps, never prose bodies.
+
+### What Intent Never Contains
+
+Intent never contains Behavior field names, code identifiers, or mechanism: no states, results, codes, transactions, edges, or consistency modes. Computed facts such as implemented, verified, stale, reachable, and effective status appear in the book and model output only. Behavior owns its records and points up; Intent states the promises those records keep.
 
 ## Standards
 
-### Keep Product Intent in Its Homes
+### Keep Intent in Its Homes
 
 **Statement:** A consumer MUST keep its brief, requirement pages, goals, problems, features, constraints, decisions, and journeys under `docs/product/`, and its research under `docs/research/`.
 
@@ -72,13 +108,13 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Statement:** A constraint MUST state its `source`, `category`, `applies`, and `appliesBecause` in fields and its demand in Summary and What It Requires.
 
-**Rationale:** An unanswered constraint is an outside rule the product can break unknowingly: a law, a regulation, or provider terms the team never examined. Recording each rule with its source and applicability proves the team asked. A project with no outside rules records that answer too, so a later reader can tell examined from ignored. The `category` is technical, organizational, or convention. Summary states the rule in the source's own words, and What It Requires states what the product does to obey it.
+**Rationale:** An unanswered constraint is an outside rule the product can break unknowingly: a law, a regulation, or provider terms the team never examined. Recording each rule with its source and applicability proves the team asked. A project with no outside rules records that answer too, so a later reader can tell examined from ignored. The `category` is technical, organizational, or convention. Summary states the rule in the source's own words, and What It Requires states what the product does to obey it. A fact learned from the world, such as a provider shortening its refund window, first lands as research with its source and date, then as a constraint draft.
 
 ### Record Research with Read Sources
 
 **Statement:** A research record MUST state its `question`, list each source with its read date, and carry Answer.
 
-**Rationale:** A fact without its source cannot be rechecked when a decision depends on it. The read date shows when the outside fact was true, so a later reader knows whether to trust or refresh it. Research without sources and dates asks every later choice to rest on memory. Answer states what the sources say and how sure the answer is, and Notes on Sources holds what a later reader needs about each source.
+**Rationale:** A fact without its source cannot be rechecked when a decision depends on it. The read date shows when the outside fact was true, so a later reader knows whether to trust or refresh it. Research without sources and dates asks every later choice to rest on memory. Answer states what the sources say and how sure the answer is, and Notes on Sources holds what a later reader needs about each source. Observed provider behavior lands here too, cited and dated, before any constraint or requirement rests on it.
 
 ### Record Each Choice as a Decision
 
@@ -88,9 +124,9 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 ### Name the Person Who Approved a Decision
 
-**Statement:** Only the named decider approves a decision, and an approved decision MUST carry `decided`.
+**Statement:** An approved decision MUST carry `approvedBy` with its decider and `approvedOn` with its date.
 
-**Rationale:** Product, commercial, and legal choices belong to an accountable person. Naming the decider while the decision is a draft shows who approves before release. Building can start on a draft while approval gates the release, so agent work never stalls on one person's queue. The `decided` date proves the approval happened.
+**Rationale:** Product, commercial, and legal choices belong to an accountable person. Naming the decider while the decision is a draft shows who approves before release. Building can start on a draft while approval gates the release, so agent work never stalls on one person's queue. The `approvedBy` name and `approvedOn` date prove the approval happened, and the builder writes `approvedHash` over the semantic fields so a later change reopens the approval. The [model page](model.md) states what the hash covers.
 
 ### Replace a Decision with a New Record
 
@@ -102,25 +138,13 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Statement:** A `requirement-page` MUST carry its nine chapter and commitment sections with the frontmatter field `reviewBy`.
 
-**Rationale:** The fixed shape puts the present and the future of one area on one page. The chapter sections carry the story for people: Summary, The Situation, What We Do, Why It Is Better, and Example. The commitment sections carry the testable commitments and the choices behind them: Costs and Risks, How Sure We Are, Position, and Refusals. Position holds choices with their decisions, including choices no system carries. A reader learns where each answer sits once and finds it on every page. The `reviewBy` field makes the reread due rather than optional. The book lists the requirement entries, so the page carries no entries section.
-
-### Place the Story Before the Commitments
-
-**Statement:** A `requirement-page` MUST place its chapter for people before its commitments.
-
-**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so the reader understands the choice before meeting its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/intent#cite-sources-for-chapter-claims` states. Commitments first would ask agreement before understanding.
-
-### Cite Sources for Chapter Claims
-
-**Statement:** Each claim in the chapter MUST cite its source.
-
-**Rationale:** A number without its source cannot be rechecked when the market moves or a reader doubts it. The chapter convinces only when every claim traces to its source. Unsourced claims turn the story into a pitch that later plans cannot verify.
+**Rationale:** The fixed shape puts the present and the future of one area on one page. The chapter sections carry the story for people: Summary, The Situation, What We Do, Why It Is Better, and Example. The commitment sections carry the testable commitments and the choices behind them: Costs and Risks, How Sure We Are, Position, and Refusals. Position holds choices with their decisions, including choices no system carries. A reader learns where each answer sits once and finds it on every page. The `reviewBy` field dates the next reread against decisions and evidence. The book lists the requirement entries with their statements and their `except` and fallback inline, so the page carries no entries section.
 
 ### Identify Every Requirement
 
 **Statement:** Each requirement entry MUST carry one identifier `requirement/<topic>.<name>` naming its own page, with `kind` and `statement`.
 
-**Rationale:** An identifier lets a behavior record name the commitment it fulfills and lets the model resolve the name. A commitment written only as prose cannot be traced from code back to intent. The `kind` is functional, quality, or business: what the product does, how well it does it, or what the business holds. A business requirement carries its `values` with effective dates. Any requirement names in `feature` the planned, later, or refused feature that carries it, and in `basedOn` the constraints and research behind it.
+**Rationale:** An identifier lets a Behavior record name the commitment it fulfills and lets the model resolve the name. A commitment written only as prose cannot be traced from Intent to code. The `kind` is functional, quality, or business: what the product does, how well it does it, or what the business holds. A business requirement carries its `values` with effective dates. Any requirement names in `feature` the planned, later, or refused feature that carries it, in `basedOn` the constraints and research behind it, in `setBy` who sets its value, and in `risk` what makes it tier 1.
 
 ### Explain Each Requirement in One Line
 
@@ -134,29 +158,17 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Rationale:** A number without its measure cannot be checked: the team cannot tell what is counted or when the count holds. The `measure` names what is counted, and `by` names the date or milestone. The schema pairs the two, so a requirement carries both or neither.
 
-### Cite Requirements from Records
-
-**Statement:** A rule, use case, or journey that carries a requirement MUST name it in `fulfills`.
-
-**Rationale:** The link runs from behavior to intent, so a product change shows exactly which rules, use cases, and journeys to revisit. Without the `fulfills` name, a price or policy change starts with a search instead of a list, and some records stay behind. The requirement page stays free of behavior while every behavior record points back to intent.
-
 ### Order Each Journey Toward One Goal
 
 **Statement:** A journey MUST walk its actor toward one goal through ordered steps.
 
-**Rationale:** A journey names its `actor`, its `goal` in words, and its ordered `steps`: each step names its use case, the actor walking it, what it requires, and what it gives. The order shows how the steps join toward the goal, so a step that fits nowhere is visible. Example shows the journey walked once, Between the Steps carries the failure branches and handoffs, and Before It Starts holds the state preconditions. The journey names in `fulfills` the requirements it carries.
+**Rationale:** A journey names its `actor`, its `goal` in words, its `finishedWhen`, and its ordered `steps`: each step carries its `id`, its product sentence in `says`, the actor walking it, and what the person experiences when it fails in `ifItGoesWrong`. The order shows how the steps join toward the goal, so a step that fits nowhere is visible. The journey names in `fulfills` the requirements it carries, and the use cases that serve each step point up with `serves`.
 
-### Keep Behavior Out of Product Pages
+### Keep Behavior Out of Intent
 
-**Statement:** A product page MUST NOT describe states, results, codes, or code.
+**Statement:** An Intent record MUST NOT describe states, results, codes, or code.
 
-**Rationale:** A product page that names states, results, codes, or code becomes a second specification, and it drifts from the first with the next behavior change. Two specifications force every reader to ask which one the code follows. Behavior records own behavior and name the requirements they fulfill, so each fact has one home.
-
-### Trace Every Choice to a Decision
-
-**Statement:** Every Position and Refusals entry MUST link an unretired decision record, and an approved one whenever the page is approved.
-
-**Rationale:** A position with no decision behind it is an opinion nobody approved. The link lets a reader check who chose it, when, and on what evidence. Requiring an unretired decision, approved whenever the page is approved, keeps live positions backed by live choices.
+**Rationale:** An Intent record that names states, results, codes, or code becomes a second specification, and it drifts from the first with the next Behavior change. Two specifications force every reader to ask which one the code follows. Behavior records own behavior and point up to the requirements and steps they serve, so each fact has one home.
 
 ### Treat Generated Research as Source Material
 
@@ -164,49 +176,53 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Rationale:** Records generated outside `docs/` mix verified facts, inferences, and recommendations in one confident voice. Treating them as source material with no authority keeps a recommendation from being built as if someone decided it. A research record or an approved decision restates the claim before anything rests on it.
 
-### Review a Requirement Page by Its Date
+### State Each Exception with Its Fallback
 
-**Statement:** The owner MUST reread a `requirement-page` against its decisions and evidence before its `reviewBy` date, then move the date.
+**Statement:** A requirement that names an `except` condition MUST name its `fallback` requirement in the same entry.
 
-**Rationale:** A stale strategy misdirects every plan built on it, and nothing in the code fails when a market or a price moves. The owner rereading the page against its decisions and evidence before the `reviewBy` date catches the drift while the area still guides work. Moving the date after the reread schedules the next one.
+**Rationale:** An exception without a fallback leaves the reader at the exact moment the promise breaks: the product refuses with no stated alternative. The `when` condition states in product words when the commitment does not hold, and `fallback` names the requirement that covers what happens then. The fallback carries no `except` of its own, so the chain stays one deep and every exception ends in a promise.
 
-### Load Product Intent Before Commercial Work
+**Example:** A returned ticket is refunded on the buyer's own charge, never more than they paid. Except when the payment rail's refund window has closed for that order, with `fallback` naming the requirement that has the organizer repay the buyer by other means.
 
-**Statement:** An agent MUST read the product brief and the affected requirement pages before changing behavior that touches price, money, markets, customers, or terms.
+### Write Journey Steps as Sentences with Ids
 
-**Rationale:** Commercial behavior that contradicts the business position still compiles and passes its tests: no check compares a price or term against the brief. Only the product pages say it is wrong. Reading the brief and the affected pages before changing price, money, markets, customers, or terms keeps the code inside the position the business approved.
+**Statement:** Each journey step MUST carry its `id` and its product sentence in `says`, and name no use case.
 
-### Derive Requirement Coverage from the Model
+**Rationale:** A step written as a product sentence reads in the book chapter with no Behavior knowledge: the founder approves what a person experiences, not which handler runs. The `id` (`s1`, `s2`, and so on) gives Behavior a stable target: use cases point up with `serves` to `journey/<name>#s1`. A step that names its use case drags Behavior into Intent and breaks the chapter every time Behavior renames.
 
-**Statement:** A consumer MUST derive its requirement coverage from the model, never by hand.
+**Example:** Step `s3` says `Someone else buys the freed place, and the old code stops admitting.` and names no use case; `use-case/sales.complete-ticket-resale` names `journey/hand-a-ticket-back#s3` in `serves`.
 
-**Rationale:** Coverage kept by hand goes stale with the next record change and then reports intent the system no longer carries, or hides intent it now does. The model lists each requirement with the records that fulfill it, computed from the current graph. A requirement no record fulfills is intent the system does not carry yet, visible as a gap rather than a guess.
+### State When Each Journey Finishes
 
-### Build Intent Before Specification Before Code
+**Statement:** A journey MUST state its observable end in `finishedWhen`.
 
-**Statement:** A behavior change MUST land intent, research, decision, requirement, specification, code, and tests in that order; a decision written after its code is a defect.
+**Rationale:** A journey without a stated end can stop anywhere: the reader cannot tell a finished walk from an abandoned one, and serving records cannot tell done from dropped. `finishedWhen` states the observable end in one sentence, in product words a founder can check.
 
-**Rationale:** The order makes each layer checkable before the next builds on it: intent first, then research, decision, and requirement, then specification records, then code and tests. A specification written before its decision argues from code instead of from intent. A decision written after its code justifies what already shipped. Approval follows the draft gate on the [model page](model.md): nothing is approved behind a draft.
+**Example:** `finishedWhen`: the original buyer has their money on the card they paid with, or the organizer credit they chose, and the freed place is sold again or back with them.
 
-**Example:** A price change lands its research note, then decision `decision/0011-raise-the-monthly-plan` and requirement `requirement/pricing.monthly-plan-fee`, then the billing `fulfills` link, then the code.
+### Group Questions into Ballots
 
-The running Claimwick example lands its receipt threshold in the same order: research `research/approval-time-benchmarks` asks how fast small companies decide expenses, decision `decision/0001-receipt-threshold` chooses 25 EUR and names `requirement/approval.receipt-over-threshold` in `decides`, use case `use-case/spending.submit-expense` names that requirement in `fulfills`, and only then does the submit-expense handler carry it. A decision written after that code would be a defect.
+**Statement:** Each draft question MUST name its `decider`, its `decideBy` date, and its `ballot`.
 
-The order of work: intent, then the choice and its commitment, then specification records, then code and tests.
+**Rationale:** A question without a decider and a date waits on nobody: work below it guesses while nobody is asked. The `ballot` groups questions in the inbox by a decision id or a short topic slug, so the founder answers one ballot at a time. Tier-1 questions need explicit approval; a tier-3 draft carrying `recommended` auto-approves after its `decideBy` plus the veto window, recorded as `auto (veto window)`. A draft past its date that cannot auto-approve is reported as a known gap with its owner, so it never silently blocks.
 
-![The order of work in four steps: product brief and requirement pages state what the business commits; research, decision, and requirement hold the evidence, the choice, and the commitment; specification records carry the rules, use cases, and journeys; code and tests are what the product does today.](../assets/diagrams/core-product-order.svg)
+**Example:** Ballot `resale-terms`, due 2026-11-01: how many tickets one buyer may hold in the return queue at once, recommended 4 as an organizer listing setting; and whether the organizer may charge a handling fee on a return, recommended yes, organizer-set and shown before the buyer confirms.
 
-### Reject an Unfulfilled Requirement
+### Let the Founder Decide Business Choices
 
-**Statement:** A consumer MUST fail its checks on a functional, quality, or business requirement that nothing fulfills or delivers, outside a known gap.
+**Statement:** The founder MUST decide each draft question that sets a price, fee, rate, term, market, payer, retention period, observable freshness, or tenant-varying figure.
 
-**Rationale:** Failing the checks on an unfulfilled functional, quality, or business requirement keeps intent and system aligned: the team either connects the requirement or admits the gap. A rule, use case, or journey fulfills a requirement, and a planned, later, or refused feature delivers it through the `feature` link. A retired requirement is past intent and needs no fulfillment. Planned work belongs to its feature, so a known gap marks only what nobody owns.
+**Rationale:** Agents draft Intent and the founder decides it: a price or term chosen in Behavior would bind the business without its decider. Each figure that differs by tenant, market, or date travels up as a draft question with the founder as decider, so Behavior never silently fixes what the business owns. Money and personal-data questions carry `risk` and need explicit approval.
 
-### Build on a Draft Decision Before Approval
+**Example:** The return-queue cap moves from 4 to 6 when the founder answers the ballot; the listing setting and its scenarios follow the approved requirement.
 
-**Statement:** An agent MAY build on a `draft` decision while approval gates the release, not the code.
+### Treat Tenant-Set Values as Data
 
-**Rationale:** Approval before every edit stalls agent work on a queue of one person. Building on a draft keeps work moving while the decider reviews. The release still needs the approval, so nothing ships on a draft alone.
+**Statement:** A consumer MUST treat a `setBy: tenant` value as tenant data outside founder approval.
+
+**Rationale:** Tenants choose their own values within the ranges Intent sets: an organizer prices the freed place at face value by default and keeps any difference. The founder approves the requirement that sets the range and the default, and each tenant's choice inside it needs no ballot. Treating tenant values as approvals would ask the founder to approve choices that are never theirs.
+
+**Example:** The organizer sets a resale price above face value; the requirement covering organizer pricing already holds the founder's approval, so the price itself is data.
 
 ## Conventions
 
@@ -259,15 +275,57 @@ docs/product/
 
 ## Reference Example
 
-This informative example demonstrates `litespec/core/intent#trace-every-choice-to-a-decision`, `litespec/core/intent#identify-every-requirement`, and `litespec/core/intent#cite-requirements-from-records`.
+This informative example demonstrates `litespec/core/intent#order-each-journey-toward-one-goal`, `litespec/core/intent#write-journey-steps-as-sentences-with-ids`, `litespec/core/intent#state-when-each-journey-finishes`, `litespec/core/intent#identify-every-requirement`, `litespec/core/intent#state-each-exception-with-its-fallback`, `litespec/core/intent#group-questions-into-ballots`, `litespec/core/intent#let-the-founder-decide-business-choices`, and `litespec/core/intent#treat-tenant-set-values-as-data`.
 
-A subscription business keeps `docs/product/business/pricing.md` with `id` `pricing`. Its entries state `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names that requirement in `fulfills`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`: the pricing row links the new record, and the book lists both.
+The book renders journey `journey/hand-a-ticket-back` as one chapter. No field name, JSON, or Behavior page appears.
+
+```text
+Hand a ticket back
+
+A buyer who cannot attend hands their ticket back and is refunded on their
+own charge.
+
+Finished when: the original buyer has their money on the card they paid with,
+or the organizer credit they chose, and the freed place is sold again or back
+with them.
+
+1. The buyer sees what handing back means for their ticket: money or credit,
+   and how long money takes.
+2. The buyer hands the ticket back and chooses money or credit.
+3. Someone else buys the freed place, and the old code stops admitting.
+4. The original buyer is refunded once that sale has settled.
+If it goes wrong: past the card window only credit is offered; a ticket that
+already admitted someone cannot come back; if nobody buys the place before the
+window shuts, the ticket is theirs again.
+
+Promises
+- A returned ticket is refunded on the buyer's own charge, never more than
+  they paid.
+    Except when the payment rail's refund window has closed for that order.
+    Then the organizer repays the buyer by other means and NightHall records it.
+- The organizer resells the freed place at their own price, face value by
+  default, and keeps any difference.
+- A handed-over ticket cannot be taken back once someone else holds it.
+
+Consequences (context, not part of what you approve)
+- New refusal a buyer can meet: "This ticket already admitted someone."
+- Personal data kept: the original buyer's name on the refunded order line,
+  for the statutory seven years.
+
+Open questions (ballot "Resale terms", due 2026-11-01)
+1. How many tickets may one buyer have in the return queue at once?
+   Recommended: 4, held by the organizer as a listing setting.
+2. Can the organizer charge a handling fee on a return?
+   Recommended: yes, organizer-set, shown before the buyer confirms.
+```
+
+For step 3, the serving use case `use-case/sales.complete-ticket-resale` contributes its goal in one line, and its scenarios contribute their Then clauses as context. The founder approves the promises or answers the ballot from this chapter alone.
 
 ## Verification
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/intent#keep-product-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/product/`, and each research record under `docs/research/`. |
+| litespec/core/intent#keep-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/product/`, and each research record under `docs/research/`. |
 | litespec/core/intent#state-one-product | checkable | `litespec model check` reports no `product-not-singleton` finding, and `litespec consumer` validates the brief fields against the record schema. |
 | litespec/core/intent#state-each-goal-with-its-measure | checkable | `litespec consumer` fails a goal page missing a required field or its Why It Matters section. |
 | litespec/core/intent#state-each-problem-with-its-evidence | checkable | `litespec consumer` fails a problem page missing its statement, Situation, or Evidence. |
@@ -275,24 +333,20 @@ A subscription business keeps `docs/product/business/pricing.md` with `id` `pric
 | litespec/core/intent#answer-every-constraint | checkable | `litespec consumer` fails a constraint page missing a required field, Summary, or What It Requires. |
 | litespec/core/intent#record-research-with-read-sources | checkable | `litespec consumer` fails a research record without `question`, `sources`, or Answer. |
 | litespec/core/intent#record-each-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required field or section; `litespec model check` reports `decision-decides-nothing` when it settles no record. |
-| litespec/core/intent#name-the-person-who-approved-a-decision | guidance | The `decided` date on the decision beside the approval from its named decider. |
+| litespec/core/intent#name-the-person-who-approved-a-decision | guidance | The `approvedBy` name and `approvedOn` date on the approved decision beside the approval from its named decider. |
 | litespec/core/intent#replace-a-decision-with-a-new-record | guidance | The `replaces` name on the new decision and the retired status on the old one, in the same change. |
 | litespec/core/intent#shape-each-requirement-page | checkable | `litespec consumer` fails a requirement page missing a required section; the `reviewBy` date sits in its frontmatter. |
-| litespec/core/intent#place-the-story-before-the-commitments | guidance | The chapter sections ahead of the commitment sections on each requirement page. |
-| litespec/core/intent#cite-sources-for-chapter-claims | guidance | A source beside each number and claim in the chapter. |
 | litespec/core/intent#identify-every-requirement | checkable | `litespec consumer` fails a requirement entry without identifier, `kind`, or `statement`, or a business requirement without dated values. |
 | litespec/core/intent#explain-each-requirement-in-one-line | guidance | The one-line `rationale` on each requirement entry. |
-| litespec/core/intent#state-the-measure-on-a-counted-requirement | guidance | The `measure` and `by` fields on each requirement whose statement names a number. |
-| litespec/core/intent#cite-requirements-from-records | guidance | The `fulfills` names on each rule, use case, and journey beside the requirements they carry. |
-| litespec/core/intent#order-each-journey-toward-one-goal | checkable | `litespec consumer` fails a journey page missing its actor, goal, steps, Example, or Between the Steps. |
-| litespec/core/intent#keep-behavior-out-of-product-pages | guidance | Product pages under `docs/product/` and `docs/research/` free of state, result, code, and code names. |
-| litespec/core/intent#trace-every-choice-to-a-decision | guidance | The decision link behind each Position and Refusals entry, with its status beside the page status. |
+| litespec/core/intent#state-the-measure-on-a-counted-requirement | checkable | `litespec model check` reports no `requirement-unmeasured` finding on requirements whose statements name numbers. |
+| litespec/core/intent#order-each-journey-toward-one-goal | checkable | `litespec consumer` fails a journey missing its actor, goal, `finishedWhen`, or steps. |
+| litespec/core/intent#keep-behavior-out-of-intent | guidance | Intent records under `docs/product/` and `docs/research/` free of states, results, codes, and code names. |
 | litespec/core/intent#treat-generated-research-as-source-material | guidance | A research record or an approved decision behind each position built from generated records. |
-| litespec/core/intent#review-a-requirement-page-by-its-date | guidance | A future `reviewBy` date in the frontmatter of each requirement page. |
-| litespec/core/intent#load-product-intent-before-commercial-work | guidance | The brief and the affected requirement pages named in the change report for the behavior change. |
-| litespec/core/intent#derive-requirement-coverage-from-the-model | guidance | The requirement coverage rendered from the model, with no hand-kept list beside it. |
-| litespec/core/intent#build-intent-before-specification-before-code | guidance | The research, decision, requirement, records, code, and tests for the change, landed in that order. |
-| litespec/core/intent#reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open known gap. |
-| litespec/core/intent#build-on-a-draft-decision-before-approval | guidance | The approval on every decision behind the released records. |
+| litespec/core/intent#state-each-exception-with-its-fallback | checkable | `litespec model check` reports no `except-without-fallback` finding. |
+| litespec/core/intent#write-journey-steps-as-sentences-with-ids | checkable | `litespec consumer` fails a journey step missing `id` or `says`, or naming a use case. |
+| litespec/core/intent#state-when-each-journey-finishes | checkable | `litespec consumer` fails a journey missing `finishedWhen`. |
+| litespec/core/intent#group-questions-into-ballots | checkable | `litespec model check` reports no `draft-without-decider` finding on Intent questions. |
+| litespec/core/intent#let-the-founder-decide-business-choices | guidance | The founder's answer on each business draft question beside its `approvedBy`. |
+| litespec/core/intent#treat-tenant-set-values-as-data | guidance | Each `setBy: tenant` value stored as tenant data with no founder approval beside it. |
 | litespec/core/intent#group-product-records-by-area | guidance | The `docs/product/` layout beside the project's recorded layout. |
 | litespec/core/intent#name-product-decisions-in-one-numbered-sequence | guidance | Each decision file named `<number>-<name>.md` beside its matching identifier. |
