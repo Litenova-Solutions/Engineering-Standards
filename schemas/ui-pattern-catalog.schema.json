@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://litespec.dev/2.0.0/schemas/ui-pattern-catalog.schema.json",
+  "$id": "https://litespec.dev/3.0.0/schemas/ui-pattern-catalog.schema.json",
   "title": "UI pattern catalog",
   "description": "One decision per recurring UI question: the options considered, the option chosen, how it changes on a compact screen, and where each frontend implements it. The catalog names behavior and structure, never a component library, so one catalog serves every frontend platform.",
   "type": "object",
