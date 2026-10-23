@@ -1,8 +1,8 @@
-# Cross-Tenant Delegation
+# Agent Delegation
 
 ## Intent
 
-Delegation lets one actor act for another across tenants, such as an assistant acting for an organizer or support acting under a customer grant. This page states the grant each side declares, how the pairing stays bounded in permission and time, and how the trail and scenarios prove it. A project selects it when any use case reaches across tenants through delegation, so no cross-tenant act runs on one side's word alone.
+Agent delegation lets one software agent start another on the same working tree by giving it a written brief with its own paths. This page states what the brief carries, how a worker stays inside its paths, and how the delegating agent verifies the result before accepting it. A project selects it when one agent starts another on the same tree, so each worker owns its part instead of rewriting another's.
 
 ## Activation
 
@@ -10,69 +10,64 @@ Activation scope: `project`.
 
 Applicable specification kinds: None.
 
-The consumer selects `delegation` when an actor in one tenant acts for a party in another tenant. Each such use case declares `tenant: cross` in its access, as `litespec/core/access#scope-every-grant-to-its-tenant-reach` states.
+The consumer selects `delegation` when one agent starts another agent on the same tree.
 
 ## Baseline Relationship
 
-This extension replaces no baseline provision. The [access page](../core/access.md) requires the declared grant on both sides, and this extension states the fields each side carries.
+This extension replaces no baseline provision. The [agent protocol](../core/agent.md) governs one agent working alone, and this extension governs the handoff between two.
 
 This extension switches on no optional record type.
 
 ## Standards
 
-### Declare Delegation Grants on Both Sides
+### Write a Brief Before Delegating
 
-**Statement:** A delegation MUST declare the delegator grant naming who may be acted for and the acting grant naming who may act.
+**Statement:** An agent that starts another agent MUST give it a written brief stating goal, context, sources, and output.
 
-**Rationale:** Delegation lets one actor act for another, so a grant on one side alone leaves the other side unreviewed. The delegator grant names the role at its scope that may be acted for and the permissions open to delegation; the acting grant names the role permitted to act and the pairing it acts under. `litespec/core/access#grant-across-tenants-only-through-declared-delegation` requires both declarations.
+**Rationale:** Two agents sharing one tree collide without a written split of goal, context, sources, and output. The brief states what the worker owns and what it builds on. When workers collide, the defect lies in the brief rather than in either worker.
 
-**Example:** An assistant acts for an organizer only where the organizer delegation grant and the assistant acting grant both name the pairing.
+**Example:** A brief carries four sections, each answering one question for the worker.
 
-### Scope Delegated Grants to Named Permissions
+```text
+Goal: the change the worker owns.
+Context: the repository facts the change builds on.
+Sources: the records and pages to read first.
+Output: the files to change and the report to write.
+```
 
-**Statement:** A delegation MUST name the permissions it delegates, never all permissions.
+### Restrict a Worker to Its Paths
 
-**Rationale:** A delegation open to every permission hands the whole tenant to the acting party: one pairing meant for reading reports also moves money. Naming each delegated permission bounds the pairing to what the delegator intended, and each new permission needs its own review before the acting party holds it.
+**Statement:** A delegated worker MUST stay inside the paths its brief names and commit nothing.
 
-### Bound Every Delegation in Time
+**Rationale:** The brief names the paths the worker may change. A worker that stays inside them cannot rewrite what another worker owns. One that roams the whole tree overwrites parallel work and commits what nobody asked for.
 
-**Statement:** A delegation MUST carry an expiry or a revocation path.
+### Ask Only Unanswered Questions
 
-**Rationale:** A grant with no end outlives its reason: the assistant keeps acting after the engagement ends, and nobody reopens the pairing because no date asks for it. An expiry ends the pairing on its date, and a revocation path ends it on demand. Either way, the end is stated beside the grant instead of left for an incident to discover.
+**Statement:** A delegated worker MUST ask no question its brief answers.
 
-### Audit Actions Taken Under Delegation
+**Rationale:** The brief answers the questions the delegating agent already settled. A worker that re-asks them spends a round trip on a reading failure. Questions stay for what the brief leaves genuinely unanswered.
 
-**Statement:** An action that an actor takes under delegation MUST record the delegation grant used.
+### Verify Before Accepting Worker Output
 
-**Rationale:** An acted-for action without a marker reads exactly like the delegator's own action, so a reviewer cannot tell who actually acted. Recording the delegation grant used puts the acting party on the record beside the delegator. `litespec/ext/audit#record-delegated-administrative-access` states the same marker for administrative grants.
+**Statement:** A delegating agent MUST re-run the verification its brief names before accepting worker output.
 
-### Prove Delegated Calls with Scenarios
+**Rationale:** The delegating agent owns the result, so it re-runs the verification the brief named and watches it pass. A done claim without that run is a claim, not evidence. Accepting on trust moves the worker's defect into the delegating agent's change.
 
-**Statement:** A delegation MUST prove an allowed call and a refused call with scenarios.
+### Hold Back Example Rows from the Implementing Worker
 
-**Rationale:** A pairing described only in prose hides where its grant stops: the allowed assistant and the uninvited one read alike. A scenario walking an allowed call and a scenario ending a call without delegation in the derived forbidden result pin the boundary as checked facts. `litespec/core/access#prove-hierarchies-derived-trust-and-delegation-with-scenarios` requires both scenarios.
+**Statement:** A delegating agent MUST check a delegated refusal or calculation implementation against example rows held back from the worker that wrote it.
 
-### Review Delegated Cross-Tenant Grants as Tier 1
-
-**Statement:** A use case acting under delegation across tenants MUST carry tier 1 review through the security queue.
-
-**Rationale:** A delegated call reads or writes data that belongs to another tenant, which is the highest access risk a grant carries. Tier 1 review through the security queue puts that grant before the security reviewer separately from reviewed status, so no delegated cross-tenant act ships on a developer sample alone. `litespec/core/access#review-cross-tenant-access-as-tier-1` routes every cross-tenant use case there.
+**Rationale:** Example rows given to the implementing worker become the values the implementation is tuned to pass, so the check proves nothing. Rows held back stay an independent verdict: the delegating agent runs them after the worker finishes, and the implementation passes or fails on unseen cases.
 
 ## Conventions
 
-### Record Delegation Grants with Roles
-
-**Default:** Record each delegation grant on the role page that holds it.
-
-**Replacement:** A consumer records a delegation-records convention naming where its delegation grants live.
-
-**Rationale:** The grant qualifies the role: the delegator role names who may be acted for, and the acting role names who may act. Recording each grant on its role page keeps the pairing beside the permission it extends, so a review reads both at once.
+None.
 
 ## Dependencies
 
 Packages: None.
 
-Related extensions: `tenancy` for tenant isolation, `audit` for the delegation marker.
+Related extensions: None.
 
 Guides: None.
 
@@ -80,10 +75,8 @@ Guides: None.
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/ext/delegation#declare-delegation-grants-on-both-sides | guidance | Each delegation declares a delegator grant naming who may be acted for and an acting grant naming who may act. |
-| litespec/ext/delegation#scope-delegated-grants-to-named-permissions | guidance | Each delegation names its delegated permissions, with none open to all permissions. |
-| litespec/ext/delegation#bound-every-delegation-in-time | guidance | Each delegation carries an expiry or a revocation path. |
-| litespec/ext/delegation#audit-actions-taken-under-delegation | guidance | Each action under delegation records the delegation grant used. |
-| litespec/ext/delegation#prove-delegated-calls-with-scenarios | guidance | Each delegation proves an allowed call and a refused call with scenarios. |
-| litespec/ext/delegation#review-delegated-cross-tenant-grants-as-tier-1 | guidance | Each use case acting under delegation across tenants carries tier 1 review through the security queue. |
-| litespec/ext/delegation#record-delegation-grants-with-roles | guidance | Each delegation grant sits on its role page, or the delegation-records convention names where grants live. |
+| litespec/ext/delegation#write-a-brief-before-delegating | guidance | Which briefs lack goal, context, sources, or output? Look at the briefs the delegating agent wrote. |
+| litespec/ext/delegation#restrict-a-worker-to-its-paths | checkable | `git diff --name-only` lists only the brief's named paths. The worker commits nothing. |
+| litespec/ext/delegation#ask-only-unanswered-questions | guidance | Which worker questions repeat answers the brief gives? Look at the worker questions beside the brief. |
+| litespec/ext/delegation#verify-before-accepting-worker-output | guidance | Which accepted outputs lack a watched verification run? Look at the verification runs the delegating agent reports. |
+| litespec/ext/delegation#hold-back-example-rows-from-the-implementing-worker | guidance | Which delegated refusal or calculation implementations were checked only against rows the worker saw? Look at the held-back rows and the check runs. |

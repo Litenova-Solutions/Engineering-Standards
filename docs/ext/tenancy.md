@@ -108,6 +108,44 @@ It switches on no record type: tenant scope applies to records every project req
 
 **Example:** A support export covering every tenant records the operator, the export, the tenant count, and the incident it was run for.
 
+### Declare Delegation Grants on Both Sides
+
+**Statement:** A delegation MUST declare the delegator grant naming who may be acted for and the acting grant naming who may act.
+
+**Rationale:** Delegation lets one actor act for another, so a grant on one side alone leaves the other side unreviewed. The delegator grant names the role at its scope that may be acted for and the permissions open to delegation; the acting grant names the role permitted to act and the pairing it acts under. `litespec/core/access#grant-across-tenants-only-through-declared-delegation` requires both declarations.
+
+**Example:** An assistant acts for an organizer only where the organizer delegation grant and the assistant acting grant both name the pairing.
+
+### Scope Delegated Grants to Named Permissions
+
+**Statement:** A delegation MUST name the permissions it delegates, never all permissions.
+
+**Rationale:** A delegation open to every permission hands the whole tenant to the acting party: one pairing meant for reading reports also moves money. Naming each delegated permission bounds the pairing to what the delegator intended, and each new permission needs its own review before the acting party holds it.
+
+### Bound Every Delegation in Time
+
+**Statement:** A delegation MUST carry an expiry or a revocation path.
+
+**Rationale:** A grant with no end outlives its reason: the assistant keeps acting after the engagement ends, and nobody reopens the pairing because no date asks for it. An expiry ends the pairing on its date, and a revocation path ends it on demand. Either way, the end is stated beside the grant instead of left for an incident to discover.
+
+### Audit Actions Taken Under Delegation
+
+**Statement:** An action that an actor takes under delegation MUST record the delegation grant used.
+
+**Rationale:** An acted-for action without a marker reads exactly like the delegator's own action, so a reviewer cannot tell who actually acted. Recording the delegation grant used puts the acting party on the record beside the delegator. `litespec/ext/audit#record-delegated-administrative-access` states the same marker for administrative grants.
+
+### Prove Delegated Calls with Scenarios
+
+**Statement:** A delegation MUST prove an allowed call and a refused call with scenarios.
+
+**Rationale:** A pairing described only in prose hides where its grant stops: the allowed assistant and the uninvited one read alike. A scenario walking an allowed call and a scenario ending a call without delegation in the derived forbidden result pin the boundary as checked facts. `litespec/core/access#prove-hierarchies-derived-trust-and-delegation-with-scenarios` requires both scenarios.
+
+### Review Delegated Cross-Tenant Grants as Tier 1
+
+**Statement:** A use case acting under delegation across tenants MUST carry tier 1 review through the security queue.
+
+**Rationale:** A delegated call reads or writes data that belongs to another tenant, which is the highest access risk a grant carries. Tier 1 review through the security queue puts that grant before the security reviewer separately from reviewed status, so no delegated cross-tenant act ships on a developer sample alone. `litespec/core/access#review-cross-tenant-access-as-tier-1` routes every cross-tenant use case there.
+
 ## Conventions
 
 ### Use Typed Tenant Identities
@@ -133,6 +171,14 @@ It switches on no record type: tenant scope applies to records every project req
 **Replacement:** A consumer records a tenant-scope convention naming how its Domain receives tenant scope.
 
 **Rationale:** Domain logic that reads the tenant from ambient request state depends on the host to run at all, which complicates tests and reuse. Passing the scope through Application messages or trusted ports keeps the tenant visible in the call and the Domain free of host state.
+
+### Record Delegation Grants with Roles
+
+**Default:** Record each delegation grant on the role page that holds it.
+
+**Replacement:** A consumer records a delegation-records convention naming where its delegation grants live.
+
+**Rationale:** The grant qualifies the role: the delegator role names who may be acted for, and the acting role names who may act. Recording each grant on its role page keeps the pairing beside the permission it extends, so a review reads both at once.
 
 ## Dependencies
 
@@ -163,3 +209,10 @@ Guides: None.
 | litespec/ext/tenancy#use-typed-tenant-identities | guidance | Tenant references carry the `TenantId` type, or the tenant-identity convention names another type. |
 | litespec/ext/tenancy#use-one-tenant-accessor | guidance | One current-tenant accessor serves the trusted host boundary, or the tenant-access convention names where readers find the tenant. |
 | litespec/ext/tenancy#pass-tenant-scope-explicitly | guidance | Domain code reads no ambient tenant state, or the tenant-scope convention names how the Domain receives scope. |
+| litespec/ext/tenancy#declare-delegation-grants-on-both-sides | guidance | Each delegation declares a delegator grant naming who may be acted for and an acting grant naming who may act. |
+| litespec/ext/tenancy#scope-delegated-grants-to-named-permissions | guidance | Each delegation names its delegated permissions, with none open to all permissions. |
+| litespec/ext/tenancy#bound-every-delegation-in-time | guidance | Each delegation carries an expiry or a revocation path. |
+| litespec/ext/tenancy#audit-actions-taken-under-delegation | guidance | Each action under delegation records the delegation grant used. |
+| litespec/ext/tenancy#prove-delegated-calls-with-scenarios | guidance | Each delegation proves an allowed call and a refused call with scenarios. |
+| litespec/ext/tenancy#review-delegated-cross-tenant-grants-as-tier-1 | guidance | Each use case acting under delegation across tenants carries tier 1 review through the security queue. |
+| litespec/ext/tenancy#record-delegation-grants-with-roles | guidance | Each delegation grant sits on its role page, or the delegation-records convention names where grants live. |

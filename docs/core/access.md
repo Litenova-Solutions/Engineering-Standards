@@ -38,7 +38,7 @@ An entitlement is a grant that depends on what the caller bought or configured, 
 
 ### Hierarchies, Derived Trust, and Delegation
 
-Hierarchies, derived trust, and delegation are patterns built from the same three access parts, not extra grant forms. A hierarchy nests roles so a senior role allows what its junior roles allow, derived trust lets one checked fact stand for another within one call, and delegation lets one actor act for another. Each pattern is proved by scenarios that show who is allowed and who is refused. Grants that cross tenants through delegation use the delegation extension, which states the declared grant each side carries.
+Hierarchies, derived trust, and delegation are patterns built from the same three access parts, not extra grant forms. A hierarchy nests roles so a senior role allows what its junior roles allow, derived trust lets one checked fact stand for another within one call, and delegation lets one actor act for another. Each pattern is proved by scenarios that show who is allowed and who is refused. Grants that cross tenants through delegation use the tenancy extension, which states the declared grant each side carries.
 
 ### Entry Points
 
@@ -186,7 +186,7 @@ An actor, role, or external system page carries a Summary section stating what t
 
 **Statement:** A grant that acts across tenants through delegation MUST declare its delegation grant on both sides.
 
-**Rationale:** Delegation lets one actor act for another, so a grant on one side alone leaves the other side unreviewed. Declaring the grant on both sides shows who may delegate and who may be acted for, and the delegation extension states the fields each side carries.
+**Rationale:** Delegation lets one actor act for another, so a grant on one side alone leaves the other side unreviewed. Declaring the grant on both sides shows who may delegate and who may be acted for, and the tenancy extension states the fields each side carries.
 
 **Example:** An assistant acts for an organizer only where the organizer delegation grant and the assistant acting grant both name the pairing.
 
@@ -276,7 +276,7 @@ An actor, role, or external system page carries a Summary section stating what t
 | litespec/core/access#review-cross-tenant-access-as-tier-1 | guidance | Which cross grants shipped without security review? Look at the security queue in the Behavior diff. |
 | litespec/core/access#cite-the-setting-or-plan-behind-every-entitlement | guidance | Which entitlement grants lack a cited setting or plan? Look at the grant beside the settings each use case cites. |
 | litespec/core/access#prove-hierarchies-derived-trust-and-delegation-with-scenarios | guidance | Which hierarchy, trust, or delegation patterns lack an allowed and a refused scenario? Look at the scenarios on the use cases that carry the pattern. |
-| litespec/core/access#grant-across-tenants-only-through-declared-delegation | guidance | Which cross tenant delegation grants lack a declared grant on both sides? Look at the delegation grants beside the extension fields. |
+| litespec/core/access#grant-across-tenants-only-through-declared-delegation | guidance | Which cross tenant delegation grants lack a declared grant on both sides? Look at the delegation grants the tenancy extension declares. |
 | litespec/core/access#name-every-entry-point-with-its-kind | checkable | `litespec model check` reports `record-shape` for an entry point without `kind` and `invalid-field` for a kind outside browser, api, webhook, device, cli, mcp, served-content, reaction, and job. |
 | litespec/core/access#describe-every-served-content-entry-point-with-its-serving-fields | checkable | `litespec model check` reports `record-shape` for a served content entry point without path, contentType, cacheControl, versioning, or fulfills. |
 | litespec/core/access#name-the-actor-for-every-external-system | checkable | `litespec model check` reports `record-shape` for an external system without `actor`. |
