@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://litespec.dev/2.0.0/schemas/litespec-project.schema.json",
+  "$id": "https://litespec.dev/3.0.0/schemas/litespec-project.schema.json",
   "title": "LiteSpec Consumer Project",
   "type": "object",
   "additionalProperties": false,
@@ -52,7 +52,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": ["constraint", "research", "limit", "runbook", "goal", "external-system"]
+        "enum": ["constraint", "research", "setting", "runbook", "goal", "external-system"]
       }
     },
     "stackConfig": {
@@ -108,6 +108,36 @@
         }
       }
     },
+    "review": {
+      "description": "How this project reviews record changes: the veto window after which a tier-3 draft question carrying a recommendation auto-approves, and the security reviewer who owns the security queue.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "vetoWindowDays": {
+          "description": "Days after decideBy before a tier-3 draft question carrying a recommendation auto-approves. Defaults to 7.",
+          "type": "integer",
+          "default": 7
+        },
+        "securityReviewer": {
+          "description": "The owner who reviews access widenings, new outside calls and new personal-data flows.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "adoption": {
+      "description": "The adoption transcription mode this project still runs under, if any. After the named decision is approved, no Behavior record may stay transcribed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transcriptionEndsWith"],
+      "properties": {
+        "transcriptionEndsWith": {
+          "description": "The decision whose approval ends transcription mode.",
+          "type": "string",
+          "pattern": "^decision/[0-9]+-[a-z0-9][a-z0-9-]*$"
+        }
+      }
+    },
     "constraints": {
       "description": "Present once the project has stated which outside constraints apply to it, possibly none.",
       "type": "object",
@@ -148,7 +178,7 @@
     "paths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["domainDocs", "uiDocs", "frontends"],
+      "required": ["behaviorDocs", "uiDocs", "frontends"],
       "properties": {
         "docs": {
           "description": "Root of the specification tree. Every Markdown file under it carries a metadata block unless the path is listed in unstructuredDocs.",
@@ -175,12 +205,12 @@
             "$ref": "#/$defs/projectPath"
           }
         },
-        "domainDocs": { "$ref": "#/$defs/projectPath" },
+        "behaviorDocs": { "$ref": "#/$defs/projectPath" },
         "records": {
           "description": "Home folders per record type, where they differ from the defaults the model states.",
           "type": "object",
           "propertyNames": {
-            "pattern": "^(product|goal|constraint|research|decision|requirement|problem|feature|actor|role|permission|journey|module|aggregate|rule|use-case|result|scenario|event|entry-point|external-system|limit|runbook|deviation|known-gap|term)$"
+            "pattern": "^(product|goal|constraint|research|decision|requirement|problem|feature|actor|role|permission|journey|module|aggregate|rule|use-case|result|scenario|event|entry-point|external-system|reaction|job|notification|setting|integration-event|runbook|deviation|known-gap|term)$"
           },
           "additionalProperties": { "$ref": "#/$defs/projectPath" }
         },
@@ -308,7 +338,7 @@
       }
     },
     "selectedExtensions": {
-      "description": "Extensions active for this project. Each entry records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires.",
+      "description": "Extensions active for this project. Each entry records the criterion that was met and the date the selection is next reviewed, so a selection that costs nothing to keep still expires. The 3.0 extensions are privacy, devices, automation, workflow-engine, pipeline, queues and ai.",
       "type": "array",
       "uniqueItems": true,
       "items": {

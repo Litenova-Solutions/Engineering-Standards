@@ -38,11 +38,11 @@ The shared evaluator lives in `apps/cli/src/LiteSpec.Cli/Schemas/JsonSchema.cs`.
 
 ### Litespec Project Schema
 
-`litespec-project.schema.json` owns the shape of the consumer project file: the project name, the size, the stacks, the reviewed LiteSpec release, the documentation and code paths, the owners, and the selected extensions. `litespec consumer` validates the consumer file through it, `litespec init` writes that file from a preset, and `litespec validate` proves the shipped template in [templates/consumer/litespec.project.json](../templates/consumer/litespec.project.json) meets it.
+`litespec-project.schema.json` owns the shape of the consumer project file: the project name, the size, the stacks, the reviewed LiteSpec release, the documentation and code paths, the owners, the review and adoption settings, and the selected extensions. `litespec consumer` validates the consumer file through it, `litespec init` writes that file from a preset, and `litespec validate` proves the shipped template in [templates/consumer/litespec.project.json](../templates/consumer/litespec.project.json) meets it.
 
 ### Record Schema
 
-`record.schema.json` owns the frontmatter of every consumer record page: 30 page shapes from product brief through aggregate and use case to reference, each with its entry records for requirements, rules, events, results, and scenarios. `litespec consumer` validates each page frontmatter through it and then checks the body sections the schema cannot see.
+`record.schema.json` owns the frontmatter of every consumer record page: 36 page shapes from product brief through aggregate, use case, reaction, job, notification, setting, and integration event to reference, each with its entry records for requirements, permissions, rules, events, results, scenarios, entry points, and settings. `litespec consumer` validates each page frontmatter through it and then checks the body sections the schema cannot see.
 
 ### Language Schema
 
