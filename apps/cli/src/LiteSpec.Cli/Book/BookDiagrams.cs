@@ -27,8 +27,14 @@ static class BookDiagrams
         var transitions = fields["transitions"] as JsonArray ?? [];
         foreach (var entry in transitions.OfType<JsonObject>())
         {
-            var from = states.IndexOf(BookRender.Str(entry["from"]));
             var to = states.IndexOf(BookRender.Str(entry["to"]));
+            if (BookRender.Str(entry["from"]) == "-" && to >= 0)
+            {
+                diagram.AppendLine($"    [*] --> s{to}");
+                continue;
+            }
+
+            var from = states.IndexOf(BookRender.Str(entry["from"]));
             if (from < 0 || to < 0)
             {
                 continue;

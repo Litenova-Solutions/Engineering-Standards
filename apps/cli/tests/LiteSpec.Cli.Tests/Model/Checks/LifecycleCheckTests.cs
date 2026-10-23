@@ -45,6 +45,18 @@ public sealed class LifecycleCheckTests
     }
 
     [Fact]
+    public void A_State_Entered_Only_At_Creation_Is_Reached()
+    {
+        using var temp = Cli.Temp("checks");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            Loan(temp.Path, """{"from": "Active", "to": "Returned"}""", """{"from": "-", "to": "Overdue"}"""));
+
+        Assert.DoesNotContain("state-unreachable", TestModel.Codes(model));
+        Assert.DoesNotContain("transition-unresolved", TestModel.Codes(model));
+    }
+
+    [Fact]
     public void Transition_To_A_Missing_State_Reports_Transition_Unresolved()
     {
         using var temp = Cli.Temp("checks");

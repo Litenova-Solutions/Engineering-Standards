@@ -327,9 +327,15 @@ static class RecordReader
                 var start = CleanCell(CellOf(cells, from), false);
                 var end = CleanCell(CellOf(cells, to), false);
 
-                if (IsEmptyCell(start) || IsEmptyCell(end))
+                if (IsEmptyCell(end))
                 {
                     continue;
+                }
+
+                // An empty From is a creation: the row names the state an instance starts in.
+                if (IsEmptyCell(start))
+                {
+                    start = Creation;
                 }
 
                 string? trigger = null;
@@ -517,6 +523,9 @@ static class RecordReader
 
         return (text[1..labelEnd], space < 0 ? target : target[..space]);
     }
+
+    /// <summary>The From of a transition that creates the instance.</summary>
+    public const string Creation = "-";
 
     private static bool IsEmptyCell(string text) =>
         text.Length == 0

@@ -1209,7 +1209,7 @@ static partial class Checker
 
             foreach (var transition in transitions)
             {
-                if (!states.Contains(transition.From))
+                if (transition.From != RecordReader.Creation && !states.Contains(transition.From))
                 {
                     findings.Add(new Finding("transition-unresolved", $"Transition on aggregate '{aggregate.Id}' leads from '{transition.From}', which is not a state of the aggregate.", aggregate.File, aggregate.Line, SubjectOf(aggregate)));
                 }
