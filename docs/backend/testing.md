@@ -86,7 +86,7 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 **Statement:** A rule claim MUST confirm only through a scenario the same test proves.
 
-**Rationale:** Each rule holds where its kind says: an invariant inside the aggregate, a precondition at the guard, a calculation in its pure evaluation, a cross-aggregate rule at the store or the reacting use case. A scenario that walks through that point exercises the rule, so the rule claim rides on the scenario proof instead of carrying its own enforcement-point tag. A calculation rule earns its proof from a scenario carrying the examples table that `litespec/core/domain#tabulate-every-calculation-with-examples` requires.
+**Rationale:** Each rule holds where its kind says: an invariant inside the aggregate, a precondition at the guard, a calculation in its pure evaluation, a cross-aggregate rule at the store or the reacting use case. A scenario that walks through that point exercises the rule, so the rule claim rides on the scenario proof instead of carrying its own enforcement-point tag. A calculation rule earns its proof from a scenario carrying the examples table that `litespec/core/behavior#tabulate-every-calculation-with-examples` requires.
 
 **Example:** A test proving the scenario for an expense above the threshold with no receipt claims the receipt rule alongside the scenario. The scenario sends the command and asserts the `spending.receipt-missing` refusal, and the rule claim confirms because the same test proves the scenario. No separate tag names the validator or the store.
 
@@ -118,7 +118,7 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 **Statement:** Every calculation rule MUST be proved by property tests seeded from its scenario examples.
 
-**Rationale:** An examples table holds the debated rows, and property tests range beyond them: each generated input checks the same stated property the rows illustrate. Seeding from the table ties the properties to reviewed values instead of invented ones. The table itself lives on a scenario proving the rule, as `litespec/core/domain#tabulate-every-calculation-with-examples` requires.
+**Rationale:** An examples table holds the debated rows, and property tests range beyond them: each generated input checks the same stated property the rows illustrate. Seeding from the table ties the properties to reviewed values instead of invented ones. The table itself lives on a scenario proving the rule, as `litespec/core/behavior#tabulate-every-calculation-with-examples` requires.
 
 **Example:** A rounding rule with three reviewed rows seeds a property test asserting the rounded total against the stated bound for each generated input.
 
@@ -126,7 +126,7 @@ The default strategy is one database per test class, cloned from a migrated temp
 
 **Statement:** Every aggregate MUST be proved by a model-based test generated from its declared transitions.
 
-**Rationale:** The transitions table declares every allowed move between states, and a model-based test walks generated sequences through that model: each walk checks that allowed moves succeed and rejected moves refuse. Generating from the declared table keeps the model and the test in agreement by construction. The table lives on the aggregate page, as `litespec/core/domain#connect-every-state-through-transitions` requires.
+**Rationale:** The transitions table declares every allowed move between states, and a model-based test walks generated sequences through that model: each walk checks that allowed moves succeed and rejected moves refuse. Generating from the declared table keeps the model and the test in agreement by construction. The table lives on the aggregate page, as `litespec/core/behavior#connect-every-state-through-transitions` requires.
 
 **Example:** An expense test generates walks across submitted, approved, rejected, and reimbursed, checking each move against the declared transitions. A walk attempting reimbursement from submitted ends in the refusal the transitions table allows.
 

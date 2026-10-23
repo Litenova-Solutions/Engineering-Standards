@@ -139,7 +139,7 @@ You review a port declared beside its aggregate with that aggregate's specificat
 
 **Rationale:** A reaction without a declared classification leaves its delivery to whoever reads the code: a retry that needed durable delivery is lost, or a rebuildable projection blocks the command's transaction. Exactly one classification states the contract. Atomic reactions commit with the triggering command's transaction, and a failure rolls both back. Durable reactions run after commit through durable delivery, and a failure retries until it succeeds. Rebuildable reactions build derived state that a rebuild reproduces, and a failure waits for the next rebuild. Best-effort-optional reactions skip or drop their effect when delivery fails, and no record needs it.
 
-The use case names its trigger on its record under `litespec/core/domain#trigger-every-reaction`, and the reaction's definition beside its use-case folder carries the classification. Required delivery activates the outbox extension, and required derived state uses an atomic, durable, or rebuildable path.
+The use case names its trigger on its record under `litespec/core/behavior#trigger-every-reaction`, and the reaction's definition beside its use-case folder carries the classification. Required delivery activates the outbox extension, and required derived state uses an atomic, durable, or rebuildable path.
 
 ### Keep One State-Changing Use Case in One Pipeline
 

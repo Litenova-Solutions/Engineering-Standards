@@ -48,8 +48,8 @@ One product worked end to end, from its first record to a passing check.
 - [Technology Stacks](core/stacks.md): what selecting a stack applies, and what each stack folder holds.
 - [Engineering Principles](core/principles.md): the rules of thumb for choices no narrower rule covers.
 - [Project Model](core/model.md): the record types, their links, and what the builder computes.
-- [Product Intent](core/product.md): where a consumer states its business intent and in what form.
-- [Domain Model](core/domain.md): the bounded context, the glossary, and the modules, aggregates, rules, events, use cases, results, and scenarios inside it.
+- [Product Intent](core/intent.md): where a consumer states its business intent and in what form.
+- [Domain Model](core/behavior.md): the bounded context, the glossary, and the modules, aggregates, rules, events, use cases, results, and scenarios inside it.
 - [Access](core/access.md): the actors, roles, permissions, entry points, and external systems that govern who may do what and how it is reached.
 - [Agent Operating Protocol](core/agent.md): how agents select context, resolve standards, and report completion.
 - [Authoring Standard](core/authoring.md): page styles, provision contracts, identifiers, and prose style; what `litespec validate` checks.

@@ -11,7 +11,7 @@ The seven principle pages directly in this folder hold for every backend. They s
 ## Backend Principles
 
 - [Backend Architecture](architecture.md): the five parts, the direction references point, and the modules and use cases that organize every layer.
-- [Domain Layer](domain.md): aggregates, lifecycles, closed value sets, and domain repositories, and the boundary that keeps technical concerns out of business rules.
+- [Domain Layer](behavior.md): aggregates, lifecycles, closed value sets, and domain repositories, and the boundary that keeps technical concerns out of business rules.
 - [Application Layer](application.md): use-case coordination, pipeline stages, ports, and event reactions.
 - [Persistence](persistence.md): domain repositories, the read session, the one commit per command, and the obligations on stored data.
 - [HTTP API](api.md): endpoints, routes, errors, collection paging, and the generated OpenAPI contract.

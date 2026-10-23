@@ -2,13 +2,13 @@
 
 ## Intent
 
-Who may act in the product and how they reach it: actors, roles, permissions, entry points, and external systems. Product owners approve these records above the review line, and stacks enforce them in authorization code below it. The [model page](model.md) states the shared record rules, and the [domain page](domain.md) states the use cases that need permissions.
+Who may act in the product and how they reach it: actors, roles, permissions, entry points, and external systems. Product owners approve these records above the review line, and stacks enforce them in authorization code below it. The [model page](model.md) states the shared record rules, and the [domain page](behavior.md) states the use cases that need permissions.
 
 ## Concepts
 
 ### The Permission Chain
 
-Access follows one chain from actor to use case: an actor holds a role at a scope, the role allows permissions, and the use case needs permissions. The chain answers every access question in one place: which actor held which role at which scope, which permission the role allowed, and which use case needed it. The [domain page](domain.md) states how a use case names the permissions it needs.
+Access follows one chain from actor to use case: an actor holds a role at a scope, the role allows permissions, and the use case needs permissions. The chain answers every access question in one place: which actor held which role at which scope, which permission the role allowed, and which use case needed it. The [domain page](behavior.md) states how a use case names the permissions it needs.
 
 The chain is role-based access control: permissions attach to roles, never to actors directly, and scopes bound each hold to one reach. The [lineage page](../learn/lineage.md) names the practice LiteSpec borrows.
 

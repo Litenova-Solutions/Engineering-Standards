@@ -39,7 +39,7 @@ Each type answers one question. Small projects keep the rows marked small. Large
 | `known-gap` | small | What is missing, who owns it, and until when? |
 | `term` | small | Which word means what? |
 
-The [product page](product.md) states the product records, the [domain page](domain.md) states the domain records, and the [access page](access.md) states the access records.
+The [product page](intent.md) states the product records, the [domain page](behavior.md) states the domain records, and the [access page](access.md) states the access records.
 
 The record tree runs from product intent down to the scenario.
 

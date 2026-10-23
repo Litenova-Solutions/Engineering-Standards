@@ -16,7 +16,7 @@ The consumer enables `compat` for public APIs, partner clients, mobile clients, 
 
 This extension replaces no baseline provision.
 
-The core `event` stays inside the product; this extension owns each event consumed outside it, as the [domain page](../core/domain.md) states.
+The core `event` stays inside the product; this extension owns each event consumed outside it, as the [domain page](../core/behavior.md) states.
 
 This extension switches on no optional record type.
 

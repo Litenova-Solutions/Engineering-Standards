@@ -32,7 +32,7 @@ The block above opens the page between two lines that carry only `---`, the spec
 
 ## The Goal
 
-A goal record states one measurable outcome the product serves, with the measure, the target, and the date it serves it by. Claimwick keeps one: every submitted expense is decided within five business days. It lives at `docs/product/goals/decided-in-days.md`, which applies `litespec/core/product#state-each-goal-with-its-measure` on [Product Intent](../core/product.md).
+A goal record states one measurable outcome the product serves, with the measure, the target, and the date it serves it by. Claimwick keeps one: every submitted expense is decided within five business days. It lives at `docs/product/goals/decided-in-days.md`, which applies `litespec/core/intent#state-each-goal-with-its-measure` on [Product Intent](../core/intent.md).
 
 ```json
 {
@@ -52,7 +52,7 @@ The body below the block holds one Why It Matters section: employees plan around
 
 ## The Problem
 
-A problem record states one pain someone has today. Claimwick keeps one: submitted expenses wait weeks for a decision, so employees chase managers by email. It lives at `docs/product/problems/expenses-wait-weeks.md`, and its `affects` link names the employee actor, which applies `litespec/core/product#state-each-problem-with-its-evidence`.
+A problem record states one pain someone has today. Claimwick keeps one: submitted expenses wait weeks for a decision, so employees chase managers by email. It lives at `docs/product/problems/expenses-wait-weeks.md`, and its `affects` link names the employee actor, which applies `litespec/core/intent#state-each-problem-with-its-evidence`.
 
 ```json
 {
@@ -72,7 +72,7 @@ The statement stays to one sentence, and the page body adds a Situation section 
 
 ## The Feature
 
-A feature record states what the product offers against a problem, with its state and the problem it solves. Claimwick keeps one: managers get a reminder for expenses waiting past three days. It lives at `docs/product/features/approval-reminders.md`, it solves the waiting problem and serves the five-day goal, which applies `litespec/core/product#state-each-feature-with-its-state`.
+A feature record states what the product offers against a problem, with its state and the problem it solves. Claimwick keeps one: managers get a reminder for expenses waiting past three days. It lives at `docs/product/features/approval-reminders.md`, it solves the waiting problem and serves the five-day goal, which applies `litespec/core/intent#state-each-feature-with-its-state`.
 
 ```json
 {
@@ -95,7 +95,7 @@ The body below the block holds one Offering section: the reminder names the expe
 
 ## The Requirements
 
-A requirement states one behavior the product shows or one guarantee it keeps. Claimwick groups its 4 approval requirements as entries on one requirement page at `docs/product/spending/approval.md`. Each entry carries its own identifier, title, kind, statement, one-line rationale, and links, which applies `litespec/core/product#identify-every-requirement` and `litespec/core/product#explain-each-requirement-in-one-line`.
+A requirement states one behavior the product shows or one guarantee it keeps. Claimwick groups its 4 approval requirements as entries on one requirement page at `docs/product/spending/approval.md`. Each entry carries its own identifier, title, kind, statement, one-line rationale, and links, which applies `litespec/core/intent#identify-every-requirement` and `litespec/core/intent#explain-each-requirement-in-one-line`.
 
 ```json
 {
@@ -172,7 +172,7 @@ All 4 requirements are functional requirements: each states something the produc
 
 ## The Research
 
-A research record states one outside fact that informs a choice, with the question it answers and the sources it read. Claimwick keeps one: small companies decide expenses within one week. It lives at `docs/research/approval-time-benchmarks.md`, which applies `litespec/core/product#record-research-with-read-sources`.
+A research record states one outside fact that informs a choice, with the question it answers and the sources it read. Claimwick keeps one: small companies decide expenses within one week. It lives at `docs/research/approval-time-benchmarks.md`, which applies `litespec/core/intent#record-research-with-read-sources`.
 
 ```json
 {
@@ -195,7 +195,7 @@ The body below the block holds an Answer section with its confidence and a Notes
 
 ## The Decision
 
-A decision record states one dated choice with the options it weighed. Claimwick chose a 25 EUR receipt threshold after a finance review in February 2026. The record lives at `docs/product/decisions/0001-receipt-threshold.md`, and its `decides` link names the receipt requirement it settles, which applies `litespec/core/model#name-what-every-decision-decides`. Each option carries what speaks for and against it, which applies `litespec/core/product#record-each-choice-as-a-decision`.
+A decision record states one dated choice with the options it weighed. Claimwick chose a 25 EUR receipt threshold after a finance review in February 2026. The record lives at `docs/product/decisions/0001-receipt-threshold.md`, and its `decides` link names the receipt requirement it settles, which applies `litespec/core/model#name-what-every-decision-decides`. Each option carries what speaks for and against it, which applies `litespec/core/intent#record-each-choice-as-a-decision`.
 
 ```json
 {
@@ -235,7 +235,7 @@ The page body carries 4 short sections: Context, Decision, Consequences, and Evi
 
 ## The Constraint
 
-A constraint states one outside rule the product obeys. Claimwick answers the national tax law on receipts: receipts stay kept for 7 years because Claimwick stores receipts for reimbursed expenses. The record lives at `docs/product/constraints/tax-receipt-retention.md`, which applies `litespec/core/product#answer-every-constraint`.
+A constraint states one outside rule the product obeys. Claimwick answers the national tax law on receipts: receipts stay kept for 7 years because Claimwick stores receipts for reimbursed expenses. The record lives at `docs/product/constraints/tax-receipt-retention.md`, which applies `litespec/core/intent#answer-every-constraint`.
 
 ```json
 {
@@ -255,7 +255,7 @@ The `applies` field answers whether the outside rule covers this product, and `a
 
 ## The Journey
 
-A journey record orders use cases toward one goal for one actor. Claimwick keeps one: an employee submits an expense and receives reimbursement. It lives at `docs/product/journeys/submit-and-reimburse.md`, it fulfills the five-day requirement, and each step names what it produces in `gives`, which applies `litespec/core/product#order-each-journey-toward-one-goal`.
+A journey record orders use cases toward one goal for one actor. Claimwick keeps one: an employee submits an expense and receives reimbursement. It lives at `docs/product/journeys/submit-and-reimburse.md`, it fulfills the five-day requirement, and each step names what it produces in `gives`, which applies `litespec/core/intent#order-each-journey-toward-one-goal`.
 
 ```json
 {

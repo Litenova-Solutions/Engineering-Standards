@@ -152,7 +152,7 @@ Personal data spreads further than the database: logs, search indexes, outboxes,
 
 **Statement:** A consumer MUST set an ASVS 5.0 level as its security target.
 
-**Rationale:** ASVS 5.0 defines three levels, L1, L2, and L3, with each requirement verifiable to pass or fail, and the organization picks one by risk. The level lives on a quality requirement with its measure, as `litespec/core/product#state-the-measure-on-a-counted-requirement` states, so the target is checked rather than declared. The level choice and any accepted finding are each decided once by a person.
+**Rationale:** ASVS 5.0 defines three levels, L1, L2, and L3, with each requirement verifiable to pass or fail, and the organization picks one by risk. The level lives on a quality requirement with its measure, as `litespec/core/intent#state-the-measure-on-a-counted-requirement` states, so the target is checked rather than declared. The level choice and any accepted finding are each decided once by a person.
 
 ### Scan Every Release with the ZAP Baseline
 

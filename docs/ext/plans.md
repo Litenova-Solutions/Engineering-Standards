@@ -16,7 +16,7 @@ The project selects `plans` when it sells more than one tier, or gates behavior 
 
 This extension replaces no baseline provision. It sits beside the [multitenancy extension](tenancy.md): tenancy isolates each tenant's data, while plans state what each tenant's tier allows.
 
-It switches on no record type: plans live as business requirements, gated behavior resolves through permissions, and gated amounts resolve through limits, which the [product page](../core/product.md), the [access page](../core/access.md), and the [model page](../core/model.md) state.
+It switches on no record type: plans live as business requirements, gated behavior resolves through permissions, and gated amounts resolve through limits, which the [product page](../core/intent.md), the [access page](../core/access.md), and the [model page](../core/model.md) state.
 
 ## Standards
 
@@ -44,7 +44,7 @@ It switches on no record type: plans live as business requirements, gated behavi
 
 **Statement:** A use case run past its plan MUST end in the refusal result the use case names for that run.
 
-**Rationale:** A run past its plan is a refusal like any other: it ends in the named refusal result with its stable code, as the [domain page](../core/domain.md) states, so callers branch on one code instead of guessing from an error page. The code stays stable while prices and allowances move.
+**Rationale:** A run past its plan is a refusal like any other: it ends in the named refusal result with its stable code, as the [domain page](../core/behavior.md) states, so callers branch on one code instead of guessing from an error page. The code stays stable while prices and allowances move.
 
 ### Resolve the Acting Plan from Trusted Context
 
@@ -74,7 +74,7 @@ It switches on no record type: plans live as business requirements, gated behavi
 
 **Replacement:** A consumer records a plan-price convention naming where its plan prices live.
 
-**Rationale:** A business requirement carries its values with effective dates, as the [product page](../core/product.md) states, so each price shows when it holds. Recording each plan price there keeps the commercial fact with the commitment it prices.
+**Rationale:** A business requirement carries its values with effective dates, as the [product page](../core/intent.md) states, so each price shows when it holds. Recording each plan price there keeps the commercial fact with the commitment it prices.
 
 ## Dependencies
 

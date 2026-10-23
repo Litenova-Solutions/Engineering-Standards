@@ -6,7 +6,7 @@ A decision record pins one expensive-to-reverse choice (a data model, a provider
 
 ## Reference
 
-The [product page](../core/product.md) states what a decision record means; this page states where it lives and what it holds.
+The [product page](../core/intent.md) states what a decision record means; this page states where it lives and what it holds.
 
 ### Where a Record Lives
 

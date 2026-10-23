@@ -48,7 +48,7 @@ The system holds one delivery approach and one operating model:
 
 ### What the System Combines
 
-The system combines product intent, domain behavior, access control, operations, and project upkeep into one specification that joins intent to code. The [product page](product.md) states goals, problems, features, constraints, research, decisions, requirements, and journeys. The [domain page](domain.md) states the bounded context, the glossary, modules, aggregates, rules, events, use cases, results, and scenarios. The [access page](access.md) states actors, roles, permissions, entry points, and external systems. The [model page](model.md) states records, identifiers, links, authority, authoring order, verification, and the builder that computes how intent connects to code.
+The system combines product intent, domain behavior, access control, operations, and project upkeep into one specification that joins intent to code. The [product page](intent.md) states goals, problems, features, constraints, research, decisions, requirements, and journeys. The [domain page](behavior.md) states the bounded context, the glossary, modules, aggregates, rules, events, use cases, results, and scenarios. The [access page](access.md) states actors, roles, permissions, entry points, and external systems. The [model page](model.md) states records, identifiers, links, authority, authoring order, verification, and the builder that computes how intent connects to code.
 
 Each page owns its tables and rules, and this page cites them without copying. A reader who needs a record type, a link field, or the authority order opens the owning page.
 

@@ -24,7 +24,7 @@ This extension switches on `limit` and `runbook`: schedules bound their retentio
 
 **Statement:** A scheduled job MUST run from a reaction whose trigger states its schedule in words.
 
-**Rationale:** The trigger states when the behavior answers: `litespec/core/domain#trigger-every-reaction` names the events, or the schedule or deadline in plain words. A schedule kept outside the trigger runs with no reviewed moment attached, and misfire behavior has no stated time to measure against.
+**Rationale:** The trigger states when the behavior answers: `litespec/core/behavior#trigger-every-reaction` names the events, or the schedule or deadline in plain words. A schedule kept outside the trigger runs with no reviewed moment attached, and misfire behavior has no stated time to measure against.
 
 ### Record Schedule Behavior
 

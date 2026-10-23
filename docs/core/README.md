@@ -6,7 +6,7 @@ The Core pages state what every LiteSpec project shares: the system, its scope a
 
 ## How the Pages Fit Together
 
-Start with [LiteSpec](system.md) for the system the other pages detail, then [Supported Scope](scope.md) for the size, shape, and stacks a project selects. [Product Intent](product.md), [Project Model](model.md), [Domain Records](domain.md), and [Access Records](access.md) state what a project writes down, and [Agent Operating Protocol](agent.md) states how agents work from those records. [Authoring Standard](authoring.md) and [Maintaining the Standards](maintaining.md) state how pages themselves are written and kept, [Technology Stacks](stacks.md) states what a stack selection applies, [Engineering Principles](principles.md) settles choices no narrower page covers, and [Product Release](release.md) states what a release ships.
+Start with [LiteSpec](system.md) for the system the other pages detail, then [Supported Scope](scope.md) for the size, shape, and stacks a project selects. [Product Intent](intent.md), [Project Model](model.md), [Domain Records](behavior.md), and [Access Records](access.md) state what a project writes down, and [Agent Operating Protocol](agent.md) states how agents work from those records. [Authoring Standard](authoring.md) and [Maintaining the Standards](maintaining.md) state how pages themselves are written and kept, [Technology Stacks](stacks.md) states what a stack selection applies, [Engineering Principles](principles.md) settles choices no narrower page covers, and [Product Release](release.md) states what a release ships.
 
 ## The Record Tree
 
@@ -78,9 +78,9 @@ Review of the specification is enough only when all six conditions hold:
 
 ## Intent and the Model
 
-- [Product Intent](product.md): where a consumer states its business intent and in what form.
+- [Product Intent](intent.md): where a consumer states its business intent and in what form.
 - [Project Model](model.md): the record types, their links, and what the builder computes.
-- [Domain Records](domain.md): the bounded context, the glossary, and the modules, aggregates, rules, events, use cases, results, and scenarios inside it.
+- [Domain Records](behavior.md): the bounded context, the glossary, and the modules, aggregates, rules, events, use cases, results, and scenarios inside it.
 - [Access Records](access.md): the actors, roles, permissions, entry points, and external systems that govern who may do what and how it is reached.
 
 ## Agents, Authoring, and Releases

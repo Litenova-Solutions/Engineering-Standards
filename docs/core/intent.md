@@ -108,7 +108,7 @@ A decision sets the position, and a requirement page states it as requirements. 
 
 **Statement:** A `requirement-page` MUST place its chapter for people before its commitments.
 
-**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so the reader understands the choice before meeting its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/product#cite-sources-for-chapter-claims` states. Commitments first would ask agreement before understanding.
+**Rationale:** A rule list states what was decided and convinces nobody of why. The chapter carries the situation, the voices, the numbers, the comparison, and one worked example, so the reader understands the choice before meeting its rules. Sources keep the story checkable rather than a pitch, as `litespec/core/intent#cite-sources-for-chapter-claims` states. Commitments first would ask agreement before understanding.
 
 ### Cite Sources for Chapter Claims
 
@@ -259,7 +259,7 @@ docs/product/
 
 ## Reference Example
 
-This informative example demonstrates `litespec/core/product#trace-every-choice-to-a-decision`, `litespec/core/product#identify-every-requirement`, and `litespec/core/product#cite-requirements-from-records`.
+This informative example demonstrates `litespec/core/intent#trace-every-choice-to-a-decision`, `litespec/core/intent#identify-every-requirement`, and `litespec/core/intent#cite-requirements-from-records`.
 
 A subscription business keeps `docs/product/business/pricing.md` with `id` `pricing`. Its entries state `requirement/pricing.monthly-plan-fee`, and its Position row for the monthly plan links `decision/0003-monthly-plan`. The billing use case names that requirement in `fulfills`. When the price changes, decision `decision/0011-raise-the-monthly-plan` replaces `decision/0003-monthly-plan`: the pricing row links the new record, and the book lists both.
 
@@ -267,32 +267,32 @@ A subscription business keeps `docs/product/business/pricing.md` with `id` `pric
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/product#keep-product-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/product/`, and each research record under `docs/research/`. |
-| litespec/core/product#state-one-product | checkable | `litespec model check` reports no `product-not-singleton` finding, and `litespec consumer` validates the brief fields against the record schema. |
-| litespec/core/product#state-each-goal-with-its-measure | checkable | `litespec consumer` fails a goal page missing a required field or its Why It Matters section. |
-| litespec/core/product#state-each-problem-with-its-evidence | checkable | `litespec consumer` fails a problem page missing its statement, Situation, or Evidence. |
-| litespec/core/product#state-each-feature-with-its-state | checkable | `litespec consumer` fails a feature page missing its state, Offering, refused reason, or planned date. |
-| litespec/core/product#answer-every-constraint | checkable | `litespec consumer` fails a constraint page missing a required field, Summary, or What It Requires. |
-| litespec/core/product#record-research-with-read-sources | checkable | `litespec consumer` fails a research record without `question`, `sources`, or Answer. |
-| litespec/core/product#record-each-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required field or section; `litespec model check` reports `decision-decides-nothing` when it settles no record. |
-| litespec/core/product#name-the-person-who-approved-a-decision | guidance | The `decided` date on the decision beside the approval from its named decider. |
-| litespec/core/product#replace-a-decision-with-a-new-record | guidance | The `replaces` name on the new decision and the retired status on the old one, in the same change. |
-| litespec/core/product#shape-each-requirement-page | checkable | `litespec consumer` fails a requirement page missing a required section; the `reviewBy` date sits in its frontmatter. |
-| litespec/core/product#place-the-story-before-the-commitments | guidance | The chapter sections ahead of the commitment sections on each requirement page. |
-| litespec/core/product#cite-sources-for-chapter-claims | guidance | A source beside each number and claim in the chapter. |
-| litespec/core/product#identify-every-requirement | checkable | `litespec consumer` fails a requirement entry without identifier, `kind`, or `statement`, or a business requirement without dated values. |
-| litespec/core/product#explain-each-requirement-in-one-line | guidance | The one-line `rationale` on each requirement entry. |
-| litespec/core/product#state-the-measure-on-a-counted-requirement | guidance | The `measure` and `by` fields on each requirement whose statement names a number. |
-| litespec/core/product#cite-requirements-from-records | guidance | The `fulfills` names on each rule, use case, and journey beside the requirements they carry. |
-| litespec/core/product#order-each-journey-toward-one-goal | checkable | `litespec consumer` fails a journey page missing its actor, goal, steps, Example, or Between the Steps. |
-| litespec/core/product#keep-behavior-out-of-product-pages | guidance | Product pages under `docs/product/` and `docs/research/` free of state, result, code, and code names. |
-| litespec/core/product#trace-every-choice-to-a-decision | guidance | The decision link behind each Position and Refusals entry, with its status beside the page status. |
-| litespec/core/product#treat-generated-research-as-source-material | guidance | A research record or an approved decision behind each position built from generated records. |
-| litespec/core/product#review-a-requirement-page-by-its-date | guidance | A future `reviewBy` date in the frontmatter of each requirement page. |
-| litespec/core/product#load-product-intent-before-commercial-work | guidance | The brief and the affected requirement pages named in the change report for the behavior change. |
-| litespec/core/product#derive-requirement-coverage-from-the-model | guidance | The requirement coverage rendered from the model, with no hand-kept list beside it. |
-| litespec/core/product#build-intent-before-specification-before-code | guidance | The research, decision, requirement, records, code, and tests for the change, landed in that order. |
-| litespec/core/product#reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open known gap. |
-| litespec/core/product#build-on-a-draft-decision-before-approval | guidance | The approval on every decision behind the released records. |
-| litespec/core/product#group-product-records-by-area | guidance | The `docs/product/` layout beside the project's recorded layout. |
-| litespec/core/product#name-product-decisions-in-one-numbered-sequence | guidance | Each decision file named `<number>-<name>.md` beside its matching identifier. |
+| litespec/core/intent#keep-product-intent-in-its-homes | guidance | Each brief, requirement page, goal, problem, feature, constraint, decision, and journey under `docs/product/`, and each research record under `docs/research/`. |
+| litespec/core/intent#state-one-product | checkable | `litespec model check` reports no `product-not-singleton` finding, and `litespec consumer` validates the brief fields against the record schema. |
+| litespec/core/intent#state-each-goal-with-its-measure | checkable | `litespec consumer` fails a goal page missing a required field or its Why It Matters section. |
+| litespec/core/intent#state-each-problem-with-its-evidence | checkable | `litespec consumer` fails a problem page missing its statement, Situation, or Evidence. |
+| litespec/core/intent#state-each-feature-with-its-state | checkable | `litespec consumer` fails a feature page missing its state, Offering, refused reason, or planned date. |
+| litespec/core/intent#answer-every-constraint | checkable | `litespec consumer` fails a constraint page missing a required field, Summary, or What It Requires. |
+| litespec/core/intent#record-research-with-read-sources | checkable | `litespec consumer` fails a research record without `question`, `sources`, or Answer. |
+| litespec/core/intent#record-each-choice-as-a-decision | checkable | `litespec consumer` fails a decision missing a required field or section; `litespec model check` reports `decision-decides-nothing` when it settles no record. |
+| litespec/core/intent#name-the-person-who-approved-a-decision | guidance | The `decided` date on the decision beside the approval from its named decider. |
+| litespec/core/intent#replace-a-decision-with-a-new-record | guidance | The `replaces` name on the new decision and the retired status on the old one, in the same change. |
+| litespec/core/intent#shape-each-requirement-page | checkable | `litespec consumer` fails a requirement page missing a required section; the `reviewBy` date sits in its frontmatter. |
+| litespec/core/intent#place-the-story-before-the-commitments | guidance | The chapter sections ahead of the commitment sections on each requirement page. |
+| litespec/core/intent#cite-sources-for-chapter-claims | guidance | A source beside each number and claim in the chapter. |
+| litespec/core/intent#identify-every-requirement | checkable | `litespec consumer` fails a requirement entry without identifier, `kind`, or `statement`, or a business requirement without dated values. |
+| litespec/core/intent#explain-each-requirement-in-one-line | guidance | The one-line `rationale` on each requirement entry. |
+| litespec/core/intent#state-the-measure-on-a-counted-requirement | guidance | The `measure` and `by` fields on each requirement whose statement names a number. |
+| litespec/core/intent#cite-requirements-from-records | guidance | The `fulfills` names on each rule, use case, and journey beside the requirements they carry. |
+| litespec/core/intent#order-each-journey-toward-one-goal | checkable | `litespec consumer` fails a journey page missing its actor, goal, steps, Example, or Between the Steps. |
+| litespec/core/intent#keep-behavior-out-of-product-pages | guidance | Product pages under `docs/product/` and `docs/research/` free of state, result, code, and code names. |
+| litespec/core/intent#trace-every-choice-to-a-decision | guidance | The decision link behind each Position and Refusals entry, with its status beside the page status. |
+| litespec/core/intent#treat-generated-research-as-source-material | guidance | A research record or an approved decision behind each position built from generated records. |
+| litespec/core/intent#review-a-requirement-page-by-its-date | guidance | A future `reviewBy` date in the frontmatter of each requirement page. |
+| litespec/core/intent#load-product-intent-before-commercial-work | guidance | The brief and the affected requirement pages named in the change report for the behavior change. |
+| litespec/core/intent#derive-requirement-coverage-from-the-model | guidance | The requirement coverage rendered from the model, with no hand-kept list beside it. |
+| litespec/core/intent#build-intent-before-specification-before-code | guidance | The research, decision, requirement, records, code, and tests for the change, landed in that order. |
+| litespec/core/intent#reject-an-unfulfilled-requirement | checkable | `litespec model check` reports no `requirement-unfulfilled` finding outside an open known gap. |
+| litespec/core/intent#build-on-a-draft-decision-before-approval | guidance | The approval on every decision behind the released records. |
+| litespec/core/intent#group-product-records-by-area | guidance | The `docs/product/` layout beside the project's recorded layout. |
+| litespec/core/intent#name-product-decisions-in-one-numbered-sequence | guidance | Each decision file named `<number>-<name>.md` beside its matching identifier. |

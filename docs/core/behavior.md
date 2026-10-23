@@ -41,7 +41,7 @@ Each aggregate declares its lifecycle as `states` entries with a `name` and a `m
 
 ### Rules and Events
 
-A rule states what holds, with its `kind` and its `statement`. An invariant holds after every change; a precondition guards the behavior before it runs; a calculation derives a value; a cross-aggregate rule spans aggregates and lives on a rule page at `docs/domain/rules/<name>.md`, while each other rule lives as an entry on its aggregate page. A rule names what it constrains in `governs`, the refusal its breach produces in `refusal` (the result a caller sees, or a bare refusal code for a guard no caller reaches because an earlier check refuses first), the requirements it carries in `fulfills`, and the constraints and research behind it in `basedOn`. The [product page](product.md) states requirements.
+A rule states what holds, with its `kind` and its `statement`. An invariant holds after every change; a precondition guards the behavior before it runs; a calculation derives a value; a cross-aggregate rule spans aggregates and lives on a rule page at `docs/domain/rules/<name>.md`, while each other rule lives as an entry on its aggregate page. A rule names what it constrains in `governs`, the refusal its breach produces in `refusal` (the result a caller sees, or a bare refusal code for a guard no caller reaches because an earlier check refuses first), the requirements it carries in `fulfills`, and the constraints and research behind it in `basedOn`. The [product page](intent.md) states requirements.
 
 An event is an immutable statement that a business fact completed, named in the past tense, with its `meaning` and the facts it `carries`. Each event is raised through the root of its aggregate, and each event stays inside the product: published events belong to the [API compatibility extension](../ext/compat.md).
 
@@ -236,24 +236,24 @@ The specification names only what carries business meaning. Child entities and v
 
 | ID | Mark | Evidence |
 |:---|:---|:---|
-| litespec/core/domain#define-every-domain-term-in-the-glossary | guidance | Each term the domain records name appears with its meaning in `docs/glossary.json`. |
-| litespec/core/domain#state-every-module-dependency | guidance | Each module page names in `dependsOn` the modules its text and records rely on. |
-| litespec/core/domain#model-each-aggregate-lifecycle-with-states | checkable | `litespec consumer` fails an aggregate page without `states` entries carrying a name and a meaning. |
-| litespec/core/domain#connect-every-state-through-transitions | guidance | The Transitions table on each aggregate page pairs every allowed change with an existing state and use case. |
-| litespec/core/domain#classify-every-aggregate-data-field | guidance | The Data table on each aggregate page pairs each field with a meaning and a classification. |
-| litespec/core/domain#state-each-rule-with-its-kind | checkable | `litespec consumer` fails a rule entry without `kind` or `statement`. |
-| litespec/core/domain#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` outside its name. |
-| litespec/core/domain#keep-cross-aggregate-rules-on-a-rule-page | guidance | Each cross-aggregate rule sits as an entry on a rule page; other rules sit on their aggregate page. |
-| litespec/core/domain#name-the-refusal-a-broken-rule-produces | guidance | Each guarded rule names its refusal in `refusal` beside the rule entry. |
-| litespec/core/domain#state-each-event-with-meaning-and-carries | checkable | `litespec consumer` fails an event entry without `meaning` or `carries`. |
-| litespec/core/domain#raise-every-event-through-its-aggregate-root | guidance | Each event is raised from the root of the aggregate that owns it. |
-| litespec/core/domain#give-each-use-case-one-kind | checkable | `litespec consumer` fails a use-case page without `kind` or with an unknown kind. |
-| litespec/core/domain#trigger-every-reaction | guidance | Each reaction page names its trigger events, schedule, or deadline. |
-| litespec/core/domain#declare-every-query-output | guidance | Each query page declares the shape its readers receive in `output`. |
-| litespec/core/domain#end-every-use-case-in-named-results | checkable | `litespec model check` reports `use-case-without-success` for a use case with no success result; each refusal entry on the use-case page carries its code. |
-| litespec/core/domain#name-the-result-each-scenario-ends-in | checkable | `litespec consumer` fails a scenario entry without `result`, and `litespec model check` reports `scenario-result-unresolved` for a scenario ending in another use case's result. |
-| litespec/core/domain#write-every-scenario-in-given-when-then | checkable | `litespec consumer` fails a scenario entry without `given`, `when`, or `then`. |
-| litespec/core/domain#tabulate-every-calculation-with-examples | guidance | A scenario proving each calculation rule carries its examples table on the use-case page. |
-| litespec/core/domain#keep-design-choices-out-of-the-records | guidance | No record page declares a child entity or value object as a record type. |
-| litespec/core/domain#illustrate-pages-with-examples-from-the-cast | guidance | Each module, aggregate, and use case page carries an Example section from the cast, or the project documentation names the pages that do. |
-| litespec/core/domain#group-cross-aggregate-rules-by-theme | guidance | Each rule page states its theme in Summary, or the project documentation names another grouping. |
+| litespec/core/behavior#define-every-domain-term-in-the-glossary | guidance | Each term the domain records name appears with its meaning in `docs/glossary.json`. |
+| litespec/core/behavior#state-every-module-dependency | guidance | Each module page names in `dependsOn` the modules its text and records rely on. |
+| litespec/core/behavior#model-each-aggregate-lifecycle-with-states | checkable | `litespec consumer` fails an aggregate page without `states` entries carrying a name and a meaning. |
+| litespec/core/behavior#connect-every-state-through-transitions | guidance | The Transitions table on each aggregate page pairs every allowed change with an existing state and use case. |
+| litespec/core/behavior#classify-every-aggregate-data-field | guidance | The Data table on each aggregate page pairs each field with a meaning and a classification. |
+| litespec/core/behavior#state-each-rule-with-its-kind | checkable | `litespec consumer` fails a rule entry without `kind` or `statement`. |
+| litespec/core/behavior#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` outside its name. |
+| litespec/core/behavior#keep-cross-aggregate-rules-on-a-rule-page | guidance | Each cross-aggregate rule sits as an entry on a rule page; other rules sit on their aggregate page. |
+| litespec/core/behavior#name-the-refusal-a-broken-rule-produces | guidance | Each guarded rule names its refusal in `refusal` beside the rule entry. |
+| litespec/core/behavior#state-each-event-with-meaning-and-carries | checkable | `litespec consumer` fails an event entry without `meaning` or `carries`. |
+| litespec/core/behavior#raise-every-event-through-its-aggregate-root | guidance | Each event is raised from the root of the aggregate that owns it. |
+| litespec/core/behavior#give-each-use-case-one-kind | checkable | `litespec consumer` fails a use-case page without `kind` or with an unknown kind. |
+| litespec/core/behavior#trigger-every-reaction | guidance | Each reaction page names its trigger events, schedule, or deadline. |
+| litespec/core/behavior#declare-every-query-output | guidance | Each query page declares the shape its readers receive in `output`. |
+| litespec/core/behavior#end-every-use-case-in-named-results | checkable | `litespec model check` reports `use-case-without-success` for a use case with no success result; each refusal entry on the use-case page carries its code. |
+| litespec/core/behavior#name-the-result-each-scenario-ends-in | checkable | `litespec consumer` fails a scenario entry without `result`, and `litespec model check` reports `scenario-result-unresolved` for a scenario ending in another use case's result. |
+| litespec/core/behavior#write-every-scenario-in-given-when-then | checkable | `litespec consumer` fails a scenario entry without `given`, `when`, or `then`. |
+| litespec/core/behavior#tabulate-every-calculation-with-examples | guidance | A scenario proving each calculation rule carries its examples table on the use-case page. |
+| litespec/core/behavior#keep-design-choices-out-of-the-records | guidance | No record page declares a child entity or value object as a record type. |
+| litespec/core/behavior#illustrate-pages-with-examples-from-the-cast | guidance | Each module, aggregate, and use case page carries an Example section from the cast, or the project documentation names the pages that do. |
+| litespec/core/behavior#group-cross-aggregate-rules-by-theme | guidance | Each rule page states its theme in Summary, or the project documentation names another grouping. |

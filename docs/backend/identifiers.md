@@ -8,7 +8,7 @@ Every record carries one identifier naming its type, its home, and its own name.
 
 ### Identifier Forms
 
-An identifier names its record type first, then the record name, with the owning home in between when the type has one. The model states the form each type uses, with one row per type and one example per row. A rule home is an aggregate name or a module name. A result or scenario home is a use-case name, and an event home is an aggregate name. A use-case name is unique across the project, so a result cites only that name. An aggregate name is unique across the project, so a rule cites only that name. A rule name keeps the negation its statement makes, as `litespec/core/domain#keep-the-negation-word-in-the-rule-name` requires.
+An identifier names its record type first, then the record name, with the owning home in between when the type has one. The model states the form each type uses, with one row per type and one example per row. A rule home is an aggregate name or a module name. A result or scenario home is a use-case name, and an event home is an aggregate name. A use-case name is unique across the project, so a result cites only that name. An aggregate name is unique across the project, so a rule cites only that name. A rule name keeps the negation its statement makes, as `litespec/core/behavior#keep-the-negation-word-in-the-rule-name` requires.
 
 ### Name Rules
 
