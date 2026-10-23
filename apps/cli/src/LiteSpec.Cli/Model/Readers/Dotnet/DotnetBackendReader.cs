@@ -184,15 +184,23 @@ sealed class DotnetBackendReader : IBackendReader
                 ? typed.BaseList.Types.Select(type => BaseName(type.Type)).ToList()
                 : [];
 
-            var kind = Classify(declared.Identifier.ValueText, bases);
+            var tags = Identifiers.ImplementsTag()
+                .Matches(declared.GetLeadingTrivia().ToString())
+                .Cast<System.Text.RegularExpressions.Match>()
+                .Select(match => match.Groups["id"].Value)
+                .ToList();
+
+            // A hosted service named for the host rather than the job still runs a use case
+            // when its implements tag says so.
+            var kind = Classify(declared.Identifier.ValueText, bases)
+                ?? (tags.Count > 0 && bases.Any(baseName =>
+                        baseName is "BackgroundService" or "IHostedService"
+                        || baseName.StartsWith("BackgroundService<", StringComparison.Ordinal))
+                    ? "job"
+                    : null);
 
             if (kind is not null)
             {
-                var tags = Identifiers.ImplementsTag()
-                    .Matches(declared.GetLeadingTrivia().ToString())
-                    .Cast<System.Text.RegularExpressions.Match>()
-                    .Select(match => match.Groups["id"].Value)
-                    .ToList();
 
                 model.Reactions.Add(new ReactionInfo(
                     declared.Identifier.ValueText,
