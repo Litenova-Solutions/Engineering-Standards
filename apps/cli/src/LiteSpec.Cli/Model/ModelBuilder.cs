@@ -176,6 +176,8 @@ static partial class ModelBuilder
                 ? code.Class[..^"Event".Length]
                 : code.Class);
 
+            // An event record names its aggregate once: `event/access-code.issued` is the
+            // class AccessCodeIssuedEvent, and so is `event/access-code.access-code-issued`.
             var owner = OwnerOfEventFile(model, code.File);
             var match = events.FirstOrDefault(record =>
                     Identifiers.TrySplit(record.Id, out _, out var home, out var name)
@@ -184,7 +186,10 @@ static partial class ModelBuilder
                     && home == owner)
                 ?? events.FirstOrDefault(record =>
                     Identifiers.TrySplit(record.Id, out _, out _, out var name)
-                    && name == kebab);
+                    && name == kebab)
+                ?? events.FirstOrDefault(record =>
+                    Identifiers.TrySplit(record.Id, out _, out var home, out var name)
+                    && $"{home}-{name}" == kebab);
 
             if (match is not null)
             {

@@ -291,7 +291,7 @@ static partial class ConsumerValidator
                 }
             }
 
-            var text = File.ReadAllText(file);
+            var text = ReadShared(file);
 
             if (text.Length > 0 && text[0] == '\uFEFF')
             {
@@ -307,6 +307,25 @@ static partial class ConsumerValidator
 
                 TextCache[file] = text;
                 return text;
+            }
+        }
+
+        /// <summary>
+        ///     Reads a file that an editor or an agent may be saving at the same moment:
+        ///     a sharing violation is retried for about a second before it is thrown.
+        /// </summary>
+        static string ReadShared(string file)
+        {
+            for (var attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    return File.ReadAllText(file);
+                }
+                catch (IOException) when (attempt < 10 && File.Exists(file))
+                {
+                    Thread.Sleep(100);
+                }
             }
         }
 

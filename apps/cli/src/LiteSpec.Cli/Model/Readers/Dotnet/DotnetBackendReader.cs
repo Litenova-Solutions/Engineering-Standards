@@ -72,6 +72,24 @@ sealed class DotnetBackendReader : IBackendReader
         return model;
     }
 
+    /// <summary>
+    ///     The use case whose Application folder holds a file: <c>&lt;Module&gt;/&lt;Aggregate&gt;/&lt;UseCase&gt;/</c>
+    ///     names <c>use-case/&lt;module&gt;.&lt;use-case&gt;</c>, as for a handler. A reaction or job without an
+    ///     implements tag belongs to the use case whose folder holds it; outside such a folder it belongs to none.
+    /// </summary>
+    private static string? UseCaseOfFolder(ConsumerConfig config, string file)
+    {
+        var relative = Path.GetRelativePath(config.ApplicationRoot, file);
+
+        if (relative.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relative))
+        {
+            return null;
+        }
+
+        var parts = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return parts.Length < 4 ? null : $"use-case/{Naming.Kebab(parts[0])}.{Naming.Kebab(parts[2])}";
+    }
+
     private static void ReadHandlers(ConsumerConfig config, CodeModel model)
     {
         foreach (var file in SourceTree.Files(config.ApplicationRoot, ".cs"))
@@ -181,7 +199,7 @@ sealed class DotnetBackendReader : IBackendReader
                     file,
                     tree.GetLineSpan(declared.Span).StartLinePosition.Line + 1,
                     kind,
-                    tags.FirstOrDefault()));
+                    tags.FirstOrDefault() ?? UseCaseOfFolder(config, file)));
             }
         }
     }

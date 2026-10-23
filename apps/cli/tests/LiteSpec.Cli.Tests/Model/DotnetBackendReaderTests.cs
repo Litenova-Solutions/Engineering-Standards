@@ -148,6 +148,32 @@ public sealed class DotnetBackendReaderTests
               "webapi": "src/WebApi", "infrastructure": "src/Infra"}}}
             """);
 
+    [Fact]
+    public void Reaction_Without_A_Tag_Belongs_To_Its_Use_Case_Folder()
+    {
+        using var temp = Cli.Temp("reader");
+        WriteProject(temp.Path);
+        WriteSource(temp.Path, Path.Combine("App", "Lending", "Loans", "BorrowCopy"), "NotifyOnCopyBorrowedReaction.cs", """
+            namespace Library.Application.Lending.Loans.BorrowCopy;
+
+            public sealed class NotifyOnCopyBorrowedReaction : IDomainEventReaction<CopyBorrowedEvent>
+            {
+            }
+            """);
+        WriteSource(temp.Path, "App", "SweepReaction.cs", """
+            namespace Library.Application;
+
+            public sealed class SweepReaction : IDomainEventReaction<CopyBorrowedEvent>
+            {
+            }
+            """);
+
+        var reactions = new DotnetBackendReader().Read(ConsumerConfig.Load(temp.Path)).Reactions;
+
+        Assert.Equal("use-case/lending.borrow-copy", Assert.Single(reactions, reaction => reaction.Class == "NotifyOnCopyBorrowedReaction").UseCaseId);
+        Assert.Null(Assert.Single(reactions, reaction => reaction.Class == "SweepReaction").UseCaseId);
+    }
+
     static void WriteSource(string root, string project, string file, string text)
     {
         var folder = Path.Combine(root, "src", project);
