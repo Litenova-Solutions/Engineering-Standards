@@ -1,7 +1,8 @@
 name: Release
 
-# A release is a v<version> tag on main. The tag publishes the two NuGet packages, the
-# GitHub release and the site for that version, after the same checks a pull request runs.
+# A release is a v<version> tag on main. The tag publishes the two NuGet packages and the
+# GitHub release for that version, after the same checks a pull request runs. The site
+# deploys from main through Cloudflare Workers Builds, not from this workflow.
 on:
   push:
     tags:
@@ -128,41 +129,3 @@ jobs:
             exit 1
           fi
           gh release create "$GITHUB_REF_NAME" packages/*.nupkg --title "LiteSpec $VERSION" --notes-file notes.md --verify-tag
-
-  site:
-    needs: [verify, nuget]
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    environment: release
-    defaults:
-      run:
-        working-directory: apps/site
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Configure Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          # The Node release the manifest pins under stack.
-          node-version: "24.22.0"
-          package-manager-cache: false
-
-      - name: Install pnpm
-        run: npm install --global pnpm@11.28.5
-
-      - name: Install the site dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Test the site
-        run: pnpm test
-
-      - name: Build the site
-        run: pnpm build
-
-      # wrangler.jsonc names the account and the litespec.dev route; the token is a
-      # Cloudflare API token limited to editing this Worker.
-      - name: Deploy litespec.dev
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: npx --yes wrangler@4.151.3 deploy
