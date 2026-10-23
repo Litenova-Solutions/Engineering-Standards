@@ -16,7 +16,7 @@ Selecting a stack applies its folder and every folder above it, so a stack never
 
 Every SDK, framework, and package version resolves from `litespec.manifest.json`, which owns the pins. A version copied from prose, an example, a package search, or agent memory drifts from that pin.
 
-When an extension or a consumer override replaces baseline behavior, it names every baseline provision ID it replaces. Unrelated stack provisions stay active, so a replacement stays inside the boundary it named.
+When an extension or a consumer override replaces baseline behavior, it names every baseline provision ID it replaces. Unrelated stack provisions stay active, so a replacement stays inside the boundary it named. Each extension states how it composes with the Behavior fields its boundary touches, such as the audit field, the tenant scope, or the job record.
 
 ## Standards
 

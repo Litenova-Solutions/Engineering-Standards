@@ -8,9 +8,9 @@ An agent is software that reads task context, edits files, and runs checks. This
 
 ### The Project Model and the Agent Context
 
-A consumer project describes itself with records of fixed types, and the model builder joins those records to code, screens, tests, and test runs. The [model page](model.md) states the record types and their links. An agent queries that model for the records a task touches: `litespec model query <id>` prints one record with its links in both directions, such as a use case with its rules, results, and scenarios.
+A consumer project describes itself with records of fixed types in four layers: Intent states the promises, Behavior states how the system keeps them, Implementation is code only, and Proof shows the checks. The [model page](model.md) states the record types and their links. An agent queries that model for the records a task touches: `litespec model query <id>` prints one record with its links in both directions, such as a use case with its rules, results, and scenarios.
 
-The generated agent context is the rendered summary of that selection: the smallest record set that covers the request, with the links the builder computed. Reading it before editing starts the run from approved intent instead of repository guesswork.
+The generated agent context is the rendered summary of that selection: the smallest record set that covers the request, with the links the builder joined between records. Code, screens, and tests point up to the records they serve. Reading the context before editing starts the run from decided Intent instead of repository guesswork.
 
 ### Extensions and Their Boundaries
 
@@ -19,6 +19,18 @@ An extension is a conditional standards bundle a project selects when its criter
 ### Guidance Precedence
 
 Guidance overlaps by design: a project deviation narrows a shared provision, an extension replaces a baseline default, and a stack page refines its area page. The precedence order decides which one wins: the project deviation first, then the extension, then the deeper page, then the shallower page. A deeper page is one that sits further down the documentation tree, such as a stack page under its area page. The most local approved decision wins, and the broader baseline fills only the gaps it leaves.
+
+### Founder Decisions and Agent Drafts
+
+Agents write every page below the founder's decisions: the founder decides Intent, and agents draft the records that carry those decisions down through Behavior. The Specify translation rule forbids agents from deciding commercial and market figures on their own: a price, fee, rate, term, market, payer, personal-data retention period, observable freshness, or tenant, market, or date dependent default or figure. Each of those stays a draft question with a decider and a date. The [Intent page](intent.md) states the Specify boundary.
+
+### Ballots and Questions
+
+A ballot groups open questions for one decision, by decision identifier or short topic slug, each with a recommended answer. Tier-1 questions need explicit approval, while tier-3 questions with a recommendation auto-approve after the veto window the project record sets. A draft past its date that cannot auto-approve is reported as a known gap with its owner, so nothing silently blocks.
+
+### Transcription Mode
+
+During adoption, agents write Behavior records from working code and mark each one `source: transcribed`. A transcribed record stays in draft until its Intent parent is approved, and transcription mode ends when the decision named in `adoption.transcriptionEndsWith` is approved. The [scope page](scope.md) states the adoption record.
 
 ### Side Effects That Need Approval
 
@@ -30,7 +42,7 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 **Statement:** An agent MUST query the project model for the records that cover the request, and read the generated agent context, before editing.
 
-**Rationale:** Without the query, an agent reads either too little and invents the missing rules, or half the repository and buries the task in unrelated guidance. The query returns the smallest record set that covers the request, with the links the model computed from code, screens, and test runs, so the agent starts from approved intent.
+**Rationale:** Without the query, an agent reads either too little and invents the missing rules, or half the repository and buries the task in unrelated guidance. The query returns the smallest record set that covers the request, with the links the builder joined between records, so the agent starts from decided Intent.
 
 **Example:** `litespec model query use-case/orders.cancel-order` returns the use case with its rules, results, and scenarios.
 
@@ -102,6 +114,44 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 **Example:** The implementing agent writes a discount calculation from its rule and scenario; a later check runs the withheld example rows against the result.
 
+### Write Pages Below Decided Intent
+
+**Statement:** An agent MUST write every page below the founder's decisions.
+
+**Rationale:** The founder decides Intent, and everything below those decisions is drafting: Behavior records, code, and tests that carry the decisions down. An agent that invents promises writes commitments nobody approved, while an agent that waits for dictation wastes the review the founder gives to drafts. Writing below decided Intent keeps authorship with the agent and decisions with the founder.
+
+**Example:** Given an approved requirement for buyer refunds, an agent drafts the use case, its scenarios, and the handler without asking what the promise means.
+
+### Escalate Decisions That Specify Forbids
+
+**Statement:** An agent MUST NOT decide a price, fee, rate, term, market, payer, personal-data retention period, observable freshness, or tenant, market, or date dependent default or figure.
+
+**Rationale:** The Specify translation rule reserves commercial and market figures for Intent, because each one binds the product to buyers, markets, or law. An agent that picks a figure silently decides what only the founder approves. Each undecided figure becomes a draft question with a decider, a date, and a recommended answer.
+
+**Example:** A setting needs a default queue cap; the agent drafts the question with a recommended value instead of writing the default into the record.
+
+### Raise Questions in Ballots with Recommendations
+
+**Statement:** An agent MUST raise each open question in a ballot with a recommended answer.
+
+**Rationale:** A question without a recommendation asks the founder to research from nothing, while a recommendation gives a default to accept or correct. Grouping questions in ballots by decision or topic lets each decider answer one set at a time. Tier-1 questions wait for explicit approval, and tier-3 questions auto-approve after the veto window, so the ballot carries both without blocking either.
+
+**Example:** Two resale questions land in the "Resale terms" ballot, each with a recommended answer and a due date.
+
+### Mark Transcribed Records During Adoption
+
+**Statement:** An agent writing Behavior from code during adoption MUST mark the record `source: transcribed`.
+
+**Rationale:** Transcription reverses the normal direction: the record follows working code instead of leading it. The mark tells every reviewer that the record is evidence, not a promise, so it stays in draft until an approved Intent parent adopts it. When the ending decision is approved, any record still carrying the mark fails, which proves the mode ended cleanly.
+
+**Example:** A handler with no use-case page gains a transcribed draft that waits for its requirement's ballot.
+
+### Advise Without Gating
+
+**Statement:** An agent MUST report its findings as advice instead of recording approval or review.
+
+**Rationale:** Approval and review belong to people: the founder approves Intent, developers review Behavior, and the security reviewer clears tier-1 access and data. An agent that records approval spends authority it was never given. Advice with evidence lets each reviewer decide faster without moving the decision to the agent.
+
 ## Conventions
 
 ### Read the Full Record Before Changing a Boundary
@@ -140,9 +190,9 @@ Some changes reach beyond an ordinary implementation edit: they alter project bo
 
 ## Reference Example
 
-This informative example demonstrates `litespec/core/agent#select-task-context`, `litespec/core/agent#load-applicable-extensions`, and `litespec/core/agent#inspect-local-examples-after-standards`.
+This informative example demonstrates `litespec/core/agent#select-task-context`, `litespec/core/agent#load-applicable-extensions`, `litespec/core/agent#raise-questions-in-ballots-with-recommendations`, and `litespec/core/agent#inspect-local-examples-after-standards`.
 
-A command-handler change for `use-case/orders.cancel-order` queries the model for its use case, reads the generated agent context, and loads the selected extensions whose boundary the change touches. It then reads the neighboring handler for local names and shapes. It leaves unrelated frontend and container guidance unread.
+A command-handler change for `use-case/orders.cancel-order` queries the model for its use case, reads the generated agent context, and loads the selected extensions whose boundary the change touches. It then reads the neighboring handler for local names and shapes. Open figures go to a ballot with recommended answers. It leaves unrelated frontend and container guidance unread.
 
 ## Verification
 
@@ -159,6 +209,11 @@ A command-handler change for `use-case/orders.cancel-order` queries the model fo
 | litespec/core/agent#make-coherent-scoped-changes | guidance | Every changed artifact traces to the authorized request. |
 | litespec/core/agent#take-expected-values-from-the-scenario | guidance | Each test's expected values match the scenario's Then, with none taken from a code run. |
 | litespec/core/agent#verify-refusals-and-calculations-against-held-back-examples | guidance | The check log shows refusal and calculation example rows withheld during implementation and run after. |
+| litespec/core/agent#write-pages-below-decided-intent | guidance | Each drafted page traces to a decided Intent record, with no invented promise. |
+| litespec/core/agent#escalate-decisions-that-specify-forbids | guidance | Each commercial or market figure the change needs sits in a draft question, not in an agent-written decision. |
+| litespec/core/agent#raise-questions-in-ballots-with-recommendations | guidance | Each open question sits in a ballot with a recommended answer. |
+| litespec/core/agent#mark-transcribed-records-during-adoption | guidance | Each record transcribed from code carries `source: transcribed` and stays in draft until its Intent parent is approved. |
+| litespec/core/agent#advise-without-gating | guidance | The agent output records findings as advice, with approval and review left to people. |
 | litespec/core/agent#read-the-full-record-before-changing-a-boundary | guidance | Each file generation or boundary change cites the full record it matched. |
 | litespec/core/agent#inspect-local-examples-after-standards | guidance | The change names the neighboring files that shaped it after the standards. |
 | litespec/core/agent#keep-agent-working-files-under-agents | guidance | Every agent working file sits under `.agents/` or the path the working-files convention names. |

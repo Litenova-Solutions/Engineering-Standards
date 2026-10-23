@@ -68,7 +68,12 @@ A consumer page is a record or one of these styles. Each one opens with the spec
 | external-system | `templates/consumer/external-system.md` | Summary |
 | permission-list | `templates/consumer/permission-list.md` | Entries only |
 | entry-point-list | `templates/consumer/entry-point-list.md` | Entries only |
-| limit-set | `templates/consumer/limit-set.md` | Entries only |
+| setting-set | `templates/consumer/setting-set.md` | Entries only |
+| reaction | `templates/consumer/reaction.md` | Goal, optional Example, optional Notes |
+| job | `templates/consumer/job.md` | Goal, optional Example, optional Notes |
+| notification | `templates/consumer/notification.md` | Summary, optional Example, optional Notes |
+| integration-event | `templates/consumer/integration-event.md` | Summary, optional Notes |
+| retention-schedule | `templates/consumer/retention-schedule.md` | Entries only |
 | runbook | `templates/consumer/runbook.md` | Impact, Prerequisites, Procedure, Verification, Rollback or Recovery, Escalation |
 | deviation | `templates/consumer/deviation.md` | Consequences |
 | known-gap | `templates/consumer/known-gap.md` | Exit |
@@ -156,6 +161,20 @@ Every provision ID is `litespec/<page>#<slug>`:
 
 The heading carries no identifier text. A renamed heading renames the ID, so the two stay in agreement. No two pages share a path, so no two provisions share an ID. Consumer record identifiers follow the [identifier page](../backend/identifiers.md).
 
+### Record Identifiers
+
+A consumer record identifier is `type/home.name` in kebab-case: the type names the record kind, and `home.name` names the module or set that owns it. The [model page](model.md) states the record types and their homes. The reaction, job, notification, setting, and integration-event types use these forms:
+
+| Type | Form | Home |
+|:---|:---|:---|
+| `reaction` | `reaction/<module>.<name>` | The module whose records the reaction changes |
+| `job` | `job/<module>.<name>` | The module |
+| `notification` | `notification/<module>.<name>` | The module |
+| `setting` | `setting/<module>.<name>` | The module |
+| `integration-event` | `integration-event/<name>` | The published set |
+
+A journey step identifier is `journey/<name>#<step-id>`, with step identifiers `s1`, `s2`, and so on. A derived generic result is `result/<use-case-home.name>.forbidden` or `result/<use-case-home.name>.invalid-input`; scenarios may point at derived results, which are never written as records.
+
 ### Verification Table
 
 Every page that owns provisions ends with a Verification table that has one row per provision:
@@ -170,7 +189,11 @@ A `checkable` row starts with the checking command in backticks, then the findin
 
 ### Generated Regions
 
-A generated region is a section a tool writes, between `<!-- generated:<name> -->` and `<!-- /generated:<name> -->`. Only the owning tool writes inside it, and an edit there is lost at the next generation. Authoring checks skip generated regions.
+A generated region is a section a tool writes, between `<!-- generated:<name> -->` and `<!-- /generated:<name> -->`. Only the owning tool writes inside it, and an edit there is lost at the next generation. Authoring checks skip generated regions. Inside Intent and Behavior records, a generated region derives from other records only.
+
+### Authoring at Scale
+
+Many authors, often agents, write records in parallel. `litespec new` scaffolds a page and reserves its identifier before prose exists, and `litespec rename` rewrites every link when an identifier changes. Validating one page before committing keeps each commit sound without walking the whole repository.
 
 ### Release Model
 
@@ -404,6 +427,14 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 **Rationale:** A counter orders a provision among its siblings and says nothing about what it requires. Words name the obligation; numbers would renumber every sibling on each insertion and break citations for no gain.
 
+### Use the Declared Record Identifier Grammar
+
+**Statement:** A consumer record identifier MUST be `type/home.name` in kebab-case, using the form this page states for its type.
+
+**Rationale:** The type names the record kind and `home.name` names the owning module or set, so an identifier resolves with no lookup table. One grammar for every record kind keeps identifiers writable by hand and checkable by tool, including the reaction, job, notification, setting, and integration-event forms.
+
+**Example:** `reaction/sales.notify-buyer` is a reaction owned by the sales module, and `journey/hand-back#s2` is the second step of a journey.
+
 ### Map Provisions to Evidence
 
 **Statement:** A page that owns provisions MUST give every provision one row in its Verification table.
@@ -474,17 +505,47 @@ This model governs LiteSpec itself. A consumer product has its own users, so its
 
 ### Derive a Computed Fact Instead of Restating It
 
-**Statement:** A specification MUST name the source or the command that produces any count, census, or membership list computed from code.
+**Statement:** A specification MUST name the source or the command that produces any count, census, or membership list derived between records.
 
-**Rationale:** A restated number is right until the next unrelated commit changes the code it counts, and nothing reports when it goes stale. Naming the source or the command gives every reader the current figure instead of the figure from commit day.
+**Rationale:** A restated number is right until the next unrelated edit changes the records it counts, and nothing reports when it goes stale. Naming the source or the command gives every reader the current figure instead of the figure from commit day. Derivation between records is allowed: generic refusals derive from `access` and `input`, and computed statuses appear in the book and the model output only.
 
-**Example:** A page states the rule and the command rather than the total.
+**Example:** A chapter states where its numbers come from rather than copying them.
 
 ```markdown
-Every command declares an audit position. To count the declarations:
-
-    grep -rl "Audited(" src/Application --include=*.cs | wc -l
+The figures below render from the retention schedule at build time.
 ```
+
+### Keep Code out of Intent and Behavior Fields
+
+**Statement:** No field on an Intent or Behavior record MUST be filled from code.
+
+**Rationale:** Code implements Behavior, so a field filled from an implementation restates what already ships instead of stating the promise under review. A fact learned from the world enters Intent as research or a constraint, cited and dated, and a need the upper layer does not state travels up as a draft question. Derivation between records stays allowed.
+
+**Example:** A positivity guard found in a handler becomes a draft rule with its question, while the code stays untouched until the rule is reviewed.
+
+### Scaffold Pages and Reserve Identifiers
+
+**Statement:** An author MUST scaffold a new page with `litespec new <type> <id>`, which reserves its identifier.
+
+**Rationale:** Two agents working in parallel mint the same identifier when each writes a file by hand, and the collision surfaces only at merge time. Scaffolding reserves the identifier before any prose exists, so the second author learns the clash at creation and picks another name.
+
+**Example:** `litespec new reaction sales.notify-buyer` creates the reaction page with its metadata block and reserved identifier.
+
+### Rewrite Every Link on a Rename
+
+**Statement:** An author MUST rename a record identifier with `litespec rename <old> <new>`, which rewrites every link.
+
+**Rationale:** An identifier rename touches the page, its metadata, and every record that points at it. Rewriting every link in the same command leaves no citation pointing at the old name, so the repository stays resolvable at every commit.
+
+**Example:** `litespec rename use-case/sales.close-sale use-case/sales.complete-sale` updates the page and every citation together.
+
+### Validate a Single Page Before Committing
+
+**Statement:** An author MUST validate a single page before committing it.
+
+**Rationale:** Full validation walks the whole repository, which grows slow exactly when many authors commit often. A single-page check reports shape and link errors for the page at hand in seconds, so each commit arrives already sound.
+
+**Example:** The author validates the touched page, fixes the reported diagnostics, and commits only when the page passes.
 
 ### Run Repeatable Authoring Checks
 
@@ -571,6 +632,7 @@ Every command declares an audit position. To count the declarations:
 | litespec/core/authoring#name-the-owning-page-in-the-identifier | checkable | `litespec validate` emits no `ID_PAGE_FILENAME` or `ID_DUPLICATE` diagnostic. |
 | litespec/core/authoring#keep-identifiers-out-of-provision-headings | checkable | `litespec validate` emits no `ID_IN_HEADING` diagnostic. |
 | litespec/core/authoring#exclude-a-sequence-number-from-the-identifier | guidance | Which identifiers carry a sequence number? Look at the provision IDs the change adds. |
+| litespec/core/authoring#use-the-declared-record-identifier-grammar | checkable | `litespec consumer` fails a record identifier outside the declared grammar. |
 | litespec/core/authoring#map-provisions-to-evidence | checkable | `litespec validate` emits no `VERIFY_MISSING_ID` or `VERIFY_UNKNOWN_ID` diagnostic. |
 | litespec/core/authoring#mark-every-provision-checkable-or-guidance | checkable | `litespec validate` emits no `VERIFY_MARK` diagnostic. |
 | litespec/core/authoring#name-observable-evidence-in-verification-rows | checkable | `litespec validate` emits no `VERIFY_GENERIC_EVIDENCE` or `VERIFY_TEMPLATED_EVIDENCE` diagnostic. |
@@ -581,6 +643,10 @@ Every command declares an audit position. To count the declarations:
 | litespec/core/authoring#use-one-metadata-carrier | guidance | Which pages carry metadata outside the opening block? Look at the body sections of each page the change touches. |
 | litespec/core/authoring#classify-every-specification-file | checkable | `litespec consumer` fails a Markdown file with no declared type outside a declared unstructured path. |
 | litespec/core/authoring#derive-a-computed-fact-instead-of-restating-it | guidance | Which counts, censuses, or membership lists lack a source or command? Look at the numbers the change adds. |
+| litespec/core/authoring#keep-code-out-of-intent-and-behavior-fields | guidance | Which Intent or Behavior fields copy values from code? Look at the fields the change fills, beside the implementation. |
+| litespec/core/authoring#scaffold-pages-and-reserve-identifiers | guidance | Which new pages lack a reserved identifier? Look for pages created without `litespec new`. |
+| litespec/core/authoring#rewrite-every-link-on-a-rename | checkable | `litespec rename` leaves no citation of the old identifier, and `litespec validate` emits no `ID_UNKNOWN_REFERENCE` diagnostic. |
+| litespec/core/authoring#validate-a-single-page-before-committing | guidance | The change report shows each touched page passing single-page validation before commit. |
 | litespec/core/authoring#run-repeatable-authoring-checks | checkable | `litespec validate`, `dotnet test --solution LiteSpec.slnx` and `git diff --check` exit zero. |
 | litespec/core/authoring#validate-current-standards-material | guidance | Which validator inputs come from outside the working tree? Look at the paths the validator reads. |
 | litespec/core/authoring#exclude-historical-transition-material | guidance | Which active files carry history-specific paths, aliases, or migration material? Look at the files the change adds. |

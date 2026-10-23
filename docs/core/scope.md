@@ -18,9 +18,13 @@ Each stack decides which technology pages and checks apply. A project names one 
 
 ### Extensions, Constraints, and the Boundary
 
-An extension is a conditional standards bundle that stays inactive until a documented condition holds; caching, durable messaging, and multitenancy are examples. A project selects an extension only when its activation criterion holds, and the [extension catalog](../ext/README.md) lists each extension with its criteria. Outside constraints work the same way: the project states in `litespec.project.json` whether any constraint applies, and an empty answer records that none does.
+An extension is a conditional standards bundle that stays inactive until a documented condition holds. The Behavior extensions are `privacy`, `devices`, `automation`, `workflow-engine`, `pipeline`, `queues`, and `ai`, beside the existing `tenancy`, `compat`, `jobs`, `outbox`, `audit`, and `stage` extensions. A project selects an extension only when its activation criterion holds, and the [extension catalog](../ext/README.md) lists each extension with its criteria. Outside constraints work the same way: the project states in `litespec.project.json` whether any constraint applies, and an empty answer records that none does.
 
 Some architectures fall outside what LiteSpec supports: microservices, multiple contexts, native clients, other platforms, event sourcing, active-active regions, and large pipelines. A project that considers one records a separate project decision naming it. Projects outside the boundary can still use individual ideas without claiming conformance.
+
+### Review and Adoption Settings
+
+The project record carries its review settings under `review`: the veto window in days and the name of the security reviewer. Tier-3 questions with a recommendation auto-approve after the veto window, while tier-1 questions wait for explicit approval. A project that transcribes Behavior from working code names the ending decision under `adoption`, and points `paths.behaviorDocs` at the folder holding its Behavior records.
 
 ### What Claiming Conformance Means
 
@@ -43,7 +47,7 @@ The running Claimwick example declares large with a server shape and two stacks 
   "size": "large",
   "shape": "server",
   "stacks": ["dotnet", "svelte"],
-  "optionalTypes": ["constraint", "research", "limit", "runbook"]
+  "optionalTypes": ["constraint", "research", "setting", "runbook"]
 }
 ```
 
@@ -111,6 +115,42 @@ The diagram shows the three project choices and what each decides.
 
 **Example:** A consumer that selects the dotnet stack and the caching extension claims conformance when every page those selections apply holds and their checks pass, with each departure recorded as a deviation.
 
+### Record the Review Configuration
+
+**Statement:** A consumer MUST record `review.vetoWindowDays` and `review.securityReviewer` in `litespec.project.json`.
+
+**Rationale:** The veto window sets how long a tier-3 question waits before auto-approval, with seven days as the default, so every recommendation carries its own deadline. The security reviewer clears access widenings, new outside calls, and new personal-data flows apart from ordinary review. Recording both names the people and the pace before any ballot opens.
+
+**Example:**
+
+```json
+{ "review": { "vetoWindowDays": 7, "securityReviewer": "__OWNER__" } }
+```
+
+### Record the Transcription Endpoint
+
+**Statement:** A consumer that transcribes Behavior from code MUST record `adoption.transcriptionEndsWith` in `litespec.project.json`.
+
+**Rationale:** Transcription mode ends when one named decision is approved, so every transcribed record has a date by which it gains an approved Intent parent or fails. Without the named endpoint, transcribed drafts linger beside reviewed records with nobody able to tell the mode is over.
+
+**Example:**
+
+```json
+{ "adoption": { "transcriptionEndsWith": "decision/end-transcription" } }
+```
+
+### Point Behavior Docs at the Behavior Root
+
+**Statement:** A consumer MUST set `paths.behaviorDocs` in `litespec.project.json` to the folder that holds its Behavior records.
+
+**Rationale:** The builder joins records, queries, diffs, and the book from one declared root. A Behavior tree the project record never names is one the tools never see, so its records skip every check. One declared folder keeps authors and tools on the same tree.
+
+**Example:**
+
+```json
+{ "paths": { "behaviorDocs": "docs/behavior" } }
+```
+
 ## Conventions
 
 ### Start with One API and Database
@@ -147,5 +187,8 @@ A publishing product supports sign-in, draft creation, publication, and public r
 | litespec/core/scope#declare-a-consumer-that-has-no-backend | checkable | `litespec consumer` refuses a `client-only` project that names a backend stack. |
 | litespec/core/scope#record-unsupported-scope-decisions | guidance | A project decision names each architecture outside the supported boundary the project adopts. |
 | litespec/core/scope#claim-conformance-only-when-every-applicable-provision-holds | guidance | `litespec.project.json` names the selected size, shape, stacks, and extensions; each departure from an applied page resolves to a deviation record under `docs/deviations/`, and the selected checks pass. |
+| litespec/core/scope#record-the-review-configuration | checkable | `litespec consumer` rejects a project record without `review.vetoWindowDays` or `review.securityReviewer`. |
+| litespec/core/scope#record-the-transcription-endpoint | checkable | `litespec consumer` rejects a transcribed record in a project without `adoption.transcriptionEndsWith`. |
+| litespec/core/scope#point-behavior-docs-at-the-behavior-root | checkable | `litespec consumer` rejects a project record without `paths.behaviorDocs`. |
 | litespec/core/scope#start-with-one-api-and-database | guidance | The topology holds one API deployable and one database, or a topology convention records what runs instead. |
 | litespec/core/scope#measure-capacity-before-expansion | guidance | Each added cache, replica, queue, or partition follows recorded load, latency target, and observed constraint, or a capacity convention. |
