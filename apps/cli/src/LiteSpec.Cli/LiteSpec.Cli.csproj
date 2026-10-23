@@ -8,7 +8,7 @@
         <ToolCommandName>litespec</ToolCommandName>
         <PackageId>LiteSpec.Cli</PackageId>
         <!-- The package version is the release version: keep it equal to version in litespec.manifest.json. -->
-        <Version>2.0.0</Version>
+        <Version>3.0.0</Version>
         <Description>The LiteSpec command line: authoring checks, the provision index, consumer and UI validation, the project model, and the project book. The package carries the LiteSpec release it checks against.</Description>
         <Authors>Litenova Solutions</Authors>
         <PackageTags>litespec;specification;architecture;dotnet-tool;ddd</PackageTags>

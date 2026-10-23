@@ -1,3 +1,5 @@
+using System.Text.Json;
+using LiteSpec.Model;
 using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model;
@@ -93,24 +95,36 @@ static class ModelFixture
     }
 
     // Writes JSON frontmatter, a heading, and one line of body, joined with line feeds.
-    static string GapFile(string endsBy) =>
-        "---\n"
-        + "{\n"
-        + "  \"type\": \"known-gap\",\n"
-        + "  \"id\": \"known-gap/list-loans-unimplemented\",\n"
-        + "  \"title\": \"List loans unimplemented\",\n"
-        + "  \"owner\": \"lending-team\",\n"
-        + "  \"status\": \"approved\",\n"
-        + "  \"check\": \"use-case-unimplemented\",\n"
-        + "  \"subject\": [\n"
-        + "    \"use-case/lending.list-loans\"\n"
-        + "  ],\n"
-        + $"  \"endsBy\": \"{endsBy}\",\n"
-        + "  \"reason\": \"Listing waits for the search index.\"\n"
-        + "}\n"
-        + "---\n"
-        + "\n"
-        + "# List loans unimplemented\n"
-        + "\n"
-        + "Listing loans has no handler yet.\n";
+    // The approval hash is stamped over the written fields, so the gap itself reports nothing.
+    static string GapFile(string endsBy)
+    {
+        var frontmatter =
+            "{\n"
+            + "  \"type\": \"known-gap\",\n"
+            + "  \"id\": \"known-gap/list-loans-unimplemented\",\n"
+            + "  \"title\": \"List loans unimplemented\",\n"
+            + "  \"owner\": \"lending-team\",\n"
+            + "  \"status\": \"approved\",\n"
+            + "  \"check\": \"use-case-unimplemented\",\n"
+            + "  \"subject\": [\n"
+            + "    \"use-case/lending.list-loans\"\n"
+            + "  ],\n"
+            + $"  \"endsBy\": \"{endsBy}\",\n"
+            + "  \"reason\": \"Listing waits for the search index.\"\n"
+            + "}\n";
+
+        using var document = JsonDocument.Parse(frontmatter);
+        var record = new LiteSpec.Model.Record
+        {
+            Type = "known-gap",
+            Id = "known-gap/list-loans-unimplemented",
+            Raw = document.RootElement.Clone(),
+        };
+        var hash = Checker.SemanticHash(record);
+        var stamped = frontmatter.Replace(
+            "\n}",
+            ",\n  \"approvedBy\": \"lending-team\",\n  \"approvedOn\": \"2026-10-01\",\n  \"approvedHash\": \"" + hash + "\"\n}");
+
+        return "---\n" + stamped + "---\n" + "\n" + "# List loans unimplemented\n" + "\n" + "Listing loans has no handler yet.\n";
+    }
 }

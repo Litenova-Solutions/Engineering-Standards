@@ -1,5 +1,36 @@
 # Changelog
 
+## v3.0.0
+
+LiteSpec 3.0.0 is a top-down specification standard for one bounded-context business application, written by agents and judged by machines, so people review only what is theirs to decide. A consumer installs this release as the `LiteSpec.Cli` local .NET tool at the release version and records it in `reviewedLiteSpecVersion`. The release takes effect as the `v3.0.0` tag.
+
+### Layers
+
+- Four layers: Intent (why and what we promise; product people review it), Behavior (how the system behaves; developers review it), Implementation (code) and Proof (tests, checks, computed statuses and the book).
+- Each layer is written from the one above. Nothing above Implementation is computed from code; code and tests point up. Facts from the world enter Intent as research or constraints, and what a lower layer needs travels up as a question with a decider.
+- The translation rules Specify, Implement and Verify state what each boundary receives, must add, may not decide, and checks.
+- Consumer docs sit in one folder per layer: `docs/intent`, `docs/behavior`, `docs/implementation`, `docs/proof` and `docs/governance`.
+
+### Records
+
+- Journeys are product sentences with step ids, `finishedWhen` and `ifItGoesWrong`; use cases point up with `serves`.
+- Requirements state exceptions with `except` and a `fallback`, and carry `risk` and `setBy`.
+- Use cases are commands or queries with `access` (auth, grant, tenant scope), `changes`, `reads`, `consistency`, `effects` (issues, sends, publishes, calls), `idempotency`, `audit`, typed query output in `include` groups, freshness and paging. Generic refusals are derived.
+- New record types: reaction, job, notification, setting (replacing limit) and integration event. Aggregates have entity, process and store kinds, and data classes with erasure positions. A retention schedule page holds retention rows.
+- Approval is data: `approvedBy`, `approvedOn` and a semantic `approvedHash`, written by `litespec model approve`.
+
+### Review and checks
+
+- Product people read journey chapters and ballots; developers review Behavior diffs; a named security reviewer sees tier-1 access and data changes. Tier-3 questions auto-approve after a veto window.
+- Every check has a tier: G (record graph, blocking), S (stack reader, blocking where qualified) and A (advisory).
+- Declared edges replace mechanism bans: every edge between use cases, reactions, jobs, notifications, integration events and external systems is declared and checked. A calls edge counts only through a port anchored to an external-system record.
+
+### Tools
+
+- `litespec model diff` has `--intent` and `--behavior` views with a security queue, and `litespec book` renders journey chapters and a ballots page.
+- `litespec new` scaffolds a page, `litespec rename` rewrites an id everywhere, and `litespec model approve` records approval.
+- Extensions added: privacy, devices, automation, workflow-engine, pipeline, queues and ai. LS2002 is retired.
+
 ## v2.0.0
 
 LiteSpec 2.0.0 is the standards contract for one bounded-context business application, built by people and agents. People and agents write intent records; the model builder reads the code, screens, tests, and test runs and computes the links between the two. A consumer installs this release as the `LiteSpec.Cli` local .NET tool at the release version, records it in `reviewedLiteSpecVersion`, and keeps it for as long as it serves. The release takes effect as the `v2.0.0` tag.
