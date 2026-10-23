@@ -17,6 +17,25 @@ static class Differ
         "terms", "questions", "records",
     };
 
+    /// <summary>One parsed access grant: auth kinds, grant and tenant scope.</summary>
+    sealed record AccessValue(HashSet<string> Auth, string? Grant, string? Tenant);
+
+    /// <summary>One parsed effect edge: its verb, target and timing.</summary>
+    sealed record EffectEntry(string Verb, string Target, string? Timing)
+    {
+        /// <summary>The edge without its timing, such as calls external-system/stripe#charge.</summary>
+        public string Edge() => $"{Verb} {Target}";
+
+        /// <summary>The edge with its timing.</summary>
+        public string Describe() => $"{Verb} {Target} ({Timing ?? "no timing"})";
+    }
+
+    /// <summary>One parsed data class: its classification and erasure position.</summary>
+    sealed record DataClassValue(string? Classification, string? OnErasure);
+
+    /// <summary>One parsed journey step: its sentence, actor and fallback.</summary>
+    sealed record JourneyStep(string Says, string? Actor, string? IfItGoesWrong);
+
     /// <summary>Diffs the base model against the head model.</summary>
     public static IntentDiff Diff(
         ProjectModel baseModel, ProjectModel headModel, string baseLabel, string headLabel)
@@ -93,7 +112,8 @@ static class Differ
             };
         }
 
-        return new IntentDiff(baseLabel, headLabel, changes);
+        return new IntentDiff(
+            baseLabel, headLabel, changes, SecurityQueue(baseModel, headModel, addedIds, removedIds));
     }
 
     static IntentChange RemovedEntry(ProjectModel baseModel, Record record)
@@ -108,6 +128,11 @@ static class Differ
         if (record.Type == "aggregate")
         {
             details.Add(AggregateStatesLine(record));
+        }
+
+        if (record.Type == "journey")
+        {
+            details.AddRange(JourneyStepsLines(record));
         }
 
         var reasons = new List<BreakingReason>();
@@ -140,6 +165,11 @@ static class Differ
         if (record.Type == "scenario")
         {
             details.Add(ScenarioLine(record));
+        }
+
+        if (record.Type == "journey")
+        {
+            details.AddRange(JourneyStepsLines(record));
         }
 
         var reasons = new List<BreakingReason>();
@@ -196,11 +226,20 @@ static class Differ
         }
 
         CompareStatus(before, after, details);
+        CompareQuestions(before, after, details);
 
         switch (before.Type)
         {
             case "requirement":
                 CompareRequirement(before, after, approved, details, reasons);
+                break;
+
+            case "journey":
+                CompareJourney(before, after, details);
+                break;
+
+            case "decision":
+                CompareDecision(before, after, details);
                 break;
 
             case "rule":
@@ -220,7 +259,7 @@ static class Differ
                 break;
 
             case "use-case":
-                CompareFields(before, after, details);
+                CompareUseCase(before, after, details);
                 EnrichUseCase(baseModel, headModel, before, addedIds, removedIds, byId, details, reasons);
                 break;
 
@@ -243,7 +282,8 @@ static class Differ
             change,
             reasons.Count > 0,
             reasons,
-            details);
+            details,
+            IntentDiff.ViewOf(record));
 
     static string Qualifier(Record record) => record.Type switch
     {
@@ -300,6 +340,22 @@ static class Differ
 
     static string ScenarioLine(Record record) =>
         $"Given {record.Field("given") ?? "nothing"}; when {record.Field("when") ?? "nothing"}; then {record.Field("then") ?? "nothing"}.";
+
+    /// <summary>One product sentence per journey step, in step order.</summary>
+    static List<string> JourneyStepsLines(Record record)
+    {
+        var steps = JourneySteps(record);
+
+        if (steps is null)
+        {
+            return [];
+        }
+
+        return steps
+            .OrderBy(step => step.Key, StringComparer.Ordinal)
+            .Select(step => $"Step {step.Key}: \"{step.Value.Says}\".")
+            .ToList();
+    }
 
     static string AggregateStatesLine(Record record)
     {
@@ -418,7 +474,7 @@ static class Differ
     static void CompareRequirement(
         Record before, Record after, bool approved, List<string> details, List<BreakingReason> reasons)
     {
-        var handled = new HashSet<string>(StringComparer.Ordinal) { "statement", "measure", "by" };
+        var handled = new HashSet<string>(StringComparer.Ordinal) { "statement", "measure", "by", "except" };
 
         if (CompareValue("Statement", Field(before, "statement"), Field(after, "statement"), details) && approved)
         {
@@ -433,7 +489,196 @@ static class Differ
             reasons.Add(Reason("quality-measure-changed"));
         }
 
+        CompareExcept(before, after, details);
         CompareFields(before, after, details, handled);
+    }
+
+    static void CompareExcept(Record before, Record after, List<string> details)
+    {
+        var oldExcept = ExceptEntries(before);
+        var newExcept = ExceptEntries(after);
+
+        if (oldExcept is null || newExcept is null)
+        {
+            CompareValue("Except", Field(before, "except"), Field(after, "except"), details);
+            return;
+        }
+
+        foreach (var when in oldExcept.Keys.Where(when => !newExcept.ContainsKey(when))
+                     .OrderBy(when => when, StringComparer.Ordinal))
+        {
+            details.Add($"Exception removed: \"{when}\".");
+        }
+
+        foreach (var when in newExcept.Keys.Where(when => !oldExcept.ContainsKey(when))
+                     .OrderBy(when => when, StringComparer.Ordinal))
+        {
+            details.Add($"Exception added: \"{when}\", falling back to {newExcept[when]}.");
+        }
+
+        foreach (var when in oldExcept.Keys.Where(newExcept.ContainsKey)
+                     .OrderBy(when => when, StringComparer.Ordinal))
+        {
+            if (!string.Equals(oldExcept[when], newExcept[when], StringComparison.Ordinal))
+            {
+                details.Add($"Exception \"{when}\" now falls back to {newExcept[when]} (was: {oldExcept[when]}).");
+            }
+        }
+    }
+
+    static void CompareJourney(Record before, Record after, List<string> details)
+    {
+        var handled = new HashSet<string>(StringComparer.Ordinal) { "goal", "finishedWhen", "steps" };
+
+        CompareValue("Goal", Field(before, "goal"), Field(after, "goal"), details);
+        CompareValue("Finished when", Field(before, "finishedWhen"), Field(after, "finishedWhen"), details);
+        CompareJourneySteps(before, after, details);
+        CompareFields(before, after, details, handled);
+    }
+
+    static void CompareJourneySteps(Record before, Record after, List<string> details)
+    {
+        var oldSteps = JourneySteps(before);
+        var newSteps = JourneySteps(after);
+
+        if (oldSteps is null || newSteps is null)
+        {
+            CompareValue("Steps", Field(before, "steps"), Field(after, "steps"), details);
+            return;
+        }
+
+        foreach (var id in oldSteps.Keys.Where(id => !newSteps.ContainsKey(id))
+                     .OrderBy(id => id, StringComparer.Ordinal))
+        {
+            details.Add($"Step {id} removed: \"{oldSteps[id].Says}\".");
+        }
+
+        foreach (var id in newSteps.Keys.Where(id => !oldSteps.ContainsKey(id))
+                     .OrderBy(id => id, StringComparer.Ordinal))
+        {
+            details.Add($"Step {id} added: \"{newSteps[id].Says}\".");
+        }
+
+        foreach (var id in oldSteps.Keys.Where(newSteps.ContainsKey)
+                     .OrderBy(id => id, StringComparer.Ordinal))
+        {
+            var oldStep = oldSteps[id];
+            var newStep = newSteps[id];
+
+            if (!string.Equals(oldStep.Says, newStep.Says, StringComparison.Ordinal))
+            {
+                details.Add($"Step {id} changed: \"{newStep.Says}\" (was: \"{oldStep.Says}\").");
+            }
+
+            if (!string.Equals(oldStep.Actor, newStep.Actor, StringComparison.Ordinal))
+            {
+                details.Add($"Step {id} actor changed from {oldStep.Actor ?? "none"} to {newStep.Actor ?? "none"}.");
+            }
+
+            if (!string.Equals(oldStep.IfItGoesWrong, newStep.IfItGoesWrong, StringComparison.Ordinal))
+            {
+                details.Add(oldStep.IfItGoesWrong is null
+                    ? $"Step {id} gained a fallback: \"{newStep.IfItGoesWrong}\"."
+                    : newStep.IfItGoesWrong is null
+                        ? $"Step {id} lost its fallback."
+                        : $"Step {id} fallback changed: \"{newStep.IfItGoesWrong}\" (was: \"{oldStep.IfItGoesWrong}\").");
+            }
+        }
+    }
+
+    static void CompareDecision(Record before, Record after, List<string> details)
+    {
+        var handled = new HashSet<string>(StringComparer.Ordinal) { "chosen", "decided", "options" };
+
+        CompareValue("Chosen", Field(before, "chosen"), Field(after, "chosen"), details);
+        CompareValue("Decided", Field(before, "decided"), Field(after, "decided"), details);
+        CompareDecisionOptions(before, after, details);
+        CompareFields(before, after, details, handled);
+    }
+
+    static void CompareDecisionOptions(Record before, Record after, List<string> details)
+    {
+        var oldOptions = OptionNames(before);
+        var newOptions = OptionNames(after);
+
+        if (oldOptions is null || newOptions is null)
+        {
+            CompareValue("Options", Field(before, "options"), Field(after, "options"), details);
+            return;
+        }
+
+        foreach (var name in oldOptions.Where(name => !newOptions.Contains(name, StringComparer.Ordinal))
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            details.Add($"Option removed: \"{name}\".");
+        }
+
+        foreach (var name in newOptions.Where(name => !oldOptions.Contains(name, StringComparer.Ordinal))
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            details.Add($"Option added: \"{name}\".");
+        }
+    }
+
+    /// <summary>
+    ///     Compares the open questions on any record, keyed by the question text.
+    ///     The generic field walk skips questions, so this runs for every type.
+    /// </summary>
+    static void CompareQuestions(Record before, Record after, List<string> details)
+    {
+        var oldQuestions = QuestionEntries(before);
+        var newQuestions = QuestionEntries(after);
+
+        if (oldQuestions is null || newQuestions is null)
+        {
+            if (Field(before, "questions") is not null || Field(after, "questions") is not null)
+            {
+                CompareValue("Questions", Field(before, "questions"), Field(after, "questions"), details);
+            }
+
+            return;
+        }
+
+        if (oldQuestions.Count == 0 && newQuestions.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var question in oldQuestions.Keys.Where(question => !newQuestions.ContainsKey(question))
+                     .OrderBy(question => question, StringComparer.Ordinal))
+        {
+            details.Add($"Question removed: \"{question}\".");
+        }
+
+        foreach (var question in newQuestions.Keys.Where(question => !oldQuestions.ContainsKey(question))
+                     .OrderBy(question => question, StringComparer.Ordinal))
+        {
+            details.Add($"Question added: \"{question}\".");
+        }
+
+        foreach (var question in oldQuestions.Keys.Where(newQuestions.ContainsKey)
+                     .OrderBy(question => question, StringComparer.Ordinal))
+        {
+            var oldEntry = oldQuestions[question];
+            var newEntry = newQuestions[question];
+
+            CompareQuestionField(question, "recommended", oldEntry, newEntry, details);
+            CompareQuestionField(question, "decideBy", oldEntry, newEntry, details);
+            CompareQuestionField(question, "decider", oldEntry, newEntry, details);
+            CompareQuestionField(question, "ballot", oldEntry, newEntry, details);
+        }
+    }
+
+    static void CompareQuestionField(
+        string question, string field, JsonElement oldEntry, JsonElement newEntry, List<string> details)
+    {
+        var oldValue = StringOf(oldEntry, field);
+        var newValue = StringOf(newEntry, field);
+
+        if (!string.Equals(oldValue, newValue, StringComparison.Ordinal))
+        {
+            details.Add($"Question \"{question}\" {field} changed: \"{newValue ?? "none"}\" (was: \"{oldValue ?? "none"}\").");
+        }
     }
 
     static void CompareRule(
@@ -565,12 +810,135 @@ static class Differ
         List<string> details,
         List<BreakingReason> reasons)
     {
-        var handled = new HashSet<string>(StringComparer.Ordinal) { "states", "transitions", "data" };
+        var handled = new HashSet<string>(StringComparer.Ordinal) { "states", "transitions", "data", "dataClasses" };
 
         CompareStates(before, after, approved, details, reasons);
         CompareTransitions(before, after, baseModel, headModel, approved, details, reasons);
         CompareData(before, after, details);
+        CompareDataClasses(before, after, details);
         CompareFields(before, after, details, handled);
+    }
+
+    static void CompareUseCase(Record before, Record after, List<string> details)
+    {
+        var handled = new HashSet<string>(StringComparer.Ordinal) { "access", "effects" };
+
+        CompareAccess(before, after, details);
+        CompareEffects(before, after, details);
+        CompareFields(before, after, details, handled);
+    }
+
+    static void CompareAccess(Record before, Record after, List<string> details)
+    {
+        var oldAccess = AccessOf(before);
+        var newAccess = AccessOf(after);
+
+        if (oldAccess is null || newAccess is null)
+        {
+            CompareValue("Access", Field(before, "access"), Field(after, "access"), details);
+            return;
+        }
+
+        if (!string.Equals(oldAccess.Tenant, newAccess.Tenant, StringComparison.Ordinal))
+        {
+            details.Add($"Tenant scope changed from {oldAccess.Tenant ?? "none"} to {newAccess.Tenant ?? "none"}.");
+        }
+
+        if (!string.Equals(oldAccess.Grant, newAccess.Grant, StringComparison.Ordinal))
+        {
+            details.Add($"Grant changed: \"{newAccess.Grant ?? "none"}\" (was: \"{oldAccess.Grant ?? "none"}\").");
+        }
+
+        var oldAuth = oldAccess.Auth;
+        var newAuth = newAccess.Auth;
+
+        if (!oldAuth.SetEquals(newAuth))
+        {
+            var parts = newAuth.Except(oldAuth, StringComparer.Ordinal).OrderBy(kind => kind, StringComparer.Ordinal)
+                    .Select(kind => $"+{kind}")
+                .Concat(oldAuth.Except(newAuth, StringComparer.Ordinal).OrderBy(kind => kind, StringComparer.Ordinal)
+                    .Select(kind => $"-{kind}"))
+                .ToList();
+
+            details.Add($"Auth changed: {string.Join(", ", parts)}.");
+        }
+    }
+
+    static void CompareEffects(Record before, Record after, List<string> details)
+    {
+        var oldEffects = EffectEntries(before);
+        var newEffects = EffectEntries(after);
+
+        if (oldEffects is null || newEffects is null)
+        {
+            CompareValue("Effects", Field(before, "effects"), Field(after, "effects"), details);
+            return;
+        }
+
+        foreach (var key in oldEffects.Keys.Where(key => !newEffects.ContainsKey(key))
+                     .OrderBy(key => key, StringComparer.Ordinal))
+        {
+            details.Add($"Effect removed: {oldEffects[key].Describe()}.");
+        }
+
+        foreach (var key in newEffects.Keys.Where(key => !oldEffects.ContainsKey(key))
+                     .OrderBy(key => key, StringComparer.Ordinal))
+        {
+            details.Add($"Effect added: {newEffects[key].Describe()}.");
+        }
+
+        foreach (var key in oldEffects.Keys.Where(newEffects.ContainsKey)
+                     .OrderBy(key => key, StringComparer.Ordinal))
+        {
+            var oldEffect = oldEffects[key];
+            var newEffect = newEffects[key];
+
+            if (!string.Equals(oldEffect.Timing, newEffect.Timing, StringComparison.Ordinal))
+            {
+                details.Add($"Effect {oldEffect.Edge()} timing changed from {oldEffect.Timing ?? "none"} to {newEffect.Timing ?? "none"}.");
+            }
+        }
+    }
+
+    static void CompareDataClasses(Record before, Record after, List<string> details)
+    {
+        var oldClasses = DataClassEntries(before);
+        var newClasses = DataClassEntries(after);
+
+        if (oldClasses is null || newClasses is null)
+        {
+            CompareValue("Data classes", Field(before, "dataClasses"), Field(after, "dataClasses"), details);
+            return;
+        }
+
+        foreach (var name in oldClasses.Keys.Where(name => !newClasses.ContainsKey(name))
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            details.Add($"Data class removed: {name}.");
+        }
+
+        foreach (var name in newClasses.Keys.Where(name => !oldClasses.ContainsKey(name))
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            details.Add($"Data class added: {name} ({newClasses[name].Classification ?? "no classification"}).");
+        }
+
+        foreach (var name in oldClasses.Keys.Where(newClasses.ContainsKey)
+                     .OrderBy(name => name, StringComparer.Ordinal))
+        {
+            var oldClass = oldClasses[name];
+            var newClass = newClasses[name];
+
+            if (!string.Equals(oldClass.Classification, newClass.Classification, StringComparison.Ordinal))
+            {
+                details.Add($"Data class {name} classification changed from {oldClass.Classification ?? "none"} to {newClass.Classification ?? "none"}.");
+            }
+
+            if (!string.Equals(oldClass.OnErasure, newClass.OnErasure, StringComparison.Ordinal))
+            {
+                details.Add($"Data class {name} erasure changed from {oldClass.OnErasure ?? "none"} to {newClass.OnErasure ?? "none"}.");
+            }
+        }
     }
 
     static void CompareStates(
@@ -964,6 +1332,235 @@ static class Differ
             ? value.GetString()
             : null;
 
+    static AccessValue? AccessOf(Record record)
+    {
+        if (Field(record, "access") is not { } value)
+        {
+            return null;
+        }
+
+        if (value.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        var auth = new HashSet<string>(StringComparer.Ordinal);
+
+        if (value.TryGetProperty("auth", out var kinds))
+        {
+            if (kinds.ValueKind == JsonValueKind.String && kinds.GetString() is { } single)
+            {
+                auth.Add(single);
+            }
+            else if (kinds.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var kind in kinds.EnumerateArray())
+                {
+                    if (kind.ValueKind == JsonValueKind.String && kind.GetString() is { } name)
+                    {
+                        auth.Add(name);
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return new AccessValue(auth, StringOf(value, "grant"), StringOf(value, "tenant"));
+    }
+
+    /// <summary>One entry per effect, keyed by its verb and target.</summary>
+    static Dictionary<string, EffectEntry>? EffectEntries(Record record)
+    {
+        if (Field(record, "effects") is not { } value)
+        {
+            return new Dictionary<string, EffectEntry>(StringComparer.Ordinal);
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var effects = new Dictionary<string, EffectEntry>(StringComparer.Ordinal);
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            var verb = StringOf(entry, "issues") is not null ? "issues"
+                : StringOf(entry, "sends") is not null ? "sends"
+                : StringOf(entry, "publishes") is not null ? "publishes"
+                : StringOf(entry, "calls") is not null ? "calls"
+                : null;
+
+            if (verb is null)
+            {
+                return null;
+            }
+
+            var target = StringOf(entry, verb)!;
+
+            effects[$"{verb}\0{target}"] = new EffectEntry(verb, target, StringOf(entry, "timing"));
+        }
+
+        return effects;
+    }
+
+    /// <summary>One entry per data class, keyed by its name.</summary>
+    static Dictionary<string, DataClassValue>? DataClassEntries(Record record)
+    {
+        if (Field(record, "dataClasses") is not { } value)
+        {
+            return new Dictionary<string, DataClassValue>(StringComparer.Ordinal);
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var classes = new Dictionary<string, DataClassValue>(StringComparer.Ordinal);
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            classes[StringOf(entry, "name") ?? "none"] =
+                new DataClassValue(StringOf(entry, "classification"), StringOf(entry, "onErasure"));
+        }
+
+        return classes;
+    }
+
+    /// <summary>One entry per journey step, keyed by its step id.</summary>
+    static Dictionary<string, JourneyStep>? JourneySteps(Record record)
+    {
+        if (Field(record, "steps") is not { } value)
+        {
+            return new Dictionary<string, JourneyStep>(StringComparer.Ordinal);
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var steps = new Dictionary<string, JourneyStep>(StringComparer.Ordinal);
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            steps[StringOf(entry, "id") ?? "none"] = new JourneyStep(
+                StringOf(entry, "says") ?? "",
+                StringOf(entry, "actor"),
+                StringOf(entry, "ifItGoesWrong"));
+        }
+
+        return steps;
+    }
+
+    /// <summary>One fallback per exception, keyed by its when condition.</summary>
+    static Dictionary<string, string>? ExceptEntries(Record record)
+    {
+        if (Field(record, "except") is not { } value)
+        {
+            return new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var except = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object)
+            {
+                return null;
+            }
+
+            except[StringOf(entry, "when") ?? "none"] = StringOf(entry, "fallback") ?? "none";
+        }
+
+        return except;
+    }
+
+    static List<string>? OptionNames(Record record)
+    {
+        if (Field(record, "options") is not { } value)
+        {
+            return [];
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var names = new List<string>();
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind == JsonValueKind.String && entry.GetString() is { } name)
+            {
+                names.Add(name);
+            }
+            else if (entry.ValueKind == JsonValueKind.Object)
+            {
+                names.Add(StringOf(entry, "name") ?? "none");
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return names;
+    }
+
+    /// <summary>One entry per open question, keyed by the question text.</summary>
+    static Dictionary<string, JsonElement>? QuestionEntries(Record record)
+    {
+        if (Field(record, "questions") is not { } value)
+        {
+            return new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        }
+
+        if (value.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        var questions = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+
+        foreach (var entry in value.EnumerateArray())
+        {
+            if (entry.ValueKind != JsonValueKind.Object || StringOf(entry, "question") is not { } question)
+            {
+                return null;
+            }
+
+            questions[question] = entry;
+        }
+
+        return questions;
+    }
+
     /// <summary>One canonical string per JSON value, with object keys sorted.</summary>
     static string Canonical(JsonElement value) => value.ValueKind switch
     {
@@ -980,15 +1577,142 @@ static class Differ
         _ => "null",
     };
 
-    /// <summary>Whether the record stands approved: its effective status, else its own.</summary>
+    /// <summary>
+    ///     The security queue: use cases widened to tenant scope cross, new calls
+    ///     effects, and new personal or sensitive data classes, in record order.
+    /// </summary>
+    static List<SecurityQueueEntry> SecurityQueue(
+        ProjectModel baseModel, ProjectModel headModel, HashSet<string> addedIds, HashSet<string> removedIds)
+    {
+        var queue = new List<SecurityQueueEntry>();
+
+        foreach (var record in headModel.Records
+                     .OrderBy(left => left.Type, StringComparer.Ordinal)
+                     .ThenBy(left => left.Id, StringComparer.Ordinal))
+        {
+            if (removedIds.Contains(record.Id))
+            {
+                continue;
+            }
+
+            var added = addedIds.Contains(record.Id);
+            baseModel.ById.TryGetValue(record.Id, out var before);
+
+            if (record.Type == "use-case")
+            {
+                QueueTenantWidening(before, record, added, queue);
+                QueueNewCalls(before, record, added, queue);
+            }
+
+            if (record.Type == "aggregate")
+            {
+                QueueNewDataClasses(before, record, added, queue);
+            }
+        }
+
+        return queue;
+    }
+
+    static void QueueTenantWidening(
+        Record? before, Record after, bool added, List<SecurityQueueEntry> queue)
+    {
+        var tenant = AccessOf(after)?.Tenant;
+
+        if (!string.Equals(tenant, "cross", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (!added && before is not null
+            && string.Equals(AccessOf(before)?.Tenant, "cross", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        queue.Add(new SecurityQueueEntry(
+            after.Id,
+            after.Title,
+            after.Type,
+            added || before is null
+                ? "Access tenant scope is cross."
+                : $"Access tenant scope widened from {AccessOf(before)?.Tenant ?? "none"} to cross."));
+    }
+
+    static void QueueNewCalls(Record? before, Record after, bool added, List<SecurityQueueEntry> queue)
+    {
+        var newEffects = EffectEntries(after);
+
+        if (newEffects is null)
+        {
+            return;
+        }
+
+        var oldEffects = !added && before is not null ? EffectEntries(before) : new Dictionary<string, EffectEntry>();
+
+        if (oldEffects is null)
+        {
+            return;
+        }
+
+        foreach (var key in newEffects.Keys
+                     .Where(key => !oldEffects.ContainsKey(key) && newEffects[key].Verb == "calls")
+                     .OrderBy(key => key, StringComparer.Ordinal))
+        {
+            queue.Add(new SecurityQueueEntry(
+                after.Id, after.Title, after.Type, $"New calls effect: {newEffects[key].Describe()}."));
+        }
+    }
+
+    static void QueueNewDataClasses(Record? before, Record after, bool added, List<SecurityQueueEntry> queue)
+    {
+        var newClasses = DataClassEntries(after);
+
+        if (newClasses is null)
+        {
+            return;
+        }
+
+        var oldClasses = !added && before is not null ? DataClassEntries(before) : new Dictionary<string, DataClassValue>();
+
+        if (oldClasses is null)
+        {
+            return;
+        }
+
+        foreach (var name in newClasses.Keys.OrderBy(left => left, StringComparer.Ordinal))
+        {
+            var classification = newClasses[name].Classification;
+
+            if (classification is not ("personal" or "sensitive"))
+            {
+                continue;
+            }
+
+            if (!oldClasses.TryGetValue(name, out var oldClass))
+            {
+                queue.Add(new SecurityQueueEntry(
+                    after.Id, after.Title, after.Type, $"New {classification} data class: {name}."));
+            }
+            else if (oldClass.Classification is not ("personal" or "sensitive"))
+            {
+                queue.Add(new SecurityQueueEntry(
+                    after.Id,
+                    after.Title,
+                    after.Type,
+                    $"Data class {name} is now {classification} (was: {oldClass.Classification ?? "none"})."));
+            }
+        }
+    }
+
+    /// <summary>Whether the record stands approved or reviewed: its effective status, else its own.</summary>
     static bool Approved(ProjectModel model, Record record)
     {
         if (model.EffectiveStatus.TryGetValue(record.Id, out var effective))
         {
-            return effective == "approved";
+            return effective is "approved" or "reviewed";
         }
 
-        return record.Status is null or "approved";
+        return record.Status is null or "approved" or "reviewed";
     }
 
     static BreakingReason Reason(string code) => new(code, code switch

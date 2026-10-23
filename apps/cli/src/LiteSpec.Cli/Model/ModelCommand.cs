@@ -14,10 +14,10 @@ static class ModelCommand
           litespec model check --root <consumer> [--format json]
           litespec model render --root <consumer>
           litespec model query --root <consumer> <id>
-          litespec model diff <base> --root <consumer> [--format text|markdown|json] [--fail-on breaking] [--breaking-only]
+          litespec model diff <base> --root <consumer> [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
           litespec model --help
 
-        Exit codes: 0 no open finding, 1 an open finding, no record with the id, or a breaking intent change with --fail-on breaking, 2 usage error.
+        Exit codes: 0 no open blocking finding, 1 an open blocking finding, no record with the id, or a breaking intent change with --fail-on breaking, 2 usage error.
         """;
 
     public static int Run(string[] args)
@@ -31,7 +31,7 @@ static class ModelCommand
         var command = args[0];
         var parsed = CliArgs.Parse(
             args[1..],
-            command == "diff" ? ["--breaking-only"] : [],
+            command == "diff" ? ["--breaking-only", "--intent", "--behavior"] : [],
             command == "diff" ? ["--root", "--out", "--format", "--fail-on"] : ["--root", "--out", "--format"],
             maxPositionals: command is "query" or "diff" ? 1 : 0);
 
@@ -109,6 +109,7 @@ static class ModelCommand
                     var model = ModelBuilder.Build(config);
                     var (findings, known) = Checker.Check(model);
                     var json = parsed.Json;
+                    var qualified = StackQualified(config);
 
                     if (json)
                     {
@@ -124,18 +125,18 @@ static class ModelCommand
                     {
                         foreach (var finding in findings)
                         {
-                            Console.WriteLine($"{config.Relative(finding.Path)}:{finding.Line} [{finding.Code}] {finding.Message}");
+                            Console.WriteLine($"{config.Relative(finding.Path)}:{finding.Line} [{TierOf(finding)}] [{finding.Code}] {finding.Message}");
                         }
 
                         foreach (var gap in known)
                         {
-                            Console.WriteLine($"{config.Relative(gap.Path)}:{gap.Line} [known {gap.Code}] {gap.Message}");
+                            Console.WriteLine($"{config.Relative(gap.Path)}:{gap.Line} [known {TierOf(gap)}] [{gap.Code}] {gap.Message}");
                         }
 
                         Console.WriteLine($"{findings.Count} findings, {known.Count} known.");
                     }
 
-                    return findings.Count == 0 ? 0 : 1;
+                    return findings.Any(finding => Blocks(finding, qualified)) ? 1 : 0;
                 }
 
                 case "render":
@@ -189,6 +190,9 @@ static class ModelCommand
 
                     var format = parsed.Value("--format") ?? "text";
                     var breakingOnly = parsed.Has("--breaking-only");
+                    var view = parsed.Has("--intent") && !parsed.Has("--behavior") ? DiffView.Intent
+                        : parsed.Has("--behavior") && !parsed.Has("--intent") ? DiffView.Behavior
+                        : DiffView.Both;
                     var headModel = ModelBuilder.Build(config);
 
                     DiffBase checkout;
@@ -210,12 +214,12 @@ static class ModelCommand
 
                         Console.WriteLine(format switch
                         {
-                            "markdown" => DiffFormatter.Markdown(diff, breakingOnly),
-                            "json" => DiffFormatter.Json(diff, breakingOnly),
-                            _ => DiffFormatter.Text(diff, breakingOnly),
+                            "markdown" => DiffFormatter.Markdown(diff, breakingOnly, view),
+                            "json" => DiffFormatter.Json(diff, breakingOnly, view),
+                            _ => DiffFormatter.Text(diff, breakingOnly, view),
                         });
 
-                        return parsed.Value("--fail-on") == "breaking" && diff.BreakingCount > 0 ? 1 : 0;
+                        return parsed.Value("--fail-on") == "breaking" && diff.BreakingCountIn(view) > 0 ? 1 : 0;
                     }
                 }
 
@@ -242,9 +246,49 @@ static class ModelCommand
     static Func<Finding, object> AsJson(ConsumerConfig config) => finding => new
     {
         code = finding.Code,
+        tier = TierOf(finding),
         message = finding.Message,
         path = config.Relative(finding.Path),
         line = finding.Line,
         subject = finding.Subject,
+    };
+
+    /// <summary>Whether the finding blocks: G always, S only where the stack reader is qualified.</summary>
+    static bool Blocks(Finding finding, bool qualified) => TierOf(finding) switch
+    {
+        "G" => true,
+        "S" => qualified,
+        _ => false,
+    };
+
+    /// <summary>Whether the stack reader is qualified: the project names a .NET stack.</summary>
+    static bool StackQualified(ConsumerConfig config) =>
+        config.Stacks.Contains("dotnet", StringComparer.Ordinal)
+        || config.Stacks.Contains("blazor", StringComparer.Ordinal);
+
+    /// <summary>
+    ///     The finding's tier. The checks worker carries the tier on the finding;
+    ///     until it lands, the tier falls back to the code table below.
+    /// </summary>
+    static string TierOf(Finding finding)
+    {
+        var tier = typeof(Finding).GetProperty("Tier")?.GetValue(finding)?.ToString();
+
+        if (tier is "G" or "S" or "A")
+        {
+            return tier;
+        }
+
+        return TierByCode(finding.Code);
+    }
+
+    /// <summary>The tier each check code carries, for findings that carry no tier yet.</summary>
+    static string TierByCode(string code) => code switch
+    {
+        "behavior-unrecorded" or "use-case-unimplemented" or "use-case-access"
+            or "refusal-not-thrown" or "proves-unconfirmed" or "use-case-without-scenario"
+            or "write-undeclared" or "result-undeclared" or "effect-undeclared" => "S",
+        "prose-missing" or "many-aggregates" or "question-aged" => "A",
+        _ => "G",
     };
 }
