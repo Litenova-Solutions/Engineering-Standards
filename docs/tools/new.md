@@ -14,7 +14,7 @@ litespec new <type> <id> [--root <path>] [--help]
 
 This command creates one record page from the template for its type, with the opening specification metadata block already filled. It reserves the identifier before any prose exists, so two authors working in parallel never mint the same identifier twice. The second author learns the clash at creation and picks another name.
 
-`<type>` is the record type or page style, such as `reaction`, `use-case`, or `decision`. `<id>` is the `home.name` part of the identifier, such as `sales.notify-buyer`; the command composes the full identifier as `<type>/<id>`. The page is written at the home its type owns: a reaction under `modules/<module>/reactions/`, a job under `modules/<module>/jobs/`, a notification under `modules/<module>/notifications/`, a decision under the decisions folder. The command refuses an identifier a record already carries.
+`<type>` is the record type or page style, such as `reaction`, `use-case`, or `decision`. `<id>` is the `home.name` part of the identifier, such as `sales.notify-buyer`; the command composes the full identifier as `<type>/<id>`. The page is written at the home its type owns: a reaction under `modules/<module>/reactions/`, a job under `modules/<module>/jobs/`, a notification under `modules/<module>/notifications/`, a decision under the decisions folder. A use-case page starts under `reads/` beside its module; move the file beside its aggregate once the use case names one. The command refuses an identifier a record already carries.
 
 Run it before writing any new record, as `litespec/core/authoring#scaffold-pages-and-reserve-identifiers` states. Validate the new page before committing it.
 

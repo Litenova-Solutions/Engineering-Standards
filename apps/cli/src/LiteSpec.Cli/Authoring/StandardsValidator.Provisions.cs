@@ -10,7 +10,7 @@ static partial class StandardsValidator
     static readonly HashSet<string> VerificationMarks = new(["checkable", "guidance"], StringComparer.Ordinal);
 
     static readonly HashSet<string> LiteSpecCommands = new(
-        ["validate", "provisions", "consumer", "ui", "model", "book", "patterns", "init"],
+        ["validate", "provisions", "consumer", "ui", "model", "book", "patterns", "init", "new", "rename"],
         StringComparer.Ordinal);
 
     // A claim is the comparable core of a heading, a Statement, a Default, or a

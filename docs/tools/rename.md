@@ -12,7 +12,7 @@ litespec rename <old> <new> [--root <path>] [--help]
 
 ## Description
 
-This command renames one record identifier across the consumer repository. It moves the page to the path the new identifier owns, updates the opening specification metadata block, and rewrites every citation of the old identifier, so no link points at the old name after the rename. The repository stays resolvable at every commit.
+This command renames one record identifier across the consumer repository. It moves the page to the path the new identifier owns, updates the opening specification metadata block, and rewrites every citation of the old identifier, so no link points at the old name after the rename. A use-case page that already sits beside its aggregate stays in its folder and takes the new file name. The repository stays resolvable at every commit.
 
 Both arguments are full record identifiers, such as `use-case/sales.close-sale`. The command refuses a new identifier a record already carries and an old identifier no record carries.
 

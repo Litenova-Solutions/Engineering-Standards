@@ -20,6 +20,8 @@ const string usage = """
 
     Commands in a consumer repository:
       init          Write litespec.project.json from a preset.
+      new           Scaffold a record page and reserve its identifier.
+      rename        Rename a record identifier and rewrite every link.
       consumer      Validate the consumer's project file, records and language.
       ui            Validate the controlled web UI contract.
       model         Build, check, render or query the project model.
@@ -47,6 +49,8 @@ return args[0] switch
     "validate" => StandardsValidator.Run(rest),
     "provisions" => ProvisionsCommand.Run(rest),
     "init" => InitCommand.Run(rest),
+    "new" => NewCommand.Run(rest),
+    "rename" => RenameCommand.Run(rest),
     "consumer" => ConsumerValidator.Run(rest),
     "ui" => UiValidator.Run(rest),
     "model" => ModelCommand.Run(rest),
