@@ -9,13 +9,17 @@
     "event/expense.submitted"
   ],
   "if": "The expense waits past three business days with no decision.",
-  "sends": "notification/spending.approval-reminder",
+  "effects": [
+    {
+      "sends": "notification/spending.approval-reminder"
+    }
+  ],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
   "approvedBy": "claimwick-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "ccefadbf"
+  "approvedHash": "21b6075a"
 }
 ---
 

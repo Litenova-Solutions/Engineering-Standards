@@ -11,15 +11,18 @@
     "timezone": "Europe/Amsterdam"
   },
   "scope": "Decided expenses past their retention.",
-  "issues": [
-    "use-case/spending.erase-personal-data"
+  "effects": [
+    {
+      "issues": "use-case/spending.erase-personal-data",
+      "timing": "async"
+    }
   ],
   "fulfills": [
     "requirement/approval.erase-after-retention"
   ],
   "approvedBy": "claimwick-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "343f7804"
+  "approvedHash": "5bc21c0f"
 }
 ---
 

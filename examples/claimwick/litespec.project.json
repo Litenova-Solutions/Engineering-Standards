@@ -27,7 +27,7 @@
   "paths": {
     "docs": "docs",
     "behaviorDocs": "docs/behavior",
-    "uiDocs": "docs/ui",
+    "uiDocs": "docs/implementation/ui",
     "glossary": "docs/glossary.json",
     "testRoots": [
       "apps/api/tests"
