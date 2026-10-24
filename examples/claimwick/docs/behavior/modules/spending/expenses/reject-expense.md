@@ -4,12 +4,18 @@
   "id": "use-case/spending.reject-expense",
   "title": "Reject Expense",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/approve-expense"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/approve-expense",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s3"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
@@ -19,6 +25,9 @@
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
+  "changes": [
+    "aggregate/spending.expense"
+  ],
   "records": [
     {
       "type": "result",
@@ -26,7 +35,10 @@
       "title": "Rejected",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The expense is rejected."
+      "meaning": "The expense is rejected.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "8a09db39"
     },
     {
       "type": "result",
@@ -35,20 +47,29 @@
       "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.not-submitted",
-      "meaning": "The expense is already decided."
+      "meaning": "The expense is already decided.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "b2983ba6"
     },
     {
       "type": "scenario",
       "id": "scenario/reject-expense.rejecting-a-submitted-expense-succeeds",
       "title": "Rejecting a submitted expense succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "An employee submitted an expense outside the policy.",
       "when": "The manager rejects the expense with a reason.",
       "result": "result/reject-expense.rejected",
-      "then": "The expense is rejected."
+      "then": "The expense is rejected.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "69289937"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "ec7a062f"
 }
 ---
 

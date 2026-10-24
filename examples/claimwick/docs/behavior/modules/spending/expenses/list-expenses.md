@@ -4,12 +4,18 @@
   "id": "use-case/spending.list-expenses",
   "title": "List Expenses",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "query",
-  "needs": [
-    "permission/list-expenses"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/list-expenses",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s5"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
@@ -17,11 +23,31 @@
   "fulfills": [
     "requirement/approval.decided-within-five-days"
   ],
-  "output": [
-    {
-      "name": "expenses",
-      "meaning": "One row per expense: its identity, amount, currency, state and submission time, newest first."
+  "output": {
+    "include": {
+      "rows": {
+        "fields": [
+          {
+            "name": "expenses",
+            "meaning": "One row per expense: its identity, amount, currency, state and submission time, newest first."
+          }
+        ],
+        "classification": "internal",
+        "source": [
+          "aggregate/spending.expense"
+        ],
+        "freshness": "immediate"
+      }
     }
+  },
+  "paging": {
+    "order": "Submission time, newest first.",
+    "cursor": "The submission time and identity of the last row.",
+    "defaultLimit": 25,
+    "maxLimit": 100
+  },
+  "reads": [
+    "aggregate/spending.expense"
   ],
   "records": [
     {
@@ -30,20 +56,29 @@
       "title": "Listed",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The expenses are listed."
+      "meaning": "The expenses are listed.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "86b26cfd"
     },
     {
       "type": "scenario",
       "id": "scenario/list-expenses.listing-own-expenses-succeeds",
       "title": "Listing own expenses succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "An employee submitted two expenses.",
       "when": "The employee lists their expenses.",
       "result": "result/list-expenses.listed",
-      "then": "Both expenses are listed."
+      "then": "Both expenses are listed.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "e9f8e65e"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "ddacd257"
 }
 ---
 

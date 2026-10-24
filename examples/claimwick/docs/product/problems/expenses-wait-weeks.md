@@ -8,7 +8,10 @@
   "affects": [
     "actor/employee"
   ],
-  "statement": "Submitted expenses wait weeks for a decision, so employees chase managers by email."
+  "statement": "Submitted expenses wait weeks for a decision, so employees chase managers by email.",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "cf10badf"
 }
 ---
 

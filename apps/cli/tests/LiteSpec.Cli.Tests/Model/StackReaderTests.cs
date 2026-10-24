@@ -9,8 +9,8 @@ public sealed class StackReaderTests
 {
     /// <summary><c>model build</c> on the fixture prints the counts its contents hold.</summary>
     [Theory]
-    [InlineData("small", 61, 7, 0, 0)]
-    [InlineData("large", 78, 7, 1, 9)]
+    [InlineData("small", 69, 7, 0, 0)]
+    [InlineData("large", 89, 7, 1, 9)]
     public void Build_Prints_Fixture_Counts(string fixture, int records, int handlers, int screens, int scenarios)
     {
         using var temp = ModelFixture.Prepare(fixture);
@@ -61,10 +61,10 @@ public sealed class StackReaderTests
         using var temp = ModelFixture.Prepare("small");
 
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-junit-scenario.md"),
+            Path.Combine(temp.Path, "docs", "behavior", "modules", "lending", "loans", "borrow-copy-junit-scenario.md"),
             BorrowScenarioPage);
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-junit-scenario.md"),
+            Path.Combine(temp.Path, "docs", "behavior", "modules", "lending", "loans", "return-copy-junit-scenario.md"),
             ReturnScenarioPage);
 
         var scenariosFolder = Path.Combine(
@@ -101,10 +101,10 @@ public sealed class StackReaderTests
         using var temp = ModelFixture.Prepare("small");
 
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "borrow-copy-trx-scenario.md"),
+            Path.Combine(temp.Path, "docs", "behavior", "modules", "lending", "loans", "borrow-copy-trx-scenario.md"),
             BorrowScenarioPage);
         File.WriteAllText(
-            Path.Combine(temp.Path, "docs", "domain", "modules", "lending", "loans", "return-copy-trx-scenario.md"),
+            Path.Combine(temp.Path, "docs", "behavior", "modules", "lending", "loans", "return-copy-trx-scenario.md"),
             ReturnScenarioPage);
 
         var scenariosFolder = Path.Combine(
@@ -141,7 +141,7 @@ public sealed class StackReaderTests
           "id": "scenario/borrow-copy.borrowing-an-available-copy-succeeds",
           "title": "Borrowing an available copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A copy sits available on its shelf.",
           "when": "The reader borrows the copy.",
           "result": "result/borrow-copy.borrowed",
@@ -161,7 +161,7 @@ public sealed class StackReaderTests
           "id": "scenario/return-copy.returning-a-borrowed-copy-succeeds",
           "title": "Returning a borrowed copy succeeds",
           "owner": "lending-team",
-          "status": "approved",
+          "status": "reviewed",
           "given": "A loan stands active on a copy.",
           "when": "The reader returns the copy.",
           "result": "result/return-copy.returned",

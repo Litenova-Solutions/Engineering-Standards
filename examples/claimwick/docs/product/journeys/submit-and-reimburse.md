@@ -7,65 +7,56 @@
   "status": "approved",
   "actor": "actor/employee",
   "goal": "Submit an expense and receive reimbursement.",
+  "finishedWhen": "The employee holds the reimbursement, and the personal data of old expenses is erased past retention.",
   "steps": [
     {
-      "useCase": "use-case/spending.submit-expense",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "A submitted expense."
+      "id": "s1",
+      "says": "The employee submits the expense with its amount and currency.",
+      "actor": "actor/employee"
     },
     {
-      "useCase": "use-case/spending.attach-receipt",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "A receipt on the expense."
+      "id": "s2",
+      "says": "The employee attaches the receipt to the expense.",
+      "actor": "actor/employee"
     },
     {
-      "useCase": "use-case/spending.approve-expense",
+      "id": "s3",
+      "says": "The manager approves or rejects the expense within five business days.",
       "actor": "actor/manager",
-      "requires": [],
-      "gives": "An approved expense."
+      "ifItGoesWrong": "The expense waits past three business days, and the approver is reminded."
     },
     {
-      "useCase": "use-case/spending.reject-expense",
-      "actor": "actor/manager",
-      "requires": [],
-      "gives": "A rejected expense."
+      "id": "s4",
+      "says": "Finance reimburses the approved expense.",
+      "actor": "actor/finance"
     },
     {
-      "useCase": "use-case/spending.reimburse-expense",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "A reimbursed expense."
+      "id": "s5",
+      "says": "The employee watches each expense in their own list.",
+      "actor": "actor/employee"
     },
     {
-      "useCase": "use-case/spending.list-expenses",
-      "actor": "actor/employee",
-      "requires": [],
-      "gives": "The employee expense list."
+      "id": "s6",
+      "says": "The manager sets the receipt threshold for the policy.",
+      "actor": "actor/manager"
     },
     {
-      "useCase": "use-case/spending.set-receipt-threshold",
-      "actor": "actor/manager",
-      "requires": [],
-      "gives": "A new receipt threshold."
+      "id": "s7",
+      "says": "Finance exports the approved expenses in one batch.",
+      "actor": "actor/finance"
     },
     {
-      "useCase": "use-case/spending.export-expenses",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "An export batch."
-    },
-    {
-      "useCase": "use-case/spending.erase-personal-data",
-      "actor": "actor/finance",
-      "requires": [],
-      "gives": "An expense without personal data."
+      "id": "s8",
+      "says": "Finance erases the personal data of expenses past retention.",
+      "actor": "actor/finance"
     }
   ],
   "fulfills": [
     "requirement/approval.decided-within-five-days"
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "0e4812e7"
 }
 ---
 

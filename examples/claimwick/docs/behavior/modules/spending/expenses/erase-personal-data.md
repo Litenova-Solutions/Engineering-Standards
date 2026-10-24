@@ -4,16 +4,31 @@
   "id": "use-case/spending.erase-personal-data",
   "title": "Erase Personal Data",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/erase-personal-data"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/erase-personal-data",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s8"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
   "raises": [],
+  "fulfills": [
+    "requirement/approval.erase-after-retention"
+  ],
+  "changes": [
+    "aggregate/spending.expense"
+  ],
+  "risk": [
+    "personal-data"
+  ],
   "records": [
     {
       "type": "result",
@@ -21,20 +36,29 @@
       "title": "Erased",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The personal data of the expense is erased."
+      "meaning": "The personal data of the expense is erased.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "621f4965"
     },
     {
       "type": "scenario",
       "id": "scenario/erase-personal-data.erasing-personal-data-succeeds",
       "title": "Erasing personal data succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "An expense was reimbursed and its retention ended.",
       "when": "Finance erases the personal data of the expense.",
       "result": "result/erase-personal-data.erased",
-      "then": "The personal data of the expense is erased."
+      "then": "The personal data of the expense is erased.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "8f6cf1e9"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "ab2a1e85"
 }
 ---
 

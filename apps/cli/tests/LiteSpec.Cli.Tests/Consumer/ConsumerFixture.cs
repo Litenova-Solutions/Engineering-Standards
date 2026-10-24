@@ -37,7 +37,7 @@ static class ConsumerFixture
     [
         new("docs/product/brief.md",
             """
-            {"type":"product","id":"product/fixture","title":"Fixture Shop","owner":"fixture","status":"approved","boundary":"The shop sells printed books to readers.","neverDoes":["The shop never sells ebooks."],"audience":["actor/customer"]}
+            {"type":"product","id":"product/fixture","title":"Fixture Shop","owner":"fixture","status":"approved","boundary":"The shop sells printed books to readers.","neverDoes":["The shop never sells ebooks."],"audience":["actor/customer"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Fixture Shop
@@ -49,7 +49,7 @@ static class ConsumerFixture
             """),
         new("docs/product/pricing.md",
             """
-            {"type":"requirement-page","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","reviewBy":"2027-04-01","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","kind":"business","statement":"Every order carries a flat fee of one euro.","rationale":"One fee keeps every receipt readable.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}]}]}
+            {"type":"requirement-page","id":"pricing","title":"Pricing","owner":"fixture","status":"approved","reviewBy":"2027-04-01","records":[{"type":"requirement","id":"requirement/pricing.flat-fee","title":"Flat fee","owner":"fixture","status":"approved","kind":"business","statement":"Every order carries a flat fee of one euro.","rationale":"One fee keeps every receipt readable.","values":[{"value":"EUR 1.00","effectiveFrom":"2026-01-01"}],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}]}
             """,
             """
             # Pricing
@@ -93,7 +93,7 @@ static class ConsumerFixture
             """),
         new("docs/product/decisions/0001-launch.md",
             """
-            {"type":"decision","id":"decision/0001-launch","title":"Launch with a flat fee","owner":"fixture","status":"approved","decided":"2026-01-01","options":[{"name":"Flat fee","for":"Every receipt shows the same fee line.","against":"Large orders pay too little for delivery."},{"name":"Percentage","for":"Large orders carry their delivery cost.","against":"Every receipt needs its own math."}],"chosen":"Flat fee","changeWhen":"The fee changes when delivery costs move.","decides":["requirement/pricing.flat-fee"],"basedOn":[]}
+            {"type":"decision","id":"decision/0001-launch","title":"Launch with a flat fee","owner":"fixture","status":"approved","decided":"2026-01-01","options":[{"name":"Flat fee","for":"Every receipt shows the same fee line.","against":"Large orders pay too little for delivery."},{"name":"Percentage","for":"Large orders carry their delivery cost.","against":"Every receipt needs its own math."}],"chosen":"Flat fee","changeWhen":"The fee changes when delivery costs move.","decides":["requirement/pricing.flat-fee"],"basedOn":[],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Launch with a Flat Fee
@@ -115,9 +115,9 @@ static class ConsumerFixture
             The launch plan states the fee on its first page.
 
             """),
-        new("docs/domain/actors/customer.md",
+        new("docs/behavior/actors/customer.md",
             """
-            {"type":"actor","id":"actor/customer","title":"Customer","owner":"fixture","status":"approved","kind":"person","holds":[{"role":"role/customer","scope":"self"}]}
+            {"type":"actor","id":"actor/customer","title":"Customer","owner":"fixture","status":"approved","kind":"person","holds":[{"role":"role/customer","scope":"self"}],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Customer
@@ -127,9 +127,9 @@ static class ConsumerFixture
             A customer buys books from the shop.
 
             """),
-        new("docs/domain/roles/customer.md",
+        new("docs/behavior/roles/customer.md",
             """
-            {"type":"role","id":"role/customer","title":"Customer","owner":"fixture","status":"approved","scope":"self","allows":["permission/cancel-order"]}
+            {"type":"role","id":"role/customer","title":"Customer","owner":"fixture","status":"reviewed","scope":"self","allows":["permission/cancel-order"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Customer
@@ -139,9 +139,9 @@ static class ConsumerFixture
             A customer holds this role on their own orders.
 
             """),
-        new("docs/domain/permissions.md",
+        new("docs/behavior/permissions.md",
             """
-            {"type":"permission-list","id":"permissions","title":"Permissions","owner":"fixture","status":"approved","records":[{"type":"permission","id":"permission/cancel-order","title":"Cancel order","meaning":"The holder cancels an order they placed."}]}
+            {"type":"permission-list","id":"permissions","title":"Permissions","owner":"fixture","status":"reviewed","records":[{"type":"permission","id":"permission/cancel-order","title":"Cancel order","owner":"fixture","status":"reviewed","meaning":"The holder cancels an order they placed.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}]}
             """,
             """
             # Permissions
@@ -149,9 +149,9 @@ static class ConsumerFixture
             The list below names every action the shop grants.
 
             """),
-        new("docs/domain/entry-points.md",
+        new("docs/behavior/entry-points.md",
             """
-            {"type":"entry-point-list","id":"entry-points","title":"Entry points","owner":"fixture","status":"approved","records":[{"type":"entry-point","id":"entry-point/web","title":"Web shop","kind":"app","path":"apps/web"}]}
+            {"type":"entry-point-list","id":"entry-points","title":"Entry points","owner":"fixture","status":"reviewed","records":[{"type":"entry-point","id":"entry-point/web","title":"Web shop","owner":"fixture","status":"reviewed","kind":"browser","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}]}
             """,
             """
             # Entry Points
@@ -159,9 +159,9 @@ static class ConsumerFixture
             Customers reach the shop through the web shop.
 
             """),
-        new("docs/domain/modules/orders/README.md",
+        new("docs/behavior/modules/orders/README.md",
             """
-            {"type":"module","id":"module/orders","title":"Orders","owner":"fixture","status":"approved","dependsOn":[]}
+            {"type":"module","id":"module/orders","title":"Orders","owner":"fixture","status":"reviewed","dependsOn":[],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Orders
@@ -169,9 +169,9 @@ static class ConsumerFixture
             The orders module keeps every order claim.
 
             """),
-        new("docs/domain/modules/orders/order-claims/README.md",
+        new("docs/behavior/modules/orders/order-claims/README.md",
             """
-            {"type":"aggregate","id":"aggregate/orders.order-claim","title":"Order claim","owner":"fixture","status":"approved","states":[{"name":"Draft","meaning":"The claim is open for changes."},{"name":"Canceled","meaning":"The customer canceled the claim."}],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","kind":"precondition","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"]},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","meaning":"An order claim was canceled.","carries":["orderId"]}]}
+            {"type":"aggregate","id":"aggregate/orders.order-claim","title":"Order claim","owner":"fixture","status":"reviewed","states":[{"name":"Draft","meaning":"The claim is open for changes."},{"name":"Canceled","meaning":"The customer canceled the claim."}],"records":[{"type":"rule","id":"rule/order-claim.cancel-before-shipment-only","title":"Cancel before shipment only","owner":"fixture","status":"reviewed","kind":"precondition","statement":"A customer cancels an order claim only before its shipment leaves.","governs":["use-case/orders.cancel-order"],"refusal":"result/cancel-order.cancel-refused","basedOn":[],"fulfills":["requirement/pricing.flat-fee"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"},{"type":"event","id":"event/order-claim.order-canceled","title":"Order canceled","owner":"fixture","status":"reviewed","meaning":"An order claim was canceled.","carries":["orderId"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Order Claim
@@ -189,9 +189,9 @@ static class ConsumerFixture
             | orderId | The order this claim states. | internal |
 
             """),
-        new("docs/domain/modules/orders/cancel-order.md",
+        new("docs/behavior/modules/orders/cancel-order.md",
             """
-            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"approved","kind":"command","needs":["permission/cancel-order"],"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","outcome":"success","meaning":"The order claim was canceled."},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","outcome":"refusal","code":"orders.cancel-refused","meaning":"The shipment already left, so the cancel is refused."}]}
+            {"type":"use-case","id":"use-case/orders.cancel-order","title":"Cancel order","owner":"fixture","status":"reviewed","kind":"command","access":{"auth":["session"],"grant":"permission/cancel-order","tenant":"own"},"reachedThrough":["entry-point/web"],"raises":["event/order-claim.order-canceled"],"fulfills":["requirement/pricing.flat-fee"],"records":[{"type":"result","id":"result/cancel-order.order-canceled","title":"Order canceled","owner":"fixture","outcome":"success","meaning":"The order claim was canceled.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"},{"type":"result","id":"result/cancel-order.cancel-refused","title":"Cancel refused","owner":"fixture","outcome":"refusal","code":"orders.cancel-refused","meaning":"The shipment already left, so the cancel is refused.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}
             """,
             """
             # Cancel Order
@@ -385,7 +385,7 @@ static class ConsumerFixture
             ["paths"] = new JsonObject
             {
                 ["docs"] = "docs",
-                ["domainDocs"] = "docs/domain",
+                ["behaviorDocs"] = "docs/behavior",
                 ["uiDocs"] = "docs/ui",
                 ["frontends"] = new JsonArray(),
             },

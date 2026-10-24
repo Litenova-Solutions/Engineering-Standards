@@ -28,7 +28,10 @@
   "decides": [
     "requirement/approval.receipt-over-threshold"
   ],
-  "basedOn": []
+  "basedOn": [],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "32fc1654"
 }
 ---
 

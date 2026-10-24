@@ -20,7 +20,10 @@
       ],
       "basedOn": [
         "research/approval-time-benchmarks"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "8633bda2"
     },
     {
       "type": "requirement",
@@ -36,7 +39,10 @@
       ],
       "basedOn": [
         "constraint/tax-receipt-retention"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "1767aa48"
     },
     {
       "type": "requirement",
@@ -50,7 +56,10 @@
       "feature": [
         "feature/approval-reminders"
       ],
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "2dca57ec"
     },
     {
       "type": "requirement",
@@ -64,7 +73,26 @@
       "feature": [
         "feature/approval-reminders"
       ],
-      "basedOn": []
+      "basedOn": [],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "0d1c59cb"
+    },
+    {
+      "type": "requirement",
+      "id": "requirement/approval.erase-after-retention",
+      "title": "Erase after retention",
+      "owner": "claimwick-team",
+      "status": "approved",
+      "kind": "functional",
+      "statement": "The personal data of a decided expense is erased after its retention.",
+      "rationale": "Past its need, personal data is a risk with no use.",
+      "basedOn": [
+        "constraint/tax-receipt-retention"
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "d94fb08d"
     }
   ]
 }
@@ -82,7 +110,7 @@ Expenses arrive daily, and each one needs a timely decision with proof where the
 
 ## What We Do
 
-Every submitted expense is decided within five business days. Expenses above the receipt threshold carry a receipt. Nobody approves their own expense, and each approved expense is reimbursed at most once.
+Every submitted expense is decided within five business days. Expenses above the receipt threshold carry a receipt. Nobody approves their own expense, and each approved expense is reimbursed at most once. The personal data of a decided expense is erased after its retention.
 
 ## Why It Is Better
 

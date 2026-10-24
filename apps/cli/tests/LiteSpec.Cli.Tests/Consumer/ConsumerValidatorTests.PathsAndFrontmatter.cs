@@ -100,7 +100,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/modules/orders/unscanned.md",
+            "docs/behavior/modules/orders/unscanned.md",
             ConsumerFixture.Page(
                 ConsumerFixture.Meta("""{"type":"workflow","id":"unscanned","title":"Unscanned","owner":"fixture","status":"approved"}"""),
                 "# Unscanned\n"));
@@ -113,7 +113,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
-            "docs/domain/modules/orders/cancel-order.md",
+            "docs/behavior/modules/orders/cancel-order.md",
             meta => meta.Remove("title"));
         AssertProblem(RunConsumer(folder.Path), "missing required property 'title'");
     }
@@ -124,7 +124,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
-            "docs/domain/modules/orders/cancel-order.md",
+            "docs/behavior/modules/orders/cancel-order.md",
             meta => meta["implementationStatus"] = "planned");
         AssertProblem(RunConsumer(folder.Path), "unknown property 'implementationStatus'");
     }
@@ -140,13 +140,13 @@ public sealed partial class ConsumerValidatorTests
         AssertProblem(RunConsumer(folder.Path), "/status");
     }
 
-    [Fact(DisplayName = "use-case kind outside command, query and reaction")]
-    public void UseCaseKindOutsideCommandQueryAndReaction()
+    [Fact(DisplayName = "use-case kind outside command and query")]
+    public void UseCaseKindOutsideCommandAndQuery()
     {
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
-            "docs/domain/modules/orders/cancel-order.md",
+            "docs/behavior/modules/orders/cancel-order.md",
             meta => meta["kind"] = "mutation");
         AssertProblem(RunConsumer(folder.Path), "/kind");
     }
@@ -157,7 +157,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
-            "docs/domain/modules/orders/cancel-order.md",
+            "docs/behavior/modules/orders/cancel-order.md",
             meta => ((JsonObject)((JsonArray)meta["records"]!)[0]!).Remove("outcome"));
         AssertProblem(RunConsumer(folder.Path), "/records/0");
     }
@@ -168,7 +168,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.MutateMeta(
             folder.Path,
-            "docs/domain/modules/orders/cancel-order.md",
+            "docs/behavior/modules/orders/cancel-order.md",
             meta => meta["type"] = "business-record");
         AssertProblem(RunConsumer(folder.Path), "matches 0 of");
     }
@@ -179,7 +179,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/modules/orders/plain.md",
+            "docs/behavior/modules/orders/plain.md",
             "# Plain\n\nA page with no record.\n");
         AssertProblem(RunConsumer(folder.Path), "no frontmatter block");
     }
@@ -190,7 +190,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/modules/orders/broken.md",
+            "docs/behavior/modules/orders/broken.md",
             "---\n{bad json}\n---\n\n# Broken\n");
         AssertProblem(RunConsumer(folder.Path), "JSON parse error");
     }

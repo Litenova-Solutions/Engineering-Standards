@@ -4,12 +4,18 @@
   "id": "use-case/spending.reimburse-expense",
   "title": "Reimburse Expense",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/reimburse-expense"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/reimburse-expense",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s4"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
@@ -19,6 +25,12 @@
   "fulfills": [
     "requirement/approval.single-reimbursement"
   ],
+  "changes": [
+    "aggregate/spending.expense"
+  ],
+  "risk": [
+    "money"
+  ],
   "records": [
     {
       "type": "result",
@@ -26,7 +38,10 @@
       "title": "Reimbursed",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The expense is reimbursed."
+      "meaning": "The expense is reimbursed.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "bab7b447"
     },
     {
       "type": "result",
@@ -35,7 +50,10 @@
       "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.not-approved",
-      "meaning": "The expense is not approved."
+      "meaning": "The expense is not approved.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "f9b836a8"
     },
     {
       "type": "result",
@@ -44,20 +62,29 @@
       "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.already-reimbursed",
-      "meaning": "The expense is already reimbursed."
+      "meaning": "The expense is already reimbursed.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "46b8e152"
     },
     {
       "type": "scenario",
       "id": "scenario/reimburse-expense.reimbursing-an-approved-expense-succeeds",
       "title": "Reimbursing an approved expense succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "A manager approved an expense.",
       "when": "Finance reimburses the expense.",
       "result": "result/reimburse-expense.reimbursed",
-      "then": "The expense is reimbursed."
+      "then": "The expense is reimbursed.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "46883c3c"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "6fd56b98"
 }
 ---
 

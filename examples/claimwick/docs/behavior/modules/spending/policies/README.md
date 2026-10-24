@@ -4,7 +4,7 @@
   "id": "aggregate/spending.policy",
   "title": "Policy",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "summary": "The policy is the company spending policy and its receipt threshold.",
   "states": [
     {
@@ -22,7 +22,7 @@
       "id": "rule/policy.threshold-never-negative",
       "title": "Threshold never negative",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "invariant",
       "statement": "A threshold is never negative.",
       "governs": [
@@ -32,9 +32,15 @@
       "basedOn": [],
       "fulfills": [
         "requirement/approval.receipt-over-threshold"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "a7c6b445"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "020c08d4"
 }
 ---
 

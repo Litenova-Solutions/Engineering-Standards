@@ -8,7 +8,10 @@
   "statement": "Every submitted expense is decided within five business days.",
   "measure": "Median hours from submission to decision.",
   "target": "Under 120 hours.",
-  "by": "2026-12-31"
+  "by": "2026-12-31",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "a2c4a57d"
 }
 ---
 

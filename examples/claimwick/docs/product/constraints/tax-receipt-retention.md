@@ -8,7 +8,10 @@
   "source": "National tax law keeps business receipts for 7 years.",
   "category": "organizational",
   "applies": true,
-  "appliesBecause": "Claimwick stores receipts for reimbursed expenses."
+  "appliesBecause": "Claimwick stores receipts for reimbursed expenses.",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "d3ce0644"
 }
 ---
 

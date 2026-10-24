@@ -11,7 +11,10 @@
       "read": "2026-02-10"
     }
   ],
-  "question": "How fast do small companies decide expenses?"
+  "question": "How fast do small companies decide expenses?",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "bdfdf4b1"
 }
 ---
 

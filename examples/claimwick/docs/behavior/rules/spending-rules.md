@@ -3,14 +3,14 @@
   "type": "rule-set",
   "title": "Spending Rules",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "records": [
     {
       "type": "rule",
       "id": "rule/spending.receipt-filed-once",
       "title": "Receipt filed once",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "cross-aggregate",
       "statement": "A receipt file supports one expense across spending.",
       "governs": [
@@ -19,7 +19,10 @@
       "basedOn": [],
       "fulfills": [
         "requirement/approval.receipt-over-threshold"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "144ac574"
     }
   ]
 }

@@ -4,18 +4,27 @@
   "id": "use-case/spending.set-receipt-threshold",
   "title": "Set Receipt Threshold",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/manage-policy"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/manage-policy",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s6"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
   "raises": [],
   "fulfills": [
     "requirement/approval.receipt-over-threshold"
+  ],
+  "changes": [
+    "aggregate/spending.policy"
   ],
   "records": [
     {
@@ -24,7 +33,10 @@
       "title": "Threshold set",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The receipt threshold is set."
+      "meaning": "The receipt threshold is set.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "bac7afcc"
     },
     {
       "type": "result",
@@ -33,20 +45,29 @@
       "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.negative-threshold",
-      "meaning": "The threshold is negative."
+      "meaning": "The threshold is negative.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "6688dc4e"
     },
     {
       "type": "scenario",
       "id": "scenario/set-receipt-threshold.setting-the-threshold-succeeds",
       "title": "Setting the threshold succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "Finance agreed a new receipt threshold with the managers.",
       "when": "The manager sets the receipt threshold.",
       "result": "result/set-receipt-threshold.threshold-set",
-      "then": "The receipt threshold is set."
+      "then": "The receipt threshold is set.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "6acb36e6"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "14d07e70"
 }
 ---
 

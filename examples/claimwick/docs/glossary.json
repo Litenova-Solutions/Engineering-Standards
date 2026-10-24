@@ -16,7 +16,7 @@
         }
       ],
       "owner": "claimwick-team",
-      "status": "approved"
+      "status": "retired"
     },
     {
       "id": "term/receipt",
@@ -33,7 +33,7 @@
         }
       ],
       "owner": "claimwick-team",
-      "status": "approved"
+      "status": "retired"
     },
     {
       "id": "term/policy",
@@ -45,7 +45,7 @@
       },
       "rejected": [],
       "owner": "claimwick-team",
-      "status": "approved"
+      "status": "retired"
     },
     {
       "id": "term/approver",
@@ -57,7 +57,7 @@
       },
       "rejected": [],
       "owner": "claimwick-team",
-      "status": "approved"
+      "status": "retired"
     }
   ],
   "mannered": [

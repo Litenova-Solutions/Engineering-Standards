@@ -5,15 +5,15 @@ public sealed partial class ConsumerValidatorTests
     const string BriefPage = "docs/product/brief.md";
     const string RequirementPage = "docs/product/pricing.md";
     const string DecisionPage = "docs/product/decisions/0001-launch.md";
-    const string ActorPage = "docs/domain/actors/customer.md";
+    const string ActorPage = "docs/behavior/actors/customer.md";
     const string TutorialPage = "docs/guide/first-run.md";
     const string HowToPage = "docs/guide/add-a-pack.md";
     const string CommandPage = "docs/tools/fixture-up.md";
     const string ReferencePage = "docs/reference/ports.md";
     const string ConfigurationPage = "docs/tools/configuration.md";
-    const string UseCasePage = "docs/domain/modules/orders/cancel-order.md";
-    const string AggregatePage = "docs/domain/modules/orders/order-claims/README.md";
-    const string ModulePage = "docs/domain/modules/orders/README.md";
+    const string UseCasePage = "docs/behavior/modules/orders/cancel-order.md";
+    const string AggregatePage = "docs/behavior/modules/orders/order-claims/README.md";
+    const string ModulePage = "docs/behavior/modules/orders/README.md";
 
     static string ReplaceFirst(string raw, string oldValue, string newValue)
     {
@@ -117,7 +117,14 @@ public sealed partial class ConsumerValidatorTests
     public void QueryWithoutWhatHappens()
     {
         using var folder = ConsumerFixture.Create();
-        ConsumerFixture.MutateMeta(folder.Path, UseCasePage, meta => meta["kind"] = "query");
+        ConsumerFixture.MutateMeta(
+            folder.Path,
+            UseCasePage,
+            meta =>
+            {
+                meta["kind"] = "query";
+                meta["output"] = ConsumerFixture.Meta("""{"include":{"rows":{"fields":[{"name":"claims","meaning":"One row per order claim."}],"classification":"internal","source":["aggregate/orders.order-claim"],"freshness":"immediate"}}}""");
+            });
         ConsumerFixture.MutateBody(folder.Path, UseCasePage, raw => WithoutSection(raw, "What Happens"));
         AssertClean(RunConsumer(folder.Path));
     }
@@ -130,7 +137,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/goals/faster-delivery.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"goal","id":"goal/faster-delivery","title":"Faster Delivery","owner":"fixture","status":"approved","statement":"Orders arrive in two days.","measure":"Median days to arrival.","target":"Two days.","by":"2026-12-31"}"""),
+                ConsumerFixture.Meta("""{"type":"goal","id":"goal/faster-delivery","title":"Faster Delivery","owner":"fixture","status":"approved","statement":"Orders arrive in two days.","measure":"Median days to arrival.","target":"Two days.","by":"2026-12-31","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Faster Delivery\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Why It Matters'");
     }
@@ -143,7 +150,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/problems/slow-delivery.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"problem","id":"problem/slow-delivery","title":"Slow Delivery","owner":"fixture","status":"approved","statement":"Orders take weeks to arrive."}"""),
+                ConsumerFixture.Meta("""{"type":"problem","id":"problem/slow-delivery","title":"Slow Delivery","owner":"fixture","status":"approved","statement":"Orders take weeks to arrive.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Slow Delivery\n\n## Situation\n\nOrders take weeks to arrive.\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Evidence'");
     }
@@ -156,7 +163,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/features/approval-reminders.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"feature","id":"feature/approval-reminders","title":"Approval Reminders","owner":"fixture","status":"approved","state":"shipped"}"""),
+                ConsumerFixture.Meta("""{"type":"feature","id":"feature/approval-reminders","title":"Approval Reminders","owner":"fixture","status":"approved","state":"shipped","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Approval Reminders\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Offering'");
     }
@@ -169,7 +176,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/constraints/tax-retention.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"constraint","id":"constraint/tax-retention","title":"Tax Retention","owner":"fixture","status":"approved","source":"Tax office guidance.","category":"technical","applies":true,"appliesBecause":"The shop keeps receipts."}"""),
+                ConsumerFixture.Meta("""{"type":"constraint","id":"constraint/tax-retention","title":"Tax Retention","owner":"fixture","status":"approved","source":"Tax office guidance.","category":"technical","applies":true,"appliesBecause":"The shop keeps receipts.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Tax Retention\n\n## Summary\n\nThe guidance states the retention duty.\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'What It Requires'");
     }
@@ -182,7 +189,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/research/delivery-benchmarks.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"research","id":"research/delivery-benchmarks","title":"Delivery Benchmarks","owner":"fixture","status":"approved","question":"How fast do rivals deliver?","sources":[{"url":"https://example.com/benchmarks","read":"2026-01-01"}]}"""),
+                ConsumerFixture.Meta("""{"type":"research","id":"research/delivery-benchmarks","title":"Delivery Benchmarks","owner":"fixture","status":"approved","question":"How fast do rivals deliver?","sources":[{"url":"https://example.com/benchmarks","read":"2026-01-01"}],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Delivery Benchmarks\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Answer'");
     }
@@ -195,7 +202,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/journeys/submit-and-reimburse.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"journey","id":"journey/submit-and-reimburse","title":"Submit and Reimburse","owner":"fixture","status":"approved","actor":"actor/customer","goal":"The customer is reimbursed.","steps":[{"useCase":"use-case/orders.cancel-order"}]}"""),
+                ConsumerFixture.Meta("""{"type":"journey","id":"journey/submit-and-reimburse","title":"Submit and Reimburse","owner":"fixture","status":"approved","actor":"actor/customer","goal":"The customer is reimbursed.","finishedWhen":"The customer holds the reimbursement.","steps":[{"id":"s1","says":"The customer submits the order.","actor":"actor/customer"}],"fulfills":["requirement/pricing.flat-fee"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Submit and Reimburse\n\n## Between the Steps\n\nThe shop hands the claim to payment.\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Example'");
     }
@@ -208,7 +215,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/product/journeys/submit-and-reimburse.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"journey","id":"journey/submit-and-reimburse","title":"Submit and Reimburse","owner":"fixture","status":"approved","actor":"actor/customer","goal":"The customer is reimbursed.","steps":[{"useCase":"use-case/orders.cancel-order"}]}"""),
+                ConsumerFixture.Meta("""{"type":"journey","id":"journey/submit-and-reimburse","title":"Submit and Reimburse","owner":"fixture","status":"approved","actor":"actor/customer","goal":"The customer is reimbursed.","finishedWhen":"The customer holds the reimbursement.","steps":[{"id":"s1","says":"The customer submits the order.","actor":"actor/customer"}],"fulfills":["requirement/pricing.flat-fee"],"approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Submit and Reimburse\n\n## Example\n\nAlex submits a claim on Monday and is reimbursed by Friday.\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Between the Steps'");
     }
@@ -219,7 +226,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/rules/spending-standards.md",
+            "docs/behavior/rules/spending-standards.md",
             ConsumerFixture.Page(
                 ConsumerFixture.Meta("""{"type":"rule-set","id":"spending-standards","title":"Spending Standards","owner":"fixture","status":"approved"}"""),
                 "# Spending Standards\n"));
@@ -232,9 +239,9 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/systems/payout-bank.md",
+            "docs/behavior/systems/payout-bank.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"external-system","id":"external-system/payout-bank","title":"Payout Bank","owner":"fixture","status":"approved","actor":"actor/customer"}"""),
+                ConsumerFixture.Meta("""{"type":"external-system","id":"external-system/payout-bank","title":"Payout Bank","owner":"fixture","status":"reviewed","actor":"actor/customer","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Payout Bank\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Summary'");
     }
@@ -247,7 +254,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/runbooks/clear-stuck-reimbursements.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"runbook","id":"runbook/clear-stuck-reimbursements","title":"Clear Stuck Reimbursements","owner":"fixture","status":"approved","trigger":"A reimbursement sits past its date."}"""),
+                ConsumerFixture.Meta("""{"type":"runbook","id":"runbook/clear-stuck-reimbursements","title":"Clear Stuck Reimbursements","owner":"fixture","status":"reviewed","trigger":"A reimbursement sits past its date.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Clear Stuck Reimbursements\n\n## Impact\n\nStuck claims block payment.\n\n## Prerequisites\n\nThe reader holds the payments role.\n\n## Procedure\n\nClear the stuck claim and rerun payment.\n\n## Verification\n\nThe claim leaves the stuck list.\n\n## Rollback or Recovery\n\nRestore the claim from its snapshot.\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Escalation'");
     }
@@ -260,7 +267,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/deviations/export-review-bypass.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"deviation","id":"deviation/export-review-bypass","title":"Export Review Bypass","owner":"fixture","status":"approved","provision":"litespec/core/scope#select-a-size-a-shape-and-stacks","reason":"The export runs once.","reviewBy":"2027-01-01","removeWhen":"The export is removed."}"""),
+                ConsumerFixture.Meta("""{"type":"deviation","id":"deviation/export-review-bypass","title":"Export Review Bypass","owner":"fixture","status":"approved","provision":"litespec/core/scope#select-a-size-a-shape-and-stacks","reason":"The export runs once.","reviewBy":"2027-01-01","removeWhen":"The export is removed.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Export Review Bypass\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Consequences'");
     }
@@ -273,7 +280,7 @@ public sealed partial class ConsumerValidatorTests
             folder.Path,
             "docs/known-gaps/export-unimplemented.md",
             ConsumerFixture.Page(
-                ConsumerFixture.Meta("""{"type":"known-gap","id":"known-gap/export-unimplemented","title":"Export Unimplemented","owner":"fixture","status":"approved","check":"behavior-unrecorded","subject":["use-case/orders.cancel-order"],"endsBy":"2027-01-01","reason":"The export ships later."}"""),
+                ConsumerFixture.Meta("""{"type":"known-gap","id":"known-gap/export-unimplemented","title":"Export Unimplemented","owner":"fixture","status":"approved","check":"behavior-unrecorded","subject":["use-case/orders.cancel-order"],"endsBy":"2027-01-01","reason":"The export ships later.","approvedBy":"fixture","approvedOn":"2026-10-01","approvedHash":"00000000"}"""),
                 "# Export Unimplemented\n"));
         AssertProblem(RunConsumer(folder.Path), "requires an H2 'Exit'");
     }

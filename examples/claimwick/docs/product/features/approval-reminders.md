@@ -11,7 +11,10 @@
   ],
   "serves": [
     "goal/decided-in-days"
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "5093ffa7"
 }
 ---
 
@@ -19,4 +22,4 @@
 
 ## Offering
 
-Managers get a reminder for expenses waiting past three days. The reminder names the expense and its waiting time. Expenses decided in time never trigger one.
+Managers get a reminder for expenses waiting past three business days. The reminder names the expense and its waiting time. Expenses decided in time never trigger one.

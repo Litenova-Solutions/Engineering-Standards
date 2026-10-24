@@ -1,24 +1,33 @@
 ---
 {
-  "type": "limit-set",
-  "title": "Limits",
+  "type": "setting-set",
+  "title": "Settings",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "records": [
     {
-      "type": "limit",
-      "id": "limit/open-expenses-per-employee",
-      "title": "Open expenses per employee",
+      "type": "setting",
+      "id": "setting/spending.receipt-threshold",
+      "title": "Receipt Threshold",
       "owner": "claimwick-team",
-      "status": "approved",
-      "bound": "Open expenses per employee",
-      "value": "20",
-      "runbook": "runbook/clear-stuck-reimbursements"
+      "status": "reviewed",
+      "valueType": "money",
+      "default": "EUR 25",
+      "range": "EUR 0 to EUR 500",
+      "unit": "EUR",
+      "setBy": "founder",
+      "atBound": "refuse",
+      "fulfills": [
+        "requirement/approval.receipt-over-threshold"
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "806421bb"
     }
   ]
 }
 ---
 
-# Limits
+# Settings
 
-Spending runs within these bounds.
+Spending runs within these settings.

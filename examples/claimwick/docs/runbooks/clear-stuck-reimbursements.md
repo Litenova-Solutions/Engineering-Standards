@@ -4,9 +4,12 @@
   "id": "runbook/clear-stuck-reimbursements",
   "title": "Clear Stuck Reimbursements",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "trigger": "A reimbursement stays queued past one business day.",
-  "severity": "high"
+  "severity": "high",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "e582aaa7"
 }
 ---
 

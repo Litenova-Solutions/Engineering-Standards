@@ -14,7 +14,10 @@
     "actor/employee",
     "actor/manager",
     "actor/finance"
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "8bf49696"
 }
 ---
 

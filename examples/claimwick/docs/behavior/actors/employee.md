@@ -11,7 +11,10 @@
       "role": "role/employee",
       "scope": "self"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "83ebafae"
 }
 ---
 

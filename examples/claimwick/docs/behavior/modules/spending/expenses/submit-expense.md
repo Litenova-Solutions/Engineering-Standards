@@ -4,12 +4,18 @@
   "id": "use-case/spending.submit-expense",
   "title": "Submit Expense",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "kind": "command",
-  "needs": [
-    "permission/submit-expense"
+  "access": {
+    "auth": [
+      "session"
+    ],
+    "grant": "permission/submit-expense",
+    "tenant": "own"
+  },
+  "serves": [
+    "journey/submit-and-reimburse#s1"
   ],
-  "anonymous": false,
   "reachedThrough": [
     "entry-point/claimwick-app"
   ],
@@ -33,6 +39,12 @@
       "meaning": "The proof of payment, required above the threshold."
     }
   ],
+  "changes": [
+    "aggregate/spending.expense"
+  ],
+  "reads": [
+    "aggregate/spending.policy"
+  ],
   "records": [
     {
       "type": "result",
@@ -40,7 +52,10 @@
       "title": "Submitted",
       "owner": "claimwick-team",
       "outcome": "success",
-      "meaning": "The expense is submitted."
+      "meaning": "The expense is submitted.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "95ade09a"
     },
     {
       "type": "result",
@@ -49,20 +64,29 @@
       "owner": "claimwick-team",
       "outcome": "refusal",
       "code": "spending.receipt-missing",
-      "meaning": "The expense is above the receipt threshold and carries no receipt."
+      "meaning": "The expense is above the receipt threshold and carries no receipt.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "91419801"
     },
     {
       "type": "scenario",
       "id": "scenario/submit-expense.submitting-with-a-receipt-succeeds",
       "title": "Submitting with a receipt succeeds",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "given": "An employee paid for a train ticket and kept the receipt.",
       "when": "The employee submits the expense with the receipt.",
       "result": "result/submit-expense.submitted",
-      "then": "The expense is submitted."
+      "then": "The expense is submitted.",
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "c583910f"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "bb488e1b"
 }
 ---
 

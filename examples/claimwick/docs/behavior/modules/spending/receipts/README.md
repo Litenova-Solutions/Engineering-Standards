@@ -4,7 +4,7 @@
   "id": "aggregate/spending.receipt",
   "title": "Receipt",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "summary": "A receipt is proof of payment attached to an expense.",
   "states": [
     {
@@ -22,7 +22,7 @@
       "id": "rule/receipt.attaches-before-decision",
       "title": "Attaches before decision",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "kind": "precondition",
       "statement": "A receipt attaches before the expense is decided.",
       "governs": [
@@ -32,21 +32,30 @@
       "basedOn": [],
       "fulfills": [
         "requirement/approval.receipt-over-threshold"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "98084cc5"
     },
     {
       "type": "event",
       "id": "event/receipt.attached",
       "title": "Receipt attached",
       "owner": "claimwick-team",
-      "status": "approved",
+      "status": "reviewed",
       "meaning": "A receipt was attached.",
       "carries": [
         "receiptId",
         "expenseId"
-      ]
+      ],
+      "approvedBy": "claimwick-team",
+      "approvedOn": "2026-10-01",
+      "approvedHash": "904eea77"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "1068ed49"
 }
 ---
 

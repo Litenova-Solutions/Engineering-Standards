@@ -11,7 +11,10 @@
       "role": "role/approver",
       "scope": "team"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "6119ccc5"
 }
 ---
 

@@ -8,7 +8,10 @@
   "provision": "litespec/backend/application#enforce-target-authorization-in-the-pipeline",
   "reason": "The weekend export runs with no reviewer on shift.",
   "reviewBy": "2027-01-01",
-  "removeWhen": "A reviewer covers weekends."
+  "removeWhen": "A reviewer covers weekends.",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "82e28f59"
 }
 ---
 

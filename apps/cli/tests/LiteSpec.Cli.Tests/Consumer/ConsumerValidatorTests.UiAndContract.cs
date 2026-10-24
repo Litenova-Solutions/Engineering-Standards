@@ -103,7 +103,7 @@ public sealed partial class ConsumerValidatorTests
         using var folder = ConsumerFixture.Create();
         ConsumerFixture.WriteFile(
             folder.Path,
-            "docs/domain/modules/orders/bom-page.md",
+            "docs/behavior/modules/orders/bom-page.md",
             char.ConvertFromUtf32(0xFEFF) + ConsumerFixture.Page(
                 ConsumerFixture.Meta("""{"type":"reference","id":"bom-page","title":"BOM Page","owner":"fixture","status":"approved"}"""),
                 """

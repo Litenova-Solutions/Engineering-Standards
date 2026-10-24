@@ -11,7 +11,10 @@
       "role": "role/finance",
       "scope": "platform"
     }
-  ]
+  ],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "26830f26"
 }
 ---
 

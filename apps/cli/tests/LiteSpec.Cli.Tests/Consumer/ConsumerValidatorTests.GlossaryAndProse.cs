@@ -4,7 +4,7 @@ namespace LiteSpec.Tests.Consumer;
 
 public sealed partial class ConsumerValidatorTests
 {
-    const string ModuleReadme = "docs/domain/modules/orders/README.md";
+    const string ModuleReadme = "docs/behavior/modules/orders/README.md";
     const string GlossaryFile = "docs/glossary.json";
 
     [Fact(DisplayName = "glossary without its version")]

@@ -10,7 +10,10 @@
     "use-case/spending.export-expenses"
   ],
   "endsBy": "2027-06-01",
-  "reason": "Export waits for the finance file format."
+  "reason": "Export waits for the finance file format.",
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "356553fc"
 }
 ---
 

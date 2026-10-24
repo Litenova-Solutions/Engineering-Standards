@@ -4,9 +4,12 @@
   "id": "module/spending",
   "title": "Spending",
   "owner": "claimwick-team",
-  "status": "approved",
+  "status": "reviewed",
   "summary": "Spending submits, decides, reimburses and exports work expenses.",
-  "dependsOn": []
+  "dependsOn": [],
+  "approvedBy": "claimwick-team",
+  "approvedOn": "2026-10-01",
+  "approvedHash": "63d10617"
 }
 ---
 
