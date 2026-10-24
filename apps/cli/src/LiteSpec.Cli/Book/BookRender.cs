@@ -252,7 +252,7 @@ static class BookRender
     /// <summary>
     ///     Renders a link to a record: its title for every reader, its id for developers only.
     ///     An id that resolves to nothing shows words to reviewers and the id to developers.
-    ///     A step or operation id links its carrying record with the fragment kept.
+    ///     A step or operation id links its carrying record, keeping the fragment in the link target.
     /// </summary>
     public static string RecordLink(BookIndex index, string rel, string id)
     {
@@ -264,8 +264,7 @@ static class BookRender
         var hash = id.IndexOf('#');
         if (hash > 0 && index.ById.TryGetValue(id[..hash], out var carrier))
         {
-            var step = id[(hash + 1)..];
-            return $"<a href=\"{rel}{BookModel.RecordUrl(id)}\">{Esc(carrier["title"])} {Esc(step)}</a> <span class=\"mono dim dev-only\">{Esc(id)}</span>";
+            return $"<a href=\"{rel}{BookModel.RecordUrl(id)}\">{Esc(carrier["title"])}</a> <span class=\"mono dim dev-only\">{Esc(id)}</span>";
         }
 
         return $"<span class=\"dev-only\"><code>{Esc(id)}</code></span><span class=\"reviewer-only\">a missing record</span>";

@@ -42,9 +42,12 @@ static class Differ
     {
         var baseById = baseModel.ById;
         var headById = headModel.ById;
-        var removedIds = baseById.Keys.Where(id => !headById.ContainsKey(id))
+
+        // A derived generic result follows its use case, so the use case's own
+        // entry carries the change and the derived record stays out of the diff.
+        var removedIds = baseById.Keys.Where(id => !headById.ContainsKey(id) && !baseById[id].Derived)
             .ToHashSet(StringComparer.Ordinal);
-        var addedIds = headById.Keys.Where(id => !baseById.ContainsKey(id))
+        var addedIds = headById.Keys.Where(id => !baseById.ContainsKey(id) && !headById[id].Derived)
             .ToHashSet(StringComparer.Ordinal);
         var changes = new List<IntentChange>();
         var byId = new Dictionary<string, IntentChange>(StringComparer.Ordinal);
@@ -65,7 +68,7 @@ static class Differ
             byId[id] = entry;
         }
 
-        foreach (var id in baseById.Keys.Where(headById.ContainsKey))
+        foreach (var id in baseById.Keys.Where(id => headById.ContainsKey(id) && !baseById[id].Derived))
         {
             var entry = ModifiedEntry(
                 baseModel, headModel, baseById[id], headById[id], addedIds, removedIds, byId);

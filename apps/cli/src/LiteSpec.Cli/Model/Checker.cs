@@ -1024,7 +1024,9 @@ static partial class Checker
             }
         }
 
-        foreach (var result in results.Where(left => left.Field("outcome") == "refusal"))
+        // A derived generic refusal is enforced by the access pipeline and input
+        // validation, never thrown by handler code, so only written refusals count.
+        foreach (var result in results.Where(left => !left.Derived && left.Field("outcome") == "refusal"))
         {
             if (result.Field("code") is { } code && !thrown.Contains(code))
             {

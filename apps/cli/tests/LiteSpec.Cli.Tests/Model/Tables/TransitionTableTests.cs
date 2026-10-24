@@ -1,4 +1,5 @@
 using System.Text.Json;
+using LiteSpec.Model;
 using LiteSpec.Tests.Support;
 
 namespace LiteSpec.Tests.Model.Tables;
@@ -12,6 +13,7 @@ public sealed class TransitionTableTests
     {
         using var temp = ModelFixture.Prepare("small");
         AppendTable(temp.Path, TransitionsTable);
+        RestampAggregate(temp.Path, MergedTransitions);
 
         using var document = Build(temp.Path);
         var transitions = Record(document, "aggregate/lending.loan")
@@ -44,6 +46,7 @@ public sealed class TransitionTableTests
     {
         using var temp = ModelFixture.Prepare("small");
         AppendTable(temp.Path, DanglingTable);
+        RestampAggregate(temp.Path, MergedDangling);
 
         var check = Cli.Run("model", "check", "--root", temp.Path, "--format", "json");
         Assert.Equal(1, check.Status);
@@ -72,6 +75,38 @@ public sealed class TransitionTableTests
     {
         var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "README.md");
         File.AppendAllText(page, table);
+    }
+
+    /// <summary>
+    ///     Re-stamps the loan aggregate's approval hash over its frontmatter plus the
+    ///     transitions the appended table merges in, so the check reads only the table.
+    /// </summary>
+    static void RestampAggregate(string root, string transitions)
+    {
+        var page = Path.Combine(root, "docs", "behavior", "modules", "lending", "loans", "README.md");
+        var text = File.ReadAllText(page);
+
+        if (!Frontmatter.TryParse(text, out var parsed, out _))
+        {
+            throw new InvalidOperationException("The loans page lost its frontmatter.");
+        }
+
+        var merged = parsed.Root.GetRawText().Insert(1, $"\"transitions\": {transitions},");
+
+        using var document = JsonDocument.Parse(merged);
+        var record = new LiteSpec.Model.Record
+        {
+            Type = "aggregate",
+            Id = "aggregate/lending.loan",
+            Raw = document.RootElement.Clone(),
+        };
+        var hash = Checker.SemanticHash(record);
+
+        // The page record's hash is the last approvedHash in the file.
+        var marker = "\"approvedHash\": \"";
+        var start = text.LastIndexOf(marker, StringComparison.Ordinal) + marker.Length;
+        var end = text.IndexOf('"', start);
+        File.WriteAllText(page, text[..start] + hash + text[end..]);
     }
 
     static void AddFrontMatterTransitions(string root)
@@ -116,4 +151,10 @@ public sealed class TransitionTableTests
         | ---- | -- | -- |
         | Active | Returned | use-case/lending.nope |
         """;
+
+    /// <summary>The transitions TransitionsTable merges into the loan aggregate.</summary>
+    const string MergedTransitions = """[{ "from": "Active", "to": "Overdue", "by": "use-case/lending.extend-loan" }, { "from": "Overdue", "to": "Returned", "by": "use-case/lending.return-copy" }, { "from": "Active", "to": "Returned", "by": "use-case/lending.return-copy" }]""";
+
+    /// <summary>The transitions DanglingTable merges into the loan aggregate.</summary>
+    const string MergedDangling = """[{ "from": "Active", "to": "Returned", "by": "use-case/lending.nope" }]""";
 }
