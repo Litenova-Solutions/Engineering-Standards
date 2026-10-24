@@ -33,7 +33,7 @@
   "idempotency": {
     "mode": "key",
     "key": "loan:{copy}",
-    "scope": "organizer"
+    "scope": "tenant"
   },
   "records": [
     {

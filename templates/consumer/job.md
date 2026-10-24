@@ -49,7 +49,7 @@
   "idempotency": {
     "mode": "<key|state|not-pending|none>",
     "key": "<Key template of {field} placeholders over the input field names, when the mode is key, otherwise remove this line>",
-    "scope": "<organizer|account|login|global when the mode is key, otherwise remove this line>",
+    "scope": "<tenant|account|login|global when the mode is key, otherwise remove this line>",
     "reason": "<Reason when the mode is none, otherwise remove this line>"
   },
   "risk": ["<money|door|personal-data|access, or remove this line>"],

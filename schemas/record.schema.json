@@ -571,7 +571,7 @@
       "properties": {
         "mode": { "enum": ["key", "state", "not-pending", "none"] },
         "key": { "$ref": "#/$defs/nonEmptyString" },
-        "scope": { "enum": ["organizer", "account", "login", "global"] },
+        "scope": { "enum": ["tenant", "account", "login", "global"] },
         "reason": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [

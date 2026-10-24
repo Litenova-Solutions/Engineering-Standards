@@ -1896,7 +1896,7 @@ static partial class Checker
     }
 
     /// <summary>The idempotency scopes a key may name.</summary>
-    private static readonly string[] IdempotencyScopes = ["organizer", "account", "login", "global"];
+    private static readonly string[] IdempotencyScopes = ["tenant", "account", "login", "global"];
 
     /// <summary>A {field} placeholder inside an idempotency key template.</summary>
     static readonly Regex IdempotencyPlaceholder = new(
@@ -1944,6 +1944,13 @@ static partial class Checker
         if (placeholders.Count == 0)
         {
             findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds idempotency key '{template}' with no {{field}} placeholder; input fields in scope: {inScope}.", record.File, record.Line, SubjectOf(record)));
+            return;
+        }
+
+        // A reaction or a job takes no input: its key names fields of the triggering
+        // event or the run window, which the record does not list.
+        if (record.Type is "reaction" or "job")
+        {
             return;
         }
 

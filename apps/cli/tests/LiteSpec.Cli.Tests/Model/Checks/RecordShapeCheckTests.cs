@@ -105,7 +105,7 @@ public sealed class RecordShapeCheckTests
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "kind": "command", "reachedThrough": ["entry-point/library-app"], "input": [{"name": "copyId", "meaning": "The copy."}], "idempotency": {"mode": "key", "key": "loan:{copy}", "scope": "organizer"}}"""));
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "kind": "command", "reachedThrough": ["entry-point/library-app"], "input": [{"name": "copyId", "meaning": "The copy."}], "idempotency": {"mode": "key", "key": "loan:{copy}", "scope": "tenant"}}"""));
 
         Assert.True(Reports(model, "record-shape", "placeholder 'copy' names no input field"));
         Assert.True(Reports(model, "record-shape", "input fields in scope: copyId"));
@@ -117,7 +117,7 @@ public sealed class RecordShapeCheckTests
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
-            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "kind": "command", "reachedThrough": ["entry-point/library-app"], "input": [{"name": "copyId", "meaning": "The copy."}], "idempotency": {"mode": "key", "key": "notice per loan", "scope": "organizer"}}"""));
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "kind": "command", "reachedThrough": ["entry-point/library-app"], "input": [{"name": "copyId", "meaning": "The copy."}], "idempotency": {"mode": "key", "key": "notice per loan", "scope": "tenant"}}"""));
 
         Assert.True(Reports(model, "record-shape", "with no {field} placeholder"));
         Assert.True(Reports(model, "record-shape", "input fields in scope: copyId"));
