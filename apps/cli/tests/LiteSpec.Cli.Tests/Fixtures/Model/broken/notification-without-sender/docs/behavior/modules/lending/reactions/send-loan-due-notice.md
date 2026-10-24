@@ -13,9 +13,12 @@
   ],
   "approvedBy": "lending-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "289428ab",
-  "issues": [
-    "use-case/lending.return-copy"
+  "approvedHash": "7337e44f",
+  "effects": [
+    {
+      "issues": "use-case/lending.return-copy",
+      "timing": "async"
+    }
   ]
 }
 ---

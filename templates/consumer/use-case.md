@@ -68,8 +68,8 @@
   "raises": ["event/<aggregate>.<past-tense>"],
   "idempotency": {
     "mode": "<key|state|not-pending|none>",
-    "key": "<Key template when the mode is key, otherwise remove this line>",
-    "scope": "<Scope when the mode is key, otherwise remove this line>",
+    "key": "<Key template of {field} placeholders over the input field names, when the mode is key, otherwise remove this line>",
+    "scope": "<organizer|account|login|global when the mode is key, otherwise remove this line>",
     "reason": "<Reason when the mode is none, otherwise remove this line>"
   },
   "audit": {

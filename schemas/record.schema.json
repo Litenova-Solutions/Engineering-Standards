@@ -487,6 +487,83 @@
         }
       ]
     },
+    "reactionEffectEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "issues": { "$ref": "#/$defs/useCaseId" },
+        "sends": { "$ref": "#/$defs/notificationId" },
+        "publishes": { "$ref": "#/$defs/integrationEventId" },
+        "calls": { "$ref": "#/$defs/externalOperationRef" },
+        "timing": { "enum": ["inline", "after-commit", "async"] },
+        "sharesTransaction": { "type": "boolean" },
+        "onFailure": { "$ref": "#/$defs/onFailurePolicy" },
+        "onExhausted": { "$ref": "#/$defs/nonEmptyString" },
+        "before": { "$ref": "#/$defs/nonEmptyString" },
+        "forEach": { "$ref": "#/$defs/nonEmptyString" }
+      },
+      "allOf": [
+        {
+          "anyOf": [
+            { "required": ["issues"] },
+            { "required": ["sends"] },
+            { "required": ["publishes"] },
+            { "required": ["calls"] }
+          ]
+        },
+        { "not": { "required": ["issues", "sends"] } },
+        { "not": { "required": ["issues", "publishes"] } },
+        { "not": { "required": ["issues", "calls"] } },
+        { "not": { "required": ["sends", "publishes"] } },
+        { "not": { "required": ["sends", "calls"] } },
+        { "not": { "required": ["publishes", "calls"] } },
+        {
+          "if": {
+            "required": ["issues"],
+            "properties": { "timing": { "const": "inline" } }
+          },
+          "then": { "required": ["sharesTransaction"] }
+        }
+      ]
+    },
+    "isoDuration": {
+      "type": "string",
+      "pattern": "^P(?=.*\\d)(?:\\d+Y)?(?:\\d+M)?(?:\\d+W)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+(?:\\.\\d+)?S)?)?$"
+    },
+    "retryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxAttempts", "initialDelay", "maxDelay", "backoff"],
+      "properties": {
+        "maxAttempts": { "type": "integer", "minimum": 1 },
+        "initialDelay": { "$ref": "#/$defs/isoDuration" },
+        "maxDelay": { "$ref": "#/$defs/isoDuration" },
+        "backoff": { "enum": ["exponential", "fixed"] }
+      }
+    },
+    "deadLetterPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["after", "action"],
+      "properties": {
+        "after": { "$ref": "#/$defs/isoDuration" },
+        "action": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "structuredOnFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retry"],
+      "properties": {
+        "retry": {
+          "anyOf": [
+            { "const": "none" },
+            { "$ref": "#/$defs/retryPolicy" }
+          ]
+        },
+        "deadLetter": { "$ref": "#/$defs/deadLetterPolicy" }
+      }
+    },
     "idempotencyObject": {
       "type": "object",
       "additionalProperties": false,
@@ -494,7 +571,7 @@
       "properties": {
         "mode": { "enum": ["key", "state", "not-pending", "none"] },
         "key": { "$ref": "#/$defs/nonEmptyString" },
-        "scope": { "$ref": "#/$defs/nonEmptyString" },
+        "scope": { "enum": ["organizer", "account", "login", "global"] },
         "reason": { "$ref": "#/$defs/nonEmptyString" }
       },
       "allOf": [
@@ -1952,7 +2029,7 @@
     "reactionPage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "id", "title", "owner", "status", "on"],
+      "required": ["type", "id", "title", "owner", "status", "on", "effects"],
       "properties": {
         "type": { "const": "reaction" },
         "id": { "$ref": "#/$defs/reactionId" },
@@ -1979,14 +2056,18 @@
           }
         },
         "if": { "$ref": "#/$defs/nonEmptyString" },
-        "issues": { "$ref": "#/$defs/useCaseId" },
-        "sends": { "$ref": "#/$defs/notificationId" },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/reactionEffectEntry" }
+        },
         "forEach": { "$ref": "#/$defs/nonEmptyString" },
         "reads": { "$ref": "#/$defs/aggregateIdArray" },
         "fulfills": { "$ref": "#/$defs/requirementIdArray" },
         "serves": { "$ref": "#/$defs/servesArray" },
         "idempotency": { "$ref": "#/$defs/idempotencyObject" },
-        "onFailure": { "$ref": "#/$defs/onFailurePolicy" },
+        "onFailure": { "$ref": "#/$defs/structuredOnFailure" },
         "onExhausted": { "$ref": "#/$defs/nonEmptyString" },
         "risk": { "$ref": "#/$defs/riskArray" },
         "source": { "$ref": "#/$defs/transcribedSource" }
@@ -2005,9 +2086,7 @@
             "properties": { "status": { "const": "reviewed" } }
           },
           "then": { "required": ["approvedBy", "approvedOn", "approvedHash"] }
-        },
-        { "anyOf": [{ "required": ["issues"] }, { "required": ["sends"] }] },
-        { "not": { "required": ["issues", "sends"] } }
+        }
       ]
     },
     "jobPage": {
@@ -2033,10 +2112,11 @@
         "scope": { "$ref": "#/$defs/nonEmptyString" },
         "batchSize": { "type": "integer" },
         "lease": { "$ref": "#/$defs/leaseObject" },
-        "issues": {
+        "effects": {
           "type": "array",
+          "minItems": 1,
           "uniqueItems": true,
-          "items": { "$ref": "#/$defs/useCaseId" }
+          "items": { "$ref": "#/$defs/effectEntry" }
         },
         "reads": { "$ref": "#/$defs/aggregateIdArray" },
         "serviceLevel": { "$ref": "#/$defs/nonEmptyString" },
@@ -2047,7 +2127,7 @@
         "cursor": { "$ref": "#/$defs/nonEmptyString" },
         "fulfills": { "$ref": "#/$defs/requirementIdArray" },
         "serves": { "$ref": "#/$defs/servesArray" },
-        "onFailure": { "$ref": "#/$defs/onFailurePolicy" },
+        "onFailure": { "$ref": "#/$defs/structuredOnFailure" },
         "onExhausted": { "$ref": "#/$defs/nonEmptyString" },
         "idempotency": { "$ref": "#/$defs/idempotencyObject" },
         "risk": { "$ref": "#/$defs/riskArray" },

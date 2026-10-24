@@ -8,13 +8,17 @@
   "on": [
     "event/loan.loan-borrowed"
   ],
-  "sends": "notification/lending.loan-due",
+  "effects": [
+    {
+      "sends": "notification/lending.loan-due"
+    }
+  ],
   "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
   "approvedBy": "lending-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "dac45342"
+  "approvedHash": "a551aff9"
 }
 ---
 

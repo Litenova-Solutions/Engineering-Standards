@@ -8,15 +8,18 @@
   "on": [
     "event/loan.no-such-event"
   ],
-  "issues": [
-    "use-case/lending.return-copy"
+  "effects": [
+    {
+      "issues": "use-case/lending.return-copy",
+      "timing": "async"
+    }
   ],
   "fulfills": [
     "requirement/borrowing.loan-period-days"
   ],
   "approvedBy": "lending-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "2f88c832"
+  "approvedHash": "66cfc2f1"
 }
 ---
 

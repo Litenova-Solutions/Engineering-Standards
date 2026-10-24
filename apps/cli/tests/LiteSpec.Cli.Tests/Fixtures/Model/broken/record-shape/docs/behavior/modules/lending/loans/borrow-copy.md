@@ -24,6 +24,17 @@
   "fulfills": [
     "requirement/borrowing.max-active-loans"
   ],
+  "input": [
+    {
+      "name": "copyId",
+      "meaning": "The copy the reader borrows."
+    }
+  ],
+  "idempotency": {
+    "mode": "key",
+    "key": "loan:{copy}",
+    "scope": "organizer"
+  },
   "records": [
     {
       "type": "result",
@@ -65,7 +76,7 @@
   ],
   "approvedBy": "lending-team",
   "approvedOn": "2026-10-01",
-  "approvedHash": "b327565a"
+  "approvedHash": "5efd0baa"
 }
 ---
 

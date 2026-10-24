@@ -426,6 +426,20 @@ static partial class Checker
                 {
                     RequireIds(record, "reachedThrough", 1, findings);
                 }
+                CheckIdempotency(record, findings);
+                break;
+
+            case "reaction":
+                CheckLegacyEdges(record, ["issues", "sends"], findings);
+                RequireArray(record, "effects", 1, findings);
+                CheckIdempotency(record, findings);
+                CheckFailurePolicy(record, findings);
+                break;
+
+            case "job":
+                CheckLegacyEdges(record, ["issues"], findings);
+                CheckIdempotency(record, findings);
+                CheckFailurePolicy(record, findings);
                 break;
 
             case "external-system":
@@ -1863,6 +1877,218 @@ static partial class Checker
         else if (!Regex.IsMatch(value, pattern))
         {
             findings.Add(new Finding("invalid-field", $"Record '{record.Id}' has {field} '{value}', which is not {shape}.", record.File, record.Line, SubjectOf(record)));
+        }
+    }
+
+    /// <summary>
+    ///     Flags the retired top-level edge fields on a reaction or job: edges live in
+    ///     the effects array, under one grammar for every record that has edges.
+    /// </summary>
+    private static void CheckLegacyEdges(Record record, string[] fields, List<Finding> findings)
+    {
+        foreach (var field in fields)
+        {
+            if (record.Has(field))
+            {
+                findings.Add(new Finding("record-shape", $"{Label(record.Type)} '{record.Id}' holds top-level {field}; declare its edges in effects.", record.File, record.Line, SubjectOf(record)));
+            }
+        }
+    }
+
+    /// <summary>The idempotency scopes a key may name.</summary>
+    private static readonly string[] IdempotencyScopes = ["organizer", "account", "login", "global"];
+
+    /// <summary>A {field} placeholder inside an idempotency key template.</summary>
+    static readonly Regex IdempotencyPlaceholder = new(
+        @"\{(?<name>[^{}]+)\}",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>
+    ///     The idempotency key and scope: the key templates {field} placeholders over
+    ///     the record's input field names, and the scope names one of the four tenancies.
+    /// </summary>
+    private static void CheckIdempotency(Record record, List<Finding> findings)
+    {
+        if (record.Raw.ValueKind != JsonValueKind.Object
+            || !record.Raw.TryGetProperty("idempotency", out var idempotency)
+            || idempotency.ValueKind != JsonValueKind.Object)
+        {
+            return;
+        }
+
+        if (idempotency.TryGetProperty("scope", out var scope)
+            && scope.ValueKind == JsonValueKind.String
+            && scope.GetString() is { } scopeName
+            && !IdempotencyScopes.Contains(scopeName, StringComparer.Ordinal))
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds idempotency scope '{scopeName}'; {string.Join(", ", IdempotencyScopes)}.", record.File, record.Line, SubjectOf(record)));
+        }
+
+        if (!idempotency.TryGetProperty("key", out var key)
+            || key.ValueKind != JsonValueKind.String
+            || key.GetString() is not { } template)
+        {
+            return;
+        }
+
+        var fields = InputNames(record);
+        var inScope = fields.Count > 0 ? string.Join(", ", fields) : "none";
+
+        var placeholders = IdempotencyPlaceholder.Matches(template)
+            .Select(match => match.Groups["name"].Value.Trim())
+            .Where(name => name.Length > 0)
+            .Distinct(StringComparer.Ordinal)
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+        if (placeholders.Count == 0)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds idempotency key '{template}' with no {{field}} placeholder; input fields in scope: {inScope}.", record.File, record.Line, SubjectOf(record)));
+            return;
+        }
+
+        foreach (var name in placeholders)
+        {
+            if (!fields.Contains(name, StringComparer.Ordinal))
+            {
+                findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds idempotency key '{template}': placeholder '{name}' names no input field; input fields in scope: {inScope}.", record.File, record.Line, SubjectOf(record)));
+            }
+        }
+    }
+
+    /// <summary>The record's input field names, in written order.</summary>
+    private static IReadOnlyList<string> InputNames(Record record)
+    {
+        if (record.Raw.ValueKind != JsonValueKind.Object
+            || !record.Raw.TryGetProperty("input", out var input)
+            || input.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        return
+        [
+            .. input.EnumerateArray()
+                      .Where(entry => entry.ValueKind == JsonValueKind.Object
+                          && entry.TryGetProperty("name", out var name)
+                          && name.ValueKind == JsonValueKind.String
+                          && name.GetString() is { Length: > 0 })
+                      .Select(entry => entry.GetProperty("name").GetString()!),
+        ];
+    }
+
+    /// <summary>An ISO 8601 duration, as the failure policy delays and retention use.</summary>
+    static readonly Regex IsoDuration = new(
+        @"^P(?=.*\d)(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+(?:\.\d+)?S)?)?$",
+        RegexOptions.CultureInvariant);
+
+    /// <summary>
+    ///     The reaction or job failure policy: a retry object with attempts, delays and
+    ///     backoff, or none, with an optional dead letter. Prose and malformed durations report.
+    /// </summary>
+    private static void CheckFailurePolicy(Record record, List<Finding> findings)
+    {
+        if (record.Raw.ValueKind != JsonValueKind.Object
+            || !record.Raw.TryGetProperty("onFailure", out var policy))
+        {
+            return;
+        }
+
+        if (policy.ValueKind == JsonValueKind.String)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure '{policy.GetString()}' as prose; declare retry and deadLetter.", record.File, record.Line, SubjectOf(record)));
+            return;
+        }
+
+        if (policy.ValueKind != JsonValueKind.Object)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure as no object.", record.File, record.Line, SubjectOf(record)));
+            return;
+        }
+
+        if (!policy.TryGetProperty("retry", out var retry))
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure with no retry.", record.File, record.Line, SubjectOf(record)));
+        }
+        else if (retry.ValueKind == JsonValueKind.String)
+        {
+            if (retry.GetString() != "none")
+            {
+                findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry '{retry.GetString()}'; none or a retry object.", record.File, record.Line, SubjectOf(record)));
+            }
+        }
+        else if (retry.ValueKind == JsonValueKind.Object)
+        {
+            CheckRetryPolicy(record, retry, findings);
+        }
+        else
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry as neither none nor a retry object.", record.File, record.Line, SubjectOf(record)));
+        }
+
+        if (policy.TryGetProperty("deadLetter", out var deadLetter))
+        {
+            CheckDeadLetter(record, deadLetter, findings);
+        }
+    }
+
+    /// <summary>The retry object: attempts, ISO 8601 delays and an exponential or fixed backoff.</summary>
+    private static void CheckRetryPolicy(Record record, JsonElement retry, List<Finding> findings)
+    {
+        if (!retry.TryGetProperty("maxAttempts", out var attempts)
+            || attempts.ValueKind != JsonValueKind.Number
+            || !attempts.TryGetInt32(out var count)
+            || count < 1)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry with no positive maxAttempts.", record.File, record.Line, SubjectOf(record)));
+        }
+
+        CheckPolicyDuration(record, retry, "initialDelay", "onFailure retry initialDelay", findings);
+        CheckPolicyDuration(record, retry, "maxDelay", "onFailure retry maxDelay", findings);
+
+        if (!retry.TryGetProperty("backoff", out var backoff)
+            || backoff.ValueKind != JsonValueKind.String
+            || backoff.GetString() is not { } shape)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry with no backoff.", record.File, record.Line, SubjectOf(record)));
+        }
+        else if (shape is not ("exponential" or "fixed"))
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry backoff '{shape}'; exponential, fixed.", record.File, record.Line, SubjectOf(record)));
+        }
+    }
+
+    /// <summary>One ISO 8601 duration inside the failure policy: missing or malformed reports.</summary>
+    private static void CheckPolicyDuration(Record record, JsonElement holder, string field, string where, List<Finding> findings)
+    {
+        if (!holder.TryGetProperty(field, out var value)
+            || value.ValueKind != JsonValueKind.String
+            || value.GetString() is not { } text)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds {where} with no duration.", record.File, record.Line, SubjectOf(record)));
+        }
+        else if (!IsoDuration.IsMatch(text))
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds {where} '{text}', which is not an ISO 8601 duration.", record.File, record.Line, SubjectOf(record)));
+        }
+    }
+
+    /// <summary>The dead letter: an ISO 8601 retention and what a person does.</summary>
+    private static void CheckDeadLetter(Record record, JsonElement deadLetter, List<Finding> findings)
+    {
+        if (deadLetter.ValueKind != JsonValueKind.Object)
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure deadLetter as no object.", record.File, record.Line, SubjectOf(record)));
+            return;
+        }
+
+        CheckPolicyDuration(record, deadLetter, "after", "onFailure deadLetter after", findings);
+
+        if (!deadLetter.TryGetProperty("action", out var action)
+            || action.ValueKind != JsonValueKind.String
+            || action.GetString() is not { Length: > 0 })
+        {
+            findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure deadLetter with no action.", record.File, record.Line, SubjectOf(record)));
         }
     }
 

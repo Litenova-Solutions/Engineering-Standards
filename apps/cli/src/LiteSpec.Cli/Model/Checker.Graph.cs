@@ -248,7 +248,7 @@ static partial class Checker
 
     /// <summary>
     ///     The declared effect edges: use-case effects and raises, reaction triggers
-    ///     reversed into event edges with issues and sends, and job issues.
+    ///     reversed into event edges with the reaction effects, and job effects.
     /// </summary>
     private static Dictionary<string, List<string>> EffectGraph(ProjectModel model)
     {
@@ -305,21 +305,22 @@ static partial class Checker
                     }
                 }
 
-                foreach (var issued in record.Ids("issues"))
+                foreach (var entry in EffectEntries(record))
                 {
-                    Edge(record.Id, issued);
-                }
-
-                foreach (var sent in record.Ids("sends"))
-                {
-                    Edge(record.Id, sent);
+                    if (EffectTarget(entry) is { } target)
+                    {
+                        Edge(record.Id, target);
+                    }
                 }
             }
             else if (record.Type == "job")
             {
-                foreach (var issued in record.Ids("issues"))
+                foreach (var entry in EffectEntries(record))
                 {
-                    Edge(record.Id, issued);
+                    if (EffectTarget(entry) is { } target)
+                    {
+                        Edge(record.Id, target);
+                    }
                 }
             }
         }
@@ -821,17 +822,10 @@ static partial class Checker
     {
         var sent = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (var reaction in model.Records.Where(record => record.Type == "reaction" && record.Status != "retired"))
+        foreach (var holder in model.Records.Where(record =>
+            record.Type is "use-case" or "reaction" or "job" && record.Status != "retired"))
         {
-            foreach (var target in reaction.Ids("sends"))
-            {
-                sent.Add(target);
-            }
-        }
-
-        foreach (var useCase in model.Records.Where(record => record.Type == "use-case" && record.Status != "retired"))
-        {
-            foreach (var entry in EffectEntries(useCase))
+            foreach (var entry in EffectEntries(holder))
             {
                 if (Str(entry, "sends") is { Length: > 0 } target)
                 {
@@ -1212,7 +1206,7 @@ static partial class Checker
         }
     }
 
-    /// <summary>The use case effect entries: objects in its effects array.</summary>
+    /// <summary>The record's effect entries: objects in its effects array. A reaction entry without timing reads as async.</summary>
     private static IReadOnlyList<JsonElement> EffectEntries(Record record)
     {
         if (record.Raw.ValueKind == JsonValueKind.Object
