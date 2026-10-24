@@ -2019,9 +2019,9 @@ static partial class Checker
         }
         else if (retry.ValueKind == JsonValueKind.String)
         {
-            if (retry.GetString() != "none")
+            if (retry.GetString() is not ("none" or "next-run"))
             {
-                findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry '{retry.GetString()}'; none or a retry object.", record.File, record.Line, SubjectOf(record)));
+                findings.Add(new Finding("record-shape", $"Record '{record.Id}' holds onFailure retry '{retry.GetString()}'; none, next-run or a retry object.", record.File, record.Line, SubjectOf(record)));
             }
         }
         else if (retry.ValueKind == JsonValueKind.Object)

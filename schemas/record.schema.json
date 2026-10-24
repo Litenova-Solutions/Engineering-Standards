@@ -558,10 +558,13 @@
         "retry": {
           "anyOf": [
             { "const": "none" },
+            { "const": "next-run" },
             { "$ref": "#/$defs/retryPolicy" }
           ]
         },
-        "deadLetter": { "$ref": "#/$defs/deadLetterPolicy" }
+        "deadLetter": { "$ref": "#/$defs/deadLetterPolicy" },
+        "surfacesIn": { "type": "string", "pattern": "^entry-point/" },
+        "runbook": { "type": "string", "pattern": "^runbook/" }
       }
     },
     "idempotencyObject": {
