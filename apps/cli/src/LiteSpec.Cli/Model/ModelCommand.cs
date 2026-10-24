@@ -11,10 +11,11 @@ static class ModelCommand
     public const string Usage = """
         Usage:
           litespec model build --root <consumer> [--out model.json]
-          litespec model check --root <consumer> [--format json]
+          litespec model check --root <consumer> [--format json] [--staged]
           litespec model render --root <consumer>
           litespec model query --root <consumer> <id>
-          litespec model approve --root <consumer> (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>]
+          litespec model approve --root <consumer> (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>] [--dry-run]
+          litespec model backfill --root <consumer> [<module>] [--dry-run]
           litespec model diff <base> --root <consumer> [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
           litespec model --help
 
@@ -35,18 +36,21 @@ static class ModelCommand
             command switch
             {
                 "diff" => ["--breaking-only", "--intent", "--behavior"],
-                "approve" => ["--all"],
+                "approve" => ["--all", "--dry-run"],
+                "check" => ["--staged"],
+                "backfill" => ["--dry-run"],
                 _ => [],
             },
             command switch
             {
                 "diff" => ["--root", "--out", "--format", "--fail-on"],
                 "approve" => ["--root", "--by", "--on"],
+                "backfill" => ["--root"],
                 _ => ["--root", "--out", "--format"],
             },
             maxPositionals: command switch
             {
-                "query" or "diff" => 1,
+                "query" or "diff" or "backfill" => 1,
                 "approve" => int.MaxValue,
                 _ => 0,
             });
@@ -126,19 +130,49 @@ static class ModelCommand
                     var (findings, known) = Checker.Check(model);
                     var json = parsed.Json;
                     var qualified = StackQualified(config);
+                    StagedScope.Scope? staged = null;
+
+                    if (parsed.Has("--staged"))
+                    {
+                        var (scope, stagedError) = StagedScope.For(model);
+
+                        if (scope is null)
+                        {
+                            Console.Error.WriteLine(stagedError);
+                            return 2;
+                        }
+
+                        staged = scope;
+                        findings = findings.Where(finding => StagedScope.InScope(scope, finding)).ToList();
+                        known = known.Where(gap => StagedScope.InScope(scope, gap)).ToList();
+                    }
 
                     if (json)
                     {
-                        Console.WriteLine(JsonSerializer.Serialize(
-                            new
+                        object payload = staged is null
+                            ? new
                             {
                                 findings = findings.Select(AsJson(config)).ToList(),
                                 known = known.Select(AsJson(config)).ToList(),
-                            },
-                            CliJson.Options));
+                            }
+                            : new
+                            {
+                                scope = "staged",
+                                stagedFiles = staged.StagedFiles,
+                                stagedRecords = staged.RecordIds.Count,
+                                findings = findings.Select(AsJson(config)).ToList(),
+                                known = known.Select(AsJson(config)).ToList(),
+                            };
+
+                        Console.WriteLine(JsonSerializer.Serialize(payload, CliJson.Options));
                     }
                     else
                     {
+                        if (staged is not null)
+                        {
+                            Console.WriteLine($"Staged scope: {staged.StagedFiles} files, {staged.RecordIds.Count} records.");
+                        }
+
                         foreach (var finding in findings)
                         {
                             Console.WriteLine($"{config.Relative(finding.Path)}:{finding.Line} [{TierOf(finding)}] [{finding.Code}] {finding.Message}");
@@ -186,6 +220,33 @@ static class ModelCommand
                         ? written.Where(record => record.Status is "approved" or "reviewed" && string.IsNullOrEmpty(record.ApprovedHash)).ToList()
                         : written.Where(record => ids.Contains(record.Id)).ToList();
                     var unknown = all ? [] : ids.Where(id => written.All(record => record.Id != id)).ToList();
+
+                    if (parsed.Has("--dry-run"))
+                    {
+                        var planned = all
+                            ? written.Where(record => record.Status is "approved" or "reviewed").ToList()
+                            : targets;
+                        var dry = Approver.DryRun(planned);
+
+                        foreach (var (record, reason) in dry)
+                        {
+                            var action = reason == "no approvedHash" ? "stamped" : "reopened";
+
+                            Console.WriteLine($"{config.Relative(record.File)}: {record.Id} would be {action} ({reason})");
+                        }
+
+                        var stampedCount = dry.Count(entry => entry.Reason == "no approvedHash");
+
+                        Console.WriteLine($"{Counted(stampedCount, "record")} would be stamped, {dry.Count - stampedCount} would be reopened.");
+
+                        foreach (var id in unknown)
+                        {
+                            Console.Error.WriteLine($"No written record holds '{id}'.");
+                        }
+
+                        return unknown.Count > 0 ? 1 : 0;
+                    }
+
                     var on = parsed.Value("--on") ?? DateTime.UtcNow.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
                     var (stamped, missing) = Approver.Approve(model, targets, parsed.Value("--by"), on);
 
@@ -201,6 +262,26 @@ static class ModelCommand
 
                     Console.WriteLine($"{stamped.Count} records approved.");
                     return unknown.Count + missing.Count > 0 ? 1 : 0;
+                }
+
+                case "backfill":
+                {
+                    var model = ModelBuilder.Build(config);
+                    var (lines, unknownModule) = Backfill.Run(
+                        model, parsed.Positionals.FirstOrDefault(), parsed.Has("--dry-run"));
+
+                    if (unknownModule)
+                    {
+                        Console.Error.WriteLine($"No use-case, reaction or job records in module '{parsed.Positionals[0]}'.");
+                        return 1;
+                    }
+
+                    foreach (var line in lines)
+                    {
+                        Console.WriteLine(line);
+                    }
+
+                    return 0;
                 }
 
                 case "query":
@@ -287,6 +368,8 @@ static class ModelCommand
 
     static string Relative(string root, string path) =>
         Path.GetRelativePath(root, path).Replace(Path.DirectorySeparatorChar, '/');
+
+    static string Counted(int count, string noun) => count == 1 ? $"1 {noun}" : $"{count} {noun}s";
 
     static string? DiffFormatError(string? format) =>
         format is null or "text" or "markdown" or "json"

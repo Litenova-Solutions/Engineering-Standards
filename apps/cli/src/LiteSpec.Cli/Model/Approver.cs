@@ -19,6 +19,69 @@ static class Approver
     };
 
     /// <summary>
+    ///     Computes the approval hash over the record's semantic frontmatter fields.
+    ///     The hash covers every written field except identity, workflow and approval
+    ///     data (<c>type</c>, <c>id</c>, <c>title</c>, <c>owner</c>, <c>status</c>,
+    ///     <c>decider</c>, <c>decideBy</c>, <c>approvedBy</c>, <c>approvedOn</c>,
+    ///     <c>approvedHash</c> and <c>source</c>), canonicalized and hashed to eight hex
+    ///     characters. Page prose bodies and rendered consequences summaries never feed
+    ///     the hash, so rewording prose reopens no approval. The semantic fields per
+    ///     record type include: product (boundary, neverDoes, audience); goal
+    ///     (statement, measure, target, by); problem (affects, statement); feature
+    ///     (state, refusedBecause, solves, by); requirement (kind, statement, values,
+    ///     measure, by, except, setBy, risk); constraint (source, category, applies,
+    ///     appliesBecause); decision (options, changeWhen, decided, chosen, decides);
+    ///     research (sources, question); journey (actor, goal, finishedWhen, steps,
+    ///     fulfills); actor (kind); term (term, meaning, layer, aliases); module
+    ///     (dependsOn); aggregate (kind, states, transitions, data, dataClasses, steps,
+    ///     exits, finishedWhen, driver, cursor, owner); rule (kind, statement, governs,
+    ///     refusal, releasedBy, frozenWhen, historyLink, computedBy); use-case (kind,
+    ///     serves, fulfills, access, reachedThrough, input, output, paging,
+    ///     builtAsynchronously, changes, reads, consistency, effects, raises,
+    ///     idempotency, audit, risk); result (outcome, code, meaning, recorded, codes);
+    ///     scenario (given, when, then, result, examples); event (meaning, carries);
+    ///     integration-event (direction, eventType, source, subject, payload, audience,
+    ///     trust, correlation, translates); reaction (on, if, issues, sends, forEach,
+    ///     reads, fulfills, serves, idempotency, onFailure, onExhausted); job (kind,
+    ///     schedule, scope, batchSize, lease, issues, reads, serviceLevel, evidence,
+    ///     runbook, runsWhere, guard, cursor, fulfills, serves, onFailure,
+    ///     idempotency); notification (template, audience, channel, consent, frequency,
+    ///     dedupKey, params, locale, suppressedWhen, claims, fulfills, sender); setting
+    ///     (valueType, default, range, unit, setBy, atBound, secret, meaning, runbook,
+    ///     fulfills); role (scope, allows); permission (meaning); entry-point (kind,
+    ///     auth, path, contentType, cacheControl, versioning, fulfills, protocol);
+    ///     external-system (actor, operations, erasure, acceptedBy); runbook (trigger,
+    ///     steps); deviation (provision, reason, reviewBy, removeWhen); known-gap
+    ///     (check, subject, endsBy, reason); plus questions, terms and replaces where a
+    ///     record carries them.
+    /// </summary>
+    public static string SemanticHash(Record record) => Checker.SemanticHash(record);
+
+    /// <summary>
+    ///     Plans an approval without writing: each target with no approvedHash, or whose
+    ///     semantic fields no longer match it. Returns the record with its reason: either
+    ///     <c>no approvedHash</c> or <c>approvedHash differs</c>.
+    /// </summary>
+    public static IReadOnlyList<(Record Record, string Reason)> DryRun(IReadOnlyList<Record> targets)
+    {
+        var planned = new List<(Record, string)>();
+
+        foreach (var record in targets)
+        {
+            if (record.ApprovedHash is not { Length: > 0 })
+            {
+                planned.Add((record, "no approvedHash"));
+            }
+            else if (SemanticHash(record) != record.ApprovedHash)
+            {
+                planned.Add((record, "approvedHash differs"));
+            }
+        }
+
+        return planned;
+    }
+
+    /// <summary>
     ///     Stamps each record: approvedBy and approvedOn when missing, and approvedHash always.
     ///     Returns the records stamped and the ids no written record holds.
     /// </summary>
@@ -58,7 +121,7 @@ static class Approver
                     target["approvedOn"] = on;
                 }
 
-                target["approvedHash"] = Checker.SemanticHash(record);
+                target["approvedHash"] = SemanticHash(record);
                 stamped.Add(record);
             }
 
