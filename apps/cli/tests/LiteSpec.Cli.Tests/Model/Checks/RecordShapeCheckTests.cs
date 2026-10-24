@@ -131,7 +131,7 @@ public sealed class RecordShapeCheckTests
             TestModel.Config(temp.Path),
             TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "kind": "command", "reachedThrough": ["entry-point/library-app"], "idempotency": {"mode": "key", "key": "loan:{copyId}", "scope": "branch"}}"""));
 
-        Assert.True(Reports(model, "record-shape", "organizer, account, login, global"));
+        Assert.True(Reports(model, "record-shape", "tenant, account, login, global"));
     }
 
     [Fact]
@@ -146,14 +146,14 @@ public sealed class RecordShapeCheckTests
     }
 
     [Fact]
-    public void Reaction_Key_Without_Input_Fields_Names_That()
+    public void Reaction_Key_Names_Event_Fields_Unchecked()
     {
         using var temp = Cli.Temp("checks");
         var model = TestModel.Model(
             TestModel.Config(temp.Path),
             TestModel.Record("reaction", "reaction/lending.send-loan-due-notice", Path.Combine(temp.Path, "notice.md"), """{"status": "draft", "decider": "lending-team", "decideBy": "2035-06-01", "on": ["event/loan.loan-borrowed"], "effects": [{"sends": "notification/lending.loan-due"}], "idempotency": {"mode": "key", "key": "notice:{loan}", "scope": "global"}}"""));
 
-        Assert.True(Reports(model, "record-shape", "input fields in scope: none"));
+        Assert.False(Reports(model, "record-shape", "idempotency key"));
     }
 
     [Fact]
