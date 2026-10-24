@@ -13,6 +13,8 @@ static partial class NewCommand
     /// <summary>The command's usage text.</summary>
     public const string Usage = """
         Usage: litespec new <type> <id> [--root <path>] [--help]
+               litespec new result <use-case-id> <name> --outcome success|refusal [--code <code>] [--root <path>]
+               litespec new scenario <use-case-id> <name> --result <result-id> [--root <path>]
 
         Creates one record page from the template for its type, with the opening
         specification metadata block already filled. It reserves the identifier
@@ -27,16 +29,30 @@ static partial class NewCommand
         beside its aggregate once the use case names one. The command refuses
         an identifier a record already carries.
 
+        new result and new scenario append one entry to a use-case page's
+        frontmatter records instead of scaffolding a page. The entry lands in
+        house order, successes first, then refusals in precedence order, then
+        scenarios, so a new refusal follows the existing refusals and a new
+        scenario lands last; every other byte of the frontmatter stays
+        untouched. The entry id is result/<use-case>.<name> or
+        scenario/<use-case>.<name> from the use case's own name. --code is
+        required for a refusal and carries <module>.<reason>; on a success it
+        becomes the first of codes. The command refuses a duplicate id and an
+        unknown use case.
+
           --root    The consumer repository to write into. Defaults to the working directory.
+          --code    The refusal code, for new result.
+          --outcome success or refusal, for new result.
+          --result  The scenario's result, for new scenario.
           --help    Print this text and exit.
 
-        Exit codes: 0 written, 1 the release holds no readable template for the type, 2 the identifier is taken, the type is unknown, or an option is invalid.
+        Exit codes: 0 written, 1 the release holds no readable template for the type, 2 the identifier is taken, the use case is unknown, the type is unknown, or an option is invalid.
         """;
 
     /// <summary>Runs the command and returns its exit code.</summary>
     public static int Run(string[] args)
     {
-        var parsed = CliArgs.Parse(args, [], ["--root", "--home"], maxPositionals: 2);
+        var parsed = CliArgs.Parse(args, [], ["--root", "--home", "--code", "--outcome", "--result"], maxPositionals: 3);
 
         if (parsed.Help)
         {
@@ -51,11 +67,25 @@ static partial class NewCommand
             return 2;
         }
 
+        if (parsed.Positionals is [var first, ..] && first is "result" or "scenario")
+        {
+            return AppendEntry.Run(parsed);
+        }
+
         if (parsed.Positionals is not [var type, var id])
         {
             Console.Error.WriteLine("New needs a type and an id.");
             Console.Error.WriteLine(Usage);
             return 2;
+        }
+
+        foreach (var option in new[] { "--code", "--outcome", "--result" })
+        {
+            if (parsed.Value(option) is not null)
+            {
+                Console.Error.WriteLine($"Option {option} applies only to new result and new scenario.");
+                return 2;
+            }
         }
 
         if (!RecordTypes.All.Contains(type) && !RecordTypes.PageStyles.Contains(type))
