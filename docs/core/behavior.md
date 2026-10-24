@@ -386,9 +386,9 @@ The specification names only what carries business meaning. Child entities and v
 
 ### Keep the Negation Word in the Rule Name
 
-**Statement:** A rule whose statement says `not`, `no`, `never`, or `cannot` MUST keep that word in its name.
+**Statement:** A rule whose statement says `not`, `no`, `never`, or `cannot` MUST keep a restricting word in its name: a negation such as `no`, `never` or `refused`, or a limit such as `only` or `one-...-per-...`.
 
-**Rationale:** A name that drops the negation reads as its own opposite: a rule named `cancel-after-shipment` whose statement says "never" approves what it forbids. Keeping the word keeps the name a true sentence a reviewer trusts without opening the statement. The `rule-name-negation` check reports a rule whose statement negates outside its name.
+**Rationale:** A name that drops the negation reads as its own opposite: a rule named `cancel-after-shipment` whose statement says "never" approves what it forbids. A restricting word keeps the name a true sentence a reviewer trusts without opening the statement, and `one-grant-per-account` already says what "an account never holds two grants" says. The `rule-name-negation` check reports a rule whose statement negates while its name keeps no restricting word.
 
 **Example:** The rule reads `rule/order.cancel-never-after-shipment`.
 
@@ -807,7 +807,7 @@ This informative example demonstrates `litespec/core/behavior#declare-the-kind-o
 | litespec/core/behavior#close-every-process-with-named-exits-and-a-driver | checkable | `litespec consumer` fails a process page without exits carrying triggers, `finishedWhen`, and `driver`. |
 | litespec/core/behavior#prove-every-process-guard-and-exit-with-a-scenario | guidance | A scenario proving each `when` guard and each exit sits on the process page or its use case pages. |
 | litespec/core/behavior#state-each-rule-with-its-kind | checkable | `litespec consumer` fails a rule entry without `kind` or `statement`. |
-| litespec/core/behavior#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` outside its name. |
+| litespec/core/behavior#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` while its name keeps no restricting word. |
 | litespec/core/behavior#keep-cross-aggregate-rules-on-a-rule-page | guidance | Each cross-aggregate rule sits as an entry on a rule page; other rules sit on their aggregate page. |
 | litespec/core/behavior#name-the-refusal-a-broken-rule-produces | guidance | Each guarded rule names its refusal in `refusal` beside the rule entry. |
 | litespec/core/behavior#release-every-reservation-by-a-named-use-case | checkable | `litespec model check` reports `reservation-without-release` for a reservation rule without `releasedBy` or `never` with its cost. |

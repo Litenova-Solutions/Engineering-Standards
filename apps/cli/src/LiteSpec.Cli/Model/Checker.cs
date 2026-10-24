@@ -48,6 +48,13 @@ static partial class Checker
         "planned", "later", "refused",
     };
 
+    /// <summary>Rule-name words that keep a restriction visible, so a negating statement needs no echo.</summary>
+    private static readonly HashSet<string> RuleNameRestrictions = new(StringComparer.Ordinal)
+    {
+        "not", "no", "never", "cannot", "none", "nothing", "without", "unless", "only",
+        "refused", "refuses", "refusal", "forbidden", "blocked", "rejected", "non",
+    };
+
     /// <summary>Runs every check, partitioning findings from known gaps.</summary>
     public static (IReadOnlyList<Finding> Findings, IReadOnlyList<Finding> Known) Check(ProjectModel model)
     {
@@ -931,17 +938,20 @@ static partial class Checker
                 continue;
             }
 
-            var words = name.Split('-', StringSplitOptions.RemoveEmptyEntries).ToHashSet(StringComparer.Ordinal);
+            // Any word that restricts keeps the negation: "no", "never" and "refused" say it
+            // directly, and "only" or a uniqueness "one ... per" states a limit a reader cannot miss.
+            var words = name.Split('-', StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (Match match in Regex.Matches(statement, @"\b(not|no|never|cannot)\b", RegexOptions.IgnoreCase))
+            if (words.Any(RuleNameRestrictions.Contains) || (words.Contains("one") && words.Contains("per")))
             {
-                var negation = match.Value.ToLowerInvariant();
+                continue;
+            }
 
-                if (!words.Contains(negation))
-                {
-                    findings.Add(new Finding("rule-name-negation", $"Rule '{rule.Id}' says '{negation}' but its name keeps none.", rule.File, rule.Line, SubjectOf(rule)));
-                    break;
-                }
+            var match = Regex.Match(statement, @"\b(not|no|never|cannot)\b", RegexOptions.IgnoreCase);
+
+            if (match.Success)
+            {
+                findings.Add(new Finding("rule-name-negation", $"Rule '{rule.Id}' says '{match.Value.ToLowerInvariant()}' but its name keeps no restricting word.", rule.File, rule.Line, SubjectOf(rule)));
             }
         }
     }
