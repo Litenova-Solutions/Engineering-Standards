@@ -16,6 +16,9 @@ static partial class Checker
     {
         "type", "id", "title", "owner", "status", "decider", "decideBy",
         "approvedBy", "approvedOn", "approvedHash", "source",
+
+        // A term's labels translate its name; adding a language leaves the approved meaning alone.
+        "labels",
     };
 
     /// <summary>
