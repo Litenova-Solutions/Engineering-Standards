@@ -44,6 +44,14 @@ sealed class ConsumerConfig
     /// <summary>The refusal code the derived invalid-input result carries.</summary>
     public string InvalidInputCode { get; private set; } = "request.validation-failed";
 
+    /// <summary>The HTTP status each refusal code answers with, by refusal code.</summary>
+    public IReadOnlyDictionary<string, int> RefusalStatuses { get; private set; } =
+        new Dictionary<string, int>(StringComparer.Ordinal);
+
+    /// <summary>The client refusal vocabulary translated to declared codes, by client code.</summary>
+    public IReadOnlyDictionary<string, string> RefusalAliases { get; private set; } =
+        new Dictionary<string, string>(StringComparer.Ordinal);
+
     /// <summary>The backend layers.</summary>
     public string ApplicationRoot { get; private set; } = "";
 
@@ -244,6 +252,9 @@ sealed class ConsumerConfig
             {
                 config.InvalidInputCode = invalidCode;
             }
+
+            config.RefusalStatuses = ReadStatuses(refusals);
+            config.RefusalAliases = ReadAliases(refusals);
         }
 
         if (document.RootElement.TryGetProperty("adoption", out var adoption)
@@ -276,6 +287,53 @@ sealed class ConsumerConfig
         owner.TryGetProperty(field, out var names) && names.ValueKind == JsonValueKind.Array
             ? [.. names.EnumerateArray().Where(entry => entry.ValueKind == JsonValueKind.String).Select(entry => entry.GetString()!)]
             : [];
+
+    /// <summary>The refusal statuses table: each declared code with the HTTP status it answers with.</summary>
+    private static IReadOnlyDictionary<string, int> ReadStatuses(JsonElement refusals)
+    {
+        var statuses = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        if (refusals.TryGetProperty("statuses", out var table)
+            && table.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var entry in table.EnumerateObject())
+            {
+                if (entry.Name.Length > 0
+                    && entry.Value.ValueKind == JsonValueKind.Number
+                    && entry.Value.TryGetInt32(out var status)
+                    && status is >= 100 and <= 599
+                    && !statuses.ContainsKey(entry.Name))
+                {
+                    statuses.Add(entry.Name, status);
+                }
+            }
+        }
+
+        return statuses;
+    }
+
+    /// <summary>The refusal code map: each client code with the declared code it translates to.</summary>
+    private static IReadOnlyDictionary<string, string> ReadAliases(JsonElement refusals)
+    {
+        var aliases = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        if (refusals.TryGetProperty("aliases", out var table)
+            && table.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var entry in table.EnumerateObject())
+            {
+                if (entry.Name.Length > 0
+                    && entry.Value.ValueKind == JsonValueKind.String
+                    && entry.Value.GetString() is { Length: > 0 } code
+                    && !aliases.ContainsKey(entry.Name))
+                {
+                    aliases.Add(entry.Name, code);
+                }
+            }
+        }
+
+        return aliases;
+    }
 
     private static IReadOnlyList<string> ReadHandles(JsonElement entry) =>
         entry.ValueKind == JsonValueKind.Object

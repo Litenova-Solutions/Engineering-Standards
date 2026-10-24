@@ -213,7 +213,17 @@ sealed class DotnetScenarioReader : IScenarioReader
                 {
                     identifiers.Add(construction.Type.ToString().Split('<', '.').Last());
 
-                    if (TypeName(construction.Type) is { Length: > 0 } built)
+                    if (QualifiedName(construction.Type) is { Length: > 0 } built)
+                    {
+                        created.Add(built);
+                    }
+                }
+
+                // A fact that drives its use case through the host pins the message with
+                // typeof instead of constructing it, so the pinned type counts as built.
+                foreach (var pinned in node.DescendantNodes().OfType<TypeOfExpressionSyntax>())
+                {
+                    if (QualifiedName(pinned.Type) is { Length: > 0 } built)
                     {
                         created.Add(built);
                     }
@@ -228,12 +238,14 @@ sealed class DotnetScenarioReader : IScenarioReader
                 claims,
                 steps,
                 [.. codes],
-                [.. statuses.Distinct().Order()],
+                AssertedStatuses(statuses, thenBodies, reached),
                 identifiers,
                 RoutesIn(scope, containing),
                 AssertedCodes(thenBodies, reached),
                 HasAssertion(reached),
-                created));
+                created,
+                ResolvedServices(reached),
+                StaticCalls(reached)));
         }
     }
 
@@ -287,6 +299,11 @@ sealed class DotnetScenarioReader : IScenarioReader
         return [.. asserted];
     }
 
+    /// <summary>A client refusal code: upper snake case, such as the generated client's vocabulary.</summary>
+    private static readonly System.Text.RegularExpressions.Regex ClientCode = new(
+        @"(?<![A-Z0-9_])[A-Z][A-Z0-9]*(_[A-Z0-9]+)+(?![A-Z0-9_])",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
     private static void AddCodes(SyntaxToken token, SortedSet<string> asserted)
     {
         if (token.IsKind(SyntaxKind.StringLiteralToken) && token.Value is string text)
@@ -295,8 +312,182 @@ sealed class DotnetScenarioReader : IScenarioReader
             {
                 asserted.Add(match.Value);
             }
+
+            foreach (System.Text.RegularExpressions.Match match in ClientCode.Matches(text))
+            {
+                asserted.Add(match.Value);
+            }
         }
     }
+
+    /// <summary>
+    ///     The HTTP statuses the test asserts: the LightBDD then-step statuses, an integer
+    ///     status passed to an assertion call, and an <c>HttpStatusCode</c> member or a
+    ///     <c>StatusCodes</c> constant named there. A status mentioned anywhere else, such
+    ///     as in setup, proves no refusal.
+    /// </summary>
+    private static List<int> AssertedStatuses(
+        IReadOnlyList<int> stepStatuses,
+        IReadOnlyList<SyntaxNode> thenBodies,
+        IReadOnlyList<SyntaxNode> reached)
+    {
+        var asserted = new SortedSet<int>(stepStatuses);
+
+        foreach (var body in thenBodies)
+        {
+            foreach (var access in body.DescendantNodesAndSelf().OfType<MemberAccessExpressionSyntax>())
+            {
+                if (StatusOf(access) is { } status)
+                {
+                    asserted.Add(status);
+                }
+            }
+        }
+
+        foreach (var node in reached)
+        {
+            foreach (var invocation in node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
+            {
+                if (!AssertsThrough(invocation))
+                {
+                    continue;
+                }
+
+                foreach (var token in invocation.ArgumentList.DescendantTokens())
+                {
+                    if (token.IsKind(SyntaxKind.NumericLiteralToken)
+                        && token.Value is int status
+                        && status is >= 400 and <= 599)
+                    {
+                        asserted.Add(status);
+                    }
+                }
+
+                foreach (var access in invocation.ArgumentList.DescendantNodes().OfType<MemberAccessExpressionSyntax>())
+                {
+                    if (StatusOf(access) is { } status)
+                    {
+                        asserted.Add(status);
+                    }
+                }
+            }
+        }
+
+        return [.. asserted];
+    }
+
+    /// <summary>
+    ///     The HTTP status a member access names: an <c>HttpStatusCode</c> member, or a
+    ///     <c>StatusCodes.StatusXXX</c> constant. Null when the access names neither.
+    /// </summary>
+    private static int? StatusOf(MemberAccessExpressionSyntax access)
+    {
+        var receiver = access.Expression.ToString();
+
+        if (receiver is "HttpStatusCode" || receiver.EndsWith(".HttpStatusCode", StringComparison.Ordinal))
+        {
+            if (Enum.TryParse<System.Net.HttpStatusCode>(access.Name.Identifier.ValueText, out var code)
+                && (int)code is >= 100 and <= 599)
+            {
+                return (int)code;
+            }
+
+            return null;
+        }
+
+        if ((receiver is "StatusCodes" || receiver.EndsWith(".StatusCodes", StringComparison.Ordinal))
+            && access.Name.Identifier.ValueText is { } name
+            && name.StartsWith("Status", StringComparison.Ordinal)
+            && name.Length >= "Status".Length + 3
+            && int.TryParse(name.AsSpan("Status".Length, 3), out var status)
+            && status is >= 100 and <= 599)
+        {
+            return status;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     The service types the test resolves from the host: the type arguments of
+    ///     <c>GetRequiredService</c>, <c>GetService</c> and <c>GetKeyedService</c>, or the
+    ///     <c>typeof</c> a non-generic <c>GetService</c> call carries.
+    /// </summary>
+    private static HashSet<string> ResolvedServices(IReadOnlyList<SyntaxNode> reached)
+    {
+        var resolved = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var node in reached)
+        {
+            foreach (var invocation in node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
+            {
+                var (name, arguments) = invocation.Expression switch
+                {
+                    MemberAccessExpressionSyntax member => (member.Name.Identifier.ValueText, TypeArguments(member.Name)),
+                    GenericNameSyntax generic => (generic.Identifier.ValueText, TypeArguments(generic)),
+                    IdentifierNameSyntax plain => (plain.Identifier.ValueText, new List<TypeSyntax>()),
+                    _ => ((string?)null, new List<TypeSyntax>()),
+                };
+
+                if (name is not ("GetRequiredService" or "GetService" or "GetKeyedService"))
+                {
+                    continue;
+                }
+
+                if (arguments is [var first, ..] && TypeName(first) is { Length: > 0 } service)
+                {
+                    resolved.Add(service);
+                }
+                else if (invocation.ArgumentList.Arguments is [var only, ..]
+                    && only.Expression is TypeOfExpressionSyntax pinned
+                    && TypeName(pinned.Type) is { Length: > 0 } carried)
+                {
+                    resolved.Add(carried);
+                }
+            }
+        }
+
+        return resolved;
+    }
+
+    /// <summary>
+    ///     The static calls the test body makes: each <c>Type.Method</c> invocation on a
+    ///     type-like receiver, so a call onto an aggregate type counts for the test.
+    /// </summary>
+    private static HashSet<string> StaticCalls(IReadOnlyList<SyntaxNode> reached)
+    {
+        var calls = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var node in reached)
+        {
+            foreach (var invocation in node.DescendantNodesAndSelf().OfType<InvocationExpressionSyntax>())
+            {
+                if (invocation.Expression is MemberAccessExpressionSyntax member
+                    && ReceiverName(member.Expression) is { Length: > 0 } receiver
+                    && char.IsUpper(receiver[0]))
+                {
+                    calls.Add($"{receiver}.{member.Name.Identifier.ValueText}");
+                }
+            }
+        }
+
+        return calls;
+    }
+
+    /// <summary>The rightmost name of a call receiver: the type for a static call.</summary>
+    private static string? ReceiverName(ExpressionSyntax expression) => expression switch
+    {
+        IdentifierNameSyntax plain => plain.Identifier.ValueText,
+        GenericNameSyntax generic => generic.Identifier.ValueText,
+        MemberAccessExpressionSyntax member => member.Name.Identifier.ValueText,
+        _ => null,
+    };
+
+    /// <summary>The type arguments a call name carries, or none when it carries no list.</summary>
+    private static List<TypeSyntax> TypeArguments(SimpleNameSyntax name) =>
+        name is GenericNameSyntax generic
+            ? [.. generic.TypeArgumentList.Arguments]
+            : [];
 
     /// <summary>
     ///     Whether the test asserts anything: an assertion call in its own body or in
@@ -355,6 +546,21 @@ sealed class DotnetScenarioReader : IScenarioReader
         QualifiedNameSyntax qualified => TypeName(qualified.Right),
         NullableTypeSyntax nullable => TypeName(nullable.ElementType),
         ArrayTypeSyntax array => TypeName(array.ElementType),
+        _ => "",
+    };
+
+    /// <summary>
+    ///     The constructed type's dotted name, without arguments: a nested value keeps its
+    ///     holder, so <c>new OrderLineFulfillmentType.Membership(...)</c> never reads as
+    ///     constructing the <c>Membership</c> aggregate.
+    /// </summary>
+    private static string QualifiedName(TypeSyntax type) => type switch
+    {
+        GenericNameSyntax generic => generic.Identifier.ValueText,
+        IdentifierNameSyntax plain => plain.Identifier.ValueText,
+        QualifiedNameSyntax qualified => $"{QualifiedName(qualified.Left)}.{QualifiedName(qualified.Right)}",
+        NullableTypeSyntax nullable => QualifiedName(nullable.ElementType),
+        ArrayTypeSyntax array => QualifiedName(array.ElementType),
         _ => "",
     };
 

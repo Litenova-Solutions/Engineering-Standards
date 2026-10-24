@@ -17,7 +17,9 @@ sealed record ScenarioInfo(
     IReadOnlyList<string> Routes,
     IReadOnlyList<string> AssertedCodes,
     bool HasAssertion,
-    IReadOnlySet<string> CreatedTypes);
+    IReadOnlySet<string> CreatedTypes,
+    IReadOnlySet<string> ResolvedServices,
+    IReadOnlySet<string> StaticCalls);
 
 /// <summary>What the test read found: scenarios and file comments.</summary>
 sealed record TestRead(

@@ -552,11 +552,14 @@ static partial class ModelBuilder
     /// <summary>
     ///     Confirms a proves claim. A steps test proves through the public boundary: a
     ///     when step of the use case's steps class or generated-client operation plus a
-    ///     then step, asserting the refusal code for a refusal. An integration test
+    ///     then step, asserting the refusal code for a refusal. A refusal also confirms
+    ///     from the HTTP status the project's refusal table maps to its code, or from a
+    ///     client code the project's refusal map translates to it. An integration test
     ///     proves by constructing the message it sends or requesting the use case's own
     ///     endpoint, plus an assertion. No test constructs a handler, an aggregate, or a
-    ///     repository directly. A rule claim confirms only through a scenario the same
-    ///     test proves.
+    ///     repository directly. A rule claim confirms through a scenario the same test
+    ///     proves, or through an integration fact that resolves a service from the host
+    ///     and calls the message type of a governed use case or the governed aggregate.
     /// </summary>
     public static bool Confirm(ProjectModel model, ScenarioInfo test, string claim)
     {
@@ -596,7 +599,7 @@ static partial class ModelBuilder
                 // The trigger may arrive through an entry the model does not link to the reaction, such as a
                 // processor webhook, so any when step sets it off; the assertion is what ties the proof to it.
                 var setOff = Triggers(model, test, useCase) || test.Steps.Any(step => step.Phase == "when");
-                var asserted = refusal is null ? AssertsEffect(model, test) : Asserts(test, refusal) || AssertsEffect(model, test);
+                var asserted = refusal is null ? AssertsEffect(model, test) : Asserts(model, test, refusal) || AssertsEffect(model, test);
 
                 return setOff && asserted;
             }
@@ -611,14 +614,13 @@ static partial class ModelBuilder
                 return false;
             }
 
-            return refusal is null || Asserts(test, refusal);
+            return refusal is null || Asserts(model, test, refusal);
         }
 
         var pascal = Naming.Pascal(home);
 
         // An integration test constructs the message it sends, or requests the use case's own endpoint.
-        var sendsMessage = test.CreatedTypes.Contains(pascal + "Command", StringComparer.Ordinal)
-            || test.CreatedTypes.Contains(pascal + "Query", StringComparer.Ordinal);
+        var sendsMessage = Builds(test, pascal + "Command") || Builds(test, pascal + "Query");
         var requestsEndpoint = model.Code.Endpoints
             .Where(endpoint => endpoint.UseCaseId == useCase.Id && endpoint.Route.Length > 0)
             .Any(endpoint => test.Routes.Any(route => RouteMatches(endpoint.Route, route)));
@@ -638,8 +640,13 @@ static partial class ModelBuilder
             return true;
         }
 
-        return Asserts(test, refusal);
+        return Asserts(model, test, refusal);
     }
+
+    /// <summary>Whether the test builds the message type, plainly or namespace-qualified.</summary>
+    private static bool Builds(ScenarioInfo test, string want) =>
+        test.CreatedTypes.Any(type =>
+            type == want || type.EndsWith("." + want, StringComparison.Ordinal));
 
     /// <summary>
     ///     Whether the test reaches past the public boundary: it constructs a handler,
@@ -739,7 +746,94 @@ static partial class ModelBuilder
             }
         }
 
+        return ConfirmRuleFact(model, test, rule);
+    }
+
+    /// <summary>
+    ///     Confirms a rule claim from an integration fact: the test carries no steps,
+    ///     resolves a service from the host, calls the message type of a governed use
+    ///     case or calls onto the governed aggregate, and asserts afterwards.
+    /// </summary>
+    private static bool ConfirmRuleFact(ProjectModel model, ScenarioInfo test, Record rule)
+    {
+        if (test.Steps.Count > 0
+            || test.ResolvedServices.Count == 0
+            || !test.HasAssertion
+            || ConstructsInside(test, model))
+        {
+            return false;
+        }
+
+        foreach (var governed in rule.Ids("governs"))
+        {
+            if (!model.ById.TryGetValue(governed, out var target))
+            {
+                continue;
+            }
+
+            if (target.Type == "use-case"
+                && Identifiers.TrySplit(governed, out _, out _, out var operation)
+                && operation is not null
+                && (Builds(test, Naming.Pascal(operation) + "Command")
+                    || Builds(test, Naming.Pascal(operation) + "Query")))
+            {
+                return true;
+            }
+
+            if (target.Type == "aggregate"
+                && Identifiers.TrySplit(governed, out _, out _, out var aggregate)
+                && aggregate is not null
+                && CallsAggregate(test, Naming.Pascal(aggregate)))
+            {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    /// <summary>
+    ///     Whether the test calls onto the aggregate: a static call on its type, or work
+    ///     through a resolved store whose stem names it, such as a repository or ledger.
+    /// </summary>
+    private static bool CallsAggregate(ScenarioInfo test, string pascal)
+    {
+        if (test.StaticCalls.Any(call => call.StartsWith(pascal + ".", StringComparison.Ordinal)))
+        {
+            return true;
+        }
+
+        return test.ResolvedServices.Any(service => ServiceStem(service) == pascal);
+    }
+
+    /// <summary>The aggregate a store type serves: without its interface prefix and store suffixes.</summary>
+    private static string ServiceStem(string service)
+    {
+        var stem = service;
+
+        if (stem.StartsWith("I", StringComparison.Ordinal) && stem.Length > 1 && char.IsUpper(stem[1]))
+        {
+            stem = stem[1..];
+        }
+
+        var cut = true;
+
+        while (cut)
+        {
+            cut = false;
+
+            foreach (var suffix in new[] { "Repository", "Ledger", "Store" })
+            {
+                if (stem.EndsWith(suffix, StringComparison.Ordinal) && stem.Length > suffix.Length)
+                {
+                    stem = stem[..^suffix.Length];
+                    cut = true;
+                    break;
+                }
+            }
+        }
+
+        return stem;
     }
 
     private static Record? RefusalOf(ProjectModel model, Record scenario)
@@ -903,8 +997,33 @@ static partial class ModelBuilder
                 || string.Equals(step.Receiver, stepsClass[..^"Steps".Length], StringComparison.OrdinalIgnoreCase)));
     }
 
-    private static bool Asserts(ScenarioInfo test, Record refusal) =>
-        refusal.Field("code") is { } code && test.AssertedCodes.Contains(code);
+    /// <summary>
+    ///     Whether the test asserts the refusal: the exact code, a client code the
+    ///     project's refusal map translates to it, or the HTTP status the project's
+    ///     refusal table maps to it.
+    /// </summary>
+    private static bool Asserts(ProjectModel model, ScenarioInfo test, Record refusal)
+    {
+        if (refusal.Field("code") is not { } code)
+        {
+            return false;
+        }
+
+        if (test.AssertedCodes.Contains(code))
+        {
+            return true;
+        }
+
+        if (test.AssertedCodes.Any(asserted =>
+            model.Config.RefusalAliases.TryGetValue(asserted, out var declared)
+            && declared == code))
+        {
+            return true;
+        }
+
+        return model.Config.RefusalStatuses.TryGetValue(code, out var status)
+            && test.Statuses.Contains(status);
+    }
 
     private static void ComputeStatus(ProjectModel model)
     {

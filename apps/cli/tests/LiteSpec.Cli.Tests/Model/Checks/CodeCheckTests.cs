@@ -170,4 +170,42 @@ public sealed class CodeCheckTests
 
         Assert.DoesNotContain("effect-undeclared", TestModel.Codes(model));
     }
+
+    [Fact]
+    public void Handler_Dispatching_Through_A_Helper_Names_The_Helper()
+    {
+        using var temp = Cli.Temp("checks");
+        var file = Path.Combine(temp.Path, "BorrowCopyCommandHandler.cs");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "reviewed", "kind": "command"}"""));
+        model.Code.Handlers.Add(new HandlerInfo(
+            "use-case/lending.borrow-copy", "lending", "borrow-copy", "BorrowCopy", "command", file,
+            Dispatches: [new CodeDispatch("issues", "PurgeLoansCommand", "", file, 13, "LoanFanout.RetryAsync")]));
+
+        var finding = Assert.Single(
+            Checker.Check(model).Findings,
+            found => found.Code == "effect-undeclared");
+
+        Assert.Contains("via 'LoanFanout.RetryAsync'", finding.Message);
+    }
+
+    [Fact]
+    public void Handler_Dispatching_Directly_Names_No_Helper()
+    {
+        using var temp = Cli.Temp("checks");
+        var file = Path.Combine(temp.Path, "BorrowCopyCommandHandler.cs");
+        var model = TestModel.Model(
+            TestModel.Config(temp.Path),
+            TestModel.Record("use-case", "use-case/lending.borrow-copy", Path.Combine(temp.Path, "borrow.md"), """{"status": "reviewed", "kind": "command"}"""));
+        model.Code.Handlers.Add(new HandlerInfo(
+            "use-case/lending.borrow-copy", "lending", "borrow-copy", "BorrowCopy", "command", file,
+            Dispatches: [new CodeDispatch("issues", "PurgeLoansCommand", "", file, 13)]));
+
+        var finding = Assert.Single(
+            Checker.Check(model).Findings,
+            found => found.Code == "effect-undeclared");
+
+        Assert.DoesNotContain(" via '", finding.Message);
+    }
 }

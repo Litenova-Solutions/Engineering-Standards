@@ -400,7 +400,7 @@ static class CodeChecks
                 {
                     findings.Add(CodeFinding(
                         "effect-undeclared",
-                        $"Handler for '{handler.UseCaseId}' {dispatch.Verb} '{DispatchTarget(dispatch)}', which no effects entry of the use case declares.",
+                        $"Handler for '{handler.UseCaseId}' {dispatch.Verb} '{DispatchTarget(dispatch)}'{ViaText(dispatch)}, which no effects entry of the use case declares.",
                         dispatch.File,
                         dispatch.Line,
                         handler.UseCaseId));
@@ -427,7 +427,7 @@ static class CodeChecks
                 {
                     findings.Add(CodeFinding(
                         "effect-undeclared",
-                        $"{kind} '{record.Id}' {dispatch.Verb} '{DispatchTarget(dispatch)}', which no declared edge of the {record.Type} names.",
+                        $"{kind} '{record.Id}' {dispatch.Verb} '{DispatchTarget(dispatch)}'{ViaText(dispatch)}, which no declared edge of the {record.Type} names.",
                         dispatch.File,
                         dispatch.Line,
                         record.Id));
@@ -439,6 +439,10 @@ static class CodeChecks
     /// <summary>One dispatch's target as the message reads it: the port and method for calls, else the message.</summary>
     private static string DispatchTarget(CodeDispatch dispatch) =>
         dispatch.Verb == "calls" ? $"{dispatch.Detail}.{dispatch.Target}" : dispatch.Target;
+
+    /// <summary>The helper a one-hop attribution found the dispatch through, or nothing when direct.</summary>
+    private static string ViaText(CodeDispatch dispatch) =>
+        dispatch.Via is { Length: > 0 } via ? $" via '{via}'" : "";
 
     /// <summary>Every edge a use case declares in its effects entries.</summary>
     private static List<(string Verb, string Target)> UseCaseEdges(Record useCase)

@@ -58,9 +58,10 @@ sealed record CodeThrown(string Type, string File, int Line);
 ///     <c>issues</c>, <c>publishes</c>, <c>sends</c> or <c>calls</c>. <paramref name="Target" />
 ///     is the message type, the template key, or the port method. <paramref name="Detail" />
 ///     is the port type for <c>calls</c>, <c>type</c> or <c>template</c> for <c>sends</c>,
-///     and empty otherwise.
+///     and empty otherwise. <paramref name="Via" /> names the helper <c>Type.Method</c> a
+///     one-hop attribution found the dispatch through, or null for a direct dispatch.
 /// </summary>
-sealed record CodeDispatch(string Verb, string Target, string Detail, string File, int Line);
+sealed record CodeDispatch(string Verb, string Target, string Detail, string File, int Line, string? Via = null);
 
 /// <summary>What the backend source says.</summary>
 sealed class CodeModel
