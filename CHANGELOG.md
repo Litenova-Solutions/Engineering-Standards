@@ -17,6 +17,9 @@ LiteSpec 3.0.0 is a top-down specification standard for one bounded-context busi
 - Requirements state exceptions with `except` and a `fallback`, and carry `risk` and `setBy`.
 - Use cases are commands or queries with `access` (auth, grant, tenant scope), `changes`, `reads`, `consistency`, `effects` (issues, sends, publishes, calls), `idempotency`, `audit`, typed query output in `include` groups, freshness and paging. Generic refusals are derived.
 - New record types: reaction, job, notification, setting (replacing limit) and integration event. Aggregates have entity, process and store kinds, and data classes with erasure positions. A retention schedule page holds retention rows.
+- Reactions and jobs declare edges in `effects` with the same verb grammar as use cases; a reaction may omit `timing`, which reads as `async`, and top-level `issues` and `sends` are refused.
+- An idempotency `key` templates `{field}` placeholders over the record's `input` fields, and `scope` is `tenant`, `account`, `login` or `global`; reaction and job placeholders name triggering event or run window fields and are not checked.
+- Reaction and job `onFailure` is a structured policy: `retry` of `none`, `next-run` or attempts with delays and backoff, an optional `deadLetter`, `surfacesIn` and `runbook`, with ISO 8601 durations.
 - Approval is data: `approvedBy`, `approvedOn` and a semantic `approvedHash`, written by `litespec model approve`.
 
 ### Review and checks
@@ -24,11 +27,19 @@ LiteSpec 3.0.0 is a top-down specification standard for one bounded-context busi
 - Product people read journey chapters and ballots; developers review Behavior diffs; a named security reviewer sees tier-1 access and data changes. Tier-3 questions auto-approve after a veto window.
 - Every check has a tier: G (record graph, blocking), S (stack reader, blocking where qualified) and A (advisory).
 - Declared edges replace mechanism bans: every edge between use cases, reactions, jobs, notifications, integration events and external systems is declared and checked. A calls edge counts only through a port anchored to an external-system record.
+- A refusal proof confirms from the asserted code, a client code `refusals.aliases` translates, or the HTTP status `refusals.statuses` maps to the code.
+- An integration fact that drives a use case or rule confirms its scenario or rule claim from inside the host.
+- An `effect-undeclared` finding names a one-hop helper as `via 'Type.Method'`.
+- A term's `labels` sit outside the approval hash, so adding a language reopens no approval.
 
 ### Tools
 
 - `litespec model diff` has `--intent` and `--behavior` views with a security queue, and `litespec book` renders journey chapters and a ballots page.
 - `litespec new` scaffolds a page, `litespec rename` rewrites an id everywhere, and `litespec model approve` records approval.
+- `litespec new result` and `litespec new scenario` append one entry to a use-case page in house order: successes, refusals, then scenarios.
+- `litespec model backfill` drafts missing Behavior frontmatter from code during adoption and marks touched records transcribed; `--dry-run` prints the plan.
+- `litespec model check --staged` reports only staged records, their direct links, and the records staged code implements.
+- `litespec model approve --dry-run` prints which records would be stamped and which would be reopened, without writing.
 - Extensions added: privacy, devices, automation, workflow-engine, pipeline, queues and ai. LS2002 is retired.
 
 ## v2.0.0

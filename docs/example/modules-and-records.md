@@ -423,8 +423,8 @@ Submit expense is a command: an employee submits a work expense with a receipt t
   "raises": ["event/expense.submitted"],
   "idempotency": {
     "mode": "key",
-    "key": "{employeeId}:{expenseId}",
-    "scope": "employee"
+    "key": "{employeeId}:{amount}:{currency}",
+    "scope": "login"
   },
   "audit": {
     "reason": "none",
@@ -472,7 +472,7 @@ The record ends in named results, which applies `litespec/core/model#give-every-
 
 ## The Reaction
 
-A reaction answers an event by issuing one use case or sending one notification. When an expense is reimbursed, Claimwick notifies the employee. The reaction lives at `docs/behavior/modules/spending/reactions/notify-on-reimbursement.md`, filed with the spending module whose notification it sends. Its `on` names the domain event, which applies `litespec/core/behavior#trigger-every-reaction-from-a-declared-event`, and it sends exactly one notification and writes no aggregate, which applies `litespec/core/behavior#issue-or-send-from-every-reaction`.
+A reaction answers an event through the edges its `effects` declare. When an expense is reimbursed, Claimwick notifies the employee. The reaction lives at `docs/behavior/modules/spending/reactions/notify-on-reimbursement.md`, filed with the spending module whose notification it sends. Its `on` names the domain event, which applies `litespec/core/behavior#trigger-every-reaction-from-a-declared-event`, and it declares its `sends` edge in `effects` and writes no aggregate, which applies `litespec/core/behavior#issue-or-send-from-every-reaction`.
 
 ```json
 {
@@ -484,7 +484,11 @@ A reaction answers an event by issuing one use case or sending one notification.
   "on": [
     "event/expense.reimbursed"
   ],
-  "sends": "notification/spending.reimbursement-received",
+  "effects": [
+    {
+      "sends": "notification/spending.reimbursement-received"
+    }
+  ],
   "reads": [
     "aggregate/spending.expense"
   ],
@@ -497,11 +501,22 @@ A reaction answers an event by issuing one use case or sending one notification.
   "idempotency": {
     "mode": "state"
   },
-  "onFailure": "retry (5, exponential) then dead-letter"
+  "onFailure": {
+    "retry": {
+      "maxAttempts": 5,
+      "initialDelay": "PT1M",
+      "maxDelay": "PT1H",
+      "backoff": "exponential"
+    },
+    "deadLetter": {
+      "after": "P7D",
+      "action": "Finance replays the notice by hand."
+    }
+  }
 }
 ```
 
-The reaction serves the journey's last step: the employee sees the reimbursement land because the message says so. Its failure handling retries with backoff before dead-lettering, and repeated firings collapse by state, so the employee is told once.
+The entry omits `timing`, so it reads as `async`. The reaction serves the journey's last step: the employee sees the reimbursement land because the message says so. Its failure handling retries five times with exponential backoff before dead-lettering, and repeated firings collapse by state, so the employee is told once.
 
 ## The Jobs
 
@@ -525,8 +540,11 @@ A job is scheduled, one-off, or operator work that issues use cases. Claimwick k
     "name": "remind-approvers",
     "duration": "PT15M"
   },
-  "issues": [
-    "use-case/spending.send-approver-reminder"
+  "effects": [
+    {
+      "issues": "use-case/spending.send-approver-reminder",
+      "timing": "async"
+    }
   ],
   "reads": [
     "aggregate/spending.expense"
@@ -541,7 +559,18 @@ A job is scheduled, one-off, or operator work that issues use cases. Claimwick k
   "serves": [
     "journey/submit-and-reimburse#s2"
   ],
-  "onFailure": "retry (3, linear) then dead-letter",
+  "onFailure": {
+    "retry": {
+      "maxAttempts": 3,
+      "initialDelay": "PT5M",
+      "maxDelay": "PT1H",
+      "backoff": "fixed"
+    },
+    "deadLetter": {
+      "after": "P1D",
+      "action": "The operator reruns the missed reminders by hand."
+    }
+  },
   "idempotency": {
     "mode": "state"
   }

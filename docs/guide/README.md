@@ -6,7 +6,7 @@ The Guides section teaches by doing: tutorials take a reader to a first working 
 
 ## Where to Start
 
-When LiteSpec is new, follow [Start a Consumer Repository](../tutorial/getting-started.md) first: it builds a working consumer with one implemented use case on the `dotnet` backend and a React frontend. Then follow [Model a Behavior Module](../tutorial/model-domain.md) to specify one business area from Intent into Behavior the model builder reads. When the product ships another frontend, follow [Add a Svelte Frontend](add-a-svelte-frontend.md) or [Add a Blazor Frontend](add-a-blazor-frontend.md). When the project runs and one goal needs solving, read the how-to that names it: [Build an Audit Trail](audit-trail.md) implements the audit extension on the .NET command pipeline, and [Check .NET Code with the Analyzers](../analyzers/check-dotnet-code-with-the-analyzers.md) runs the Roslyn analyzers over a .NET backend.
+When LiteSpec is new, follow [Start a Consumer Repository](../tutorial/getting-started.md) first: it builds a working consumer with one implemented use case on the `dotnet` backend and a React frontend. Then follow [Model a Behavior Module](../tutorial/model-domain.md) to specify one business area from Intent into Behavior the model builder reads. When the product ships another frontend, follow [Add a Svelte Frontend](add-a-svelte-frontend.md) or [Add a Blazor Frontend](add-a-blazor-frontend.md). When the project runs and one goal needs solving, read the how-to that names it: [Build an Audit Trail](audit-trail.md) implements the audit extension on the .NET command pipeline, [Read the Approval Hash](approval-hash.md) lists which fields feed `approvedHash` per record type, and [Check .NET Code with the Analyzers](../analyzers/check-dotnet-code-with-the-analyzers.md) runs the Roslyn analyzers over a .NET backend.
 
 ## Tutorials
 
@@ -18,3 +18,4 @@ When LiteSpec is new, follow [Start a Consumer Repository](../tutorial/getting-s
 - [Add a Svelte Frontend](add-a-svelte-frontend.md): declare a Svelte frontend on the web stack.
 - [Add a Blazor Frontend](add-a-blazor-frontend.md): declare a Blazor frontend outside the controlled UI contract.
 - [Build an Audit Trail](audit-trail.md): the audit extension on the .NET LiteBus pipeline, step by step.
+- [Read the Approval Hash](approval-hash.md): which fields feed `approvedHash` per record type, what reopens an approval, and how the approve dry run previews it.

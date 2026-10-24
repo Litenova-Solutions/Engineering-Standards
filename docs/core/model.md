@@ -199,10 +199,8 @@ Each written link lives as a field on the record it starts from: a decision carr
 | `reachedThrough` | use case | Entry points |
 | `changes` | use case | Aggregates |
 | `reads` | use case, reaction, job | Aggregates |
-| `effects` | use case, reaction | Use cases, notifications, integration events, external system operations |
+| `effects` | use case, reaction, job | Use cases, notifications, integration events, external system operations |
 | `on` | reaction | Domain events or integration events |
-| `issues` | reaction, job | Use cases |
-| `sends` | reaction | Notifications |
 | `holds` | actor | Roles at a scope |
 | `allows` | role | Permissions |
 | `actor` | journey, external system | The actor walking the journey; the actor the system acts as |
@@ -255,7 +253,7 @@ The builder also writes each record effective status: draft when the record, a d
 
 ### Approval as Data
 
-An approved or reviewed record carries its approval as data: `approvedBy` names a person owner or `auto (veto window)`, `approvedOn` names the date, and `approvedHash` is the builder hash over the semantic fields, written by `litespec model approve`. The semantic fields are the statements, results, output names, rules, and steps. Prose bodies and a term's translation labels sit outside the hash, so rewording prose or adding a language reopens no approval. `approval-reopened` fires when the semantic hash differs from `approvedHash`.
+An approved or reviewed record carries its approval as data: `approvedBy` names a person owner or `auto (veto window)`, `approvedOn` names the date, and `approvedHash` is the builder hash over the semantic fields, written by `litespec model approve`. The semantic fields are the statements, results, output names, rules, and steps. Prose bodies and a term's translation labels sit outside the hash, so rewording prose or adding a language reopens no approval. `approval-reopened` fires when the semantic hash differs from `approvedHash`. [The approval hash guide](../guide/approval-hash.md) lists which fields feed the hash per record type.
 
 ### Risk Tiers
 

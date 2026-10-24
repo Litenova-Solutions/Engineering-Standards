@@ -43,7 +43,7 @@ await commandMediator.SendAsync(
 
 **Statement:** A reaction MUST run in one class carrying one anchor tag naming its reaction record.
 
-**Rationale:** One class per reaction answers the trigger the record names in `on` and dispatches only through its `issues` or `sends`. The class carries `/// <implements>reaction/<module>.<name></implements>`, so the stack reader links it without guessing. It lives in the folder named for the reaction under `litespec/backend/dotnet/application#use-the-operation-folder-layout`. It never writes an aggregate directly: a reaction that needs a write issues a command. It honors the record's `reads`, its idempotency, and its `onFailure`. This provision states the .NET form of `litespec/backend/application#keep-event-reaction-implementations-explicit`.
+**Rationale:** One class per reaction answers the trigger the record names in `on` and dispatches only through its `effects` entries. The class carries `/// <implements>reaction/<module>.<name></implements>`, so the stack reader links it without guessing. It lives in the folder named for the reaction under `litespec/backend/dotnet/application#use-the-operation-folder-layout`. It never writes an aggregate directly: a reaction that needs a write issues a command. It honors the record's `reads`, its idempotency, and its `onFailure`. This provision states the .NET form of `litespec/backend/application#keep-event-reaction-implementations-explicit`.
 
 **Example:**
 

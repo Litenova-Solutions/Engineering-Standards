@@ -113,7 +113,7 @@ A use case is one independently testable goal: a page beside its aggregate with 
 | `changes`, `reads` | Aggregate ids touched, including `store` aggregates. |
 | `consistency` | `{ mode, because }`: mode of `atomic`, `per-record`, `compensated`, or `best-effort`. |
 | `effects` | `{ issues / sends / publishes / calls, timing, onFailure, before, forEach }` entries with exactly one verb; timing is `inline`, `after-commit`, or `async`. An inline `issues` entry states `sharesTransaction`. |
-| `idempotency` | `{ mode, key, scope, reason }`: mode of `key`, `state`, `not-pending`, or `none`. |
+| `idempotency` | `{ mode, key, scope, reason }`: mode of `key`, `state`, `not-pending`, or `none`; `key` templates `{field}` placeholders over the input field names; `scope` is `tenant`, `account`, `login`, or `global`. |
 | `audit` | `{ reason, target }` with reason of `required`, `optional`, or `none`, or `{ exempt }` with its justification. Commands are audited by default with reason `none`, and async work audits at request time. |
 
 Goal and What Happens are required only when the use case changes more than one aggregate, refuses beyond the generic refusals, carries risk, or issues inline effects. Otherwise frontmatter plus Goal is enough.
@@ -153,30 +153,30 @@ A scenario proves one ending: a child record with `given`, `when`, `then`, an op
 
 ### Reactions
 
-A reaction is a when-X-do-Y automation: on a domain or integration event, it issues one use case or sends one notification. A reaction changes nothing directly; a reaction needing a change issues a small command. It is filed with the module whose records it changes, or with the notification module when it only sends.
+A reaction is a when-X-do-Y automation: on a domain or integration event, it runs the edges its `effects` declare. A reaction changes nothing directly; a reaction needing a change issues a small command. It is filed with the module whose records it changes, or with the notification module when it only sends.
 
 | Field | Meaning |
 |:---|:---|
 | `on` | The domain or integration events answered. |
 | `if` | The skip condition in domain words, optional. |
-| `issues`, `sends` | Exactly one: the use case issued or the notification sent. |
+| `effects` | `{ issues / sends / publishes / calls, timing }` entries with exactly one verb, the same entries a use case uses; a reaction may omit `timing`, which reads as `async`. There are no top-level `issues` or `sends`. |
 | `forEach`, `reads` | The optional scope and the aggregates read. |
 | `fulfills`, `serves` | The requirements carried and the journey steps served. |
-| `idempotency` | The idempotency mode, usually `state`. |
-| `onFailure` | `retry (<attempts>, <backoff>) then dead-letter`, `skip-and-log`, or `discard`, with an optional `onExhausted`. |
+| `idempotency` | The idempotency mode, usually `state`; a `key` templates `{field}` placeholders over the triggering event or run window fields, which the record does not list. |
+| `onFailure` | `{ retry, deadLetter, surfacesIn, runbook }`: `retry` is `none`, `next-run`, or `{ maxAttempts, initialDelay, maxDelay, backoff }` with `exponential` or `fixed` backoff; `deadLetter` is `{ after, action }`; `surfacesIn` names an `entry-point/...` and `runbook` a `runbook/...`. Delays and `after` are ISO 8601 durations. |
 
-A reaction may hold scenario child records ending in the issued use case result.
+A reaction may hold scenario child records ending in a result of a use case its effects issue.
 
 ### Jobs
 
-A job is scheduled, one-off, or operator work running without a request. A scheduled job runs on its structured schedule; a one-off job runs once; an operator job is interactive platform work with no aggregate, such as a rehearsal harness. Its `issues` run once per item in its `scope`.
+A job is scheduled, one-off, or operator work running without a request. A scheduled job runs on its structured schedule; a one-off job runs once; an operator job is interactive platform work with no aggregate, such as a rehearsal harness. Its `effects` run once per item in its `scope`.
 
 | Field | Meaning |
 |:---|:---|
 | `kind` | `scheduled`, `one-off`, or `operator`. |
 | `schedule` | `{ every | cron, timezone }` in structured form. |
 | `scope`, `batchSize`, `lease` | What each run selects, how many items per batch, and the lock with its duration. |
-| `issues`, `reads` | The use cases run per item and the aggregates read. |
+| `effects`, `reads` | The `{ issues / sends / publishes / calls, timing }` entries run per item and the aggregates read. There is no top-level `issues`. |
 | `serviceLevel`, `evidence` | The promise citing its requirement, and where proof of a run lands. |
 | `runbook`, `runsWhere` | The runbook answering the job and where it runs. |
 | `fulfills`, `serves`, `onFailure`, `idempotency` | As on a use case and a reaction. |
@@ -386,9 +386,9 @@ The specification names only what carries business meaning. Child entities and v
 
 ### Keep the Negation Word in the Rule Name
 
-**Statement:** A rule whose statement says `not`, `no`, `never`, or `cannot` MUST keep a restricting word in its name: a negation such as `no`, `never` or `refused`, or a limit such as `only` or `one-...-per-...`.
+**Statement:** A rule whose statement says `not`, `no`, `never`, or `cannot` MUST keep a restricting word in its name: a negation such as `no`, `never`, `not`, `cannot`, `none`, `without`, `unless`, `refused`, or `forbidden`, a limit such as `only`, or a uniqueness `one-...-per-...`.
 
-**Rationale:** A name that drops the negation reads as its own opposite: a rule named `cancel-after-shipment` whose statement says "never" approves what it forbids. A restricting word keeps the name a true sentence a reviewer trusts without opening the statement, and `one-grant-per-account` already says what "an account never holds two grants" says. The `rule-name-negation` check reports a rule whose statement negates while its name keeps no restricting word.
+**Rationale:** A name that drops the negation reads as its own opposite: a rule named `cancel-after-shipment` whose statement says "never" approves what it forbids. A restricting word keeps the name a true sentence a reviewer trusts without opening the statement, and `one-grant-per-account` already says what "an account never holds two grants" says. The `rule-name-negation` check reports a rule whose statement negates while its name keeps no restricting word or uniqueness.
 
 **Example:** The rule reads `rule/order.cancel-never-after-shipment`.
 
@@ -544,7 +544,7 @@ The specification names only what carries business meaning. Child entities and v
 
 **Statement:** Each use case MUST declare its idempotency mode with the key, scope, or reason that mode needs.
 
-**Rationale:** A retried call without a stated idempotency runs twice: a double charge, a double admission, a double notice. Declaring the mode of `key`, `state`, or `not-pending`, with its key template and scope, states how repeats collapse; `none` carries the reason repeats cannot happen. The door scan keys on the scanner nonce scoped to the device.
+**Rationale:** A retried call without a stated idempotency runs twice: a double charge, a double admission, a double notice. Declaring the mode of `key`, `state`, or `not-pending`, with its key template and scope, states how repeats collapse; `none` carries the reason repeats cannot happen. The `key` templates `{field}` placeholders over the record's `input` field names, and the `scope` is `tenant`, `account`, `login`, or `global`. A reaction or job key names fields of the triggering event or run window instead, which the record does not list, so its placeholders are not checked. The door scan keys on `{nonce}` scoped to the login.
 
 ### State the Audit Position of Every Command
 
@@ -656,9 +656,9 @@ The specification names only what carries business meaning. Child entities and v
 
 ### Issue or Send from Every Reaction
 
-**Statement:** Each reaction MUST name exactly one target: the use case it issues or the notification it sends.
+**Statement:** Each reaction MUST declare its edges in `effects`, with exactly one verb per entry.
 
-**Rationale:** A reaction with no target observes and never acts, while a reaction with two targets hides a second behavior behind the first. Naming exactly one target keeps each automation one decision with one consequence.
+**Rationale:** A reaction with no declared edge observes and never acts, while an edge outside `effects` hides behavior the checks never see. Declaring each edge in `effects` with exactly one verb of `issues`, `sends`, `publishes`, or `calls` keeps every consequence of the automation beside its trigger, under one grammar for every record that has edges. The `record-shape` check reports a reaction with no `effects` and a reaction holding top-level `issues` or `sends`.
 
 ### Write No Aggregate Directly from a Reaction
 
@@ -674,21 +674,21 @@ The specification names only what carries business meaning. Child entities and v
 
 ### State the Failure Handling of Every Reaction
 
-**Statement:** Each reaction MUST declare its `onFailure` handling and its idempotency.
+**Statement:** Each reaction MUST declare its structured `onFailure` policy and its idempotency.
 
-**Rationale:** A failed automation without handling retries forever or drops silently: notices double-send, voids never land. Declaring the `onFailure` of retry with attempts and backoff then dead-letter, skip-and-log, or discard, with an optional `onExhausted`, states the failure shape beside the trigger, and the idempotency mode, usually `state`, states how repeats collapse.
+**Rationale:** A failed automation without handling retries forever or drops silently: notices double-send, voids never land. Declaring the `onFailure` policy states the failure shape beside the trigger: `retry` is `none`, `next-run`, or a retry object with `maxAttempts`, `initialDelay`, `maxDelay`, and `backoff` of `exponential` or `fixed`; `deadLetter` carries `after` with the action a person takes; `surfacesIn` names the entry point showing the failure and `runbook` the recovery procedure. Delays and `after` are ISO 8601 durations, and prose handling is refused. The same shape serves a job. The idempotency mode, usually `state`, states how repeats collapse.
 
 ### Point Reaction Scenarios at the Issued Result
 
-**Statement:** Each scenario on a reaction MUST end in a result of the use case the reaction issues.
+**Statement:** Each scenario on a reaction MUST end in a result of a use case its effects issue.
 
-**Rationale:** A reaction scenario ending anywhere else proves another behavior story: it walks the trigger and asserts an ending the issued use case never declares. Ending in the issued use case result keeps the scenario a proof of the automation consequence.
+**Rationale:** A reaction scenario ending anywhere else proves another behavior story: it walks the trigger and asserts an ending no issued use case declares. Ending in an issued use case result keeps the scenario a proof of the automation consequence.
 
 ### Declare Every Job with Kind and Structured Schedule
 
-**Statement:** Each job MUST declare its kind, scope, issues, reads, service level, evidence, and runbook, with a structured schedule when it runs on time.
+**Statement:** Each job MUST declare its kind, scope, effects, reads, service level, evidence, and runbook, with a structured schedule when it runs on time.
 
-**Rationale:** A job without a declared scope and promise is a blind run: nobody states what each run selects, what it runs per item, what it guarantees, or where proof lands. Declaring the kind of `scheduled`, `one-off`, or `operator`, the scope with its batch size and lease, the issued use cases with the aggregates read, the service level citing its requirement, the evidence, and the runbook states the run beside its promise. The schedule is structured with its timezone, never prose. The `schedule-unstructured` check reports a schedule no tool can read.
+**Rationale:** A job without a declared scope and promise is a blind run: nobody states what each run selects, what it runs per item, what it guarantees, or where proof lands. Declaring the kind of `scheduled`, `one-off`, or `operator`, the scope with its batch size and lease, the `effects` entries with the aggregates read, the service level citing its requirement, the evidence, and the runbook states the run beside its promise. The schedule is structured with its timezone, never prose. The `schedule-unstructured` check reports a schedule no tool can read, and `record-shape` reports a job holding top-level `issues`.
 
 **Example:** The expire-lapsed-returns job runs every six hours over open returns past their window, issues one expiry per item, and lands its evidence in the run log.
 
@@ -784,9 +784,9 @@ The specification names only what carries business meaning. Child entities and v
 
 This informative example demonstrates `litespec/core/behavior#declare-the-kind-of-every-aggregate`, `litespec/core/behavior#model-each-aggregate-lifecycle-with-states`, `litespec/core/behavior#state-each-process-step-with-its-compensation`, `litespec/core/behavior#close-every-process-with-named-exits-and-a-driver`, `litespec/core/behavior#state-each-rule-with-its-kind`, `litespec/core/behavior#give-each-use-case-a-command-or-query-kind`, `litespec/core/behavior#connect-each-use-case-to-intent`, `litespec/core/behavior#grant-each-use-case-scoped-access`, `litespec/core/behavior#bound-every-caller-supplied-input-value`, `litespec/core/behavior#state-the-consistency-of-every-use-case`, `litespec/core/behavior#declare-every-effect-with-one-verb-and-its-timing`, `litespec/core/behavior#end-every-use-case-in-named-results`, `litespec/core/behavior#order-every-refusal-list-by-precedence`, `litespec/core/behavior#trigger-every-reaction-from-a-declared-event`, `litespec/core/behavior#issue-or-send-from-every-reaction`, `litespec/core/behavior#file-every-reaction-with-the-module-it-changes`, `litespec/core/behavior#state-the-failure-handling-of-every-reaction`, `litespec/core/behavior#tabulate-every-calculation-with-examples`, `litespec/core/behavior#record-attempts-behind-recorded-refusals`, `litespec/core/behavior#list-recorded-outcomes-inside-success-codes`, and `litespec/core/behavior#name-the-idempotency-of-every-use-case`.
 
-**Resale queue.** A buyer who cannot attend hands their ticket back. The ticket resale aggregate is a process with states `Listed`, `Resold`, `Settled`, `Withdrawn`, and `Lapsed`, steps from hold-place to settle with compensations, exits for withdrawal and lapse, and a driver of a completion reaction, an expiry job, and the box office operator. The complete-ticket-resale command serves the hand-back journey step, fulfills the own-charge refund requirement, declares session auth with the manage-listing permission, bounds the caller-supplied replacement amount with the positivity rule, writes atomically because of the one-open-return rule, and publishes the resold integration event after commit. Its refusals stand in precedence order ahead of the resale-completed result. The void-code reaction answers the resold domain event, issues the void-ticket-code command from the admission module, and retries five times with backoff before dead-lettering. The refund-never-exceeds-paid rule is proven by a scenario with an examples table: a EUR 50 ticket resold for EUR 65 refunds EUR 50 to the buyer and keeps EUR 15 with the organizer.
+**Resale queue.** A buyer who cannot attend hands their ticket back. The ticket resale aggregate is a process with states `Listed`, `Resold`, `Settled`, `Withdrawn`, and `Lapsed`, steps from hold-place to settle with compensations, exits for withdrawal and lapse, and a driver of a completion reaction, an expiry job, and the box office operator. The complete-ticket-resale command serves the hand-back journey step, fulfills the own-charge refund requirement, declares session auth with the manage-listing permission, bounds the caller-supplied replacement amount with the positivity rule, writes atomically because of the one-open-return rule, and publishes the resold integration event after commit. Its refusals stand in precedence order ahead of the resale-completed result. The void-code reaction answers the resold domain event, issues the void-ticket-code command from the admission module through its effects, and retries five times with exponential backoff before dead-lettering. The refund-never-exceeds-paid rule is proven by a scenario with an examples table: a EUR 50 ticket resold for EUR 65 refunds EUR 50 to the buyer and keeps EUR 15 with the organizer.
 
-**Door scan.** A scanner records each check-in attempt. The record-check-in-attempt command declares device auth with a system grant, per-record consistency, and idempotency keyed on the scanner nonce scoped to the device. Its recorded refusals for unknown, voided, and already-admitted codes store each attempt with its reason, while malformed scans store nothing, and its admitted result lists `entry` and `re-entry` codes.
+**Door scan.** A scanner records each check-in attempt. The record-check-in-attempt command declares device auth with a system grant, per-record consistency, and idempotency keyed on `{nonce}` scoped to the login. Its recorded refusals for unknown, voided, and already-admitted codes store each attempt with its reason, while malformed scans store nothing, and its admitted result lists `entry` and `re-entry` codes.
 
 ## Verification
 
@@ -807,7 +807,7 @@ This informative example demonstrates `litespec/core/behavior#declare-the-kind-o
 | litespec/core/behavior#close-every-process-with-named-exits-and-a-driver | checkable | `litespec consumer` fails a process page without exits carrying triggers, `finishedWhen`, and `driver`. |
 | litespec/core/behavior#prove-every-process-guard-and-exit-with-a-scenario | guidance | A scenario proving each `when` guard and each exit sits on the process page or its use case pages. |
 | litespec/core/behavior#state-each-rule-with-its-kind | checkable | `litespec consumer` fails a rule entry without `kind` or `statement`. |
-| litespec/core/behavior#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` while its name keeps no restricting word. |
+| litespec/core/behavior#keep-the-negation-word-in-the-rule-name | checkable | `litespec model check` reports `rule-name-negation` for a rule whose statement says `not`, `no`, `never`, or `cannot` while its name keeps no restricting word or uniqueness. |
 | litespec/core/behavior#keep-cross-aggregate-rules-on-a-rule-page | guidance | Each cross-aggregate rule sits as an entry on a rule page; other rules sit on their aggregate page. |
 | litespec/core/behavior#name-the-refusal-a-broken-rule-produces | guidance | Each guarded rule names its refusal in `refusal` beside the rule entry. |
 | litespec/core/behavior#release-every-reservation-by-a-named-use-case | checkable | `litespec model check` reports `reservation-without-release` for a reservation rule without `releasedBy` or `never` with its cost. |
@@ -831,7 +831,7 @@ This informative example demonstrates `litespec/core/behavior#declare-the-kind-o
 | litespec/core/behavior#state-the-transaction-sharing-of-every-inline-call | checkable | `litespec consumer` fails an inline `issues` effect without `sharesTransaction`. |
 | litespec/core/behavior#keep-the-effect-graph-free-of-cycles | checkable | `litespec model check` reports `effect-loop` for a cycle with no stated end condition. |
 | litespec/core/behavior#name-the-events-each-use-case-raises | guidance | Each use case names its raised domain events in `raises` beside the use-case page. |
-| litespec/core/behavior#name-the-idempotency-of-every-use-case | checkable | `litespec consumer` fails a use case without an idempotency mode or without the key, scope, or reason its mode needs. |
+| litespec/core/behavior#name-the-idempotency-of-every-use-case | checkable | `litespec consumer` fails a use case without an idempotency mode or without the key, scope, or reason its mode needs; `litespec model check` reports `record-shape` for a key with no `{field}` placeholder, a placeholder naming no input field, or a scope outside `tenant`, `account`, `login`, and `global`. |
 | litespec/core/behavior#state-the-audit-position-of-every-command | checkable | `litespec consumer` fails a command without an audit reason and target or an exemption with its justification. |
 | litespec/core/behavior#declare-every-query-output | checkable | `litespec model check` reports `query-output-missing` for a query with no declared output. |
 | litespec/core/behavior#justify-every-wider-visibility | checkable | `litespec model check` reports `widening-unjustified` for a widened include group with no cited requirement. |
@@ -846,12 +846,12 @@ This informative example demonstrates `litespec/core/behavior#declare-the-kind-o
 | litespec/core/behavior#write-every-scenario-in-given-when-then | checkable | `litespec consumer` fails a scenario entry without `given`, `when`, or `then`. |
 | litespec/core/behavior#write-prose-on-significant-use-cases | checkable | `litespec model check` reports `prose-missing` for a significant use case without Goal and What Happens. |
 | litespec/core/behavior#trigger-every-reaction-from-a-declared-event | checkable | `litespec model check` reports `reaction-trigger-unresolved` for a trigger naming an unknown event. |
-| litespec/core/behavior#issue-or-send-from-every-reaction | checkable | `litespec consumer` fails a reaction without exactly one of `issues` and `sends`. |
+| litespec/core/behavior#issue-or-send-from-every-reaction | checkable | `litespec model check` reports `record-shape` for a reaction with no `effects` and for top-level `issues` or `sends`. |
 | litespec/core/behavior#write-no-aggregate-directly-from-a-reaction | guidance | Each reaction changes aggregates only through the use case it issues. |
 | litespec/core/behavior#file-every-reaction-with-the-module-it-changes | guidance | Each reaction page sits with the module it changes, or with the notification module when it only sends. |
-| litespec/core/behavior#state-the-failure-handling-of-every-reaction | checkable | `litespec consumer` fails a reaction without `onFailure` handling or idempotency. |
+| litespec/core/behavior#state-the-failure-handling-of-every-reaction | checkable | `litespec consumer` fails a reaction with `onFailure` outside the retry and dead-letter shape; `litespec model check` reports `record-shape` for prose handling, a missing or malformed retry, and a malformed duration. |
 | litespec/core/behavior#point-reaction-scenarios-at-the-issued-result | checkable | `litespec model check` reports `scenario-result-unresolved` for a reaction scenario ending outside the issued use case results. |
-| litespec/core/behavior#declare-every-job-with-kind-and-structured-schedule | checkable | `litespec model check` reports `schedule-unstructured` for a schedule no tool can read; `litespec consumer` fails a job without kind, scope, issues, reads, service level, evidence, or runbook. |
+| litespec/core/behavior#declare-every-job-with-kind-and-structured-schedule | checkable | `litespec model check` reports `schedule-unstructured` for a schedule no tool can read and `record-shape` for top-level `issues`; `litespec consumer` fails a job without kind, scope, effects, reads, service level, evidence, or runbook. |
 | litespec/core/behavior#guard-every-operator-job | checkable | `litespec model check` reports `operator-job-without-guard` for an operator job without `runsWhere` or guard. |
 | litespec/core/behavior#describe-every-notification-with-audience-channel-and-consent | checkable | `litespec model check` reports `notification-without-sender` for a notification no use case or reaction sends; `litespec consumer` fails a notification without its declared fields. |
 | litespec/core/behavior#claim-every-notification-promise-from-a-requirement | guidance | Each notification claim cites its requirement beside the claim. |

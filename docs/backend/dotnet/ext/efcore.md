@@ -132,7 +132,7 @@ This extension switches on no optional record type.
 
 **Statement:** An EF Core post-handler MUST collect domain events from changed aggregates and route each to the reaction its reaction record declares.
 
-**Rationale:** The post-handler collects domain events from the aggregates it changed and routes each to the reaction the reaction record declares, honoring its `onFailure`. Collecting from anywhere else drops events or delivers facts the commit did not store.
+**Rationale:** The post-handler collects domain events from the aggregates it changed and routes each to the reaction the reaction record declares, honoring its `onFailure` retry and dead-letter policy. Collecting from anywhere else drops events or delivers facts the commit did not store.
 
 ### Use Durable Outbox Delivery
 

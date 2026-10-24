@@ -2,16 +2,17 @@
 
 ## Name
 
-`litespec model` builds the project model, checks it, diffs it against a base, renders generated regions, and answers record queries.
+`litespec model` builds the project model, checks it, diffs it against a base, renders generated regions, approves records, backfills drafts from code, and answers record queries.
 
 ## Synopsis
 
 ```bash
 litespec model build [--root <consumer>] [--out <file>]
-litespec model check [--root <consumer>] [--format json]
+litespec model check [--root <consumer>] [--format json] [--staged]
 litespec model render [--root <consumer>]
 litespec model query [--root <consumer>] <id>
-litespec model approve [--root <consumer>] (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>]
+litespec model approve [--root <consumer>] (<id>... | --all) [--by <owner>] [--on <YYYY-MM-DD>] [--dry-run]
+litespec model backfill [--root <consumer>] [<module>] [--dry-run]
 litespec model diff <base> [--root <consumer>] [--format text|markdown|json] [--intent|--behavior] [--fail-on breaking] [--breaking-only]
 ```
 
@@ -19,16 +20,19 @@ litespec model diff <base> [--root <consumer>] [--format text|markdown|json] [--
 
 The model builder reads the written records, the code anchors, the routes, the tests, and the latest test run. It writes `model.json` with every record and its resolved links. The file names the code, screens, tests, and test runs it read. It adds the computed `implements`, `calls`, and `proves` links, the computed `implemented`, `verified`, `stale`, and `reachable` state of each record, and the effective status of each record. Computed states are never written on a record; they appear in the book and the model output only.
 
-`approve` writes approval data onto the named records, or with `--all` onto every approved or reviewed record that carries no `approvedHash`. It sets `approvedBy` (from `--by`, else the record decider, else its owner) and `approvedOn` (from `--on`, else today) when they are missing, and always writes `approvedHash`, the builder hash over the record semantic fields. A person runs it when they approve or review a record; agents run it only with `--by "auto (veto window)"` for a tier-3 question past its veto window.
+`approve` writes approval data onto the named records, or with `--all` onto every approved or reviewed record that carries no `approvedHash`. It sets `approvedBy` (from `--by`, else the record decider, else its owner) and `approvedOn` (from `--on`, else today) when they are missing, and always writes `approvedHash`, the builder hash over the record semantic fields. A person runs it when they approve or review a record; agents run it only with `--by "auto (veto window)"` for a tier-3 question past its veto window. With `--dry-run` it writes nothing and prints what it would do: each record that would be stamped for carrying no `approvedHash`, and each record that would be reopened for a semantic hash that differs from it. [The approval hash guide](../guide/approval-hash.md) lists which fields feed the hash per record type.
+
+`backfill` drafts Behavior records from code during adoption: for each use case, reaction, and job a handler folder or an anchor tag places, it reads the repositories, dispatches, and refusal codes the code model already holds and drafts the missing frontmatter. A use case gains `changes` or `reads`, `effects` entries, and refusal results; a reaction gains `reads` and its edges; a job gains `reads` and its edges. Every touched record is marked transcribed. Existing entries are never removed or rewritten; only missing entries are appended. With a module name it covers that module only; without one it covers every module. With `--dry-run` it prints the plan and writes nothing. It prints a per-module completeness table first, then one line per planned record, then the count of files updated and records backfilled.
 
 Aggregate transitions and data, and scenario examples, may be written as Markdown tables the builder parses, so the parts people debate read naturally even in the raw file. A front-matter field wins over a table with the same name.
 
-The five subcommands share one reader:
+The seven subcommands share one reader:
 
 - `build` writes `model.json` under `.model/` in the consumer root, unless `--out` names another file. That folder holds generated output, and the consumer ignores it in Git.
-- `check` builds the model in memory and reports every finding with its tier, code, message, path, and line.
+- `check` builds the model in memory and reports every finding with its tier, code, message, path, and line. With `--staged` it reports only the findings in the staged scope: the records on pages changed in the git index, their direct links in both directions, and the records staged code implements. A finding is in scope when its path is staged or its subject is. Outside a git repository, or when git is unavailable, `--staged` exits 2.
 - `render` rewrites the fenced generated regions and touches no text outside them.
 - `query` prints one record with its links in both directions. Agents use it to load a record's context.
+- `backfill` drafts missing Behavior frontmatter from code during adoption, as above. On a module holding no use-case, reaction, or job records it exits 1.
 - `diff` compares the working tree against a base. The base is a consumer folder holding `litespec.project.json`, or a git revision of the consumer. Records match by identifier. `--intent` shows Intent changes in product words, `--behavior` shows Behavior changes and the security queue, and without either flag it shows both. The changelog prints REMOVED, then MODIFIED, then ADDED; each section groups entries by family: goals and requirements, domain, access, operations. The header counts breaking, removed, modified, and added changes. `text` is the changelog reviewers read, `markdown` is the pull request comment, and `json` carries every change with its fingerprint and the counts for machines. `--breaking-only` shows breaking changes and hides the rest.
 
 The security queue ends the behavior diff. It lists the changes the security reviewer named in `review.securityReviewer` approves: access tenant scope widenings to `cross`, new `calls` effects, and new personal or sensitive data classes.
@@ -110,11 +114,11 @@ Every check has a tier. G reads records only and always blocks. S reads code thr
 | `use-case-unimplemented` | S | No code implements the use case and no known gap covers it. |
 | `use-case-access` | S | The code runs beyond the access grant the use case declares. |
 | `refusal-not-thrown` | S | A refusal result names a code the code never throws. |
-| `proves-unconfirmed` | S | No proving step of a claimed scenario reaches its use case, or no assertion matches its refusal. |
+| `proves-unconfirmed` | S | No proving step of a claimed scenario reaches its use case, no assertion matches its refusal by code, client alias, or HTTP status, and no integration fact drives its use case or rule. |
 | `use-case-without-scenario` | S | A use case has no scenario. It runs at large size only. |
 | `write-undeclared` | S | The code writes an aggregate outside `changes`. |
 | `result-undeclared` | S | The code returns an outcome no result declares. |
-| `effect-undeclared` | S | The code takes an edge no record declares. |
+| `effect-undeclared` | S | The code takes an edge no record declares, naming a one-hop helper as `via 'Type.Method'`. |
 | `prose-missing` | A | A use case needing Goal and What Happens prose carries none. |
 | `many-aggregates` | A | One command saves more than one atomic write group. |
 | `question-aged` | A | A question stands past its `decideBy` date. |
@@ -127,6 +131,7 @@ The `render` subcommand writes these generated regions, each fenced by `<!-- gen
 |:---|:---|:---|
 | `<id>` | for `query` | Prints the record with this identifier and its links both ways. |
 | `<base>` | for `diff` | The consumer folder or git revision to compare against. |
+| `<module>` | for `backfill` | Backfills this module only; without it, every module. |
 
 ## Options
 
@@ -139,6 +144,10 @@ The `render` subcommand writes these generated regions, each fenced by `<!-- gen
 | `--behavior` | off | Only `diff` reads it. Shows the Behavior changes and the security queue. |
 | `--fail-on breaking` | off | Only `diff` reads it. Exits 1 when the change breaks approved intent. |
 | `--breaking-only` | off | Only `diff` reads it. Shows the breaking changes and hides the rest. |
+| `--by <owner>` | the record decider, else its owner | Only `approve` reads it, and never with `--dry-run`. Sets `approvedBy` where it is missing. |
+| `--on <YYYY-MM-DD>` | today | Only `approve` reads it, and never with `--dry-run`. Sets `approvedOn` where it is missing. |
+| `--dry-run` | off | Only `approve` and `backfill` read it. Prints the plan and writes nothing. |
+| `--staged` | off | Only `check` reads it. Reports the staged scope only: staged records, their direct links, and the records staged code implements. |
 | `--help` | off | Prints the usage text and exits 0. |
 
 ## Exit Codes
@@ -146,8 +155,8 @@ The `render` subcommand writes these generated regions, each fenced by `<!-- gen
 | Code | Meaning |
 |:---|:---|
 | `0` | The command finished with no open blocking finding. |
-| `1` | `check` found an open blocking finding or an expired known gap, `query` found no record with the `id`, `diff` with `--fail-on breaking` found a breaking change, or the run failed. |
-| `2` | The arguments are wrong, the root holds no project record, or the diff base is neither a consumer folder nor a git revision. |
+| `1` | `check` found an open blocking finding or an expired known gap, `query` found no record with the `id`, `approve` named an unknown record id, `backfill` named a module with no use-case, reaction, or job records, `diff` with `--fail-on breaking` found a breaking change, or the run failed. |
+| `2` | The arguments are wrong, the root holds no project record, the diff base is neither a consumer folder nor a git revision, or `check --staged` runs outside git. |
 
 ## Examples
 
@@ -179,6 +188,30 @@ Record the founder approving two requirements:
 
 ```bash
 litespec model approve --root ../consumer requirement/buyers.guest-checkout requirement/buyers.all-in-first-price --by "NightHall founder"
+```
+
+Show what approving every record would stamp or reopen, without writing:
+
+```bash
+litespec model approve --root ../consumer --all --dry-run
+```
+
+Check only the staged records and their links before committing:
+
+```bash
+litespec model check --root ../consumer --staged
+```
+
+Draft the missing spending frontmatter from code during adoption:
+
+```bash
+litespec model backfill --root ../consumer spending
+```
+
+Show what backfilling every module would draft, without writing:
+
+```bash
+litespec model backfill --root ../consumer --dry-run
 ```
 
 Diff the working tree against the main branch:

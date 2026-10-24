@@ -125,6 +125,37 @@
         }
       }
     },
+    "refusals": {
+      "description": "The refusal codes the derived generic results carry, with the HTTP status and client vocabulary each declared code answers in.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "forbidden": {
+          "description": "The code the derived forbidden result carries. Defaults to authorization.forbidden.",
+          "type": "string",
+          "minLength": 1,
+          "default": "authorization.forbidden"
+        },
+        "invalidInput": {
+          "description": "The code the derived invalid-input result carries. Defaults to request.validation-failed.",
+          "type": "string",
+          "minLength": 1,
+          "default": "request.validation-failed"
+        },
+        "statuses": {
+          "description": "The HTTP status each declared refusal code answers with, by refusal code. A test asserting the status confirms the refusal.",
+          "type": "object",
+          "propertyNames": { "minLength": 1 },
+          "additionalProperties": { "type": "integer", "minimum": 100, "maximum": 599 }
+        },
+        "aliases": {
+          "description": "The client refusal vocabulary translated to declared codes, by client code. A test asserting the client code confirms the declared refusal.",
+          "type": "object",
+          "propertyNames": { "minLength": 1 },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "adoption": {
       "description": "The adoption transcription mode this project still runs under, if any. After the named decision is approved, no Behavior record may stay transcribed.",
       "type": "object",
